@@ -1887,7 +1887,8 @@
     },
     "qualityScore": "Qualidade do IP",
     "qualityScoreUnknown": "Pontuação desconhecida",
-    "advancedUnlockCta": "Para evitar abuso, faça login para ver as informações a seguir",
+    "advancedUnlockCta": "Login exigido para evitar abuso",
+    "advancedSignInCta": "Entrar",
     "advancedQuotaCta": "Cota mensal de dados avançados de IP esgotada",
     "advancedCooldownCta": "Limite de 24 horas de dados avançados de IP atingido",
     "ASNInfo": {

@@ -1888,6 +1888,7 @@
     "qualityScore": "IP 品質評分",
     "qualityScoreUnknown": "未知分數",
     "advancedUnlockCta": "為避免濫用，登入後可檢視以下資訊",
+    "advancedSignInCta": "登入",
     "advancedQuotaCta": "本月 IP 進階資料額度已用完",
     "advancedCooldownCta": "IP 進階資料 24 小時額度已用完",
     "ASNInfo": {

@@ -5,8 +5,9 @@
     <div v-if="!collapsed" v-show="showAdvancedBlock" class="px-4 pb-3 border-t pt-3 space-y-2.5">
 
         <!-- Gated: single CTA banner + 4-field preview grid with *** values.
-             Signed-out shows the sign-in copy; over the monthly quota or the
-             24-hour limit shows that limit's copy + a usage link. -->
+             Signed-out shows the sign-in copy + a sign-in menu (the
+             Nav's providers; hidden without Firebase); over the monthly quota
+             or the 24-hour limit shows that limit's copy + a usage link. -->
         <template v-if="allAdvancedLocked || allAdvancedQuotaExceeded || allAdvancedCooldown">
             <span
                 class="w-full flex items-center justify-between gap-2 text-xs px-2.5 py-1.5 rounded-md bg-muted/60 text-muted-foreground transition-colors group">
@@ -14,10 +15,29 @@
                     <component :is="allAdvancedLocked ? Lock : Hourglass" class="size-3.5 shrink-0" />
                     <span class="truncate">{{ gatedCta }}</span>
                 </span>
+                <!-- Sign-in and sign-up are the same OAuth action. -->
+                <DropdownMenu v-if="allAdvancedLocked && store.isFireBaseSet" @update:open="onSignInMenuOpen">
+                    <DropdownMenuTrigger as-child>
+                        <button type="button"
+                            class="shrink-0 whitespace-nowrap underline underline-offset-2 hover:text-foreground cursor-pointer">
+                            {{ t('ipInfos.advancedSignInCta') }}
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" class="shadow-md">
+                        <DropdownMenuItem class="cursor-pointer" @select="signInWith('Google')">
+                            <Icon icon="ri:google-line" />
+                            <span>{{ t('user.SignInWithGoogle') }}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem class="cursor-pointer" @select="signInWith('GitHub')">
+                            <Icon icon="ri:github-line" />
+                            <span>{{ t('user.SignInWithGithub') }}</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 <!-- Opens the Benefits & Usage dialog (usage tab for signed-in
                      users), which shows both limits — the sponsor path lives
                      there, not a direct jump. -->
-                <button v-if="allAdvancedQuotaExceeded || allAdvancedCooldown" type="button"
+                <button v-else-if="allAdvancedQuotaExceeded || allAdvancedCooldown" type="button"
                     class="shrink-0 underline underline-offset-2 hover:text-foreground cursor-pointer"
                     @click="openUsageDialog">
                     {{ t('user.ViewUsage') }}
@@ -205,6 +225,13 @@ import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
+import { Icon } from '@iconify/vue';
+import {
     ArrowRight,
     ChevronDown,
     CircleQuestionMark,
@@ -289,13 +316,24 @@ const showQualityScore = computed(() =>
     props.data.qualityScore !== undefined && !isGatedValue(props.data.qualityScore)
 );
 
-// Locked field preview: the 4 advanced fields shown as "label + ***" for signed-out users.
+// Locked field preview: 4 advanced fields shown as "label + ***" while gated,
+// with the signed-in grid's icons.
 const lockedFieldList = computed(() => [
-    { key: 'type', icon: SignalHigh, label: t('ipInfos.type') },
     { key: 'anonymity', icon: ShieldCheck, label: t('ipInfos.anonymity.label') },
-    { key: 'native', icon: House, label: t('ipInfos.advancedData.Nativeness') },
     { key: 'quality', icon: Gauge, label: t('ipInfos.qualityScore') },
+    { key: 'abuse', icon: Flag, label: t('ipInfos.abuseLevel.label') },
+    { key: 'friction', icon: Compass, label: t('ipInfos.scenarioFriction.label') },
 ]);
+
+// Signed-out sign-in menu: its opening and the provider picked.
+const onSignInMenuOpen = (open) => {
+    if (open) trackEvent('IPCheck', 'AdvancedSignUpClick', 'Open');
+};
+const signInWith = (provider) => {
+    trackEvent('IPCheck', 'AdvancedSignUpClick', provider);
+    if (provider === 'Google') store.signInWithGoogle();
+    else store.signInWithGithub();
+};
 
 // Quality Score color tiers — reuse the same 4-tone semantic as use-status-tone.
 const qualityTone = computed(() => {

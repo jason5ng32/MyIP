@@ -1887,7 +1887,8 @@
     },
     "qualityScore": "IP Quality",
     "qualityScoreUnknown": "Score Unknown",
-    "advancedUnlockCta": "To avoid abuse, sign in to view the following information",
+    "advancedUnlockCta": "Sign-in required to prevent abuse",
+    "advancedSignInCta": "Sign in",
     "advancedQuotaCta": "Monthly quota for IP advanced data used up",
     "advancedCooldownCta": "24-hour limit for IP advanced data reached",
     "ASNInfo": {

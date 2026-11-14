@@ -1887,7 +1887,8 @@
     },
     "qualityScore": "Качество IP",
     "qualityScoreUnknown": "Оценка неизвестна",
-    "advancedUnlockCta": "Чтобы предотвратить злоупотребления, войдите для просмотра следующих сведений",
+    "advancedUnlockCta": "Вход нужен против злоупотреблений",
+    "advancedSignInCta": "Войти",
     "advancedQuotaCta": "Месячная квота на расширенные данные IP исчерпана",
     "advancedCooldownCta": "Лимит расширенных данных IP за 24 часа исчерпан",
     "ASNInfo": {
