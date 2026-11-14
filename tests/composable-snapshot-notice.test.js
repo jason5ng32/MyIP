@@ -1,5 +1,5 @@
 // Tests for frontend/composables/use-snapshot-notice.js — `snapshot:changed`
-// becomes one queued toast request (fixed id, `once`, the 50 s / Speed Test
+// becomes one queued toast request (fixed id, `once`, the 35 s / Speed Test
 // timing, a View action to the snapshot) only while the notice is on
 // (snapshotsNotify, and never with automatic recording off); the delay counts
 // from page entry; empty payloads are ignored; turning the notice off cancels
@@ -57,7 +57,7 @@ describe('snapshot notice', () => {
                 track: ['Snapshots', 'ChangeNoticeClick', 'View'],
             },
         }]);
-        assert.deepEqual(SNAPSHOT_NOTICE_WHEN, { delayMs: 50000, reach: 'SpeedTest' });
+        assert.deepEqual(SNAPSHOT_NOTICE_WHEN, { delayMs: 35000, reach: 'SpeedTest' });
     });
 
     it('counts the delay from page entry', () => {
@@ -67,7 +67,7 @@ describe('snapshot notice', () => {
         clock.now = 90000;
         emitAppEvent('snapshot:changed', { id: 'id2', sections: ['ipinfo', 'dnsleak'] });
         assert.deepEqual(requests.map((r) => r.when), [
-            { delayMs: 30000, reach: 'SpeedTest' }, { delayMs: 0, reach: 'SpeedTest' },
+            { delayMs: 15000, reach: 'SpeedTest' }, { delayMs: 0, reach: 'SpeedTest' },
         ]);
     });
 

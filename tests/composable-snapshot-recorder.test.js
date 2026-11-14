@@ -523,10 +523,12 @@ describe('snapshot recorder — storage', () => {
         emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8'));
         emitAppEvent('connectivity:finished', connectivityPayload());
         assert.equal(api.storageFailed.value, true);
+        assert.equal(api.isPersisting(), false);
         assert.deepEqual(Object.keys(api.snapshots.value[0].sections).sort(), ['connectivity', 'ipinfo']);
         storage.failWrites = false;
         emitAppEvent('speedtest:finished', speedPayload(100));
         assert.equal(api.storageFailed.value, false);
+        assert.equal(api.isPersisting(), true);
         assert.equal(Object.keys(stored(storage)[0].sections).length, 3);
     });
 

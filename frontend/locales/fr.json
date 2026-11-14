@@ -1416,6 +1416,8 @@
     "ChangedTitle": "Différent de l'instantané précédent",
     "ChangedNote": "Changements : {sections}.",
     "ChangedView": "Voir",
+    "IntroTitle": "Résultats enregistrés sur cet appareil",
+    "IntroNote": "Si votre IP change, nous vous le signalerons la prochaine fois que vous ouvrirez le site.",
     "SaveNowRunning": "Tests de la page d'accueil en cours…",
     "SaveNowFailed": "Impossible de lancer les tests de la page d'accueil ; ouvrez la page d'accueil et réessayez.",
     "StorageFailed": "Ce navigateur refuse d'enregistrer les instantanés ; ceux affichés disparaîtront à la fermeture de cet onglet.",

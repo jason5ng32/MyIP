@@ -1416,6 +1416,8 @@
     "ChangedTitle": "本次访问与上次相比有较大的变化",
     "ChangedNote": "有变化的部分：{sections}。",
     "ChangedView": "查看",
+    "IntroTitle": "本次结果已保存在本机",
+    "IntroNote": "如果 IP 有变化，下次打开时会提醒你。",
     "SaveNowRunning": "正在运行首页测试…",
     "SaveNowFailed": "无法运行首页测试，请打开首页后重试。",
     "StorageFailed": "浏览器拒绝保存快照；当前显示的快照在关闭此标签页后不会保留。",

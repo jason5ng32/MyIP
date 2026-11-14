@@ -264,6 +264,8 @@ export const useSnapshots = () => {
         currentId: computed(() => state.currentId),
         createdThisSession: computed(() => state.createdThisSession),
         storageFailed: computed(() => state.storageFailed),
+        // Snapshots reach localStorage (absent or refusing writes → memory only).
+        isPersisting: () => !!storage && !state.storageFailed,
         canTakeSnapshot: computed(() => state.hasLiveIpinfo),
         skippedThisSession,
         previousOf,

@@ -40,10 +40,12 @@ watch(alert, (newVal) => {
 
 // Queued toasts (store.queueToast): timing, in-place updates and `once` live
 // in use-toast-queue.js; this draws them. An action runs onClose itself —
-// sonner closes the toast after one without calling onDismiss.
+// sonner closes the toast after one without calling onDismiss. A request's
+// `track` is sent when it appears.
 useToastQueue({
     store,
     dismiss: (id) => toast.dismiss(id),
+    track: trackEvent,
     show: (request, { onClose }) => {
         const fn = STYLE_TO_TOAST[request.style] || toast.message;
         const { action } = request;

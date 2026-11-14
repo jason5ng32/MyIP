@@ -1416,6 +1416,8 @@
     "ChangedTitle": "Diferente do instantâneo anterior",
     "ChangedNote": "Mudanças em: {sections}.",
     "ChangedView": "Ver",
+    "IntroTitle": "Resultados salvos neste dispositivo",
+    "IntroNote": "Se o seu IP mudar, avisaremos na próxima vez que você abrir o site.",
     "SaveNowRunning": "Executando os testes da página inicial…",
     "SaveNowFailed": "Não foi possível executar os testes da página inicial; abra a página inicial e tente novamente.",
     "StorageFailed": "Este navegador recusou armazenar instantâneos; os exibidos somem quando esta aba for fechada.",

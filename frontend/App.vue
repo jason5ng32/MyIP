@@ -37,7 +37,7 @@ import { useMainStore } from '@/store';
 // PWA install prompt — async and eligibility-gated: ineligible visits (too
 // few 12h-deduped uses, prompt cap reached, already installed) never load
 // pwa-install or trigger its manifest fetch; eligible ones load it at the
-// prompt's 30s mark.
+// prompt's 50s mark.
 const PWA = defineAsyncComponent(() => import('@/components/widgets/PWA.vue'));
 // Dialogs nothing shows on first paint: their code stays off the boot path.
 const User = defineAsyncComponent(() => import('@/components/User.vue'));
@@ -45,7 +45,7 @@ const Preferences = defineAsyncComponent(() => import('@/components/widgets/Pref
 const offerPwaInstall = ref(false);
 onMounted(() => {
     if (shouldOfferPwaInstall()) {
-        setTimeout(() => { offerPwaInstall.value = true; }, 30 * 1000);
+        setTimeout(() => { offerPwaInstall.value = true; }, 50 * 1000);
     }
     // Earth Online visit tick — app-level so every route counts, once per
     // page load; the backend dedups per IP (utils/features/pulse-beacon.js).
@@ -55,6 +55,7 @@ import { useAchievementEngine } from '@/composables/use-achievement-engine.js';
 import { useReportCollector } from '@/composables/use-report-collector.js';
 import { useSnapshotRecorder } from '@/composables/use-snapshot-recorder.js';
 import { useSnapshotNotice } from '@/composables/use-snapshot-notice.js';
+import { useSnapshotIntro } from '@/composables/use-snapshot-intro.js';
 import { useAppPersonaCollector } from '@/composables/use-persona-collector.js';
 
 // A page change closes store.openSheet: a site-wide sheet would stay open over
@@ -113,6 +114,10 @@ useSnapshotRecorder({ store });
 // queued toast that waits until the visitor is past the IP cards.
 const { t, locale } = useI18n();
 useSnapshotNotice({ store, t, locale });
+
+// Snapshot intro: a browser holding no snapshot at entry that records one
+// this load gets one toast saying so; after the recorder, which loads them.
+useSnapshotIntro({ store, t });
 
 // Persona collector: same bus, different consumer — keeps the normalized
 // snapshots the Persona Check cross-references, so opening the tool costs no

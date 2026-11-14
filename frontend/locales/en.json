@@ -1416,6 +1416,8 @@
     "ChangedTitle": "Different from the previous snapshot",
     "ChangedNote": "Changed: {sections}.",
     "ChangedView": "View",
+    "IntroTitle": "Results saved on this device",
+    "IntroNote": "If your IP changes, we'll let you know next time you open the site.",
     "SaveNowRunning": "Running homepage tests…",
     "SaveNowFailed": "Could not run the homepage tests; open the homepage and try again.",
     "StorageFailed": "This browser refused to store snapshots; the ones shown last until this tab is closed.",

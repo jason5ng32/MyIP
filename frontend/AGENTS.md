@@ -132,14 +132,17 @@ owns storage, retention and schema validation. Read `snapshotsAuto` through
 Later results update only this visit's automatic snapshot; visits never
 merge. Manual saves (`use-snapshot-save.js`) are frozen copies; pinned
 snapshots (`kept`) are exempt from retention. Every creation emits
-`snapshot:created` without a toast. The one toast is the change notice:
-the recorder emits `snapshot:changed` when this visit's snapshot differs
-from the previous one in what both carry (`notableChanges`, stricter than
-the smart trigger: no new section / target / field; WebRTC going dark
-counts); `use-snapshot-notice.js` (called in App.vue) queues it while
-`snapshotsNotifyOn()` (off with recording off) as a `once` toast waiting for
-50 s or the Speed Test section (away from the IP cards' actions). Schema
-changes can invalidate stored data.
+`snapshot:created`. Two toasts, both App.vue-level `once` requests gated on
+`snapshotsNotifyOn()` (off with recording off): the intro
+(`use-snapshot-intro.js`, after the recorder) — no snapshot at entry and
+this load records one automatically into localStorage → a View toast at
+15 s; and the change notice: the
+recorder emits `snapshot:changed` when this visit's snapshot differs from
+the previous one in what both carry (`notableChanges`, stricter than the
+smart trigger: no new section / target / field; WebRTC going dark counts);
+`use-snapshot-notice.js` queues it, waiting for 35 s or the Speed Test
+section (away from the IP cards' actions). Schema changes can invalidate
+stored data.
 
 `advanced-tools/Snapshots.vue` owns list + detail and URL selection (`q` / `vs`).
 `SnapshotList.vue` is a desktop column / mobile Sheet: static pinned markers,
@@ -244,7 +247,8 @@ Every "business state → color" mapping goes through `use-status-tone.js`
 - **Dialog header** — the `<DialogHeader :icon :title />` primitive.
 - **Toasts** — an immediate one is `store.setAlert`; one that waits, updates
   in place or shows once per page load is `store.queueToast` (plain object;
-  `when: { delayMs, reach }` = `use-attention-gate.js`, `action.to` a route),
+  `when: { delayMs, reach }` = `use-attention-gate.js`, `action.to` a route,
+  `track` / `action.track` = `trackEvent` args on show / click),
   run by `use-toast-queue.js` in `Toast.vue` — never feature code there.
 - **Site navigation** — one `Nav.vue` in `App.vue` above every route (fixed;
   `index.html` pads the body for it), never per page; `User` / `Preferences`

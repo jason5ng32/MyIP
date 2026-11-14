@@ -1,18 +1,22 @@
 // Toast queue: runs the requests `store.queueToast` collects in
 // `store.toastRequests` (plain objects: { id?, style?, title, message?,
 // duration?, action?: { label, to?, track? }, when?: { delayMs?, reach? },
-// once? }, or { id, cancel: true }). A request with `when` waits for its
-// attention gate (use-attention-gate.js); one whose id is already pending or
-// up replaces it (updating the toast in place); a `once` id that has closed
-// takes nothing more this page load; a cancel drops a pending one and
-// dismisses one that is up (a `once` one then counts as closed).
-// `show(request, { onClose })` draws the toast and calls onClose when it
-// goes away; Toast.vue supplies it, with `dismiss(id)`.
+// once?, track? }, or { id, cancel: true }). A request with `when` waits for
+// its attention gate (use-attention-gate.js); one whose id is already pending
+// or up replaces it (updating the toast in place); a `once` id that has
+// closed takes nothing more this page load; a cancel drops a pending one and
+// dismisses one that is up (a `once` one then counts as closed). A request's
+// `track` (event args) goes to `track(...)` when its toast appears, not on an
+// in-place update. `show(request, { onClose })` draws the toast and calls
+// onClose when it goes away; Toast.vue supplies it, with `dismiss(id)` and
+// `track`.
 
 import { watch, onScopeDispose } from 'vue';
 import { createAttentionGate } from './use-attention-gate.js';
 
-export const useToastQueue = ({ store, show, dismiss = () => {}, createGate = createAttentionGate }) => {
+export const useToastQueue = ({
+    store, show, dismiss = () => {}, track = () => {}, createGate = createAttentionGate,
+}) => {
     const entries = new Map(); // id → { request, gate, stopWatch, up }
     const closed = new Set(); // `once` ids that have closed
 
@@ -24,8 +28,13 @@ export const useToastQueue = ({ store, show, dismiss = () => {}, createGate = cr
         return entry;
     };
 
+    const shown = (request) => {
+        if (request.track) track(...request.track);
+    };
+
     const display = (id) => {
         const entry = entries.get(id);
+        const appearing = !entry.up;
         entry.up = true;
         show(entry.request, {
             onClose: () => {
@@ -34,12 +43,16 @@ export const useToastQueue = ({ store, show, dismiss = () => {}, createGate = cr
                 if (entry.request.once) closed.add(id);
             },
         });
+        if (appearing) shown(entry.request);
     };
 
     const handle = (request) => {
         const { id } = request;
         if (id === undefined || id === null) {
-            if (!request.cancel) show(request, { onClose: () => {} });
+            if (!request.cancel) {
+                show(request, { onClose: () => {} });
+                shown(request);
+            }
             return;
         }
         if (request.cancel) {

@@ -15,8 +15,8 @@ import { useSnapshots } from './use-snapshot-recorder.js';
 
 export const SNAPSHOT_NOTICE_ID = 'snapshot-changed';
 
-// 50 s on the page, or the Speed Test section reached (its heading's id).
-export const SNAPSHOT_NOTICE_WHEN = Object.freeze({ delayMs: 50 * 1000, reach: 'SpeedTest' });
+// 35 s on the page, or the Speed Test section reached (its heading's id).
+export const SNAPSHOT_NOTICE_WHEN = Object.freeze({ delayMs: 35 * 1000, reach: 'SpeedTest' });
 
 const defaultHasSnapshot = () => {
     const { snapshots } = useSnapshots();

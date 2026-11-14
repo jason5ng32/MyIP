@@ -3,8 +3,9 @@
 // the same id replaces a pending request and updates one that is up; a
 // closed `once` id takes nothing more, other ids show again; a cancel drops
 // a pending request (its gate stopped) and dismisses one that is up (closing
-// a `once` one); requests without an id just show. The browser gate itself
-// is out of scope.
+// a `once` one); requests without an id just show; a request's `track`
+// fires once when its toast appears, not on in-place updates. The browser
+// gate itself is out of scope.
 
 import assert from 'node:assert/strict';
 import { describe, it, afterEach } from 'node:test';
@@ -20,6 +21,7 @@ const start = () => {
     const dismissed = [];
     const gates = [];
     const closers = new Map();
+    const tracked = [];
     scope = effectScope();
     scope.run(() => useToastQueue({
         store,
@@ -28,6 +30,7 @@ const start = () => {
             closers.set(request.id, onClose);
         },
         dismiss: (id) => dismissed.push(id),
+        track: (...args) => tracked.push(args),
         createGate: (when) => {
             const gate = { ready: ref(!when), stopped: false, stop() { this.stopped = true; } };
             gates.push(gate);
@@ -35,7 +38,7 @@ const start = () => {
         },
     }));
     const queue = (request) => store.toastRequests.push(request);
-    return { store, shown, dismissed, gates, queue, close: (id) => closers.get(id)() };
+    return { store, shown, dismissed, gates, tracked, queue, close: (id) => closers.get(id)() };
 };
 
 const WHEN = { delayMs: 50000, reach: 'SpeedTest' };
@@ -105,6 +108,23 @@ describe('toast queue', () => {
         queue({ id: 'n', title: 'again', once: true });
         assert.deepEqual(shown, ['once']);
         assert.deepEqual(dismissed, ['n']);
+    });
+
+    it('tracks a request once, when its toast appears', () => {
+        const { shown, gates, tracked, queue, close } = start();
+        const track = ['Cat', 'Shown', 'Label'];
+        queue({ id: 'n', title: 'first', when: WHEN, track });
+        assert.deepEqual(tracked, []);
+        gates[0].ready.value = true;
+        assert.deepEqual(tracked, [track]);
+        queue({ id: 'n', title: 'updated', when: WHEN, track });
+        assert.deepEqual(shown, ['first', 'updated']);
+        assert.deepEqual(tracked, [track], 'no track on an in-place update');
+        close('n');
+        queue({ id: 'n', title: 'again', track });
+        queue({ title: 'no id', track: ['Cat', 'Plain'] });
+        queue({ id: 'q', title: 'untracked' });
+        assert.deepEqual(tracked, [track, track, ['Cat', 'Plain']]);
     });
 
     it('stops pending gates when its scope is disposed', () => {
