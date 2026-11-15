@@ -186,10 +186,6 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 **Спонсоры**
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — приватные резидентские, мобильные (4G/5G/LTE), ISP и датацентр IPv4/IPv6 прокси с поддержкой HTTP(S) и SOCKS5. Более 47 млн резидентских IP в 220+ локациях, точный таргетинг по стране, городу и провайдеру, аптайм 99,7% и поддержка 24/7. Пользователям MyIP — промокод `CHECKINGIP15` со скидкой 15%.
-</sub>
-
 <a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=ru"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
 <sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=ru">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
 
