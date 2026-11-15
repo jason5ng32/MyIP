@@ -185,10 +185,6 @@ Açık kaynaklı bir proje olarak, desteklerinden dolayı aşağıdaki sponsorla
 
 **Sponsorlar**
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>**: HTTP(S) ve SOCKS5 destekli özel konut, mobil (4G/5G/LTE), ISP ve veri merkezi IPv4/IPv6 proxy'leri sunar; 220'den fazla konumda 47 milyondan fazla konut IP'si, ülke/şehir/ISP bazında hassas hedefleme, %99,7 çalışma süresi ve 7/24 destek sağlar. MyIP kullanıcıları %15 indirim için `CHECKINGIP15` promosyon kodunu kullanabilir.
-</sub>
-
 <a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=tr"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
 <sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=tr">V.PS</a>**: Küresel konumlar, hızlı bağlantı ve dahil IPv4 ile IPv6 sunan yüksek performanslı KVM VPS.</sub>
 

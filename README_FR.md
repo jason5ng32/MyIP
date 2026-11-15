@@ -186,10 +186,6 @@ En tant que projet open source, je suis très reconnaissant aux sponsors suivant
 
 **Sponsors**
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — propose des proxys privés résidentiels, mobiles (4G/5G/LTE), ISP et datacenter IPv4/IPv6, compatibles HTTP(S) et SOCKS5, avec plus de 47 M d'IP résidentielles dans plus de 220 localisations, un ciblage précis par pays, ville et FAI, 99,7 % de disponibilité et un support 24h/24 et 7j/7. Utilisateurs de MyIP : profitez de 15 % de réduction avec le code promo `CHECKINGIP15`.
-</sub>
-
 <a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=fr"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
 <sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=fr">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
 
