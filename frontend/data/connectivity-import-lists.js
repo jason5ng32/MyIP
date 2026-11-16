@@ -380,6 +380,7 @@ export const IMPORT_LISTS = [
             { id: 'soundcloud', name: 'SoundCloud', url: 'https://soundcloud.com/favicon.ico' },
             { id: 'vimeo', name: 'Vimeo', url: 'https://vimeo.com/favicon.ico' },
             { id: 'dailymotion', name: 'Dailymotion', url: 'https://www.dailymotion.com/favicon.ico' },
+            { id: 'kick', name: 'Kick', url: 'https://kick.com/favicon.ico' },
         ],
     },
     {
