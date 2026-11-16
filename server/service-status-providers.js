@@ -72,6 +72,9 @@ export const STATUS_PROVIDERS = [
     { id: 'reddit', name: 'Reddit', api: 'https://www.redditstatus.com', page: 'https://www.redditstatus.com' },
     { id: 'twitch', name: 'Twitch', api: 'https://status.twitch.com', page: 'https://status.twitch.com' },
     { id: 'epicgames', name: 'Epic Games', api: 'https://status.epicgames.com', page: 'https://status.epicgames.com' },
+    { id: 'sentry', name: 'Sentry', api: 'https://status.sentry.io', page: 'https://status.sentry.io' },
+    // status.mixpanel.com only redirects here.
+    { id: 'mixpanel', name: 'Mixpanel', api: 'https://www.mixpanelstatus.com', page: 'https://www.mixpanelstatus.com' },
 ];
 
 // Whitelist used by requireValidProviderId() — the per-provider detail

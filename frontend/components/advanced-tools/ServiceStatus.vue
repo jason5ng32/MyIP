@@ -223,6 +223,8 @@ const PROVIDERS = [
   { id: 'reddit', name: 'Reddit', icon: 'ri:reddit-line' },
   { id: 'twitch', name: 'Twitch', icon: 'simple-icons:twitch' },
   { id: 'epicgames', name: 'Epic Games', icon: 'simple-icons:epicgames' },
+  { id: 'sentry', name: 'Sentry', icon: 'simple-icons:sentry' },
+  { id: 'mixpanel', name: 'Mixpanel', icon: 'simple-icons:mixpanel' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];
