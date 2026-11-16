@@ -2078,6 +2078,8 @@
     "NoRecentIncidents": "Nenhum incidente recente.",
     "Loading": "Carregando…",
     "Checking": "Verificando…",
+    "GroupIssues": "Com problemas relatados",
+    "GroupOperational": "Operacionais",
     "IncidentsError": "Não foi possível carregar incidentes.",
     "ComponentsError": "Não foi possível carregar serviços.",
     "indicator": {

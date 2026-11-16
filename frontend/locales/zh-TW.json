@@ -2078,6 +2078,8 @@
     "NoRecentIncidents": "近期無事故。",
     "Loading": "載入中…",
     "Checking": "查詢中…",
+    "GroupIssues": "有問題回報",
+    "GroupOperational": "運作正常",
     "IncidentsError": "無法載入事故資訊。",
     "ComponentsError": "無法載入服務項。",
     "indicator": {

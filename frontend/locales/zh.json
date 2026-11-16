@@ -2078,6 +2078,8 @@
     "NoRecentIncidents": "近期无事故。",
     "Loading": "加载中…",
     "Checking": "查询中…",
+    "GroupIssues": "有问题报告",
+    "GroupOperational": "运行正常",
     "IncidentsError": "无法加载事故信息。",
     "ComponentsError": "无法加载服务项。",
     "indicator": {

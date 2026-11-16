@@ -2078,6 +2078,8 @@
     "NoRecentIncidents": "Недавних инцидентов нет.",
     "Loading": "Загрузка…",
     "Checking": "Проверка…",
+    "GroupIssues": "Сообщают о проблемах",
+    "GroupOperational": "Работают штатно",
     "IncidentsError": "Не удалось загрузить инциденты.",
     "ComponentsError": "Не удалось загрузить сервисы.",
     "indicator": {
