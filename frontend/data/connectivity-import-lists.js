@@ -450,6 +450,7 @@ export const IMPORT_LISTS = [
             { id: 'rockstar', name: 'Rockstar', url: 'https://www.rockstargames.com/favicon.ico' },
             { id: 'roblox', name: 'Roblox', url: 'https://www.roblox.com/favicon.ico' },
             { id: 'itchio', name: 'itch.io', url: 'https://itch.io/favicon.ico' },
+            { id: 'gog', name: 'GOG', url: 'https://www.gog.com/favicon.ico' },
         ],
     },
     {
