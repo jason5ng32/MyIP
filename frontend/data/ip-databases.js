@@ -1,17 +1,19 @@
 // IP database definitions
 //
 // Each item: { id, text, url, enabled, configKey? }
-// - id    numeric identifier, referenced elsewhere in the app (e.g. userPreferences.ipGeoSource)
+// - id    stable identifier, stored in visitors' localStorage (userPreferences.ipGeoSource):
+//         never renumber; reorder the array instead
 // - text  UI display name, also lookup key (e.g. `WebRtcTest.vue` looks for "MaxMind")
 // - url   template string, {{ip}} and {{lang}} will be replaced by buildDbUrl()
 // - enabled   availability, derived from /api/configs (runtime failures never touch it)
 // - configKey /api/configs flag gating this source; absent = key-free, always available
+// Array order is the Preferences list order and the fallback walk order.
 
 export const IP_DATABASES = [
   { id: 0, text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true, configKey: 'ipChecking' },
+  { id: 3, text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true, configKey: 'ipapiis' },
   { id: 1, text: 'IPinfo.io', url: '/api/ipinfo?ip={{ip}}', enabled: true, configKey: 'ipInfo' },
   { id: 2, text: 'IP-API.com', url: '/api/ipapicom?ip={{ip}}&lang={{lang}}', enabled: true },
-  { id: 3, text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true, configKey: 'ipapiis' },
   { id: 4, text: 'IP2Location.io', url: '/api/ip2location?ip={{ip}}', enabled: true, configKey: 'ip2location' },
   { id: 5, text: 'IP.sb', url: '/api/ipsb?ip={{ip}}', enabled: true },
   { id: 6, text: 'MaxMind', url: '/api/maxmind?ip={{ip}}&lang={{lang}}', enabled: true },

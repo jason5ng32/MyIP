@@ -182,27 +182,30 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Sponsorët dhe mbështetësit
 
-Si projekt me burim të hapur, jam shumë mirënjohës për mbështetjen e sponsorëve të mëposhtëm:
+MyIP është falas dhe me kod të hapur, por funksionon mbi serverë, burime të dhënash dhe shërbime reale. Këto kompani ndihmojnë që të mbetet i tillë.
 
 **Sponsorët**
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — offers private residential, mobile (4G/5G/LTE), ISP, and datacenter IPv4/IPv6 proxies with HTTP(S) and SOCKS5 support, 47M+ residential IPs in 220+ locations, precise country/city/ISP targeting, 99.7% uptime, and 24/7 support. MyIP users can use promo code `CHECKINGIP15` to get 15% off.
-</sub>
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="60" /></a><br />
+↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — offers private residential, mobile (4G/5G/LTE), ISP, and datacenter IPv4/IPv6 proxies with HTTP(S) and SOCKS5 support, 47M+ residential IPs in 220+ locations, precise country/city/ISP targeting, 99.7% uptime, and 24/7 support. MyIP users can use promo code `CHECKINGIP15` to get 15% off.
 
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=sq"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=sq">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=sq"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="60" /></a><br />
+↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=sq">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.
 
 ----
 
 **Mbështetësit**
 
-<p><a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="32" /></a></p>
-<p><a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a></p>
-<p><a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="32" /></a></p>
-<p><a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a></p>
-<p><a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a></p>
-<p><a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a></p>
+Mbështetësit i ofrojnë MyIP shërbime ose kredite falas për mjetet dhe infrastrukturën nga të cilat varet projekti. Faleminderit që mbështetni kodin e hapur.
+
+| Mbështetësi | Çfarë bëjnë |
+| --- | --- |
+| <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>Rrjet global për CDN, siguri, DNS dhe aplikacione serverless.</sub> |
+| <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>Monitorim aplikacionesh me gjurmim gabimesh, tracing dhe riprodhim sesionesh.</sub> |
+| <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>API dhe baza të dhënash për inteligjencë IP: gjeolokacion, ASN, VPN dhe zbulim abuzimi.</sub> |
+| <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>Rishikim kodi me AI që kupton gjithë bazën tuaj të kodit.</sub> |
+| <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>Platformë dokumentacioni për ekipet teknike.</sub> |
+| <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>Menaxher fjalëkalimesh dhe sekretesh për individë dhe ekipe.</sub> |
 
 Jeni të interesuar të sponsorizoni MyIP? [Bëhu sponsor](https://github.com/sponsors/jason5ng32)
 

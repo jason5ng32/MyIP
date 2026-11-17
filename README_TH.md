@@ -182,27 +182,30 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 ผู้สนับสนุน
 
-ในฐานะโปรเจกต์โอเพนซอร์ส ขอขอบคุณผู้สนับสนุนต่อไปนี้เป็นอย่างยิ่ง:
+MyIP ใช้งานฟรีและเป็นโอเพนซอร์ส แต่ทำงานอยู่บนเซิร์ฟเวอร์ แหล่งข้อมูล และบริการจริง บริษัทเหล่านี้ช่วยให้ MyIP เป็นแบบนี้ต่อไปได้
 
 **Sponsors**
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — ให้บริการพร็อกซีส่วนตัวแบบ residential, mobile (4G/5G/LTE), ISP และดาต้าเซ็นเตอร์ทั้ง IPv4/IPv6 รองรับ HTTP(S) และ SOCKS5 มี IP residential มากกว่า 47 ล้าน IP ในกว่า 220 พื้นที่ เลือกประเทศ/เมือง/ISP ได้แม่นยำ uptime 99.7% และซัพพอร์ตตลอด 24 ชั่วโมง ผู้ใช้ MyIP ใช้โค้ด `CHECKINGIP15` รับส่วนลด 15%
-</sub>
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="60" /></a><br />
+↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — ให้บริการพร็อกซีส่วนตัวแบบ residential, mobile (4G/5G/LTE), ISP และดาต้าเซ็นเตอร์ทั้ง IPv4/IPv6 รองรับ HTTP(S) และ SOCKS5 มี IP residential มากกว่า 47 ล้าน IP ในกว่า 220 พื้นที่ เลือกประเทศ/เมือง/ISP ได้แม่นยำ uptime 99.7% และซัพพอร์ตตลอด 24 ชั่วโมง ผู้ใช้ MyIP ใช้โค้ด `CHECKINGIP15` รับส่วนลด 15%
 
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th">V.PS</a>** — VPS แบบ KVM ประสิทธิภาพสูง มีหลายพื้นที่ทั่วโลก เชื่อมต่อเร็ว ให้ทั้ง IPv4 และ IPv6</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="60" /></a><br />
+↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th">V.PS</a>** — VPS แบบ KVM ประสิทธิภาพสูง มีหลายพื้นที่ทั่วโลก เชื่อมต่อเร็ว ให้ทั้ง IPv4 และ IPv6
 
 ----
 
 **Supporters**
 
-<p><a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="32" /></a></p>
-<p><a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a></p>
-<p><a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="32" /></a></p>
-<p><a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a></p>
-<p><a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a></p>
-<p><a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a></p>
+Supporters มอบบริการหรือเครดิตให้ MyIP ใช้ฟรี สำหรับเครื่องมือและโครงสร้างพื้นฐานที่โปรเจกต์ต้องพึ่งพา ขอบคุณที่สนับสนุนโอเพนซอร์ส
+
+| Supporter | ให้บริการอะไร |
+| --- | --- |
+| <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>เครือข่ายระดับโลกสำหรับ CDN ความปลอดภัย DNS และแอปแบบ serverless</sub> |
+| <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>ระบบมอนิเตอร์แอปพลิเคชัน พร้อมติดตามข้อผิดพลาด tracing และ session replay</sub> |
+| <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>API และฐานข้อมูลข่าวกรอง IP สำหรับตำแหน่งที่ตั้ง ASN VPN และการตรวจจับการละเมิด</sub> |
+| <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>รีวิวโค้ดด้วย AI ที่เข้าใจโค้ดเบสทั้งหมดของคุณ</sub> |
+| <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>แพลตฟอร์มเอกสารสำหรับทีมเทคนิค</sub> |
+| <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>ตัวจัดการรหัสผ่านและข้อมูลลับสำหรับบุคคลและทีม</sub> |
 
 สนใจสนับสนุน MyIP? [มาเป็นผู้สนับสนุน](https://github.com/sponsors/jason5ng32)
 

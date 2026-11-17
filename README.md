@@ -179,27 +179,30 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Sponsors & Supporters
 
-As an open source project, I'm very grateful to the following sponsors for their support:
+MyIP is free and open source, but it runs on real servers, data sources and services. These companies help keep it that way.
 
 **Sponsors**
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — offers private residential, mobile (4G/5G/LTE), ISP, and datacenter IPv4/IPv6 proxies with HTTP(S) and SOCKS5 support, 47M+ residential IPs in 220+ locations, precise country/city/ISP targeting, 99.7% uptime, and 24/7 support. MyIP users can use promo code `CHECKINGIP15` to get 15% off.
-</sub>
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="60" /></a><br />
+↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — offers private residential, mobile (4G/5G/LTE), ISP, and datacenter IPv4/IPv6 proxies with HTTP(S) and SOCKS5 support, 47M+ residential IPs in 220+ locations, precise country/city/ISP targeting, 99.7% uptime, and 24/7 support. MyIP users can use promo code `CHECKINGIP15` to get 15% off.
 
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="60" /></a><br />
+↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.
 
 ----
 
 **Supporters**
 
-<p><a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="32" /></a></p>
-<p><a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a></p>
-<p><a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="32" /></a></p>
-<p><a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a></p>
-<p><a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a></p>
-<p><a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a></p>
+Supporters provide MyIP with free services or credits for the tools and infrastructure the project relies on. Thank you for backing open source.
+
+| Supporter | What they do |
+| --- | --- |
+| <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>Global network for CDN, security, DNS and serverless apps.</sub> |
+| <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>Application monitoring with error tracking, tracing and session replay.</sub> |
+| <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>IP intelligence API and databases for geolocation, ASN, VPN and abuse detection.</sub> |
+| <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>AI code review that understands your whole codebase.</sub> |
+| <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>Documentation platform for technical teams.</sub> |
+| <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>Password manager and secrets management for people and teams.</sub> |
 
 Interested in sponsoring MyIP? [Become a sponsor](https://github.com/sponsors/jason5ng32)
 
