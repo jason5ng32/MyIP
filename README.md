@@ -179,7 +179,7 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Sponsors & Supporters
 
-MyIP is free and open source, but it runs on real servers, data sources and services. These companies help keep it that way.
+MyIP is free and open source, but it runs on real servers, data sources and services. These companies help keep it that way, and they all make good products.
 
 **Sponsors**
 

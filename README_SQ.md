@@ -182,7 +182,7 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Sponsorët dhe mbështetësit
 
-MyIP është falas dhe me kod të hapur, por funksionon mbi serverë, burime të dhënash dhe shërbime reale. Këto kompani ndihmojnë që të mbetet i tillë.
+MyIP është falas dhe me kod të hapur, por funksionon mbi serverë, burime të dhënash dhe shërbime reale. Këto kompani ndihmojnë që të mbetet i tillë dhe të gjitha bëjnë produkte të mira.
 
 **Sponsorët**
 
