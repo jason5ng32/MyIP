@@ -10,10 +10,25 @@ import {
 } from '../frontend/data/ip-databases.js';
 
 describe('IP_DATABASES', () => {
-  it('has 7 unique sequential ids', () => {
+  it('has 7 unique ids covering 0–6', () => {
     assert.equal(IP_DATABASES.length, 7);
     const ids = IP_DATABASES.map((d) => d.id);
-    assert.deepEqual(ids, [0, 1, 2, 3, 4, 5, 6]);
+    assert.deepEqual([...ids].sort((a, b) => a - b), [0, 1, 2, 3, 4, 5, 6]);
+  });
+
+  // ids are stored in visitors' preferences: reordering the list must never
+  // move an id to another source.
+  it('keeps each source on its stored id', () => {
+    const idByName = Object.fromEntries(IP_DATABASES.map((d) => [d.text, d.id]));
+    assert.deepEqual(idByName, {
+      'IPCheck.ing': 0,
+      'IPinfo.io': 1,
+      'IP-API.com': 2,
+      'IPAPI.is': 3,
+      'IP2Location.io': 4,
+      'IP.sb': 5,
+      MaxMind: 6,
+    });
   });
 
   it('every entry has url + text + enabled fields', () => {
