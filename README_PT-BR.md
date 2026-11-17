@@ -182,7 +182,7 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Patrocinadores e apoiadores
 
-O MyIP é gratuito e de código aberto, mas funciona com servidores, fontes de dados e serviços reais. Estas empresas ajudam a mantê-lo assim.
+O MyIP é gratuito e de código aberto, mas funciona com servidores, fontes de dados e serviços reais. Estas empresas ajudam a mantê-lo assim, e todas fazem bons produtos.
 
 **Patrocinadores**
 
