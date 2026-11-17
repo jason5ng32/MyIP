@@ -181,7 +181,7 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Sponsorlar ve Destekçiler
 
-MyIP ücretsiz ve açık kaynaklıdır, ancak gerçek sunucular, veri kaynakları ve hizmetler üzerinde çalışır. Bu şirketler onun böyle kalmasına yardımcı oluyor.
+MyIP ücretsiz ve açık kaynaklıdır, ancak gerçek sunucular, veri kaynakları ve hizmetler üzerinde çalışır. Bu şirketler onun böyle kalmasına yardımcı oluyor ve hepsi iyi ürünler geliştiriyor.
 
 **Sponsorlar**
 

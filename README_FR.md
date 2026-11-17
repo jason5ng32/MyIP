@@ -182,7 +182,7 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Sponsors et soutiens
 
-MyIP est gratuit et open source, mais il fonctionne grâce à de vrais serveurs, sources de données et services. Ces entreprises l’aident à le rester.
+MyIP est gratuit et open source, mais il fonctionne grâce à de vrais serveurs, sources de données et services. Ces entreprises l’aident à le rester, et elles font toutes de bons produits.
 
 **Sponsors**
 
