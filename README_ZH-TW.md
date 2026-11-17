@@ -186,6 +186,10 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 **贊助商**
 
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
+<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — 提供私有住宅、行動（4G/5G/LTE）、靜態 ISP 以及資料中心 IPv4/IPv6 代理，支援 HTTP(S) 與 SOCKS5 協定，擁有 4700 萬+ 住宅 IP，涵蓋全球 220+ 地區，可精準定位國家、城市及電信業者，具備 99.7% 可用性與 24/7 技術支援。MyIP 使用者使用優惠碼 `CHECKINGIP15` 即可享 15% 折扣。
+</sub>
+
 <a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh-TW"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
 <sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh-TW">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
 
