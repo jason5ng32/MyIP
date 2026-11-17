@@ -33,6 +33,7 @@ const acknowledgementsList = [
   { name: 'Setilis Hu', link: '' },
   { name: 'Seven Yu', link: 'https://github.com/dofy' },
   { name: 'Nikolai Tschacher', link: 'https://incolumitas.com/pages/about/' },
+  { name: 'IPAPI.is', link: 'https://ipapi.is/?ref=myip' },
   { name: 'Project Alexandria (Cloudflare)', link: 'https://www.cloudflare.com/lp/project-alexandria/' },
   { name: 'Cloudflare Speedtest', link: 'https://github.com/cloudflare/speedtest' },
   { name: 'V.PS', link: 'https://v.ps/?utm_source=ipcheck.ing&utm_medium=acknowledgement&utm_campaign=footer' },
