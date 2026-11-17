@@ -181,27 +181,30 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Sponsorlar ve Destekçiler
 
-Açık kaynaklı bir proje olarak, desteklerinden dolayı aşağıdaki sponsorlara çok minnettarım:
+MyIP ücretsiz ve açık kaynaklıdır, ancak gerçek sunucular, veri kaynakları ve hizmetler üzerinde çalışır. Bu şirketler onun böyle kalmasına yardımcı oluyor.
 
 **Sponsorlar**
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>**: HTTP(S) ve SOCKS5 destekli özel konut, mobil (4G/5G/LTE), ISP ve veri merkezi IPv4/IPv6 proxy'leri sunar; 220'den fazla konumda 47 milyondan fazla konut IP'si, ülke/şehir/ISP bazında hassas hedefleme, %99,7 çalışma süresi ve 7/24 destek sağlar. MyIP kullanıcıları %15 indirim için `CHECKINGIP15` promosyon kodunu kullanabilir.
-</sub>
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="60" /></a><br />
+↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>**: HTTP(S) ve SOCKS5 destekli özel konut, mobil (4G/5G/LTE), ISP ve veri merkezi IPv4/IPv6 proxy'leri sunar; 220'den fazla konumda 47 milyondan fazla konut IP'si, ülke/şehir/ISP bazında hassas hedefleme, %99,7 çalışma süresi ve 7/24 destek sağlar. MyIP kullanıcıları %15 indirim için `CHECKINGIP15` promosyon kodunu kullanabilir.
 
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=tr"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=tr">V.PS</a>**: Küresel konumlar, hızlı bağlantı ve dahil IPv4 ile IPv6 sunan yüksek performanslı KVM VPS.</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=tr"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="60" /></a><br />
+↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=tr">V.PS</a>**: Küresel konumlar, hızlı bağlantı ve dahil IPv4 ile IPv6 sunan yüksek performanslı KVM VPS.
 
 ----
 
 **Destekçiler**
 
-<p><a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="32" /></a></p>
-<p><a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a></p>
-<p><a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="32" /></a></p>
-<p><a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a></p>
-<p><a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a></p>
-<p><a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a></p>
+Destekçiler, projenin dayandığı araçlar ve altyapı için MyIP’ye ücretsiz hizmet veya kredi sağlar. Açık kaynağı desteklediğiniz için teşekkürler.
+
+| Destekçi | Ne yapıyorlar |
+| --- | --- |
+| <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>CDN, güvenlik, DNS ve sunucusuz uygulamalar için küresel ağ.</sub> |
+| <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>Hata takibi, izleme ve oturum tekrarı sunan uygulama izleme.</sub> |
+| <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>Coğrafi konum, ASN, VPN ve kötüye kullanım tespiti için IP istihbarat API’si ve veritabanları.</sub> |
+| <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>Tüm kod tabanınızı anlayan yapay zekâ destekli kod incelemesi.</sub> |
+| <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>Teknik ekipler için dokümantasyon platformu.</sub> |
+| <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>Bireyler ve ekipler için parola ve gizli bilgi yönetimi.</sub> |
 
 MyIP'ye sponsor olmak mı istiyorsunuz? [Sponsor olun](https://github.com/sponsors/jason5ng32)
 

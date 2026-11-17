@@ -182,27 +182,30 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Sponsors et soutiens
 
-En tant que projet open source, je suis très reconnaissant aux sponsors suivants pour leur soutien :
+MyIP est gratuit et open source, mais il fonctionne grâce à de vrais serveurs, sources de données et services. Ces entreprises l’aident à le rester.
 
 **Sponsors**
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — propose des proxys privés résidentiels, mobiles (4G/5G/LTE), ISP et datacenter IPv4/IPv6, compatibles HTTP(S) et SOCKS5, avec plus de 47 M d'IP résidentielles dans plus de 220 localisations, un ciblage précis par pays, ville et FAI, 99,7 % de disponibilité et un support 24h/24 et 7j/7. Utilisateurs de MyIP : profitez de 15 % de réduction avec le code promo `CHECKINGIP15`.
-</sub>
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="60" /></a><br />
+↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — propose des proxys privés résidentiels, mobiles (4G/5G/LTE), ISP et datacenter IPv4/IPv6, compatibles HTTP(S) et SOCKS5, avec plus de 47 M d'IP résidentielles dans plus de 220 localisations, un ciblage précis par pays, ville et FAI, 99,7 % de disponibilité et un support 24h/24 et 7j/7. Utilisateurs de MyIP : profitez de 15 % de réduction avec le code promo `CHECKINGIP15`.
 
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=fr"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=fr">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=fr"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="60" /></a><br />
+↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=fr">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.
 
 ----
 
 **Soutiens**
 
-<p><a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="32" /></a></p>
-<p><a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a></p>
-<p><a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="32" /></a></p>
-<p><a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a></p>
-<p><a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a></p>
-<p><a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a></p>
+Ces soutiens fournissent gratuitement à MyIP des services ou des crédits pour les outils et l’infrastructure dont le projet dépend. Merci de soutenir l’open source.
+
+| Soutien | Activité |
+| --- | --- |
+| <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>Réseau mondial pour le CDN, la sécurité, le DNS et les applications serverless.</sub> |
+| <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>Surveillance d’applications avec suivi des erreurs, traçage et relecture de sessions.</sub> |
+| <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>API et bases de données de renseignement IP pour la géolocalisation, l’ASN, les VPN et la détection d’abus.</sub> |
+| <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>Revue de code par IA qui comprend l’ensemble de votre code.</sub> |
+| <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>Plateforme de documentation pour les équipes techniques.</sub> |
+| <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>Gestionnaire de mots de passe et de secrets pour les particuliers et les équipes.</sub> |
 
 Envie de soutenir MyIP ? [Devenir sponsor](https://github.com/sponsors/jason5ng32)
 
