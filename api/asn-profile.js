@@ -56,8 +56,7 @@ export default async (req, res) => {
         rdapAutnum: (n) => rdapAutnum(n, { timeoutMs: SOURCE_TIMEOUTS.autnum }),
         isAutnumMissing,
         queryAsRank: (n) => queryAsRank(n, { timeoutMs: SOURCE_TIMEOUTS.rank }),
-        // IPCheck.ing API pass-through: the caller's headers go upstream.
-        requestReputation: (n) => requestAsnReputation(n, req.headers, { timeoutMs: SOURCE_TIMEOUTS.reputation }),
+        requestReputation: (n) => requestAsnReputation(n, { timeoutMs: SOURCE_TIMEOUTS.reputation }),
         isPeeringdbLoaded: peeringdbReadiness(),
         lookupPeeringdb,
     });

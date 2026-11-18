@@ -71,6 +71,8 @@ one owner (`use-app-command.js`, scope-bound, setup-time), and
 `dispatchAppCommand` resolves with its result. Payload = one plain JSON object
 shaped at registration; rejections are `appCommandError(code, message)` with
 reserved `auth` / `quota` / `input` (the bus adds `unavailable` / `timeout`).
+HTTP failures from the deep tools carry the same `auth` / `quota` codes
+(`utils/codes/service-errors.js`), set on the error by `authenticatedFetch`.
 Cross-component triggers use the bus, never template refs (refs stay for UI
 chrome); tools register at setup, callers `waitForAppCommand` first.
 
@@ -81,11 +83,15 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
   `router.push`es, modified clicks stay the browser's), Nav, shortcuts
   (`Advanced.vue`'s exposed `openTool`), in-app links. `/?tool=<slug>` is only
   a replace-redirect in the router's `beforeEach` (`utils/legacy-tool-link.js`).
-- Gates (`requiresAccount`, `requiresConfig: '<configs key>'`, e.g. `asn` →
-  `cloudFlare`, the deep tools → `ipChecking` + account) decide listing only,
-  via `isToolAvailable()` / `listedTools()` over the store's `capabilities`
-  (configs + `accounts`; card grid, Nav, shortcuts); a `/tools/:slug` link is
-  never gated. Features gate on capabilities; `isUpstreamSite()` is the only
+- Gates (`requiresAccount`, `requiresConfig: '<key>'` or an array of keys,
+  all required, e.g. `asn` → `cloudFlare`, the deep tools → `ipChecking` +
+  account, Invisibility / Enhanced DNS Leak also their probe endpoint) decide
+  listing only, via `isToolAvailable()` / `listedTools()` over the store's
+  `capabilities` (configs + `accounts` + the build-time probe facts of
+  `utils/probe-endpoints.js`; card grid, Nav, shortcuts); a `/tools/:slug`
+  link is never gated. `quotaKey` on a tool or an IP source names its metered
+  feature in the quota snapshot (`store.quotaExceeded(key)`, the usage
+  dialog). Features gate on capabilities; `isUpstreamSite()` is the only
   identity check (the footer credit line, the IP probes' JSON endpoint).
 - `App.vue` keeps Home and `ToolPage` alive (`KeepAlive`); `ToolPage` keeps up
   to 8 tools alive per slug, dropped on sign-out / account switch

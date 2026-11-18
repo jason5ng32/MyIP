@@ -37,6 +37,11 @@ describe('IP_DATABASES', () => {
     for (const db of IP_DATABASES) assert.ok(db.extended === undefined || db.extended === true, db.text);
   });
 
+  it('ties only the IPCheck.ing source to a metered feature (ipinfo)', () => {
+    const metered = IP_DATABASES.filter((d) => 'quotaKey' in d).map((d) => [d.text, d.quotaKey]);
+    assert.deepEqual(metered, [['IPCheck.ing', 'ipinfo']]);
+  });
+
   it('every entry has url + text + enabled fields', () => {
     for (const db of IP_DATABASES) {
       assert.ok(db.text);

@@ -22,7 +22,7 @@ describe('tool categories', () => {
   it('the deep tools are exactly the IPCheck.ing API + sign-in ones', () => {
     const deep = ADVANCED_TOOLS.filter((t) => t.category === 'deep').map((t) => t.slug);
     const gated = ADVANCED_TOOLS
-      .filter((t) => t.requiresAccount && t.requiresConfig === 'ipChecking')
+      .filter((t) => t.requiresAccount && [].concat(t.requiresConfig).includes('ipChecking'))
       .map((t) => t.slug);
     assert.deepEqual(deep, gated);
   });

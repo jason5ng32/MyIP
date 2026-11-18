@@ -90,9 +90,14 @@ resolver list behind `dns-resolver` (gated by
   `fetch()` / `https.get()` — a hanging provider must
   time out. It injects a default `User-Agent` `MyIP/v<version>/<VITE_SITE_URL>`
   (`server/upstream-ua.js`; some WAFs block undici's `node` UA); caller-supplied
-  ones, incl. the IPCheck.ing API `{ ...req.headers }` pass-through, win.
+  ones win, incl. the visitor's `user-agent` forwarded to the IPCheck.ing API
+  (the ASN reputation request carries the default).
 - **Error shape.** `res.status(500).json({ error: error.message })` on upstream
   failure, `400` on bad input. Terse — the frontend doesn't show them verbatim.
+  The four deep-tool routes (`invisibility-test`, `dns-leak-test`, `persona`,
+  `ip-blocklist`) answer sign-in and quota failures as `{ error, code,
+  reason? }` with the codes from `common/codes/service-errors.js`, keeping the
+  upstream status.
 - **Response shape.** IP-geolocation handlers normalize to the canonical
   frontend shape (`ip` / `country_code` / `latitude` / `asn` / `org` / …); new
   sources match it. `timezone` is the exception (see "Response enrichment").
@@ -174,16 +179,18 @@ The Radar outage poll stays out of that window (it would stretch the ASN
 Profile's no-degraded-caching span); a request that finds it empty fills it
 on demand.
 
-### IPCheck.ing API header pass-through (intentional exception)
+### IPCheck.ing API requests go through one helper with a header list
 
 Handlers proxying the IPCheck.ing API (`ipcheck-ing`,
 `invisibility-test`, `update-user-achievement`, `get-user-info`,
 `dns-leak-test`, `persona`, `ip-blocklist`, and `asn-profile`'s reputation via
-`server/asn-reputation.js`) forward the caller's headers upstream (`headers: {
-...req.headers }`) — the upstream needs caller context (Accept-Language, auth
-tokens). `persona` strips the framing headers (`host` / `content-length` / …)
-first, as it re-serializes the body. Do **not** replicate for third-party
-upstreams; those get only what's explicitly needed.
+`server/asn-reputation.js`) send their requests through
+`server/ipcheck-ing-api.js`. It forwards a fixed list of the caller's headers
+(`authorization`, `accept-language`, `user-agent`, `cf-connecting-ip`,
+`x-forwarded-for`; `FORWARDED_HEADERS`) and sets `content-type` itself for
+JSON bodies; handlers never pass headers of their own. The ASN reputation
+request carries no caller headers. Third-party upstreams get only what's
+explicitly needed.
 
 ### Firebase Auth handler proxy
 

@@ -135,6 +135,8 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { formatClockTime } from '@/utils/time-utils.js';
+import { ADVANCED_TOOLS } from '@/data/tools.js';
+import { IP_DATABASES } from '@/data/ip-databases.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -186,15 +188,16 @@ const openUserBenefits = () => {
     trackEvent('Nav', 'NavClick', 'UserBenefits');
 };
 
-// Feature key → display label. Tool features reuse their page titles; the
-// ipinfo advanced-data feature has no tool page, so it gets its own key.
-const USAGE_LABEL_KEYS = {
-    ipinfo: 'user.Usage.IpinfoFeature',
-    invisibility_test: 'invisibilitytest.Title',
-    dns_leak_test: 'enhanceddnsleaktest.Title',
-    persona_check: 'personacheck.Title',
-    ip_hitlist: 'ipblocklist.Title',
-};
+// Quota key → display label, from the registries' `quotaKey`. Tools reuse
+// their page titles; the IP data source's advanced-data feature has no tool
+// page, so it gets its own key.
+const USAGE_LABEL_KEYS = Object.fromEntries([
+    ...IP_DATABASES.filter((db) => db.quotaKey).map((db) => [db.quotaKey, 'user.Usage.IpinfoFeature']),
+    ...ADVANCED_TOOLS.filter((tool) => tool.quotaKey).map((tool) => [tool.quotaKey, tool.titleKey]),
+]);
+
+// The feature carrying the 24-hour limit: the IP data source's quotaKey.
+const DAILY_QUOTA_KEY = IP_DATABASES.find((db) => db.quotaKey)?.quotaKey;
 
 // Rows for the usage dialog. Empty until the (re)fetched user info lands or
 // when the backend predates the quota field — the template then shows the
@@ -213,7 +216,7 @@ const usageRows = computed(() => {
 // `availableAt` is when the next lookup frees up, shown only while used up; a
 // null or unparseable `resetsAt` formats to '', which hides that line.
 const dailyRow = computed(() => {
-    const daily = remoteUserInfo.value?.quota?.features?.ipinfo?.daily;
+    const daily = remoteUserInfo.value?.quota?.features?.[DAILY_QUOTA_KEY]?.daily;
     if (!daily) return null;
     const { percent, exhausted, resetsAt } = daily;
     return {

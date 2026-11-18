@@ -129,8 +129,12 @@ function loadAndGetKeyMap({
   resetCommandCalls();
   const store = makeStoreStub();
   const { refs, calls } = makeRefs();
-  // Capabilities: the deep tools need both the IPCheck.ing API and sign-in.
-  const capabilities = computed(() => ({ ipChecking: deepTools, accounts: deepTools, map: true, cloudFlare }));
+  // Capabilities: the deep tools need both the IPCheck.ing API and sign-in;
+  // the two probe tools also need their probe endpoint.
+  const capabilities = computed(() => ({
+    ipChecking: deepTools, accounts: deepTools, invisibilityProbe: deepTools, dnsLeakProbe: deepTools,
+    map: true, cloudFlare,
+  }));
   const userPreferences = computed(() => ({ ipCardsToShow: 2 }));
 
   const { loadShortcuts } = useShortcuts({

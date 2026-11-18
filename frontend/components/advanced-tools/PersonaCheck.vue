@@ -267,10 +267,12 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { REGEXP_ONLY_DIGITS } from 'vue-input-otp';
 import { useMainStore } from '@/store';
+import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { dispatchAppCommand, hasAppCommand, waitForAppCommand } from '@/utils/app-commands.js';
 import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
+import { SERVICE_ERROR_CODE, AUTH_REASON } from '@/utils/codes/service-errors.js';
 import { buildObservation, usePersonaSnapshots } from '@/composables/use-persona-collector.js';
 import { localProfile } from '@/utils/persona/local-profile.js';
 import { probeGeolocation } from '@/utils/persona/probe-geolocation.js';
@@ -286,6 +288,8 @@ import PersonaReport from '@/components/advanced-tools/PersonaReport.vue';
 
 const { t } = useI18n();
 const store = useMainStore();
+// This tool's metered feature in the quota snapshot.
+const QUOTA_KEY = TOOL_BY_SLUG.get('personacheck').quotaKey;
 const router = useRouter();
 const { snapshots, missingSources } = usePersonaSnapshots();
 
@@ -410,7 +414,7 @@ const canRun = computed(() =>
 const run = async () => {
     // Pre-flight gate, same as the other quota-metered tools: when the local
     // snapshot already says the month is spent, every run would 429.
-    if (store.quotaExceeded.persona_check) {
+    if (store.quotaExceeded(QUOTA_KEY)) {
         quotaExceeded.value = true;
         return;
     }
@@ -437,16 +441,16 @@ const run = async () => {
         });
     } catch (error) {
         runStatus.value = 'idle';
-        // 429 passed through by the backend: monthly quota exhausted —
-        // retrying can't fix it, show the quota hint (with the sponsor path).
-        if (error.status === 429) {
+        // Monthly quota exhausted — retrying can't fix it, show the quota
+        // hint (with the sponsor path).
+        if (error.code === SERVICE_ERROR_CODE.QUOTA) {
             quotaExceeded.value = true;
-            store.markQuotaExhausted('persona_check');
+            store.markQuotaExhausted(QUOTA_KEY);
             return;
         }
-        // 401/403: the visitor's sign-in state is the problem, not the tool.
-        if (error.status === 401 || error.status === 403) {
-            errorKey.value = error.message?.includes('Invalid token')
+        // The visitor's sign-in state is the problem, not the tool.
+        if (error.code === SERVICE_ERROR_CODE.AUTH) {
+            errorKey.value = error.reason === AUTH_REASON.INVALID_TOKEN
                 ? 'user.InvalidUserToken'
                 : 'user.SignInToUse';
             return;

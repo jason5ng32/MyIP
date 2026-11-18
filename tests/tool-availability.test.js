@@ -11,6 +11,7 @@ const PUBLIC = { slug: 'public' };
 const ACCOUNT = { slug: 'account', requiresAccount: true };
 const RADAR = { slug: 'radar', requiresConfig: 'cloudFlare' };
 const BOTH = { slug: 'both', requiresAccount: true, requiresConfig: 'cloudFlare' };
+const MULTI = { slug: 'multi', requiresConfig: ['ipChecking', 'dnsLeakProbe'] };
 
 describe('isToolAvailable', () => {
   it('an ungated tool is always available', () => {
@@ -34,6 +35,14 @@ describe('isToolAvailable', () => {
     assert.equal(isToolAvailable(RADAR, { cloudFlare: true }), true);
     assert.equal(isToolAvailable(RADAR, { cloudFlare: false }), false);
     assert.equal(isToolAvailable(RADAR, { map: true }), false);
+  });
+
+  it('an array requiresConfig needs every named key', () => {
+    assert.equal(isToolAvailable(MULTI, { ipChecking: true, dnsLeakProbe: true }), true);
+    assert.equal(isToolAvailable(MULTI, { ipChecking: true, dnsLeakProbe: false }), false);
+    assert.equal(isToolAvailable(MULTI, { ipChecking: true }), false);
+    assert.equal(isToolAvailable(MULTI, { dnsLeakProbe: true }), false);
+    assert.equal(isToolAvailable(MULTI, {}), false);
   });
 
   it('both gates must pass', () => {
@@ -61,7 +70,9 @@ describe('listedTools', () => {
   });
 
   it('lists every registered tool once all gates pass', () => {
-    const capabilities = { ipChecking: true, accounts: true, cloudFlare: true };
+    const capabilities = {
+      ipChecking: true, accounts: true, cloudFlare: true, invisibilityProbe: true, dnsLeakProbe: true,
+    };
     assert.equal(listedTools(ADVANCED_TOOLS, capabilities).length, ADVANCED_TOOLS.length);
   });
 });
@@ -79,17 +90,43 @@ describe('registry gates (data/tools.js)', () => {
   it('the deep tools need the IPCheck.ing API and sign-in', () => {
     const deep = ADVANCED_TOOLS.filter((tool) => tool.category === 'deep');
     assert.equal(deep.length, 4);
+    const probes = { invisibilityProbe: true, dnsLeakProbe: true };
     for (const tool of deep) {
-      assert.equal(isToolAvailable(tool, { ipChecking: true, accounts: true }), true, tool.slug);
-      assert.equal(isToolAvailable(tool, { ipChecking: true, accounts: false }), false, tool.slug);
-      assert.equal(isToolAvailable(tool, { ipChecking: false, accounts: true }), false, tool.slug);
+      assert.equal(isToolAvailable(tool, { ...probes, ipChecking: true, accounts: true }), true, tool.slug);
+      assert.equal(isToolAvailable(tool, { ...probes, ipChecking: true, accounts: false }), false, tool.slug);
+      assert.equal(isToolAvailable(tool, { ...probes, ipChecking: false, accounts: true }), false, tool.slug);
     }
   });
 
-  it('every requiresConfig is a non-empty string', () => {
+  it('the two probe tools also need their probe endpoint; the others do not', () => {
+    const base = { ipChecking: true, accounts: true };
+    const listed = (caps) => listedTools(ADVANCED_TOOLS, caps)
+      .filter((tool) => tool.category === 'deep').map((tool) => tool.slug);
+    assert.deepEqual(listed(base), ['blocklist', 'personacheck']);
+    assert.deepEqual(listed({ ...base, invisibilityProbe: true }), ['invisibilitytest', 'blocklist', 'personacheck']);
+    assert.deepEqual(listed({ ...base, dnsLeakProbe: true }), ['enhanceddnsleaktest', 'blocklist', 'personacheck']);
+  });
+
+  it('each deep tool names its metered feature, and only they do', () => {
+    const metered = ADVANCED_TOOLS.filter((tool) => 'quotaKey' in tool)
+      .map((tool) => [tool.quotaKey, tool.titleKey]);
+    assert.deepEqual(Object.fromEntries(metered), {
+      invisibility_test: 'invisibilitytest.Title',
+      dns_leak_test: 'enhanceddnsleaktest.Title',
+      ip_hitlist: 'ipblocklist.Title',
+      persona_check: 'personacheck.Title',
+    });
+    assert.ok(ADVANCED_TOOLS.filter((tool) => 'quotaKey' in tool).every((tool) => tool.category === 'deep'));
+  });
+
+  it('every requiresConfig is a non-empty string or a non-empty array of them', () => {
     for (const tool of ADVANCED_TOOLS.filter((entry) => 'requiresConfig' in entry)) {
-      assert.equal(typeof tool.requiresConfig, 'string', tool.slug);
-      assert.ok(tool.requiresConfig.length > 0, tool.slug);
+      const keys = [].concat(tool.requiresConfig);
+      assert.ok(keys.length > 0, tool.slug);
+      for (const key of keys) {
+        assert.equal(typeof key, 'string', tool.slug);
+        assert.ok(key.length > 0, tool.slug);
+      }
     }
   });
 });

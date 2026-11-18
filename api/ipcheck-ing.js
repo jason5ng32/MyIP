@@ -1,28 +1,22 @@
-import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../server/logger.js';
 import { toExtended } from '../server/ipcheck-ing-extended.js';
+import { isIpCheckingApiConfigured, requestIpCheckingApi } from '../server/ipcheck-ing-api.js';
 
 export default async (req, res) => {
     // Presence, validity and public routability guaranteed by the
     // requirePublicIP middleware — a reserved address never reaches here.
     const ipAddress = req.query.ip;
 
-    const key = process.env.IPCHECKING_API_KEY;
-
-    if (!key) {
+    if (!isIpCheckingApiConfigured()) {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    // Build request
     const lang = req.query.lang || 'en';
-    const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
-    const url = new URL(`${apiEndpoint}/ipinfo?key=${key}&ip=${ipAddress}&lang=${lang}`);
 
     try {
-        const apiResponse = await fetchUpstream(url, {
-            headers: {
-                ...req.headers,
-            }
+        const apiResponse = await requestIpCheckingApi('/ipinfo', {
+            query: { ip: ipAddress, lang },
+            forwardFrom: req,
         });
 
         if (!apiResponse.ok) {

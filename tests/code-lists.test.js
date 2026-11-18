@@ -12,11 +12,13 @@ import * as connectivityCodes from '../common/codes/connectivity.js';
 import * as webrtcCodes from '../common/codes/webrtc.js';
 import * as speedtestCodes from '../common/codes/speedtest.js';
 import * as personaCodes from '../common/codes/persona.js';
+import * as serviceErrorCodes from '../common/codes/service-errors.js';
 import * as ipCodesBridge from '../frontend/utils/codes/ip.js';
 import * as connectivityCodesBridge from '../frontend/utils/codes/connectivity.js';
 import * as webrtcCodesBridge from '../frontend/utils/codes/webrtc.js';
 import * as speedtestCodesBridge from '../frontend/utils/codes/speedtest.js';
 import * as personaCodesBridge from '../frontend/utils/codes/persona.js';
+import * as serviceErrorCodesBridge from '../frontend/utils/codes/service-errors.js';
 import { VERDICT, AXIS, GRADE } from '../frontend/utils/persona/check-ids.js';
 import { IP_TYPE_I18N_KEYS, IP_TYPE_UNKNOWN_KEY, ABUSE_LEVEL_I18N_KEYS } from '../frontend/utils/codes/ip-labels.js';
 import { CONNECTIVITY_STATUS_KEYS } from '../frontend/utils/codes/connectivity-labels.js';
@@ -33,6 +35,7 @@ describe('code list bridges', () => {
         ['webrtc', webrtcCodes, webrtcCodesBridge],
         ['speedtest', speedtestCodes, speedtestCodesBridge],
         ['persona', personaCodes, personaCodesBridge],
+        ['service-errors', serviceErrorCodes, serviceErrorCodesBridge],
     ];
     for (const [name, source, bridge] of pairs) {
         it(`${name}: re-exports every list as the same object`, () => {
@@ -50,6 +53,27 @@ describe('code list bridges', () => {
     it('NAT type codes extend the ICE candidate types', () => {
         assert.deepEqual(webrtcCodes.NAT_TYPE_CODES.slice(0, webrtcCodes.ICE_CANDIDATE_TYPES.length),
             webrtcCodes.ICE_CANDIDATE_TYPES);
+    });
+});
+
+describe('service error codes', () => {
+    // The reserved owner-level codes listed in the command bus header comment.
+    const appCommandsSource = readFileSync(new URL('../frontend/utils/app-commands.js', import.meta.url), 'utf8');
+    const reservedCodes = [...appCommandsSource.matchAll(/^\/\/\s+'(\w+)'\s+—/gm)].map(([, code]) => code);
+
+    it('reuse the command bus reserved codes auth and quota', () => {
+        const { SERVICE_ERROR_CODE } = serviceErrorCodes;
+        assert.deepEqual(SERVICE_ERROR_CODE, { AUTH: 'auth', QUOTA: 'quota' });
+        for (const code of Object.values(SERVICE_ERROR_CODE)) assert.ok(reservedCodes.includes(code), code);
+    });
+
+    it('name the two auth reasons', () => {
+        assert.deepEqual(serviceErrorCodes.AUTH_REASON, { SIGN_IN_REQUIRED: 'sign_in_required', INVALID_TOKEN: 'invalid_token' });
+    });
+
+    it('are frozen', () => {
+        assert.ok(Object.isFrozen(serviceErrorCodes.SERVICE_ERROR_CODE));
+        assert.ok(Object.isFrozen(serviceErrorCodes.AUTH_REASON));
     });
 });
 

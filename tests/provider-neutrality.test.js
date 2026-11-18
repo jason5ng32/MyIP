@@ -190,13 +190,9 @@ const RULES = [
         test: (code) => /(['"`])(sign_in_required|quota_exceeded)\1/.test(code),
         permanent: {
             'server/ipcheck-ing-extended.js': 'the adapter that parses the IPCheck.ing API answer',
+            'common/codes/service-errors.js': 'the auth reason code list',
         },
-        transitional: {
-            'api/invisibility-test.js': '03',
-            'api/ip-blocklist.js': '03',
-            'frontend/components/advanced-tools/EnhancedDnsLeakTest.vue': '03',
-            'frontend/components/advanced-tools/InvisibilityTest.vue': '03',
-        },
+        transitional: {},
     },
     {
         name: 'no whole request headers in api/ and server/',
@@ -205,34 +201,16 @@ const RULES = [
         permanent: {
             'api/sentry-tunnel.js': 'visitorIpFrom reads the cf-connecting-ip header only',
         },
-        transitional: {
-            'api/asn-profile.js': '03',
-            'api/dns-leak-test.js': '03',
-            'api/get-user-info.js': '03',
-            'api/invisibility-test.js': '03',
-            'api/ip-blocklist.js': '03',
-            'api/ipcheck-ing.js': '03',
-            'api/persona.js': '03',
-            'api/update-user-achievement.js': '03',
-            'server/asn-reputation.js': '03',
-        },
+        transitional: {},
     },
     {
         name: 'no reads of the IPCheck.ing API env variables',
         test: (code) => new RegExp(`\\b(${ENV_WORDS.join('|')})\\b`).test(code),
         permanent: {
             'api/configs.js': 'derives the ipChecking flag',
+            'server/ipcheck-ing-api.js': 'the adapter that sends requests to the IPCheck.ing API',
         },
-        transitional: {
-            'api/dns-leak-test.js': '03',
-            'api/get-user-info.js': '03',
-            'api/invisibility-test.js': '03',
-            'api/ip-blocklist.js': '03',
-            'api/ipcheck-ing.js': '03',
-            'api/persona.js': '03',
-            'api/update-user-achievement.js': '03',
-            'server/asn-reputation.js': '03',
-        },
+        transitional: {},
     },
     {
         name: 'no IPCheck.ing hostname or name in code',
@@ -257,10 +235,7 @@ const RULES = [
             'frontend/components/advanced-tools/RuleTest.vue': 'rule-test probe hostnames',
             'vite.config.js': 'dev server allowedHosts',
         },
-        transitional: {
-            'frontend/components/advanced-tools/EnhancedDnsLeakTest.vue': '03',
-            'frontend/components/advanced-tools/InvisibilityTest.vue': '03',
-        },
+        transitional: {},
     },
 ];
 
