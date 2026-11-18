@@ -171,7 +171,9 @@ import, like `firebase-init.js`; all config in `sentry-init.js`). **Never import
 card resolved a valid IP of that version. Traps: `console.error` is captured,
 fingerprinted on its first argument — name the failure there; `utils/getips/`
 failures stay `console.warn`. Replay shows page text unmasked by design (input
-masked; in the privacy policy). No backend 5xx capture; envelopes: `/api/monitoring`.
+masked; in the privacy policy). Extension noise is dropped (`utils/extension-noise.js`:
+extension-scheme `denyUrls` + unhandled rejections through an extension frame).
+No backend 5xx capture; envelopes: `/api/monitoring`.
 
 ## UI system
 
