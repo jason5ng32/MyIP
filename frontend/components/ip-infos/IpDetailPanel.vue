@@ -92,8 +92,8 @@
         </CollapsibleContent>
     </Collapsible>
 
-    <!-- Advanced block (IPCheck.ing source only): gated CTA or the advanced grid + details. -->
-    <IpAdvancedBlock :data="data" :ip-geo-source="ipGeoSource" :collapsed="collapsed"
+    <!-- Advanced block (shown when the card has extended fields): gated CTA or the advanced grid + details. -->
+    <IpAdvancedBlock :data="data" :collapsed="collapsed"
         @view-usage="emit('view-usage')" @open-tool="emit('open-tool')" />
 
     <!-- ASN block: ASN row + Info / History / Connectivity panels. -->
@@ -144,7 +144,6 @@ const { t, locale } = useI18n();
 
 const props = defineProps({
     data: { type: Object, required: true },
-    ipGeoSource: { type: Number, required: true },
     asnInfos: { type: Object, required: true },
     // Optional — keyed by IP. IpInfos owns the shared map; QueryIP falls back to its own.
     asnHistoryInfos: { type: Object, default: () => ({}) },

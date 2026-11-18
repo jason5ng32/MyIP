@@ -175,31 +175,27 @@ const RULES = [
         test: (code) => code.split('\n').some((line) => NEGATED_SOURCE.test(line)
             || (/\bipGeoSource\b/.test(line) && ZERO_COMPARE.test(line))),
         permanent: {},
-        transitional: {
-            'frontend/components/ip-infos/IPCard.vue': '02',
-            'frontend/components/ip-infos/IpAdvancedBlock.vue': '02',
-            'frontend/utils/ip/transform-ip-data.js': '02',
-        },
+        transitional: {},
     },
     {
         name: `no data access to ${ADVANCED} (i18n keys aside)`,
         test: (code) => new RegExp(`\\b${ADVANCED}\\b`).test(code.replace(I18N_ADVANCED, '')),
-        permanent: {},
-        transitional: {
-            'frontend/utils/ip/transform-ip-data.js': '02',
+        permanent: {
+            'server/ipcheck-ing-extended.js': 'the adapter that parses the IPCheck.ing API answer',
         },
+        transitional: {},
     },
     {
         name: 'no quoted gate strings',
         test: (code) => /(['"`])(sign_in_required|quota_exceeded)\1/.test(code),
-        permanent: {},
+        permanent: {
+            'server/ipcheck-ing-extended.js': 'the adapter that parses the IPCheck.ing API answer',
+        },
         transitional: {
             'api/invisibility-test.js': '03',
             'api/ip-blocklist.js': '03',
             'frontend/components/advanced-tools/EnhancedDnsLeakTest.vue': '03',
             'frontend/components/advanced-tools/InvisibilityTest.vue': '03',
-            'frontend/components/ip-infos/IpAdvancedBlock.vue': '02',
-            'frontend/utils/ip/transform-ip-data.js': '02',
         },
     },
     {

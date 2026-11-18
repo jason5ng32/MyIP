@@ -167,11 +167,9 @@ describe('ipinfo:finished card rules', () => {
     assert.equal(fires(rules.SqueakyClean, cards(99, 1)), false);
   });
 
-  it('quality scores survive string form but not gated / absent states', () => {
-    assert.equal(fires(rules.PrettyDirty, cards('1')), true);
-    assert.equal(fires(rules.SqueakyClean, cards('100')), true);
+  it('unknown or absent quality scores never match', () => {
     for (const rule of [rules.PrettyDirty, rules.SqueakyClean]) {
-      assert.equal(fires(rule, cards('sign_in_required', 'quota_exceeded', 'cooldown', 'unknown', undefined)), false);
+      assert.equal(fires(rule, cards('unknown', undefined)), false);
       assert.equal(fires(rule, { cards: [] }), false);
       assert.equal(fires(rule, {}), false);
     }

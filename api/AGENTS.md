@@ -96,6 +96,9 @@ resolver list behind `dns-resolver` (gated by
 - **Response shape.** IP-geolocation handlers normalize to the canonical
   frontend shape (`ip` / `country_code` / `latitude` / `asn` / `org` / …); new
   sources match it. `timezone` is the exception (see "Response enrichment").
+  Any source may add an optional `extended` block and fill any part of it
+  (contract and validator: `common/ip-extended.js`); `ipcheck-ing` builds its
+  block in `server/ipcheck-ing-extended.js`.
 - **`?lang` is never validated in a handler.** Pass the raw tag through:
   `lookupMaxMind` normalizes it onto the languages its data carries
   (`SUPPORTED_LANGS` in `server/datasets/maxmind-service.js`); the IPCheck.ing API proxies

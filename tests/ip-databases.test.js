@@ -31,6 +31,12 @@ describe('IP_DATABASES', () => {
     });
   });
 
+  it('marks only the IPCheck.ing source as sending the extended block', () => {
+    const extended = IP_DATABASES.filter((d) => d.extended === true).map((d) => d.text);
+    assert.deepEqual(extended, ['IPCheck.ing']);
+    for (const db of IP_DATABASES) assert.ok(db.extended === undefined || db.extended === true, db.text);
+  });
+
   it('every entry has url + text + enabled fields', () => {
     for (const db of IP_DATABASES) {
       assert.ok(db.text);

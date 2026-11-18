@@ -21,7 +21,7 @@ import { VERDICT, AXIS, GRADE } from '../frontend/utils/persona/check-ids.js';
 import { IP_TYPE_I18N_KEYS, IP_TYPE_UNKNOWN_KEY, ABUSE_LEVEL_I18N_KEYS } from '../frontend/utils/codes/ip-labels.js';
 import { CONNECTIVITY_STATUS_KEYS } from '../frontend/utils/codes/connectivity-labels.js';
 import { natTypeKey } from '../frontend/utils/codes/webrtc-labels.js';
-import { extractAdvancedData } from '../frontend/utils/ip/transform-ip-data.js';
+import { transformDataFromIPapi } from '../frontend/utils/ip/transform-ip-data.js';
 
 const en = JSON.parse(readFileSync(new URL('../frontend/locales/en.json', import.meta.url), 'utf8'));
 const lookup = (key) => key.split('.').reduce((node, part) => node?.[part], en);
@@ -84,19 +84,16 @@ describe('code label maps', () => {
 
 describe('IP card line type label', () => {
     const t = (key) => `<${key}>`;
-    const typeOf = (operatorType) => extractAdvancedData({ tags: {}, operatorType, score: 50 }, t).type;
+    const typeOf = (lineType) => transformDataFromIPapi({ extended: { lineType } }, t, 'en').type;
 
     it('labels each known type through the shared map', () => {
-        assert.equal(typeOf('Business'), '<ipInfos.advancedData.type.Business>');
-        assert.equal(typeOf('Residential'), '<ipInfos.advancedData.type.Residential>');
-        assert.equal(typeOf('Wireless'), '<ipInfos.advancedData.type.Wireless>');
-        assert.equal(typeOf('Hosting'), '<ipInfos.advancedData.type.Hosting>');
+        assert.equal(typeOf('business'), '<ipInfos.advancedData.type.Business>');
+        assert.equal(typeOf('residential'), '<ipInfos.advancedData.type.Residential>');
+        assert.equal(typeOf('wireless'), '<ipInfos.advancedData.type.Wireless>');
+        assert.equal(typeOf('hosting'), '<ipInfos.advancedData.type.Hosting>');
     });
 
-    it('falls back to the unknown label, and passes gated sentinels through', () => {
-        assert.equal(typeOf('Satellite'), '<ipInfos.advancedData.type.unknownType>');
-        assert.equal(typeOf(undefined), '<ipInfos.advancedData.type.unknownType>');
-        assert.equal(typeOf('hosting'), '<ipInfos.advancedData.type.unknownType>');
-        assert.equal(typeOf('sign_in_required'), 'sign_in_required');
+    it('labels the unknown line type with the unknown label', () => {
+        assert.equal(typeOf('unknown'), '<ipInfos.advancedData.type.unknownType>');
     });
 });

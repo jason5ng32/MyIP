@@ -1,5 +1,5 @@
-// Scenario friction: validates the IPCheck.ing `advancedData.scenarios` block and maps
-// it onto display order, tones and locale keys (`ipInfos.scenarioFriction.*`).
+// Scenario friction: puts the `extended.scenarios` list in display order and maps it
+// onto tones and locale keys (`ipInfos.scenarioFriction.*`).
 
 import { SCENARIO_FRICTION_IDS, SCENARIO_FRICTION_LEVELS } from '../codes/ip.js';
 
@@ -14,15 +14,11 @@ export const LEVEL_TONE = Object.freeze({ low: 'ok-fast', medium: 'ok-mild', hig
 
 const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
-// `{ id, kind?, level }` in display order, or null when nothing usable arrived.
-// Any positive integer `version` is accepted; only the shape is checked.
-export const normalizeScenarios = (raw) => {
-    if (!isPlainObject(raw) || !Number.isInteger(raw.version) || raw.version < 1 || !Array.isArray(raw.items)) return null;
-    const levelById = new Map();
-    for (const item of raw.items) {
-        if (!isPlainObject(item) || !LEVELS.includes(item.level) || levelById.has(item.id)) continue;
-        levelById.set(item.id, item.level);
-    }
+// `[{ id, level }]` (validated with the block) → `{ id, kind?, level }` in
+// display order, or null when none is a known scenario.
+export const orderScenarios = (items) => {
+    if (!Array.isArray(items)) return null;
+    const levelById = new Map(items.filter(isPlainObject).map((item) => [item.id, item.level]));
     const out = SCENARIOS.filter((meta) => levelById.has(meta.id))
         .map((meta) => ({ ...meta, level: levelById.get(meta.id) }));
     return out.length ? out : null;

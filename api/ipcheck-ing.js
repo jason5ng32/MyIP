@@ -1,5 +1,6 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../server/logger.js';
+import { toExtended } from '../server/ipcheck-ing-extended.js';
 
 export default async (req, res) => {
     // Presence, validity and public routability guaranteed by the
@@ -28,8 +29,10 @@ export default async (req, res) => {
             throw new Error(`API responded with status: ${apiResponse.status}`);
         }
 
+        // The answer as sent, plus the generic `extended` block when it has one.
         const data = await apiResponse.json();
-        res.json(data);
+        const extended = toExtended(data);
+        res.json(extended ? { ...data, extended } : data);
     } catch (error) {
         logger.error({ err: error, ip: ipAddress, lang }, 'ipcheck-ing handler failed');
         res.status(500).json({ error: error.message });

@@ -18,7 +18,7 @@
         :id="'IPInfoCard-' + (index + 1)" class="flex"
         :class="{ 'opacity-60': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error') }">
         <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
-          :ipGeoSource="ipGeoSource" :configs="configs" :asnInfos="asnInfos" :asnHistoryInfos="asnHistoryInfos"
+          :extendedSource="extendedSource" :configs="configs" :asnInfos="asnInfos" :asnHistoryInfos="asnHistoryInfos"
           :asnConnectivityInfos="asnConnectivityInfos" @refresh-card="refreshCard" />
       </div>
     </div>
@@ -73,7 +73,7 @@ const createDefaultCard = () => ({
   asnlink: "",
   mapUrl: "",
   mapUrl_dark: "",
-  // IPCheck.ing-only fields, cleared so a refresh or source switch drops them.
+  // Extended fields, cleared so a refresh or source switch drops them.
   ...Object.fromEntries(ADVANCED_CARD_FIELDS.map((field) => [field, undefined])),
 });
 
@@ -132,6 +132,8 @@ const ipCardsToShow = ref(userPreferences.value.ipCardsToShow);
 const IPArray = ref([]);
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const usingSource = ref(userPreferences.value.ipGeoSource);
+// The selected source fills the `extended` block (IPCard's skeleton reserves its rows).
+const extendedSource = computed(() => store.ipDBs.find((db) => db.id === ipGeoSource.value)?.extended === true);
 const fetchStatus = reactive([]);
 // Timing gate for the sponsor slot: flips once every visible card settled.
 const cardsHaveSettled = ref(false);
@@ -261,15 +263,15 @@ const trackFetchStatus = (status) => {
         timezone: card.timezone,
         asn: card.asn,
         isp: card.isp,
-        // IPCheck.ing-source enrichments (locale-free codes; absent on other
-        // sources or when the field is sign-in-gated).
+        // Extended fields (locale-free codes; absent when the source gives
+        // none or the card is gated).
         anonymityCode: card.anonymityCode,
         ipTypeCode: card.ipTypeCode,
         isNativeIP: card.isNativeIP,
         qualityScore: card.qualityScore,
         anonymityProtocol: card.anonymityProtocol,
         anonymityProvider: card.anonymityProvider,
-        abuseLevel: card.scoreDimensions?.reputation?.level,
+        abuseLevel: card.abuseLevel,
         frictionScenarios: card.frictionScenarios,
       })),
     });
@@ -339,7 +341,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
       try {
         const url = store.getDbUrl(source.id, ip, setLang);
         const response = await authenticatedFetch(url);
-        const cardData = transformDataFromIPapi(response, source.id, t, lang.value);
+        const cardData = transformDataFromIPapi(response, t, lang.value);
 
         if (cardData) {
           // Fallback landed off the requested source: toast once (parallel

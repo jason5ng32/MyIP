@@ -148,8 +148,8 @@ const SECTION_SPECS = {
             timezone: opt(timeZone()),
             asn: opt(str(16)),
             isp: opt(str(128)),
-            // IPCheck.ing-source enrichments — absent on other sources, when
-            // the upstream sign-in-gates them, or when the value is 'unknown'
+            // Extended fields — absent when the source gives none, when the
+            // card is gated, or when the value is 'unknown'
             // (an unknown line type carries no diagnostic signal).
             anonymity: opt(oneOf(...ANONYMITY_CODES)),
             ipType: opt(oneOf(...IP_TYPE_CODES)),

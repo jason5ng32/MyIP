@@ -49,10 +49,9 @@ const compact = (obj) => {
 // ipinfo:finished — { cards: [{ id, source, ip, country_code, region, city,
 // timezone, asn, isp, anonymityCode?, ipTypeCode?, isNativeIP?, qualityScore?,
 // anonymityProtocol?, anonymityProvider?, abuseLevel?, frictionScenarios? }] }. Cards whose ip never resolved
-// (placeholder text in the slot) are dropped. The optional enrichments only
-// exist on the IPCheck.ing source and stay absent when gated
-// ('sign_in_required' / 'quota_exceeded' / 'cooldown' upstream values never
-// turn into codes — see transform-ip-data.js). An 'unknown' line type is noise in a
+// (placeholder text in the slot) are dropped. The optional enrichments come
+// from the answer's `extended` block and stay absent on a gated card (see
+// transform-ip-data.js). An 'unknown' line type is noise in a
 // report ("Unknown type" says nothing) — dropped like absent. `id` is the
 // card's fixed slot (`source` follows the provider that answered).
 const ANONYMITY_CODE_SET = new Set(ANONYMITY_CODES);
@@ -88,7 +87,7 @@ const buildIpinfo = (payload) => {
             anonymity: ANONYMITY_CODE_SET.has(card.anonymityCode) ? card.anonymityCode : undefined,
             ipType: IP_TYPE_CODE_SET.has(card.ipTypeCode) ? card.ipTypeCode : undefined,
             nativeIP: typeof card.isNativeIP === 'boolean' ? card.isNativeIP : undefined,
-            qualityScore: finiteNum(Number(card.qualityScore), 0, 100),
+            qualityScore: finiteNum(card.qualityScore, 0, 100),
             anonymityProtocol: clip(card.anonymityProtocol || undefined, 32),
             anonymityProvider: clip(card.anonymityProvider || undefined, 64),
             abuseLevel: ABUSE_LEVELS.includes(card.abuseLevel) ? card.abuseLevel : undefined,

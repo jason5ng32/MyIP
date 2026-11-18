@@ -1046,6 +1046,58 @@ describe('ipcheck-ing handler', () => {
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
+
+    const geo = { ip: '1.1.1.1', country: 'AU', latitude: -33.86, longitude: 151.2, asn: 'AS13335', org: 'Cloudflare' };
+    const callWith = async (upstream) => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.test';
+        globalThis.fetch = upstream;
+        const res = createResponse();
+        await ipcheckIngHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        return res;
+    };
+    const answering = (body) => async () => new Response(JSON.stringify(body), { status: 200 });
+    const silenced = async (run) => {
+        const originalError = logger.error;
+        logger.error = () => {};
+        try { return await run(); } finally { logger.error = originalError; }
+    };
+
+    it('passes the answer through and adds the extended block', async () => {
+        const advancedData = { score: 88, operatorType: 'Business', tags: { isNative: true } };
+        const res = await callWith(answering({ ...geo, advancedData }));
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, {
+            ...geo,
+            advancedData,
+            extended: {
+                anonymity: { code: 'none' }, lineType: 'business', native: true, score: 88,
+                scoreDetails: { tags: advancedData.tags },
+            },
+        });
+    });
+
+    it('answers a gated block beside the untouched advanced data', async () => {
+        const gated = 'sign_in_required';
+        const advancedData = { score: gated, operatorType: gated, anonymityProvider: gated, anonymityProtocol: gated, tags: gated };
+        const res = await callWith(answering({ ...geo, advancedData }));
+        assert.deepEqual(res.body, { ...geo, advancedData, extended: { gate: 'auth' } });
+    });
+
+    it('answers the geo fields alone when there is no advanced data', async () => {
+        const res = await callWith(answering(geo));
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, geo);
+    });
+
+    it('answers 500 when the upstream fails or is unreachable', async () => {
+        const failing = await silenced(() => callWith(async () => new Response('busy', { status: 503 })));
+        assert.equal(failing.statusCode, 500);
+        assert.deepEqual(failing.body, { error: 'API responded with status: 503' });
+        const down = await silenced(() => callWith(async () => { throw new Error('network down'); }));
+        assert.equal(down.statusCode, 500);
+        assert.match(down.body.error, /network down/);
+    });
 });
 
 // -- asn-profile handler ---------------------------------------------------

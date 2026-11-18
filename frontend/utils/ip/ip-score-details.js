@@ -1,9 +1,9 @@
-// Score-details panel for IPCheck.ing results (ScoreDetailsPanel): a plain-
+// Score-details panel for an IP card's extended fields (ScoreDetailsPanel): a plain-
 // language explanation of the quality score, built as a list of i18n
 // sentences, and the attribute rows below it. Pure — no Vue, no fetch.
 //
 // Inputs are the transformed card fields (transform-ip-data.js): `scoreTags`,
-// `scoreDimensions`, `qualityScore`, `isp`, `asn`, `ip`. Gated responses (or
+// `scoreDimensions`, `qualityScore`, `isp`, `asn`, `ip`. Gated cards (or
 // any without `dimensions`) yield nothing.
 
 const KEY = 'ipInfos.scoreDetails';

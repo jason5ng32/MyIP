@@ -52,11 +52,10 @@ export const ACHIEVEMENT_RULES = [
     { event: 'shortcut:help-opened', slug: 'CleverTrickery' },
 
     // IP cards settled — payload { cards: [{ country_code, qualityScore, … }] }.
-    // qualityScore (1–100) only rides the IPCheck.ing card; Number() maps its
-    // 'sign_in_required' / 'quota_exceeded' / 'cooldown' / absent states to NaN
-    // so they never match.
-    { event: 'ipinfo:finished', slug: 'PrettyDirty', when: (p) => (p.cards || []).some((c) => Number(c.qualityScore) === 1) },
-    { event: 'ipinfo:finished', slug: 'SqueakyClean', when: (p) => (p.cards || []).some((c) => Number(c.qualityScore) === 100) },
+    // qualityScore is a 0–100 number when the card carries one ('unknown' or
+    // absent otherwise, never matching).
+    { event: 'ipinfo:finished', slug: 'PrettyDirty', when: (p) => (p.cards || []).some((c) => c.qualityScore === 1) },
+    { event: 'ipinfo:finished', slug: 'SqueakyClean', when: (p) => (p.cards || []).some((c) => c.qualityScore === 100) },
     { event: 'ipinfo:finished', slug: 'WalkWithPenguins', when: (p) => (p.cards || []).some((c) => (c.country_code || '').toUpperCase() === 'AQ') },
 
     // Earth Online status posted (backend confirmed the write).

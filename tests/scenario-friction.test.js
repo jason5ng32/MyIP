@@ -1,4 +1,4 @@
-// Tests for frontend/utils/ip/scenario-friction.js — scenario normalization,
+// Tests for frontend/utils/ip/scenario-friction.js — scenario ordering,
 // display order, level sorting, card dot order, tones, locale keys and level shares.
 
 import assert from 'node:assert/strict';
@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 import {
     SCENARIOS,
     LEVEL_TONE,
-    normalizeScenarios,
+    orderScenarios,
     scenarioTone,
     sortByLevel,
     scenarioNameKey,
@@ -25,7 +25,7 @@ const en = JSON.parse(readFileSync(new URL('../frontend/locales/en.json', import
 const lookup = (key) => key.split('.').reduce((node, part) => node?.[part], en);
 
 const item = (id, level = 'low') => ({ id, level });
-const full = (level = 'low') => ({ version: 1, items: ORDER.map((id) => item(id, level)) });
+const full = (level = 'low') => ORDER.map((id) => item(id, level));
 
 describe('scenario-friction', () => {
     describe('report schema', () => {
@@ -70,8 +70,8 @@ describe('scenario-friction', () => {
         });
 
         it('keeps display order within a level, unknown levels as low', () => {
-            const raw = { version: 1, items: ORDER.map((id, i) => item(id, ['low', 'medium', 'high'][i % 3])) };
-            const out = sortByLevel(normalizeScenarios(raw));
+            const raw = ORDER.map((id, i) => item(id, ['low', 'medium', 'high'][i % 3]));
+            const out = sortByLevel(orderScenarios(raw));
             assert.deepEqual(out.map((s) => s.id), [
                 'signup', 'streaming', 'posting', 'email',
                 'payments', 'availability', 'crossBorderSocial',
@@ -91,68 +91,28 @@ describe('scenario-friction', () => {
         });
     });
 
-    describe('normalizeScenarios()', () => {
-        it('returns null for missing, gated or malformed blocks', () => {
-            for (const raw of [undefined, null, 'sign_in_required', 'quota_exceeded', 42, [], {},
-                { version: 1 }, { version: 1, items: {} }, { version: 1, items: [] }]) {
-                assert.equal(normalizeScenarios(raw), null, JSON.stringify(raw));
+    describe('orderScenarios()', () => {
+        it('returns null for a missing or empty list', () => {
+            for (const raw of [undefined, null, 42, {}, []]) {
+                assert.equal(orderScenarios(raw), null, JSON.stringify(raw));
             }
-        });
-
-        it('accepts any positive integer version', () => {
-            for (const version of [1, 2, 17]) {
-                assert.equal(normalizeScenarios({ ...full('high'), version })?.length, 10, String(version));
-            }
-        });
-
-        it('returns null for a missing or non-integer version', () => {
-            for (const version of ['1', 1.5, 0, -1, null, NaN]) {
-                assert.equal(normalizeScenarios({ ...full(), version }), null, String(version));
-            }
-            const { version, ...noVersion } = full();
-            assert.equal(normalizeScenarios(noVersion), null);
         });
 
         it('returns { id, kind?, level } in display order regardless of input order', () => {
-            const out = normalizeScenarios({ version: 1, items: [...ORDER].reverse().map((id) => item(id, 'medium')) });
+            const out = orderScenarios([...ORDER].reverse().map((id) => item(id, 'medium')));
             assert.deepEqual(out.map((s) => s.id), ORDER);
             assert.deepEqual(out[0], { id: 'signup', level: 'medium' });
             assert.deepEqual(out.find((s) => s.id === 'availability'), { id: 'availability', kind: 'availability', level: 'medium' });
         });
 
-        it('ignores extra fields such as reasons', () => {
-            const out = normalizeScenarios({ version: 1, items: [{ id: 'email', level: 'high', reasons: ['home_line'], score: 3 }] });
-            assert.deepEqual(out, [{ id: 'email', level: 'high' }]);
-        });
-
-        it('keeps a partial list, dropping unknown ids and items with unknown levels', () => {
-            const out = normalizeScenarios({
-                version: 1,
-                items: [
-                    item('email', 'high'),
-                    item('teleport', 'high'),
-                    item('signup', 'severe'),
-                    item('finance', null),
-                    { id: 'payments' },
-                    null,
-                    'browsing',
-                    item('posting', 'low'),
-                ],
-            });
+        it('keeps a partial list, dropping unknown ids', () => {
+            const out = orderScenarios([item('email', 'high'), item('teleport', 'high'), null, item('posting', 'low')]);
             assert.deepEqual(out.map((s) => [s.id, s.level]), [['posting', 'low'], ['email', 'high']]);
-        });
-
-        it('returns null when no valid item survives', () => {
-            assert.equal(normalizeScenarios({ version: 1, items: [item('teleport'), item('signup', 'weird'), null] }), null);
-        });
-
-        it('keeps the first of duplicate ids', () => {
-            const out = normalizeScenarios({ version: 1, items: [item('signup', 'high'), item('signup', 'low')] });
-            assert.deepEqual(out.map((s) => s.level), ['high']);
+            assert.equal(orderScenarios([item('teleport')]), null);
         });
 
         it('never throws on hostile input', () => {
-            assert.doesNotThrow(() => normalizeScenarios({ version: 1, items: [Object.create(null), [], () => {}] }));
+            assert.doesNotThrow(() => orderScenarios([Object.create(null), [], () => {}]));
         });
     });
 
@@ -171,16 +131,16 @@ describe('scenario-friction', () => {
     it('counts scenarios per level, unknown levels as smooth', () => {
         assert.deepEqual(frictionShares([item('a', 'low'), item('b', 'medium'), item('c', 'high'), item('d', 'weird')]),
             { total: 4, smooth: 2, checks: 1, restricted: 1 });
-        assert.deepEqual(frictionShares(normalizeScenarios(full('high'))), { total: 10, smooth: 0, checks: 0, restricted: 10 });
-        assert.deepEqual(frictionShares(normalizeScenarios(full())), { total: 10, smooth: 10, checks: 0, restricted: 0 });
+        assert.deepEqual(frictionShares(orderScenarios(full('high'))), { total: 10, smooth: 0, checks: 0, restricted: 10 });
+        assert.deepEqual(frictionShares(orderScenarios(full())), { total: 10, smooth: 10, checks: 0, restricted: 0 });
         assert.deepEqual(frictionShares([]), { total: 0, smooth: 0, checks: 0, restricted: 0 });
         assert.deepEqual(frictionShares(), { total: 0, smooth: 0, checks: 0, restricted: 0 });
     });
 
     describe('frictionDots()', () => {
         it('follows the details list order (sortByLevel)', () => {
-            const raw = { version: 1, items: ORDER.map((id, i) => item(id, ['low', 'medium', 'high'][i % 3])) };
-            const scenarios = normalizeScenarios(raw);
+            const raw = ORDER.map((id, i) => item(id, ['low', 'medium', 'high'][i % 3]));
+            const scenarios = orderScenarios(raw);
             assert.deepEqual(frictionDots(scenarios).map((d) => d.id), sortByLevel(scenarios).map((s) => s.id));
         });
 
@@ -190,7 +150,7 @@ describe('scenario-friction', () => {
                 { id: 'b', tone: 'ok-fast' }, { id: 'd', tone: 'ok-fast' },
                 { id: 'c', tone: 'ok-mild' }, { id: 'a', tone: 'ok-slow' },
             ]);
-            assert.equal(frictionDots(normalizeScenarios(full('high'))).length, 10);
+            assert.equal(frictionDots(orderScenarios(full('high'))).length, 10);
         });
 
         it('does not mutate its input and handles empty lists', () => {

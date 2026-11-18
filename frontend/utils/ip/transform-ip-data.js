@@ -1,5 +1,6 @@
 import getCountryName from '../country-name.js';
-import { normalizeScenarios } from './scenario-friction.js';
+import { orderScenarios } from './scenario-friction.js';
+import { isValidExtended } from './ip-extended.js';
 import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS, IP_TYPE_UNKNOWN_KEY } from '../codes/ip-labels.js';
 
 // The static map renders at zoom 3 (continent scale), where ~0.176° spans a
@@ -13,7 +14,7 @@ function mapCoord(value) {
 }
 
 // Parse IP data
-function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
+function transformDataFromIPapi(data, t, mapLanguage) {
     if (data.error) {
         throw new Error(data.reason);
     }
@@ -41,99 +42,46 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
         mapUrl_dark: hasCoords ? `/api/map?latitude=${mapLat}&longitude=${mapLon}&language=${mapLanguage}&CanvasMode=Dark` : ""
     };
 
-    if (ipGeoSource === 0) {
-        const advancedData = extractAdvancedData(data.advancedData, t);
-        return {
-            ...baseData,
-            ...advancedData,
-        };
-    }
-
-    return baseData;
+    return { ...baseData, ...extendedFields(data.extended, t) };
 };
 
-// Gated sentinels the backend may substitute for the real advanced fields:
-// signed-out visitors get 'sign_in_required', over-quota users get
-// 'quota_exceeded', and an account whose advanced data is paused for a while
-// gets 'cooldown'. All propagate as-is so the UI can pick the right CTA.
-const GATED_SENTINELS = new Set(['sign_in_required', 'quota_exceeded', 'cooldown']);
-const gatedSentinel = (value) => (GATED_SENTINELS.has(value) ? value : null);
-
-const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-
-// Every key extractAdvancedData adds to a card: a card reset to its defaults
+// Every key extendedFields adds to a card: a card reset to its defaults
 // clears them, so a later answer from another source can't inherit them.
 export const ADVANCED_CARD_FIELDS = Object.freeze([
+    'extendedGate',
     'anonymity', 'anonymityCode', 'anonymityProvider', 'anonymityProtocol',
-    'type', 'qualityScore', 'isNativeIP', 'ipTypeCode',
-    'scoreTags', 'scoreDimensions', 'scoreVersion', 'frictionScenarios',
+    'type', 'qualityScore', 'isNativeIP', 'ipTypeCode', 'abuseLevel',
+    'scoreTags', 'scoreDimensions', 'frictionScenarios',
 ]);
 
-// Anonymizing service / protocol the API named: null when absent or gated.
-const optionalName = (value) => (typeof value === 'string' && value && !gatedSentinel(value) ? value : null);
+// True when a card carries a gate or any extended field (false and 0 count).
+export const hasExtendedFields = (card) =>
+    Boolean(card) && ADVANCED_CARD_FIELDS.some((key) => card[key] != null);
 
-// Parse the advanced (IPCheck.ing-only) fields
-function extractAdvancedData(advancedData = {}, t) {
-    const anonymityCode = determineAnonymityCode(advancedData);
-    const anonymity = gatedSentinel(advancedData.tags) || t(ANONYMITY_I18N_KEYS[anonymityCode]);
-    const type = determineType(advancedData, t);
-    const qualityScore = gatedSentinel(advancedData.score) || advancedData.score;
-    const anonymityProvider = optionalName(advancedData.anonymityProvider);
-    const anonymityProtocol = optionalName(advancedData.anonymityProtocol);
-    const isNativeIP = gatedSentinel(advancedData.tags) || advancedData.tags.isNative;
+// Card fields from the answer's `extended` block (common/ip-extended.js):
+// none for a missing or malformed block, only `extendedGate` for a gated one.
+// `anonymity` / `type` are localized here; the codes beside them are locale-free.
+const extendedFields = (extended, t) => {
+    if (!isValidExtended(extended)) return {};
+    const fields = Object.fromEntries(ADVANCED_CARD_FIELDS.map((key) => [key, undefined]));
+    if (extended.gate) return { ...fields, extendedGate: extended.gate };
 
-    // Locale-free twins of anonymity / type for the diagnostic report payload
-    // (the display fields above are t()-localized at capture time; the report
-    // schema only stores enums and renders in the VIEWER's language).
-    const ipTypeCode = determineTypeCode(advancedData);
-
-    // Raw inputs for the score-details panel (utils/ip/ip-score-details.js);
-    // undefined when gated.
-    const scoreTags = isPlainObject(advancedData.tags) ? advancedData.tags : undefined;
-    const scoreDimensions = isPlainObject(advancedData.dimensions) ? advancedData.dimensions : undefined;
-    const scoreVersion = Number.isFinite(advancedData.scoreVersion) ? advancedData.scoreVersion : undefined;
-    // Scenario friction items; null when the answer carries none.
-    const frictionScenarios = normalizeScenarios(advancedData.scenarios);
-
+    const { anonymity, lineType, scoreDetails } = extended;
     return {
-        anonymity, anonymityCode, anonymityProvider, anonymityProtocol,
-        type, qualityScore, isNativeIP, ipTypeCode,
-        scoreTags, scoreDimensions, scoreVersion, frictionScenarios,
+        ...fields,
+        anonymity: anonymity && t(ANONYMITY_I18N_KEYS[anonymity.code]),
+        anonymityCode: anonymity?.code,
+        anonymityProvider: anonymity?.provider ?? null,
+        anonymityProtocol: anonymity?.protocol ?? null,
+        type: lineType && t(IP_TYPE_I18N_KEYS[lineType] ?? IP_TYPE_UNKNOWN_KEY),
+        ipTypeCode: lineType,
+        isNativeIP: extended.native,
+        qualityScore: extended.score,
+        abuseLevel: extended.abuse,
+        scoreTags: scoreDetails?.tags,
+        scoreDimensions: scoreDetails?.dimensions,
+        frictionScenarios: orderScenarios(extended.scenarios),
     };
-}
-
-// Locale-free anonymity verdict; undefined when gated (the report then omits
-// it). Tor and iCloud Private Relay first, then the public anonymity class,
-// flagged only when several independent sources agree ('multi'). A
-// residential proxy only our sighting history reports stays suspected.
-const determineAnonymityCode = (advancedData) => {
-    const tags = advancedData.tags;
-    if (gatedSentinel(tags)) return undefined;
-    const anonymity = advancedData.dimensions?.anonymity;
-    const cls = isPlainObject(anonymity) ? anonymity.class : null;
-    const multi = isPlainObject(anonymity) && anonymity.sources === 'multi';
-    if (tags.isTor) return 'tor';
-    if (tags.isRelay) return 'relay';
-    if (tags.isAnyAnonymizer && cls === 'residential_proxy') return 'residential';
-    if (cls === 'proxy') return multi ? 'proxy' : 'proxy_suspected';
-    if (cls === 'vpn') return multi ? 'vpn' : 'vpn_suspected';
-    if (tags.isResidentialProxy) return 'suspected_residential';
-    return 'none';
 };
 
-// Locale-free code for determineType.
-function determineTypeCode(advancedData) {
-    if (gatedSentinel(advancedData.operatorType)) return undefined;
-    const codes = { Business: 'business', Residential: 'residential', Wireless: 'wireless', Hosting: 'hosting' };
-    return codes[advancedData.operatorType] ?? 'unknown';
-}
-
-// Determine proxy type
-const determineType = (advancedData, t) => {
-    if (gatedSentinel(advancedData.operatorType)) {
-        return advancedData.operatorType;
-    }
-    return t(IP_TYPE_I18N_KEYS[determineTypeCode(advancedData)] ?? IP_TYPE_UNKNOWN_KEY);
-};
-
-export { transformDataFromIPapi, extractAdvancedData };
+export { transformDataFromIPapi };

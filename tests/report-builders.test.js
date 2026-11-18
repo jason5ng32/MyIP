@@ -228,31 +228,30 @@ describe('cleaning rules', () => {
         assert.ok(!('timezone' in section.cards[1]));
     });
 
-    it('ipinfo keeps IPCheck.ing enrichments and drops gated/unknown values', () => {
+    it('ipinfo keeps extended fields and drops gated / unknown values', () => {
         const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
         const section = build({
             cards: [{
                 source: 'IPCheck.ing IPv4', ip: '1.2.3.4', country_code: 'US',
                 anonymityCode: 'vpn', ipTypeCode: 'residential', isNativeIP: true,
-                qualityScore: '85', anonymityProtocol: 'OpenVPN', anonymityProvider: 'ACME VPN',
+                qualityScore: 85, anonymityProtocol: 'OpenVPN', anonymityProvider: 'ACME VPN',
             }, {
-                // Signed-out run: locale-free codes stay undefined and raw
-                // 'sign_in_required' strings must never survive the builder.
+                // Signed-out run: only the gate is set, every field undefined.
                 source: 'IPCheck.ing IPv6', ip: '2001:db8::1', country_code: 'US',
-                anonymityCode: undefined, ipTypeCode: undefined,
-                isNativeIP: 'sign_in_required', qualityScore: 'sign_in_required',
-                anonymityProvider: null, anonymityProtocol: null,
+                extendedGate: 'auth', anonymityCode: undefined, ipTypeCode: undefined,
+                isNativeIP: undefined, qualityScore: undefined,
+                anonymityProvider: undefined, anonymityProtocol: undefined,
             }, {
                 // An unknown line type carries no signal; no service named.
                 source: 'IPCheck.ing IPv6/4', ip: '9.9.9.9', country_code: 'US',
                 anonymityCode: 'none', ipTypeCode: 'unknown',
                 anonymityProvider: null, anonymityProtocol: '',
             }, {
-                // Cooldown run: same shape as signed-out, its own sentinel.
+                // Cooldown run: same shape as signed-out, its own gate.
                 source: 'IPCheck.ing IPv4', ip: '5.6.7.8', country_code: 'US',
-                anonymityCode: undefined, ipTypeCode: undefined,
-                isNativeIP: 'cooldown', qualityScore: 'cooldown',
-                anonymityProvider: null, anonymityProtocol: null,
+                extendedGate: 'cooldown', anonymityCode: undefined, ipTypeCode: undefined,
+                isNativeIP: undefined, qualityScore: undefined,
+                anonymityProvider: undefined, anonymityProtocol: undefined,
             }],
         });
         const [enriched, gated, plain, cooldown] = section.cards;

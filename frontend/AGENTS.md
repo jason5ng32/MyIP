@@ -39,6 +39,10 @@ Every file opens with a header comment stating its purpose — read those.
   report pipeline → `report/` (section titles: `report-sections.js`); the pure
   layer of one feature (a tool, a section, Pulse) → `features/`; per-source
   probe modules keep their own dirs (`getips/`, `dnsleaks/`, `persona/`).
+- **IP card extended fields:** a geo source's answer may carry an `extended`
+  block (`common/ip-extended.js`, bridged by `utils/ip/ip-extended.js`);
+  `utils/ip/transform-ip-data.js` maps it to card fields, the advanced block
+  renders by field presence, and a gated card carries only `extendedGate`.
 
 ### Achievements are event-driven
 

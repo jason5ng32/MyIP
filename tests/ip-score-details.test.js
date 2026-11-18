@@ -195,9 +195,9 @@ describe('buildScoreExplanation()', () => {
         assert.equal(none[0].params.operator, `<${P}unknownOperator>`);
     });
 
-    it('is empty without dimensions, for gated data and unknown scores', () => {
+    it('is empty without dimensions, for gated cards and unknown scores', () => {
         assert.deepEqual(buildScoreExplanation(card({ scoreDimensions: undefined }), { t }), []);
-        assert.deepEqual(buildScoreExplanation(card({ qualityScore: 'sign_in_required', scoreDimensions: undefined }), { t }), []);
+        assert.deepEqual(buildScoreExplanation(card({ qualityScore: undefined, scoreTags: undefined, scoreDimensions: undefined }), { t }), []);
         assert.deepEqual(buildScoreExplanation(card({ qualityScore: 'unknown' }), { t }), []);
         assert.deepEqual(buildScoreExplanation(card({ qualityScore: null }), { t }), []);
         assert.deepEqual(buildScoreExplanation(undefined), []);

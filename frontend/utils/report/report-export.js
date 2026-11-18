@@ -72,8 +72,7 @@ const kvLines = (pairs) => pairs
 // actually carries, in a stable order.
 const MTR_HOP_STATS = ['lossPct', 'sntCount', 'drop', 'rcv', 'lastMs', 'avgMs', 'bestMs', 'worstMs', 'stdevMs', 'javgMs'];
 
-// ipinfo's IPCheck.ing enrichment columns only render when some card
-// carries them (other sources / signed-out runs never do).
+// ipinfo's extended-field columns only render when some card carries them.
 const IPINFO_EXTRA_COLS = ['anonymity', 'ipType', 'nativeIP', 'qualityScore', 'anonymityProtocol', 'anonymityProvider', 'abuseLevel'];
 
 const SECTION_RENDERERS = {
