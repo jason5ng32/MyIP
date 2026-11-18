@@ -199,8 +199,8 @@
 
 <script setup>
 // IP Blocklist Check: which blocklists an IP is on — live DNSBLs and static
-// threat lists — via /api/ipblocklist (the private API's /iphitlist; signed-in
-// users, original site only). Verdict / row split live in
+// threat lists — via /api/ipblocklist (the IPCheck.ing API's /iphitlist; signed-in
+// users, API configured). Verdict / row split live in
 // utils/features/ip-blocklist.js. A `?q=` IP is prefilled, never run: the
 // visitor may be signed out or out of quota.
 import { ref, computed, watch } from 'vue';

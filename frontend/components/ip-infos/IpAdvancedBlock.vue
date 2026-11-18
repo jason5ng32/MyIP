@@ -253,7 +253,6 @@ const store = useMainStore();
 const props = defineProps({
     data: { type: Object, required: true },
     ipGeoSource: { type: Number, required: true },
-    configs: { type: Object, required: true },
     collapsed: { type: Boolean, default: false },
 });
 
@@ -399,7 +398,7 @@ watch(hasFriction, (has) => { if (!has && openDetail.value === 'friction') isDet
 // Blocklist Check entry: hidden when the tool is gated off; `q` only prefills.
 const router = useRouter();
 const blocklistHref = computed(() => (
-    isToolAvailable(TOOL_BY_SLUG.get('blocklist'), props.configs) && props.data.ip
+    isToolAvailable(TOOL_BY_SLUG.get('blocklist'), store.capabilities) && props.data.ip
         ? `/tools/blocklist?q=${encodeURIComponent(props.data.ip)}`
         : ''
 ));
@@ -413,7 +412,7 @@ const openBlocklist = (e) => {
 
 // Persona Check invitation closing the friction details: dropped when the tool is gated off.
 const personacheckHref = computed(() => (
-    isToolAvailable(TOOL_BY_SLUG.get('personacheck'), props.configs) ? '/tools/personacheck' : ''
+    isToolAvailable(TOOL_BY_SLUG.get('personacheck'), store.capabilities) ? '/tools/personacheck' : ''
 ));
 const openPersonacheck = (e) => {
     if (!isPlainClick(e)) return;

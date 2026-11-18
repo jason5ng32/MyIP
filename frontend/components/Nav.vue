@@ -236,8 +236,8 @@ const isPwa = isRunningAsPwa();
 const navItems = SECTION_IDS;
 
 // Gated tools stay hidden where the deployment lacks them, as in the card grid.
-const configs = computed(() => store.configs);
-const advancedTools = computed(() => listedTools(ADVANCED_TOOLS, configs.value));
+const capabilities = computed(() => store.capabilities);
+const advancedTools = computed(() => listedTools(ADVANCED_TOOLS, capabilities.value));
 
 // Sheet: Advanced Tools sub-list expanded by default for discoverability.
 const mobileToolsOpen = ref(true);

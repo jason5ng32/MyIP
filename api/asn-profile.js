@@ -2,7 +2,7 @@
 // answer: Radar ASN summary + prefix list (server/cf-radar.js), CAIDA
 // topology and neighbours (./asn-connectivity.js), RDAP autnum
 // (server/rdap.js), ASRank (server/asrank.js), the local PeeringDB index
-// (server/datasets/peeringdb-db.js) and, when the private API is configured,
+// (server/datasets/peeringdb-db.js) and, when the IPCheck.ing API is configured,
 // reputation (server/asn-reputation.js). Composition, deadlines and statuses
 // live in server/asn-profile.js. `asn` arrives as a canonical number string
 // (requireValidASN). 200 unless every configured source failed (502).
@@ -56,7 +56,7 @@ export default async (req, res) => {
         rdapAutnum: (n) => rdapAutnum(n, { timeoutMs: SOURCE_TIMEOUTS.autnum }),
         isAutnumMissing,
         queryAsRank: (n) => queryAsRank(n, { timeoutMs: SOURCE_TIMEOUTS.rank }),
-        // Private-API pass-through: the caller's headers go upstream.
+        // IPCheck.ing API pass-through: the caller's headers go upstream.
         requestReputation: (n) => requestAsnReputation(n, req.headers, { timeoutMs: SOURCE_TIMEOUTS.reputation }),
         isPeeringdbLoaded: peeringdbReadiness(),
         lookupPeeringdb,

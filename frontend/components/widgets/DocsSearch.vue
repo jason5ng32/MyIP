@@ -42,6 +42,7 @@ import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { useDocsAssistant, isDocsConfigured } from '@/composables/use-docs-assistant';
+import { isDocsAssistantAvailable } from '@/utils/docs-assistant-gate.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -52,12 +53,10 @@ const ROTATE_MS = 4000;
 const { t } = useI18n();
 const store = useMainStore();
 
-// Two gates for visibility: a docs site to answer from (build time) and the
-// canonical deployment (same as the original-site-only advanced tools).
-// Using the assistant additionally requires sign-in — enforced inside
-// askDocs, which prompts signed-out visitors to sign in.
-const enabled = computed(() => isDocsConfigured
-  && store.configs?.originalSite === true);
+// Visible when the deployment ships the assistant (docs site + sign-in);
+// using it requires being signed in — enforced inside askDocs, which
+// prompts signed-out visitors to sign in.
+const enabled = computed(() => isDocsAssistantAvailable(isDocsConfigured, store.capabilities));
 
 // While the assistant panel is open it owns the conversation, so this entry
 // point goes inert — otherwise there are two places to type. State comes from

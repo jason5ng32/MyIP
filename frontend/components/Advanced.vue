@@ -78,16 +78,16 @@ import { ArrowRight } from '@lucide/vue';
 const { t } = useI18n();
 
 const store = useMainStore();
-const configs = computed(() => store.configs);
+const capabilities = computed(() => store.capabilities);
 const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const router = useRouter();
 
-// Card groups behind the deployment gates (original site / configs flag, see
+// Card groups behind the deployment gates (sign-in / configs flag, see
 // utils/tool-availability.js). Reactive on configs, so gated cards appear the
 // moment configs land.
 const cardGroups = computed(() => groupToolsByCategory(
-    listedTools(ADVANCED_TOOLS, configs.value),
+    listedTools(ADVANCED_TOOLS, capabilities.value),
 ));
 
 // Open a tool's page. Also the keyboard shortcuts' entry point (exposed below).

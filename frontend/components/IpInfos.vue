@@ -39,6 +39,7 @@ import { isUsablePublicIP } from '@/utils/ip/valid-ip.js';
 import { toApiTag } from '@/utils/locale-registry.js';
 import { transformDataFromIPapi, ADVANCED_CARD_FIELDS } from '@/utils/ip/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
+import { isUpstreamSite } from '@/utils/upstream-site.js';
 import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
 import { useAppCommand } from '@/composables/use-app-command.js';
 import { useAsnInfo } from '@/composables/use-asn-info.js';
@@ -167,7 +168,7 @@ const resolveIP = async (cardID, getFromSource) => {
   let ip = null;
   let source = null;
   try {
-    ({ ip, source } = await getFromSource(configs.value.originalSite));
+    ({ ip, source } = await getFromSource(isUpstreamSite()));
   } catch (error) {
     // getips helpers shouldn't throw, but one must not sink the parallel batch.
     console.error('Error resolving IP for card ' + cardID + ':', error);

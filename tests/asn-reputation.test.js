@@ -1,4 +1,4 @@
-// Tests for server/asn-reputation.js — the private-API request behind the
+// Tests for server/asn-reputation.js — the IPCheck.ing API request behind the
 // /api/asn-profile reputation section: no upstream call without a key or
 // endpoint, asn + system key + caller headers forwarded, upstream status and
 // body handed back, network failures and unparsable 2xx bodies thrown.

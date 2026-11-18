@@ -96,7 +96,7 @@ const basicInfo = computed(() => {
 // or the ASN doesn't parse; `q` makes the tool run the lookup.
 const router = useRouter();
 const profileAsn = computed(() => {
-    if (!isToolAvailable(TOOL_BY_SLUG.get('asn'), store.configs)) return null;
+    if (!isToolAvailable(TOOL_BY_SLUG.get('asn'), store.capabilities)) return null;
     const asn = parseAsnInput(props.asn);
     return asn === null ? null : `AS${asn}`;
 });

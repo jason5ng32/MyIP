@@ -11,10 +11,11 @@
 //   titleKey / noteKey   — i18n keys for the tool title and one-line description
 //   category             — TOOL_CATEGORIES id: the card group it renders in
 //   component            — lazy import of the tool's .vue (rendered by ToolPage)
-//   requiresOriginalSite — gate: only shown on the original site (private API +
-//                          sign-in required); omitted == public tool
+//   requiresAccount      — gate: only shown when sign-in is configured
+//                          (capabilities.accounts); omitted == no sign-in needed
 //   requiresConfig       — gate: only shown when this `/api/configs` flag is
-//                          true (e.g. 'cloudFlare' for the Radar-backed tools)
+//                          true (e.g. 'cloudFlare' for the Radar-backed tools,
+//                          'ipChecking' for the IPCheck.ing API tools)
 //
 // Gates decide listing only (utils/tool-availability.js); a /tools/:slug link
 // opens the tool regardless.
@@ -34,18 +35,18 @@ export const ADVANCED_TOOLS = [
   { slug: 'macchecker', emoji: '🗄️', motion: 'peek', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', category: 'lookup', component: () => import('@/components/advanced-tools/MacChecker.vue') },
   { slug: 'ipcalculator', emoji: '🔢', motion: 'toss', fx: 'spark', tone: 'info', titleKey: 'ipcalculator.Title', noteKey: 'advancedtools.IpCalculator', category: 'lookup', component: () => import('@/components/advanced-tools/IpCalculator.vue') },
   { slug: 'bulklookup', emoji: '🧾', motion: 'toss', titleKey: 'bulklookup.Title', noteKey: 'advancedtools.BulkLookup', category: 'lookup', component: () => import('@/components/advanced-tools/BulkLookup.vue') },
-  { slug: 'invisibilitytest', emoji: '🫣', motion: 'peek', fx: 'scan', tone: 'muted', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', category: 'deep', component: () => import('@/components/advanced-tools/InvisibilityTest.vue'), requiresOriginalSite: true },
-  { slug: 'enhanceddnsleaktest', emoji: '🌀', motion: 'spin', fx: 'ripple', tone: 'info', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', category: 'deep', component: () => import('@/components/advanced-tools/EnhancedDnsLeakTest.vue'), requiresOriginalSite: true },
-  { slug: 'blocklist', emoji: '🚫', motion: 'slam', fx: 'ripple', tone: 'destructive', titleKey: 'ipblocklist.Title', noteKey: 'advancedtools.IpBlocklist', category: 'deep', component: () => import('@/components/advanced-tools/IpBlocklist.vue'), requiresOriginalSite: true },
-  { slug: 'personacheck', emoji: '🎭', motion: 'flip', fx: 'spark', tone: 'warning', titleKey: 'personacheck.Title', noteKey: 'advancedtools.PersonaCheck', category: 'deep', component: () => import('@/components/advanced-tools/PersonaCheck.vue'), requiresOriginalSite: true },
+  { slug: 'invisibilitytest', emoji: '🫣', motion: 'peek', fx: 'scan', tone: 'muted', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', category: 'deep', component: () => import('@/components/advanced-tools/InvisibilityTest.vue'), requiresConfig: 'ipChecking', requiresAccount: true },
+  { slug: 'enhanceddnsleaktest', emoji: '🌀', motion: 'spin', fx: 'ripple', tone: 'info', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', category: 'deep', component: () => import('@/components/advanced-tools/EnhancedDnsLeakTest.vue'), requiresConfig: 'ipChecking', requiresAccount: true },
+  { slug: 'blocklist', emoji: '🚫', motion: 'slam', fx: 'ripple', tone: 'destructive', titleKey: 'ipblocklist.Title', noteKey: 'advancedtools.IpBlocklist', category: 'deep', component: () => import('@/components/advanced-tools/IpBlocklist.vue'), requiresConfig: 'ipChecking', requiresAccount: true },
+  { slug: 'personacheck', emoji: '🎭', motion: 'flip', fx: 'spark', tone: 'warning', titleKey: 'personacheck.Title', noteKey: 'advancedtools.PersonaCheck', category: 'deep', component: () => import('@/components/advanced-tools/PersonaCheck.vue'), requiresConfig: 'ipChecking', requiresAccount: true },
   { slug: 'securitychecklist', emoji: '📋', motion: 'toss', fx: 'spark', tone: 'success', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', category: 'reference', component: () => import('@/components/advanced-tools/SecurityChecklist.vue') },
 ];
 
 // slug → entry.
 export const TOOL_BY_SLUG = new Map(ADVANCED_TOOLS.map((tool) => [tool.slug, tool]));
 
-// Card groups, in render order. On a self-hosted deployment the 'deep' tools
-// (IPCheck.ing's private API) all fail their gates, and the group disappears.
+// Card groups, in render order. Without the IPCheck.ing API and sign-in the
+// 'deep' tools all fail their gates, and the group disappears.
 // 'reference' holds content to read and work through, not tools that test.
 export const TOOL_CATEGORIES = [
   { id: 'network', titleKey: 'advancedtools.category.network' },

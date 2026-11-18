@@ -106,20 +106,34 @@ describe('configs handler', () => {
         assert.deepEqual(res.body, { message: 'Method Not Allowed' });
     });
 
-    it('returns boolean config flags for localhost requests', () => {
+    it('returns exactly the boolean config flags plus the bulk lookup source', () => {
         const res = createResponse();
         configsHandler(createRequest(), res);
         assert.equal(res.statusCode, 200);
-        for (const key of ['map', 'ipInfo', 'ipChecking', 'ip2location', 'originalSite', 'cloudFlare', 'ipapiis', 'reportSharing']) {
+        const flags = ['map', 'ipInfo', 'ipChecking', 'ip2location', 'cloudFlare', 'ipapiis', 'reportSharing'];
+        for (const key of flags) {
             assert.equal(typeof res.body[key], 'boolean');
         }
-        assert.equal(res.body.originalSite, false);
+        assert.deepEqual(Object.keys(res.body).sort(), [...flags, 'bulkLookupSource'].sort());
     });
 
     it('names the bulk lookup source as a string', () => {
         const res = createResponse();
         configsHandler(createRequest(), res);
         assert.equal(res.body.bulkLookupSource, 'maxmind');
+    });
+
+    it('ipChecking needs both the API key and the endpoint', () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        const keyOnly = createResponse();
+        configsHandler(createRequest(), keyOnly);
+        assert.equal(keyOnly.body.ipChecking, false);
+
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        const both = createResponse();
+        configsHandler(createRequest(), both);
+        assert.equal(both.body.ipChecking, true);
     });
 
     it('honors the pre-rename env spellings as fallbacks', () => {
@@ -1037,7 +1051,7 @@ describe('ipcheck-ing handler', () => {
 // -- asn-profile handler ---------------------------------------------------
 // Composition and deadlines are covered in tests/asn-profile-aggregate.test.js;
 // here: unconfigured sources read as disabled, failing upstreams as error,
-// a partial Radar answer, the local PeeringDB section, and the private-API
+// a partial Radar answer, the local PeeringDB section, and the IPCheck.ing API
 // pass-through for the reputation section.
 
 describe('asn-profile handler', () => {
@@ -1119,7 +1133,7 @@ describe('asn-profile handler', () => {
         }
     });
 
-    it('forwards the caller headers to the private API for reputation', async () => {
+    it('forwards the caller headers to the IPCheck.ing API for reputation', async () => {
         delete process.env.CLOUDFLARE_API_KEY;
         delete process.env.CLOUDFLARE_API;
         process.env.IPCHECKING_API_KEY = 'test-key';

@@ -93,7 +93,7 @@
     </Collapsible>
 
     <!-- Advanced block (IPCheck.ing source only): gated CTA or the advanced grid + details. -->
-    <IpAdvancedBlock :data="data" :ip-geo-source="ipGeoSource" :configs="configs" :collapsed="collapsed"
+    <IpAdvancedBlock :data="data" :ip-geo-source="ipGeoSource" :collapsed="collapsed"
         @view-usage="emit('view-usage')" @open-tool="emit('open-tool')" />
 
     <!-- ASN block: ASN row + Info / History / Connectivity panels. -->

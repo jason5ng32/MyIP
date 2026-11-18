@@ -90,7 +90,7 @@ resolver list behind `dns-resolver` (gated by
   `fetch()` / `https.get()` — a hanging provider must
   time out. It injects a default `User-Agent` `MyIP/v<version>/<VITE_SITE_URL>`
   (`server/upstream-ua.js`; some WAFs block undici's `node` UA); caller-supplied
-  ones, incl. the private-API `{ ...req.headers }` pass-through, win.
+  ones, incl. the IPCheck.ing API `{ ...req.headers }` pass-through, win.
 - **Error shape.** `res.status(500).json({ error: error.message })` on upstream
   failure, `400` on bad input. Terse — the frontend doesn't show them verbatim.
 - **Response shape.** IP-geolocation handlers normalize to the canonical
@@ -98,7 +98,7 @@ resolver list behind `dns-resolver` (gated by
   sources match it. `timezone` is the exception (see "Response enrichment").
 - **`?lang` is never validated in a handler.** Pass the raw tag through:
   `lookupMaxMind` normalizes it onto the languages its data carries
-  (`SUPPORTED_LANGS` in `server/datasets/maxmind-service.js`); the private-API proxies
+  (`SUPPORTED_LANGS` in `server/datasets/maxmind-service.js`); the IPCheck.ing API proxies
   forward it for the upstream's own resolution. No allow-lists; `/api/map`'s
   `language` only gets a tag-shape check, as each value is a year-cached
   Static Maps call.
@@ -171,9 +171,9 @@ The Radar outage poll stays out of that window (it would stretch the ASN
 Profile's no-degraded-caching span); a request that finds it empty fills it
 on demand.
 
-### Private-API header pass-through (intentional exception)
+### IPCheck.ing API header pass-through (intentional exception)
 
-Handlers proxying our private IPCheck.ing API (`ipcheck-ing`,
+Handlers proxying the IPCheck.ing API (`ipcheck-ing`,
 `invisibility-test`, `update-user-achievement`, `get-user-info`,
 `dns-leak-test`, `persona`, `ip-blocklist`, and `asn-profile`'s reputation via
 `server/asn-reputation.js`) forward the caller's headers upstream (`headers: {

@@ -44,6 +44,9 @@ import { storeToRefs } from 'pinia';
 import { useMainStore } from '@/store';
 import { isAnalyticsEnabled } from '@/utils/analytics';
 import { isDocsConfigured } from '@/composables/use-docs-assistant.js';
+import { isDocsAssistantAvailable } from '@/utils/docs-assistant-gate.js';
+import { isToolAvailable } from '@/utils/tool-availability.js';
+import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import { datasetLoaders, loadLocaleDataset } from '@/utils/locale-datasets.js';
 import Footer from '@/components/Footer.vue';
@@ -65,15 +68,14 @@ const isSentryEnabled = !!(import.meta.env ?? {}).VITE_SENTRY_DSN_FRONTEND;
 // the section only renders on deployments where links can actually be made.
 const isReportSharingEnabled = computed(() => store.configs?.reportSharing === true);
 
-// The docs assistant carries its own gate (build-time VITE_DOCS_URL plus the
-// canonical deployment) — same condition as its nav entry point, so the
-// section never describes a feature this deployment doesn't ship.
-const isDocsAssistantEnabled = computed(() => isDocsConfigured && store.configs?.originalSite === true);
+// The docs assistant section uses its nav entry point's gate (docs site +
+// sign-in), so it never describes a feature this deployment doesn't ship.
+const isDocsAssistantEnabled = computed(() => isDocsAssistantAvailable(isDocsConfigured, store.capabilities));
 
 // Persona Check is the one tool whose measurements leave the browser, so it
-// gets its own section — gated exactly like the tool itself (originalSite in
-// data/tools.js), which keeps the section off deployments without it.
-const isPersonaCheckEnabled = computed(() => store.configs?.originalSite === true);
+// gets its own section — gated exactly like the tool's listing, which keeps
+// the section off deployments without it.
+const isPersonaCheckEnabled = computed(() => isToolAvailable(TOOL_BY_SLUG.get('personacheck'), store.capabilities));
 
 // Privacy copy is loaded on demand per locale (same loader as the security
 // checklist dataset), then merged into i18n so t() / tm() can resolve it.

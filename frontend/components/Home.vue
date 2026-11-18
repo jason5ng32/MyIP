@@ -63,7 +63,7 @@ defineOptions({ name: 'Home' });
 
 const { t } = useI18n();
 const store = useMainStore();
-const configs = computed(() => store.configs);
+const capabilities = computed(() => store.capabilities);
 const userPreferences = computed(() => store.userPreferences);
 
 // Template refs — UI chrome only; the test sections are reached through the
@@ -94,7 +94,7 @@ const { loadShortcuts } = useShortcuts({
         queryIPRef, helpModalRef, shareReportRef, advancedToolsRef,
         isInfosLoaded, toggleInfoMask,
     },
-    store, t, configs, userPreferences,
+    store, t, capabilities, userPreferences,
 });
 
 // Scroll monitoring + section tracking (logic from widgets/Patch.vue)

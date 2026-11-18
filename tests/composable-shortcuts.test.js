@@ -121,7 +121,7 @@ after(() => {
 });
 
 function loadAndGetKeyMap({
-  originalSite = false,
+  deepTools = false,
   pulseBackend = false,
   cloudFlare = false,
 } = {}) {
@@ -129,11 +129,12 @@ function loadAndGetKeyMap({
   resetCommandCalls();
   const store = makeStoreStub();
   const { refs, calls } = makeRefs();
-  const configs = computed(() => ({ originalSite, map: true, cloudFlare }));
+  // Capabilities: the deep tools need both the IPCheck.ing API and sign-in.
+  const capabilities = computed(() => ({ ipChecking: deepTools, accounts: deepTools, map: true, cloudFlare }));
   const userPreferences = computed(() => ({ ipCardsToShow: 2 }));
 
   const { loadShortcuts } = useShortcuts({
-    refs, store, t, configs, userPreferences,
+    refs, store, t, capabilities, userPreferences,
   });
   loadShortcuts();
 
@@ -143,8 +144,8 @@ function loadAndGetKeyMap({
 }
 
 describe('useShortcuts()', () => {
-  it('loadShortcuts() registers a keymap of 26+ entries on a non-original site', () => {
-    const { keyMap } = loadAndGetKeyMap({ originalSite: false, pulseBackend: false, cloudFlare: false });
+  it('loadShortcuts() registers a keymap of 26+ entries without the deep tools', () => {
+    const { keyMap } = loadAndGetKeyMap({ deepTools: false, pulseBackend: false, cloudFlare: false });
     // 26 base entries (no invisibility / enhanced-DNS / pulse).
     const distinctKeys = new Set(keyMap.map((e) => e.keys));
     assert.ok(distinctKeys.size >= 26, `expected ≥26 distinct shortcut keys, got ${distinctKeys.size}`);
@@ -163,21 +164,21 @@ describe('useShortcuts()', () => {
     assert.equal(distinctKeys.has('f'), false, 'no shortcut acts on an open overlay');
   });
 
-  it('originalSite=true adds invisibility ("i"), enhanced DNS-leak ("D"), blocklist ("B") and persona ("P") shortcuts', () => {
-    const { keyMap, calls } = loadAndGetKeyMap({ originalSite: true });
+  it('the deep tools\' gates add invisibility ("i"), enhanced DNS-leak ("D"), blocklist ("B") and persona ("P") shortcuts', () => {
+    const { keyMap, calls } = loadAndGetKeyMap({ deepTools: true });
     const hasInvisibility = keyMap.some((e) => e.keys === 'i');
-    assert.ok(hasInvisibility, 'key "i" should be present on originalSite');
+    assert.ok(hasInvisibility, 'key "i" should be present with the deep tools');
     const D = keyMap.findLast((e) => e.keys === 'D');
-    assert.ok(D, 'key "D" should be present on originalSite');
+    assert.ok(D, 'key "D" should be present with the deep tools');
     D.action();
     assert.deepEqual(calls.advancedNavigate, ['enhanceddnsleaktest']);
     // Uppercase B is its own key — lowercase b is Browser Info's.
     const B = keyMap.findLast((e) => e.keys === 'B');
-    assert.ok(B, 'key "B" should be present on originalSite');
+    assert.ok(B, 'key "B" should be present with the deep tools');
     B.action();
     // Uppercase P is its own key — lowercase p is Earth Online's.
     const P = keyMap.findLast((e) => e.keys === 'P');
-    assert.ok(P, 'key "P" should be present on originalSite');
+    assert.ok(P, 'key "P" should be present with the deep tools');
     P.action();
     assert.deepEqual(calls.advancedNavigate, ['enhanceddnsleaktest', 'blocklist', 'personacheck']);
   });
@@ -291,16 +292,16 @@ describe('useShortcuts()', () => {
     const store = makeStoreStub();
     const { refs } = makeRefs();
     // Reactive configs source so the watcher inside useShortcuts can fire.
-    const configsData = ref({ originalSite: false, map: true });
-    const configs = computed(() => configsData.value);
+    const configsData = ref({ map: true });
+    const capabilities = computed(() => configsData.value);
     const userPreferences = computed(() => ({ ipCardsToShow: 2 }));
 
-    const { loadShortcuts } = useShortcuts({ refs, store, t, configs, userPreferences });
+    const { loadShortcuts } = useShortcuts({ refs, store, t, capabilities, userPreferences });
     loadShortcuts();
     const keyMap = refs.helpModalRef.value.keyMap;
     assert.equal(keyMap.some((e) => e.keys === 'p'), false, 'no "p" before configs resolve');
 
-    configsData.value = { originalSite: false, map: true, cloudFlare: true };
+    configsData.value = { map: true, cloudFlare: true };
     await nextTick(); // flush the configs watcher
     assert.equal(keyMap.some((e) => e.keys === 'p'), true, '"p" appears once cloudFlare lands');
   });

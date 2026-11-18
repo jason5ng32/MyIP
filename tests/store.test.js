@@ -214,6 +214,25 @@ describe('store — getters', () => {
     assert.ok(!active.find((db) => db.id === firstId));
   });
 
+  it('capabilities spreads configs and adds accounts from the sign-in setup', () => {
+    const s = useMainStore();
+    s.configs = { ipChecking: true, cloudFlare: false };
+    // No VITE_FIREBASE_* in Node tests → sign-in is not configured.
+    assert.deepEqual(s.capabilities, { ipChecking: true, cloudFlare: false, accounts: false });
+    s.isFireBaseSet = true;
+    assert.deepEqual(s.capabilities, { ipChecking: true, cloudFlare: false, accounts: true });
+  });
+
+  it('capabilities.accounts follows the sign-in setup, never a configs value', () => {
+    const s = useMainStore();
+    s.configs = { accounts: true };
+    s.isFireBaseSet = false;
+    assert.equal(s.capabilities.accounts, false);
+    s.configs = { accounts: false };
+    s.isFireBaseSet = true;
+    assert.equal(s.capabilities.accounts, true);
+  });
+
   it('curlDomainsHadSet is false when env not set', () => {
     const s = useMainStore();
     // In Node tests we don't inject VITE_CURL_* → curl.* is undefined → getter is falsy

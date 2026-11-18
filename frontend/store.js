@@ -98,6 +98,9 @@ export const useMainStore = defineStore('main', {
     allHasLoaded: (state) => {
       return Object.values(state.loadingStatus).every(status => status);
     },
+    // What the deployment offers, for feature gates (utils/tool-availability.js):
+    // the /api/configs flags plus `accounts`, the build-time sign-in setup.
+    capabilities: (state) => ({ ...state.configs, accounts: state.isFireBaseSet }),
     curlDomainsHadSet: (state) => {
       return state.curl.ipv4Domain && state.curl.ipv6Domain && state.curl.ipv64Domain;
     },

@@ -2,7 +2,7 @@
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
-// Resolves null when this deployment has no private API configured, else
+// Resolves null when this deployment has no IPCheck.ing API configured, else
 // { status, data } as the upstream answered (an unknown ASN is a 200 with
 // found: false, a table still loading is a 503). A non-2xx body that isn't
 // JSON comes back as data: null; a 2xx body that isn't JSON rejects, like a

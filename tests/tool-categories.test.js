@@ -1,6 +1,6 @@
 // Tests for the category layer of the Advanced Tools registry
 // (frontend/data/tools.js): every tool sits in a known category, the 'deep'
-// tools are exactly the original-site-only ones, the 'reference' group holds
+// tools are exactly the IPCheck.ing API + sign-in ones, the 'reference' group holds
 // the Security Checklist, and groupToolsByCategory builds the card groups
 // Advanced.vue renders.
 
@@ -19,10 +19,12 @@ describe('tool categories', () => {
     }
   });
 
-  it('the deep tools are exactly the original-site-only ones', () => {
+  it('the deep tools are exactly the IPCheck.ing API + sign-in ones', () => {
     const deep = ADVANCED_TOOLS.filter((t) => t.category === 'deep').map((t) => t.slug);
-    const original = ADVANCED_TOOLS.filter((t) => t.requiresOriginalSite).map((t) => t.slug);
-    assert.deepEqual(deep, original);
+    const gated = ADVANCED_TOOLS
+      .filter((t) => t.requiresAccount && t.requiresConfig === 'ipChecking')
+      .map((t) => t.slug);
+    assert.deepEqual(deep, gated);
   });
 
   it('the reference group holds the Security Checklist', () => {
@@ -45,7 +47,7 @@ describe('groupToolsByCategory', () => {
   });
 
   it('drops a group whose tools were all filtered out', () => {
-    const fork = ADVANCED_TOOLS.filter((t) => isToolAvailable(t, { originalSite: false, cloudFlare: false }));
+    const fork = ADVANCED_TOOLS.filter((t) => isToolAvailable(t, { ipChecking: false, accounts: false, cloudFlare: false }));
     const groups = slugsByGroup(groupToolsByCategory(fork));
     assert.deepEqual(Object.keys(groups), ['network', 'lookup', 'reference']);
     assert.ok(!groups.lookup.includes('asn'));

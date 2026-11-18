@@ -90,6 +90,11 @@ describe('applyConfigAvailability()', () => {
     assert.equal(byId[4], true);   // ip2location: true
   });
 
+  it('drops IPCheck.ing (id 0) when ipChecking is false', () => {
+    const out = applyConfigAvailability(createInitialIpDBs(), { ...configs, ipChecking: false });
+    assert.equal(out.find((db) => db.id === 0).enabled, false);
+  });
+
   it('keeps key-free sources always enabled', () => {
     const allOff = applyConfigAvailability(createInitialIpDBs(),
       { ipChecking: false, ipInfo: false, ipapiis: false, ip2location: false });
