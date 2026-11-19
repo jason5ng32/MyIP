@@ -18,7 +18,7 @@ const isCoord = (value) => (typeof value === 'number' || (typeof value === 'stri
     && Number.isFinite(Number(value));
 
 // Parse IP data
-function transformDataFromIPapi(data, t, mapLanguage) {
+const transformDataFromIPapi = (data, t, mapLanguage) => {
     if (data.error) {
         throw new Error(data.reason);
     }
