@@ -47,11 +47,12 @@ Every file opens with a header comment stating its purpose — read those.
   `metrics` as plain-text cells, never the quality score. A gated card
   carries only `extendedGate`.
 - **Data-source sentence:** `IpSourceBlock.vue`, inline after the IP section's
-  notes (`IpInfos.vue`; hidden with them in simple mode): the source selected
-  in Preferences (`ipGeoSource` → its `data/ip-databases.js` row, the name
-  linking `attribution.url`) and a switch that opens Preferences at the
-  picker, as `ipInfos.sourceFields.sentence` slots. Cards carry no geo-source row;
-  `geoSourceId` stays for the cache and Snapshots.
+  notes (`IpInfos.vue`; hidden with them in simple mode): the source that
+  answered a card, else the one selected in Preferences (`answeringSource` →
+  its `data/ip-databases.js` row, the name linking `attribution.url`) and a
+  switch that opens Preferences at the picker, as
+  `ipInfos.sourceFields.sentence` slots. Cards carry no geo-source row;
+  `geoSourceId` stays for the sentence, the cache and Snapshots.
 
 ### Achievements are event-driven
 

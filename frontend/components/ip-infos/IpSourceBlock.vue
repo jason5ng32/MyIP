@@ -1,4 +1,4 @@
-<!-- The IP section's inline data-source sentence: the source selected in Preferences, linking to its site, and a way to switch it. -->
+<!-- The IP section's inline data-source sentence: the source answering (the Preferences choice, or the one a fallback landed on), linking to its site, and a way to switch it. -->
 <template>
   <i18n-t v-if="selectedSource" keypath="ipInfos.sourceFields.sentence" tag="span" scope="global">
     <template #source>
@@ -22,8 +22,12 @@ import { trackEvent } from '@/utils/analytics';
 const { t } = useI18n();
 const store = useMainStore();
 
-// The selected source's row (data/ip-databases.js); the preference stays on an enabled one.
-const selectedSource = computed(() => store.ipDBs.find((db) => db.id === store.userPreferences.ipGeoSource) || null);
+const props = defineProps({
+  // Id of the source answering the IP cards (data/ip-databases.js).
+  sourceId: { type: Number, default: null },
+});
+
+const selectedSource = computed(() => store.ipDBs.find((db) => db.id === props.sourceId) || null);
 const sourceUrl = computed(() => selectedSource.value?.attribution?.url || '');
 
 // The source is a global preference: open Preferences at its picker.

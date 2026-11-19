@@ -8,7 +8,7 @@
       </h2>
       <div class="text-base text-muted-foreground">
         <!-- Notes, then the data-source sentence after one space. -->
-        <p v-if="!isSimpleMode">{{ t('ipInfos.Notes') }} <IpSourceBlock /></p>
+        <p v-if="!isSimpleMode">{{ t('ipInfos.Notes') }} <IpSourceBlock :source-id="answeringSource" /></p>
       </div>
     </header>
 
@@ -138,6 +138,10 @@ const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const usingSource = ref(userPreferences.value.ipGeoSource);
 // The selected source fills the `extended` block (IPCard's skeleton reserves its rows).
 const extendedSource = computed(() => store.ipDBs.find((db) => db.id === ipGeoSource.value)?.extended === true);
+// The source named beside the notes: the one that answered a card (a fallback
+// may have landed elsewhere), else the stored choice.
+const answeringSource = computed(() =>
+  ipDataCards.find((card) => card.geoSourceId != null)?.geoSourceId ?? userPreferences.value.ipGeoSource);
 const fetchStatus = reactive([]);
 // Timing gate for the sponsor slot: flips once every visible card settled.
 const cardsHaveSettled = ref(false);
