@@ -203,6 +203,7 @@ Supporters มอบบริการหรือเครดิตให้ My
 | <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>เครือข่ายระดับโลกสำหรับ CDN ความปลอดภัย DNS และแอปแบบ serverless</sub> |
 | <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>ระบบมอนิเตอร์แอปพลิเคชัน พร้อมติดตามข้อผิดพลาด tracing และ session replay</sub> |
 | <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>API และฐานข้อมูลข่าวกรอง IP สำหรับตำแหน่งที่ตั้ง ASN VPN และการตรวจจับการละเมิด</sub> |
+| <a href="https://www.ip2location.io"><img src="https://res.ipcheck.ing/img/ip2location_logo.png" alt="IP2Location.io" height="24" /></a> | <sub>API ระบุตำแหน่ง IP พร้อมการตรวจจับพร็อกซี VPN และโฮสติ้ง รวมถึงการค้นหา WHOIS ของโดเมน</sub> |
 | <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>รีวิวโค้ดด้วย AI ที่เข้าใจโค้ดเบสทั้งหมดของคุณ</sub> |
 | <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>แพลตฟอร์มเอกสารสำหรับทีมเทคนิค</sub> |
 | <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>ตัวจัดการรหัสผ่านและข้อมูลลับสำหรับบุคคลและทีม</sub> |

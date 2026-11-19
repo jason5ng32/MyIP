@@ -1,5 +1,7 @@
 // Orchestrate Cloudflare speed test preview + formal runs and derive receipt telemetry.
 
+import { SPEEDTEST_QUALITIES } from '../codes/speedtest.js';
+
 const scaleThreshold = (domain, range) => (value) => {
   let i = 0;
   while (i < domain.length && value >= domain[i]) i += 1;
@@ -12,7 +14,6 @@ const scoreLatency = scaleThreshold([10, 20, 50, 100, 500], [20, 10, 5, 0, -10, 
 const scoreLoadedLatencyIncrease = scaleThreshold([10, 20, 50, 100, 500], [20, 10, 5, 0, -10, -20]);
 const scoreUpload = scaleThreshold([1e6, 1e7, 5e7, 1e8], [0, 5, 10, 20, 30]);
 const classifyCloudSync = scaleThreshold([15, 20, 40, 60], [0, 1, 2, 3, 4]);
-const CLASSIFICATION_NAMES = ['bad', 'poor', 'average', 'good', 'great'];
 
 const defaultNow = () => (
   typeof performance !== 'undefined' && typeof performance.now === 'function'
@@ -102,7 +103,7 @@ export const computeCloudSyncScore = (measurements = {}, { includePacketLoss = f
   return {
     points,
     classificationIdx,
-    classificationName: CLASSIFICATION_NAMES[classificationIdx],
+    classificationName: SPEEDTEST_QUALITIES[classificationIdx],
   };
 };
 
@@ -117,7 +118,7 @@ export const formatTransferredBytes = (bytes) => {
 
 // Map Cloudflare's 5-tier classification name onto a 1..5 segment count (0 when unmeasured).
 export const qualityLevel = (classification) => {
-  const idx = CLASSIFICATION_NAMES.indexOf(classification);
+  const idx = SPEEDTEST_QUALITIES.indexOf(classification);
   return idx >= 0 ? idx + 1 : 0;
 };
 

@@ -3,11 +3,12 @@
 // `snapshot:created` when the browser held no snapshot at setup, the
 // snapshots reach localStorage, and the change notice it promises is on
 // (snapshotsNotifyOn); shown SNAPSHOT_INTRO_DELAY_MS after page entry,
-// `once`, with a View action to the Snapshots page and a show event. Called
-// once in App.vue after useSnapshotRecorder, which loads the stored list
-// before any result can add to it.
+// `once`, with a View action to the Snapshots page and a show event; the
+// notice turning off before then cancels it (a one-off, never re-queued).
+// Called once in App.vue after useSnapshotRecorder, which loads the stored
+// list before any result can add to it.
 
-import { onScopeDispose } from 'vue';
+import { watch, onScopeDispose } from 'vue';
 import { onAppEvent } from '../utils/app-events.js';
 import { snapshotsNotifyOn } from '../utils/features/snapshots.js';
 import { useSnapshots } from './use-snapshot-recorder.js';
@@ -23,12 +24,14 @@ export const useSnapshotIntro = ({
 }) => {
     const enteredAt = now();
     if (hadSnapshots()) return;
+    const isOn = () => snapshotsNotifyOn(store.userPreferences);
+    let stopPref = () => {};
 
     // A manual save means the visitor already found Snapshots.
     const unsubscribe = onAppEvent('snapshot:created', (payload) => {
         if (!payload?.auto) return;
         unsubscribe();
-        if (!snapshotsNotifyOn(store.userPreferences) || !persisting()) return;
+        if (!isOn() || !persisting()) return;
         store.queueToast({
             id: SNAPSHOT_INTRO_ID,
             style: 'text-info',
@@ -44,6 +47,14 @@ export const useSnapshotIntro = ({
             },
             track: ['Snapshots', 'IntroNotice', 'Show'],
         });
+        stopPref = watch(isOn, (on) => {
+            if (on) return;
+            stopPref();
+            store.cancelToast(SNAPSHOT_INTRO_ID);
+        });
     });
-    onScopeDispose(unsubscribe);
+    onScopeDispose(() => {
+        unsubscribe();
+        stopPref();
+    });
 };

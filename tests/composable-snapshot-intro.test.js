@@ -3,12 +3,12 @@
 // queued toast request (fixed id, `once`, 15 s from entry, a View action to
 // the Snapshots page, a show track) while the change notice is on and storage
 // persists; nothing for manual saves, when snapshots existed at entry, the
-// notice is off, storage is memory-only, or for later creations; disposing
-// stops it.
+// notice is off, storage is memory-only, or for later creations; the notice
+// turning off once queued cancels it, for good; disposing stops it.
 
 import assert from 'node:assert/strict';
 import { describe, it, afterEach } from 'node:test';
-import { effectScope, reactive } from 'vue';
+import { effectScope, reactive, nextTick } from 'vue';
 
 import {
     useSnapshotIntro, SNAPSHOT_INTRO_ID, SNAPSHOT_INTRO_DELAY_MS,
@@ -24,6 +24,7 @@ const start = (prefs, { had = false, persisting = true, clock = { now: 0 } } = {
     const store = reactive({
         userPreferences: { snapshotsAuto: 'smart', snapshotsNotify: true, ...prefs },
         queueToast: (request) => requests.push(request),
+        cancelToast: (id) => requests.push({ id, cancel: true }),
     });
     scope = effectScope();
     scope.run(() => useSnapshotIntro({
@@ -103,6 +104,46 @@ describe('snapshot intro', () => {
         const { requests } = start({}, { persisting: false });
         emitAppEvent('snapshot:created', { id: 'id1', auto: true });
         assert.deepEqual(requests, []);
+    });
+
+    it('cancels the queued toast when the notice or recording turns off', async () => {
+        for (const prefs of [{ snapshotsNotify: false }, { snapshotsAuto: 'off' }]) {
+            const { store, requests } = start();
+            emitAppEvent('snapshot:created', { id: 'id1', auto: true });
+            Object.assign(store.userPreferences, prefs);
+            await nextTick();
+            assert.deepEqual(requests.slice(1), [{ id: SNAPSHOT_INTRO_ID, cancel: true }], JSON.stringify(prefs));
+            scope.stop();
+        }
+    });
+
+    it('does not queue it again when the notice turns back on', async () => {
+        const { store, requests } = start();
+        emitAppEvent('snapshot:created', { id: 'id1', auto: true });
+        store.userPreferences.snapshotsNotify = false;
+        await nextTick();
+        store.userPreferences.snapshotsNotify = true;
+        await nextTick();
+        store.userPreferences.snapshotsNotify = false;
+        await nextTick();
+        assert.equal(requests.filter((r) => !r.cancel).length, 1);
+        assert.equal(requests.filter((r) => r.cancel).length, 1);
+    });
+
+    it('cancels nothing before a toast was queued', async () => {
+        const { store, requests } = start();
+        store.userPreferences.snapshotsNotify = false;
+        await nextTick();
+        assert.deepEqual(requests, []);
+    });
+
+    it('stops watching the setting when its scope is disposed', async () => {
+        const { store, requests } = start();
+        emitAppEvent('snapshot:created', { id: 'id1', auto: true });
+        scope.stop();
+        store.userPreferences.snapshotsNotify = false;
+        await nextTick();
+        assert.equal(requests.length, 1);
     });
 
     it('stops listening when its scope is disposed', () => {
