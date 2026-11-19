@@ -203,6 +203,7 @@ MyIP मुफ़्त और ओपन सोर्स है, लेकिन
 | <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>CDN, सुरक्षा, DNS और सर्वरलेस ऐप्स के लिए वैश्विक नेटवर्क।</sub> |
 | <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>एरर ट्रैकिंग, ट्रेसिंग और सेशन रीप्ले के साथ एप्लिकेशन मॉनिटरिंग।</sub> |
 | <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>जियोलोकेशन, ASN, VPN और दुरुपयोग पहचान के लिए IP इंटेलिजेंस API और डेटाबेस।</sub> |
+| <a href="https://www.ip2location.io"><img src="https://res.ipcheck.ing/img/ip2location_logo.png" alt="IP2Location.io" height="24" /></a> | <sub>प्रॉक्सी, VPN और होस्टिंग पहचान के साथ IP जियोलोकेशन API, साथ ही डोमेन WHOIS लुकअप।</sub> |
 | <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>AI कोड रिव्यू जो आपके पूरे कोडबेस को समझता है।</sub> |
 | <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>तकनीकी टीमों के लिए डॉक्यूमेंटेशन प्लेटफ़ॉर्म।</sub> |
 | <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>व्यक्तियों और टीमों के लिए पासवर्ड और सीक्रेट्स मैनेजमेंट।</sub> |
