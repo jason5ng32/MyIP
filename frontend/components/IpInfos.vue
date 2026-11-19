@@ -7,7 +7,8 @@
         🔦 {{ t('ipInfos.Title') }}
       </h2>
       <div class="text-base text-muted-foreground">
-        <p v-if="!isSimpleMode">{{ t('ipInfos.Notes') }}</p>
+        <!-- Notes, then the data-source sentence after one space. -->
+        <p v-if="!isSimpleMode">{{ t('ipInfos.Notes') }} <IpSourceBlock /></p>
       </div>
     </header>
 
@@ -45,6 +46,7 @@ import { useAppCommand } from '@/composables/use-app-command.js';
 import { useAsnInfo } from '@/composables/use-asn-info.js';
 import { authenticatedFetch, fetchErrorLabel, logSourceFetchFailure } from '@/utils/authenticated-fetch';
 import IPCard from './ip-infos/IPCard.vue';
+import IpSourceBlock from './ip-infos/IpSourceBlock.vue';
 import InfoBanner from './widgets/InfoBanner.vue';
 
 
@@ -73,6 +75,8 @@ const createDefaultCard = () => ({
   asnlink: "",
   mapUrl: "",
   mapUrl_dark: "",
+  // Id of the geo source that answered (data/ip-databases.js).
+  geoSourceId: undefined,
   // Extended fields, cleared so a refresh or source switch drops them.
   ...Object.fromEntries(ADVANCED_CARD_FIELDS.map((field) => [field, undefined])),
 });
@@ -139,8 +143,10 @@ const fetchStatus = reactive([]);
 const cardsHaveSettled = ref(false);
 
 // Middleware
+// Both keyed by source id + IP: an answer is reused only for the source that gave it.
 let pendingIPDetailsRequests = new Map();
 let ipDataCache = new Map();
+const detailsKey = (sourceID, ip) => `${sourceID}|${ip}`;
 
 // Each card is an independent pipeline: resolveIP paints the IP the moment it
 // resolves, then loadCardDetails fills in its geo data. fetchIP chains the two
@@ -273,6 +279,7 @@ const trackFetchStatus = (status) => {
         anonymityProvider: card.anonymityProvider,
         abuseLevel: card.abuseLevel,
         frictionScenarios: card.frictionScenarios,
+        geoSourceId: card.geoSourceId, // the source that answered
       })),
     });
   }
@@ -310,17 +317,18 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
   card.ip = ip;
   const setLang = toApiTag(lang.value);
 
+  const requestKey = detailsKey(sourceID, ip);
+
   // Check if the IP data is already in the cache
-  if (ipDataCache.has(ip)) {
-    const cachedData = ipDataCache.get(ip);
+  if (ipDataCache.has(requestKey)) {
+    const cachedData = ipDataCache.get(requestKey);
     Object.assign(card, cachedData);
     return;
   }
 
-  // Check if there is a query in progress, if so, wait for it to complete
-  if (pendingIPDetailsRequests.has(ip)) {
-    await pendingIPDetailsRequests.get(ip);
-    const cachedData = ipDataCache.get(ip);
+  // Check if there is a query in progress, if so, wait for it and take its answer
+  if (pendingIPDetailsRequests.has(requestKey)) {
+    const cachedData = await pendingIPDetailsRequests.get(requestKey);
     if (cachedData) {
       Object.assign(card, cachedData);
     }
@@ -341,7 +349,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
       try {
         const url = store.getDbUrl(source.id, ip, setLang);
         const response = await authenticatedFetch(url);
-        const cardData = transformDataFromIPapi(response, t, lang.value);
+        const cardData = { ...transformDataFromIPapi(response, t, lang.value), geoSourceId: source.id };
 
         if (cardData) {
           // Fallback landed off the requested source: toast once (parallel
@@ -356,8 +364,8 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
           ipGeoSource.value = source.id;
           usingSource.value = source.id;
           Object.assign(card, cardData);
-          ipDataCache.set(ip, cardData);
-          return;
+          ipDataCache.set(detailsKey(source.id, ip), cardData);
+          return cardData;
         }
       } catch (error) {
         logSourceFetchFailure(`Error fetching IP details from source ${source.id} (${fetchErrorLabel(error)}):`, error);
@@ -370,7 +378,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
   })();
 
   // Store this Promise in pendingIPDetailsRequests to avoid duplicate queries
-  pendingIPDetailsRequests.set(ip, fetchPromise);
+  pendingIPDetailsRequests.set(requestKey, fetchPromise);
 
   try {
     await fetchPromise;
@@ -379,7 +387,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
     throw error;
   } finally {
     // After completion, remove from pendingIPDetailsRequests
-    pendingIPDetailsRequests.delete(ip);
+    pendingIPDetailsRequests.delete(requestKey);
   }
 };
 

@@ -10,14 +10,6 @@ import {
 // simple i18n translation stub: return key with prefix for assertions, to verify template references rather than hardcoded translation text
 const t = (key) => `<${key}>`;
 
-// v3 tags with nothing flagged.
-const cleanTags = {
-  isBogon: false, isMobile: false, isResidential: false, isSatellite: false,
-  isCrawler: false, isBenignBot: false, isDatacenter: false, isTor: false,
-  isProxy: false, isVPN: false, isAnyAnonymizer: false, isRelay: false,
-  isResidentialProxy: false, isAbuser: false, isNative: true,
-};
-
 const basicRaw = {
   country_name: 'Japan',
   country: 'JP',
@@ -113,7 +105,9 @@ const fullExtended = {
   score: 72,
   abuse: 'low',
   scenarios: [{ id: 'email', level: 'high' }, { id: 'signup', level: 'low' }],
-  scoreDetails: { tags: { ...cleanTags, isVPN: true }, dimensions: { reputation: { level: 'low' } } },
+  scoreDetails: { dimensions: { reputation: { level: 'low' } } },
+  flags: { isDatacenter: true, isVPN: true, isAnyAnonymizer: true, isNative: false },
+  metrics: [{ id: 'fraudScore', value: 12, max: 100 }, { id: 'abuserScore', value: '0.0021 (Low)' }],
 };
 const withExtended = (extended) => transformDataFromIPapi({ ...basicRaw, extended }, t, 'en');
 
@@ -130,8 +124,9 @@ describe('extended block → card fields', () => {
     assert.equal(out.isNativeIP, false);
     assert.equal(out.qualityScore, 72);
     assert.equal(out.abuseLevel, 'low');
-    assert.equal(out.scoreTags, fullExtended.scoreDetails.tags);
+    assert.equal(out.flags, fullExtended.flags);
     assert.equal(out.scoreDimensions, fullExtended.scoreDetails.dimensions);
+    assert.equal(out.sourceMetrics, fullExtended.metrics);
     // Base fields stay as they are.
     assert.equal(out.country_code, 'JP');
     assert.equal(out.asn, 'AS12345');
@@ -169,10 +164,35 @@ describe('extended block → card fields', () => {
     assert.equal(out.anonymityProtocol, null);
   });
 
+  it('maps flags alone', () => {
+    const flagsOnly = withExtended({ flags: { isMobile: true } });
+    assert.deepEqual(flagsOnly.flags, { isMobile: true });
+    assert.equal(flagsOnly.sourceMetrics, undefined);
+    assert.equal(hasExtendedFields(flagsOnly), true);
+  });
+
+  it('maps metrics alone, and a reset to another answer clears them', () => {
+    const out = withExtended({ metrics: [{ id: 'fraudScore', value: 0 }] });
+    assert.deepEqual(out.sourceMetrics, [{ id: 'fraudScore', value: 0 }]);
+    assert.equal(hasExtendedFields(out), true);
+    assert.equal(hasExtendedFields({ sourceMetrics: [] }), true);
+    assert.ok(ADVANCED_CARD_FIELDS.includes('sourceMetrics'));
+    assert.equal(withExtended({ lineType: 'hosting' }).sourceMetrics, undefined);
+    assert.equal(withExtended({ gate: 'auth' }).sourceMetrics, undefined);
+  });
+
+  it('localizes the plain yes of anonymity and abuse', () => {
+    const out = withExtended({ anonymity: { code: 'detected', provider: 'Acme' }, abuse: 'detected' });
+    assert.equal(out.anonymity, '<ipInfos.anonymity.detected>');
+    assert.equal(out.anonymityCode, 'detected');
+    assert.equal(out.anonymityProvider, 'Acme');
+    assert.equal(out.abuseLevel, 'detected');
+  });
+
   it('leaves the fields a partial block does not carry undefined', () => {
     const out = withExtended({ score: 'unknown' });
     assert.equal(out.qualityScore, 'unknown');
-    for (const key of ['anonymity', 'anonymityCode', 'type', 'ipTypeCode', 'isNativeIP', 'abuseLevel', 'scoreTags', 'scoreDimensions']) {
+    for (const key of ['anonymity', 'anonymityCode', 'type', 'ipTypeCode', 'isNativeIP', 'abuseLevel', 'flags', 'scoreDimensions', 'sourceMetrics']) {
       assert.equal(out[key], undefined, key);
     }
     assert.equal(out.frictionScenarios, null);
@@ -180,7 +200,9 @@ describe('extended block → card fields', () => {
 
   it('ignores a malformed block as if absent', () => {
     for (const extended of [null, 'auth', [], { gate: 'locked' }, { gate: 'auth', score: 10 },
-      { score: 101 }, { lineType: 'Hosting' }, { anonymity: { code: 'cloak' } }, { extra: true }]) {
+      { score: 101 }, { lineType: 'Hosting' }, { anonymity: { code: 'cloak' } }, { extra: true },
+      { flags: { isBogon: true } }, { details: [{ group: 'weather', rows: [{ key: 'k', value: 'v' }] }] },
+      { metrics: [{ id: 'trustScore', value: 1 }] }]) {
       const out = withExtended(extended);
       for (const key of ADVANCED_CARD_FIELDS) assert.equal(key in out, false, `${JSON.stringify(extended)}: ${key}`);
     }

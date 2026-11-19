@@ -8,6 +8,7 @@ import { describe, it } from 'node:test';
 
 import { REPORT_EVENT_BUILDERS } from '../frontend/utils/report/report-builders.js';
 import { validateReport, REPORT_VERSION } from '../common/report-schema.js';
+import { buildShareReport } from '../frontend/utils/report/report-export.js';
 
 const wrap = (sectionId, section) => ({
     v: REPORT_VERSION,
@@ -273,6 +274,24 @@ describe('cleaning rules', () => {
         for (const card of section.cards) {
             for (const key of ['isProxy', 'proxyProvider', 'proxyProtocol']) assert.equal(key in card, false, key);
         }
+    });
+
+    it('ipinfo keeps a known answering geo source, local only', () => {
+        const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
+        const base = { source: 'IPCheck.ing IPv4', ip: '203.0.113.7', country_code: 'SG' };
+        const section = build({
+            cards: [0, 3, 42, '3', null, undefined, -1].map((geoSourceId) => ({ ...base, geoSourceId })),
+        });
+        assert.deepEqual(section.cards.map((card) => card.geoSource), [0, 3, undefined, undefined, undefined, undefined, undefined]);
+        assert.ok(section.cards.slice(2).every((card) => !('geoSource' in card)));
+        const report = wrap('ipinfo', section);
+        assert.deepEqual(validateReport(report, { local: true }).errors, []);
+        assert.equal(validateReport(report).ok, false, 'the share validator rejects it');
+        const shared = buildShareReport({
+            sections: { ipinfo: report.sections.ipinfo }, selectedIds: ['ipinfo'], maskTail: false, locale: 'en', origin: 'test',
+        });
+        assert.ok(shared.sections.ipinfo.cards.every((card) => !('geoSource' in card)), 'buildShareReport strips it');
+        assert.deepEqual(validateReport(shared).errors, []);
     });
 
     it('ipinfo keeps abuse level and scenario friction levels, nothing else', () => {

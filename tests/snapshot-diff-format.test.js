@@ -2,7 +2,8 @@
 // diff view's hunks (collapse rule, drift on / off, one-side items as plain
 // context, IP cards by id, the single speedtest hunk with its dotted
 // fields, numbers compared as displayed), split rows, block counts /
-// notices, and value formatting with units.
+// notices, value formatting with units, and the geo source switch line of
+// an IP card.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -220,6 +221,52 @@ describe('snapshot diff format — values', () => {
         const compared = snap({ ipinfo: { testedAt: T0, cards: [card('A', '1.1.1.1', { scenarios: { email: 'medium', signup: 'low' } })] } });
         const [hunk] = hunksOf('ipinfo', compared, viewed);
         assert.deepEqual(marks(hunk).slice(-3), [' scenarios.signup', '-scenarios.email', '+scenarios.email']);
+    });
+});
+
+describe('snapshot diff format — the answering geo source', () => {
+    const t = (key) => `t:${key}`;
+    const opts = { t, countryName: (code) => `country:${code}`, locale: 'en' };
+    const sideOf = (geoSource, fields = {}) =>
+        snap({ ipinfo: { testedAt: T0, cards: [card('A', '1.1.1.1', { ipType: 'residential', geoSource, ...fields })] } });
+
+    it('opens a compared card with one context line naming both sources', () => {
+        const [hunk] = hunksOf('ipinfo', sideOf(0), sideOf(3, { ipType: 'hosting' }));
+        assert.deepEqual(marks(hunk).slice(0, 4), [' geoSource', ' ip', ' countryCode', ' asn']);
+        assert.deepEqual(hunk.lines[0].value, [0, 3], '[compared, viewed]');
+        assert.equal(hunk.changedCount, 1, 'only the line type counts as changed');
+        assert.equal(formatFieldValue('geoSource', hunk.lines[0].value, opts), 'IPCheck.ing → IPAPI.is');
+        assert.equal(fieldLabelKey('geoSource'), 'ipInfos.sourceFields.source');
+    });
+
+    it('keeps a source-only switch closed, its line present', () => {
+        const [hunk] = hunksOf('ipinfo', sideOf(0), sideOf(2));
+        assert.equal(hunk.changedCount, 0);
+        assert.equal(hunk.open, false);
+        assert.equal(hunk.lines[0].field, 'geoSource');
+    });
+
+    it('has no line when equal, absent on a side, or nothing is compared', () => {
+        for (const [compared, viewed] of [[sideOf(3), sideOf(3)], [sideOf(undefined), sideOf(3)], [sideOf(0), sideOf(undefined)]]) {
+            const [hunk] = hunksOf('ipinfo', compared, viewed);
+            assert.equal(hunk.lines.some((line) => line.field === 'geoSource'), false);
+        }
+        const [single] = buildHunks('ipinfo', null, sideOf(3).sections.ipinfo, undefined);
+        assert.equal(single.lines.some((line) => line.field === 'geoSource'), false, 'single view leaves it out');
+        assert.ok(!sectionFieldOrder('ipinfo').includes('geoSource'));
+    });
+
+    it('splits into the compared source on the left, the viewed one on the right', () => {
+        const [hunk] = hunksOf('ipinfo', sideOf(0), sideOf(4));
+        const [row] = splitRows(hunk);
+        assert.deepEqual([row.field, row.left.mark, row.left.value, row.right.mark, row.right.value],
+            ['geoSource', ' ', 0, ' ', 4]);
+        assert.equal(formatFieldValue('geoSource', row.left.value, opts), 'IPCheck.ing');
+        assert.equal(formatFieldValue('geoSource', row.right.value, opts), 'IP2Location.io');
+    });
+
+    it('names an unknown id by its number', () => {
+        assert.equal(formatFieldValue('geoSource', [0, 42], opts), 'IPCheck.ing → 42');
     });
 });
 

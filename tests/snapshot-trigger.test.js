@@ -6,7 +6,9 @@
 // log-ratio latency shift; one-sided or unusable items,
 // one-sided or empty fields, one STUN server failing and small drift never
 // fire. notableChanges, the change notice's stricter check: only what both
-// sides carry, plus WebRTC going dark.
+// sides carry, plus WebRTC going dark; across a geo source switch an IP
+// card compares its IP alone, while the smart trigger and the source itself
+// stay as they are.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -368,5 +370,41 @@ describe('notable changes — the change notice', () => {
     it('counts WebRTC going dark, not coming back', () => {
         assert.deepEqual(changes(with_({ servers: dark })), ['webrtc']);
         assert.deepEqual(changes(sections(BASE), with_({ servers: dark })), []);
+    });
+});
+
+describe('notable changes — a geo source switch', () => {
+    // The default card's fields as one source reads them, and as another does.
+    const read = (geoSource, fields = {}) => card('ipcheck', '8.8.8.8', {
+        anonymity: 'none', ipType: 'residential', abuseLevel: 'none', geoSource, ...fields,
+    });
+    const other = { anonymity: 'detected', ipType: 'hosting', abuseLevel: 'detected', anonymityProvider: 'ExampleVPN' };
+    const of = (first) => with_({ cards: [first, BASE.cards[1]] });
+
+    it('ignores every other field of a card another source answered', () => {
+        assert.deepEqual(notableChanges(of(read(0)), of(read(3, other))), []);
+        assert.deepEqual(notableChanges(of(read(0)), of(read(3, { ipType: 'hosting' }))), [], 'line type');
+        assert.deepEqual(notableChanges(of(read(0)), of(read(3, { anonymity: 'detected' }))), [], 'anonymizer');
+        assert.deepEqual(notableChanges(of(read(0)), of(read(3, { abuseLevel: 'detected' }))), [], 'abuse');
+        assert.deepEqual(notableChanges(of(read(0)), of(read(3, { countryCode: 'JP', isp: 'Example Net' }))), [], 'geography');
+    });
+
+    it('still counts the IP itself', () => {
+        assert.deepEqual(notableChanges(of(read(0)), of(card('ipcheck', '1.1.1.1', { ...other, geoSource: 3 }))), ['ipinfo']);
+    });
+
+    it('compares as before with the same source, or a side without one', () => {
+        assert.deepEqual(notableChanges(of(read(3)), of(read(3, { ipType: 'hosting' }))), ['ipinfo'], 'same source');
+        assert.deepEqual(notableChanges(of(read(undefined)), of(read(3, { ipType: 'hosting' }))), ['ipinfo'], 'older snapshot');
+        assert.deepEqual(notableChanges(of(read(0)), of(read(undefined, { ipType: 'hosting' }))), ['ipinfo'], 'newer side without');
+    });
+
+    it('never counts the source itself, nor fires the smart trigger on it', () => {
+        assert.deepEqual(notableChanges(of(read(0)), of(read(3))), []);
+        assert.equal(snapshotTrigger(of(read(0)), of(read(3))), null);
+    });
+
+    it('leaves the smart trigger on the other fields as it is', () => {
+        assert.equal(snapshotTrigger(of(read(0)), of(read(3, { ipType: 'hosting' }))), 'ipinfo');
     });
 });

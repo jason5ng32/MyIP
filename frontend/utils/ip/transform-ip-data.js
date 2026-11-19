@@ -51,7 +51,7 @@ export const ADVANCED_CARD_FIELDS = Object.freeze([
     'extendedGate',
     'anonymity', 'anonymityCode', 'anonymityProvider', 'anonymityProtocol',
     'type', 'qualityScore', 'isNativeIP', 'ipTypeCode', 'abuseLevel',
-    'scoreTags', 'scoreDimensions', 'frictionScenarios',
+    'flags', 'scoreDimensions', 'frictionScenarios', 'sourceMetrics',
 ]);
 
 // True when a card carries a gate or any extended field (false and 0 count).
@@ -78,9 +78,10 @@ const extendedFields = (extended, t) => {
         isNativeIP: extended.native,
         qualityScore: extended.score,
         abuseLevel: extended.abuse,
-        scoreTags: scoreDetails?.tags,
+        flags: extended.flags,
         scoreDimensions: scoreDetails?.dimensions,
         frictionScenarios: orderScenarios(extended.scenarios),
+        sourceMetrics: extended.metrics,
     };
 };
 

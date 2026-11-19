@@ -31,10 +31,17 @@ describe('IP_DATABASES', () => {
     });
   });
 
-  it('marks only the IPCheck.ing source as sending the extended block', () => {
-    const extended = IP_DATABASES.filter((d) => d.extended === true).map((d) => d.text);
-    assert.deepEqual(extended, ['IPCheck.ing']);
+  it('marks the sources whose answer carries the extended block', () => {
+    const extended = IP_DATABASES.filter((d) => d.extended === true).map((d) => d.id);
+    assert.deepEqual([...extended].sort((a, b) => a - b), [0, 1, 2, 3, 4]);
     for (const db of IP_DATABASES) assert.ok(db.extended === undefined || db.extended === true, db.text);
+  });
+
+  it('gives every source an https attribution link', () => {
+    for (const db of IP_DATABASES) {
+      assert.deepEqual(Object.keys(db.attribution), ['url'], db.text);
+      assert.equal(new URL(db.attribution.url).protocol, 'https:', db.text);
+    }
   });
 
   it('ties only the IPCheck.ing source to a metered feature (ipinfo)', () => {

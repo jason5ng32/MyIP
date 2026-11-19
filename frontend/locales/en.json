@@ -1883,6 +1883,7 @@
       "proxySuspected": "Possible proxy",
       "vpn": "VPN",
       "vpnSuspected": "Possible VPN",
+      "detected": "Detected",
       "none": "Not detected"
     },
     "qualityScore": "IP Quality",
@@ -2022,7 +2023,12 @@
       "none": "Not detected",
       "low": "Occasional",
       "medium": "Moderate",
-      "high": "Frequent"
+      "high": "Frequent",
+      "detected": "Detected"
+    },
+    "sourceMetrics": {
+      "fraudScore": "Fraud score",
+      "abuserScore": "Network abuser score"
     },
     "scenarioFriction": {
       "label": "Scenario friction",
@@ -2058,6 +2064,11 @@
       },
       "personaHint": "Besides the IP, platforms weigh several other factors when deciding which limits to apply. Want to know whether your overall profile matches what you expect?",
       "personaLink": "Run Persona Check"
+    },
+    "sourceFields": {
+      "source": "Data source",
+      "switch": "change",
+      "sentence": "Geolocation database in use: {source} ({switch})."
     },
     "countryTraffic": {
       "subtitle": "Typical weekly online activity in this country/region — view human-generated traffic only, or all traffic (including bot/automated traffic).",

@@ -115,6 +115,16 @@ export const keyedItems = (id, section) => {
     return spec ? indexByKey(section?.[spec.list], spec.key) : new Map();
 };
 
+// An ipinfo card's answering geo source (local-only, absent on older
+// snapshots): not a compared field, only the explanation of the others.
+export const GEO_SOURCE_FIELD = 'geoSource';
+
+// [from, to] source ids when both cards carry one and they differ, else null.
+export const geoSourceSwitch = (left, right) => {
+    const [from, to] = [left?.[GEO_SOURCE_FIELD], right?.[GEO_SOURCE_FIELD]];
+    return Number.isInteger(from) && Number.isInteger(to) && from !== to ? [from, to] : null;
+};
+
 const makeRow = (key, field, from, to) => {
     const kind = fieldKind(field);
     const changed = !sameValue(from, to);
@@ -148,7 +158,11 @@ const diffKeyed = (id, left, right) => {
     const common = [...b.keys()].filter((k) => a.has(k));
     return {
         status: 'both',
-        rows: common.flatMap((k) => fieldRows(k, fields, a.get(k), b.get(k))),
+        rows: common.flatMap((k) => {
+            const sourceSwitch = id === 'ipinfo' ? geoSourceSwitch(a.get(k), b.get(k)) : null;
+            const sourceRow = sourceSwitch ? [makeRow(k, GEO_SOURCE_FIELD, ...sourceSwitch)] : [];
+            return [...sourceRow, ...fieldRows(k, fields, a.get(k), b.get(k))];
+        }),
         onlyLeft,
         onlyRight,
         listChanged: onlyLeft.length > 0 || onlyRight.length > 0,
@@ -168,7 +182,8 @@ const diffSection = (id, left, right) => {
 // --- entry point ------------------------------------------------------------
 
 // → { sections: { [id]: { status, rows, onlyLeft, onlyRight, listChanged } } }
-// Row: { key, field, from, to, kind, changed, highlight }.
+// Row: { key, field, from, to, kind, changed, highlight }; an ipinfo card
+// whose answering source changed opens with an unhighlighted `geoSource` row.
 export const diffSnapshots = (left, right) => {
     const sections = {};
     for (const id of HOME_SECTION_IDS) {

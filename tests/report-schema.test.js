@@ -279,6 +279,24 @@ describe('validateReport', () => {
         }
     });
 
+    it('keeps the answering geo source local: Snapshots validate it, a shared report rejects it', () => {
+        const withSource = (geoSource) => {
+            const report = makeValidReport();
+            report.sections.ipinfo.cards[0].geoSource = geoSource;
+            return report;
+        };
+        assert.deepEqual(validateReport(withSource(3), { local: true }).errors, []);
+        assert.deepEqual(validateReport(withSource(0), { local: true }).errors, []);
+        assert.deepEqual(validateReport(withSource(3)).errors, ['report.sections.ipinfo.cards[0].geoSource: unknown key']);
+        for (const bad of [-1, 1.5, '3', 64, null]) {
+            assert.equal(validateReport(withSource(bad), { local: true }).ok, false, String(bad));
+        }
+        assert.deepEqual(validateReport(makeValidReport(), { local: true }).errors, [], 'optional: older snapshots lack it');
+        const stripped = stripLocalOnly(withSource(3));
+        assert.equal('geoSource' in stripped.sections.ipinfo.cards[0], false);
+        assert.deepEqual(stripped, makeValidReport(), 'a shared report is what it was without the field');
+    });
+
     it('stripLocalOnly drops local-only fields without mutating the input', () => {
         const report = makeValidReport();
         report.sections.ipinfo.cards[0].scenarios = { signup: 'low' };

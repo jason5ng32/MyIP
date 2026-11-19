@@ -131,6 +131,15 @@
                     <dd class="font-normal wrap-break-word">{{ t(ABUSE_LEVEL_I18N_KEYS[abuseLevel]) }}</dd>
                 </div>
 
+                <!-- Source metrics: each the source's own indicator under its own name, as plain text. -->
+                <div v-for="metric in sourceMetrics" :key="metric.id">
+                    <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        <Activity class="size-3.5" />
+                        <span>{{ t(`ipInfos.sourceMetrics.${metric.id}`) }}</span>
+                    </dt>
+                    <dd class="font-normal wrap-break-word" :class="metric.ratio && 'tabular-nums'">{{ metric.text }}</dd>
+                </div>
+
                 <!-- Scenario friction: one tone dot per scenario, low → high (deliberately not a score
                      bar); hidden when the answer carries no scenarios. -->
                 <div v-if="hasFriction">
@@ -222,6 +231,7 @@ import { hasExtendedFields } from '@/utils/ip/transform-ip-data.js';
 import { ABUSE_LEVEL_I18N_KEYS } from '@/utils/codes/ip-labels.js';
 import ScenarioFrictionPanel from './ScenarioFrictionPanel.vue';
 import ScoreDetailsPanel from './ScoreDetailsPanel.vue';
+import { listSourceMetrics } from '@/utils/ip/source-fields.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -234,6 +244,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Icon } from '@iconify/vue';
 import {
+    Activity,
     ArrowRight,
     ChevronDown,
     CircleQuestionMark,
@@ -324,13 +335,16 @@ const scoreExplanation = computed(() => buildScoreExplanation(props.data, {
     t,
     formatDate: (day) => formatIsoDate(day, locale.value),
 }));
-const scoreTagRows = computed(() => listScoreTags(props.data.scoreTags));
+const scoreTagRows = computed(() => listScoreTags(props.data.flags));
 const hasScoreDetails = computed(() =>
     showAdvancedBlock.value && (scoreExplanation.value.length > 0 || scoreTagRows.value.length > 0)
 );
 
 // Abuse level (ABUSE_LEVELS); anything else hides the cell.
 const abuseLevel = computed(() => (ABUSE_LEVELS.includes(props.data.abuseLevel) ? props.data.abuseLevel : ''));
+
+// Source metrics (source-fields.js); unknown ids are skipped.
+const sourceMetrics = computed(() => listSourceMetrics(props.data));
 
 // Scenario friction: normalized scenarios (transform-ip-data.js), one dot each.
 const { dotClass } = useStatusTone();

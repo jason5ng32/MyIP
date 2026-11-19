@@ -41,8 +41,17 @@ Every file opens with a header comment stating its purpose — read those.
   probe modules keep their own dirs (`getips/`, `dnsleaks/`, `persona/`).
 - **IP card extended fields:** a geo source's answer may carry an `extended`
   block (`common/ip-extended.js`, bridged by `utils/ip/ip-extended.js`);
-  `utils/ip/transform-ip-data.js` maps it to card fields, the advanced block
-  renders by field presence, and a gated card carries only `extendedGate`.
+  `utils/ip/transform-ip-data.js` maps it to card fields and the advanced
+  block renders by field presence: line type, anonymizer and abuse verdicts
+  (a plain `detected` / `none` from the other sources), a source's own
+  `metrics` as plain-text cells, never the quality score. A gated card
+  carries only `extendedGate`.
+- **Data-source sentence:** `IpSourceBlock.vue`, inline after the IP section's
+  notes (`IpInfos.vue`; hidden with them in simple mode): the source selected
+  in Preferences (`ipGeoSource` → its `data/ip-databases.js` row, the name
+  linking `attribution.url`) and a switch that opens Preferences at the
+  picker, as `ipInfos.sourceFields.sentence` slots. Cards carry no source row;
+  `geoSourceId` stays for the cache and Snapshots.
 
 ### Achievements are event-driven
 
@@ -152,7 +161,9 @@ this load records one automatically into localStorage → a View toast at
 15 s; and the change notice: the
 recorder emits `snapshot:changed` when this visit's snapshot differs from
 the previous one in what both carry (`notableChanges`, stricter than the
-smart trigger: no new section / target / field; WebRTC going dark counts);
+smart trigger: no new section / target / field; WebRTC going dark counts;
+an IP card answered by another geo source — its local-only `geoSource` —
+compares its IP alone, and the diff names both sources);
 `use-snapshot-notice.js` queues it, waiting for 35 s or the Speed Test
 section (away from the IP cards' actions). Schema changes can invalidate
 stored data.
@@ -265,6 +276,10 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   `when: { delayMs, reach }` = `use-attention-gate.js`, `action.to` a route,
   `track` / `action.track` = `trackEvent` args on show / click),
   run by `use-toast-queue.js` in `Toast.vue` — never feature code there.
+- **Preferences at a section** — `store.openPreferencesAt(sectionId)` (the
+  section's element id) sets the one-shot `preferencesFocus`; `Preferences.vue`
+  clears it, scrolls there and briefly rings it. Never touch the panel's DOM
+  (IpSourceBlock).
 - **Site navigation** — one `Nav.vue` in `App.vue` above every route (fixed;
   `index.html` pads the body for it), never per page; `User` / `Preferences`
   sit beside it, one each. What a click does on the current route is

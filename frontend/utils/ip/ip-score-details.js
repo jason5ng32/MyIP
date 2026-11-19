@@ -2,7 +2,7 @@
 // language explanation of the quality score, built as a list of i18n
 // sentences, and the attribute rows below it. Pure — no Vue, no fetch.
 //
-// Inputs are the transformed card fields (transform-ip-data.js): `scoreTags`,
+// Inputs are the transformed card fields (transform-ip-data.js): `flags`,
 // `scoreDimensions`, `qualityScore`, `isp`, `asn`, `ip`. Gated cards (or
 // any without `dimensions`) yield nothing.
 
@@ -57,7 +57,7 @@ export const buildScoreExplanation = (data, { t = (key) => key, formatDate = (da
     const score = typeof rawScore === 'number' || /^\d+(\.\d+)?$/.test(rawScore ?? '') ? Number(rawScore) : NaN;
     if (!isPlainObject(dims) || !Number.isFinite(score)) return [];
 
-    const tags = isPlainObject(data.scoreTags) ? data.scoreTags : {};
+    const tags = isPlainObject(data.flags) ? data.flags : {};
     const sentences = [];
     const add = (key, params = {}) => sentences.push({ key: `${KEY}.explain.${key}`, params });
 

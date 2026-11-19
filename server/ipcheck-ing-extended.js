@@ -1,7 +1,9 @@
 // Turns an IPCheck.ing API `/ipinfo` answer into the generic `extended` block (common/ip-extended.js).
 
 import { ABUSE_LEVELS, SCENARIO_FRICTION_IDS, SCENARIO_FRICTION_LEVELS } from '../common/codes/ip.js';
-import { LINE_TYPE_UNKNOWN, SCORE_UNKNOWN } from '../common/ip-extended.js';
+import {
+    LINE_TYPE_UNKNOWN, SCORE_UNKNOWN, EXTENDED_FLAGS, SCORE_DIMENSION_KEYS,
+} from '../common/ip-extended.js';
 
 // Upstream value that replaces the advanced fields → the gate it stands for.
 const GATE_BY_VALUE = new Map([
@@ -61,6 +63,28 @@ const scoreOf = (score) => {
     return typeof score === 'number' && Number.isFinite(score) && score >= 0 && score <= 100 ? score : undefined;
 };
 
+// The boolean tags of the flag vocabulary; null when none.
+export const flagsOf = (tags) => {
+    const flags = Object.fromEntries(EXTENDED_FLAGS
+        .filter((key) => typeof tags[key] === 'boolean')
+        .map((key) => [key, tags[key]]));
+    return Object.keys(flags).length ? flags : null;
+};
+
+// The known dimensions with their known string members; null when not an object.
+export const dimensionsOf = (dimensions) => {
+    if (!isPlainObject(dimensions)) return null;
+    const out = {};
+    for (const [name, keys] of Object.entries(SCORE_DIMENSION_KEYS)) {
+        const member = dimensions[name];
+        if (!isPlainObject(member)) continue;
+        out[name] = Object.fromEntries(keys
+            .filter((key) => typeof member[key] === 'string')
+            .map((key) => [key, member[key]]));
+    }
+    return out;
+};
+
 const nameOf = (value) => (typeof value === 'string' && value ? value : undefined);
 
 // Drops undefined members so absent fields stay absent.
@@ -79,6 +103,7 @@ export const toExtended = (answer) => {
 
     const reputation = isPlainObject(dimensions) ? dimensions.reputation : null;
     const abuse = isPlainObject(reputation) && ABUSE_LEVELS.includes(reputation.level) ? reputation.level : undefined;
+    const scoreDimensions = dimensionsOf(dimensions);
 
     return compact({
         anonymity: compact({
@@ -91,6 +116,7 @@ export const toExtended = (answer) => {
         score: scoreOf(advanced.score),
         abuse,
         scenarios: scenariosOf(advanced.scenarios) ?? undefined,
-        scoreDetails: compact({ tags, dimensions: isPlainObject(dimensions) ? dimensions : undefined }),
+        scoreDetails: scoreDimensions ? { dimensions: scoreDimensions } : undefined,
+        flags: flagsOf(tags) ?? undefined,
     });
 };

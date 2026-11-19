@@ -15,6 +15,7 @@ import { CONNECTIVITY_STATUS } from '../codes/connectivity.js';
 import { NAT_TYPE_CODES } from '../codes/webrtc.js';
 import { SPEEDTEST_QUALITIES } from '../codes/speedtest.js';
 import { PERSONA_VERDICT, PERSONA_AXIS, PERSONA_GRADE } from '../codes/persona.js';
+import { IP_DATABASES } from '../../data/ip-databases.js';
 
 // --- small shared normalizers ----------------------------------------------
 
@@ -48,7 +49,7 @@ const compact = (obj) => {
 
 // ipinfo:finished — { cards: [{ id, source, ip, country_code, region, city,
 // timezone, asn, isp, anonymityCode?, ipTypeCode?, isNativeIP?, qualityScore?,
-// anonymityProtocol?, anonymityProvider?, abuseLevel?, frictionScenarios? }] }. Cards whose ip never resolved
+// anonymityProtocol?, anonymityProvider?, abuseLevel?, frictionScenarios?, geoSourceId? }] }. Cards whose ip never resolved
 // (placeholder text in the slot) are dropped. The optional enrichments come
 // from the answer's `extended` block and stay absent on a gated card (see
 // transform-ip-data.js). An 'unknown' line type is noise in a
@@ -68,6 +69,9 @@ const frictionLevels = (scenarios) => {
     }
     return Object.keys(levels).length ? levels : undefined;
 };
+// The answering geo source's id, when it is a known one. Local-only too.
+const GEO_SOURCE_IDS = new Set(IP_DATABASES.map((db) => db.id));
+const geoSourceOf = (id) => (GEO_SOURCE_IDS.has(id) ? id : undefined);
 const buildIpinfo = (payload) => {
     const cards = (payload?.cards ?? [])
         .filter((card) => isValidIP(card?.ip))
@@ -92,6 +96,7 @@ const buildIpinfo = (payload) => {
             anonymityProvider: clip(card.anonymityProvider || undefined, 64),
             abuseLevel: ABUSE_LEVELS.includes(card.abuseLevel) ? card.abuseLevel : undefined,
             scenarios: frictionLevels(card.frictionScenarios),
+            geoSource: geoSourceOf(card.geoSourceId),
         }));
     return cards.length ? { cards } : null;
 };

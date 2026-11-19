@@ -12,6 +12,7 @@ export const ANONYMITY_I18N_KEYS = {
     proxy_suspected: 'ipInfos.anonymity.proxySuspected',
     vpn: 'ipInfos.anonymity.vpn',
     vpn_suspected: 'ipInfos.anonymity.vpnSuspected',
+    detected: 'ipInfos.anonymity.detected',
     none: 'ipInfos.anonymity.none',
 };
 
@@ -30,4 +31,5 @@ export const ABUSE_LEVEL_I18N_KEYS = Object.freeze({
     low: 'ipInfos.abuseLevel.low',
     medium: 'ipInfos.abuseLevel.medium',
     high: 'ipInfos.abuseLevel.high',
+    detected: 'ipInfos.abuseLevel.detected',
 });

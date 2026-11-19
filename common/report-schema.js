@@ -161,6 +161,8 @@ const SECTION_SPECS = {
             // Scenario friction, Snapshots only: scenario id → level, never reasons.
             scenarios: opt(localOnly(obj(Object.fromEntries(SCENARIO_FRICTION_IDS
                 .map((id) => [id, opt(oneOf(...SCENARIO_FRICTION_LEVELS))]))))),
+            // The geo source that answered, Snapshots only: its source id.
+            geoSource: opt(localOnly(int(0, 63))),
         })),
     }),
     connectivity: obj({

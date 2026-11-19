@@ -191,6 +191,16 @@ describe('snapshots — untrusted restore', () => {
         assert.equal(sanitizeSnapshot(snapshot('b', 0, { sections })), null);
     });
 
+    it('keeps the answering geo source, which only Snapshots hold; older cards lack it', () => {
+        const sections = { ipinfo: ipinfo('8.8.8.8') };
+        assert.ok(sanitizeSnapshot(snapshot('older', 0, { sections })), 'a card without one stays valid');
+        sections.ipinfo.cards[0].geoSource = 3;
+        const clean = sanitizeSnapshot(snapshot('a', 0, { sections }));
+        assert.equal(clean.sections.ipinfo.cards[0].geoSource, 3);
+        sections.ipinfo.cards[0].geoSource = 'IPAPI.is';
+        assert.equal(sanitizeSnapshot(snapshot('b', 0, { sections })), null);
+    });
+
     it('drops unknown keys, duplicate ids, and orders newest first', () => {
         const store = restoreStore(raw(storeOf(
             { ...snapshot('a', 0), extra: true }, snapshot('c', 10), snapshot('a', 20), snapshot('b', 5),

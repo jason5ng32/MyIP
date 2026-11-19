@@ -1,7 +1,7 @@
 // Factory for IP-geolocation source handlers.
 //
-// Every geo source (ipinfo.io, ip-api.com, ipapi.is, ip2location.io, ip.sb)
-// shares an identical Express shell: read the (already-validated) ?ip,
+// The single-request geo sources (ip-api.com, ipapi.is, ip2location.io, ip.sb)
+// share an identical Express shell: read the (already-validated) ?ip,
 // build a source-specific URL, fetch it through fetchUpstream, normalize the
 // upstream JSON into the canonical response shape, and respond — with a
 // uniform try/catch that logs the error and returns a 500.

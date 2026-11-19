@@ -42,6 +42,7 @@ import serviceStatusHandler, {
 } from '../api/service-status.js';
 import createReportHandler, { getReport as getReportHandler, normalizeTtlDays } from '../api/share-report.js';
 import { modifyJsonForIPAPI } from '../api/ipapi-is.js';
+import { modifyJsonForIPSB } from '../api/ip-sb.js';
 import { modifyJson as modifyJsonForIpinfo } from '../api/ipinfo-io.js';
 import { REPORT_VERSION } from '../common/report-schema.js';
 import logger from '../server/logger.js';
@@ -1247,7 +1248,7 @@ describe('ipcheck-ing handler', () => {
             advancedData,
             extended: {
                 anonymity: { code: 'none' }, lineType: 'business', native: true, score: 88,
-                scoreDetails: { tags: advancedData.tags },
+                flags: advancedData.tags,
             },
         });
     });
@@ -1500,6 +1501,20 @@ describe('ipinfo-io normalize', () => {
     });
 });
 
+// -- ip-sb normalizer -----------------------------------------------------
+// Pure transform, no fetch involved.
+
+describe('ip-sb normalize', () => {
+    it('prefixes the ASN', () => {
+        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7', asn: 64500 }).asn, 'AS64500');
+    });
+
+    it('answers N/A when the upstream sends no ASN', () => {
+        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7' }).asn, 'N/A');
+        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7', asn: null }).asn, 'N/A');
+    });
+});
+
 // -- ipapi-is normalizer --------------------------------------------------
 // Pure transform, no fetch involved.
 
@@ -1517,8 +1532,9 @@ describe('ipapi-is normalize', () => {
         assert.equal(out.city, 'Mountain View');
         assert.equal(out.country_code, 'US');
         assert.equal(out.asn, 'AS15169');
-        assert.equal(out.isHosting, true);
-        assert.equal(out.isProxy, false);
+        assert.equal(out.extended.lineType, 'hosting');
+        assert.equal('isHosting' in out, false);
+        assert.equal('isProxy' in out, false);
     });
 
     it('falls back to N/A when the upstream places no location', () => {
@@ -1529,13 +1545,13 @@ describe('ipapi-is normalize', () => {
             assert.equal(out[key], 'N/A', `${key} should degrade to N/A`);
         }
         assert.equal(out.asn, 'N/A');
-        assert.equal(out.isHosting, false);
-        assert.equal(out.isProxy, false);
+        assert.equal(out.extended, undefined);
     });
 
-    it('flags a proxy when any of the vpn / tor / proxy bits is set', () => {
-        assert.equal(modifyJsonForIPAPI({ location: {}, is_vpn: true }).isProxy, true);
-        assert.equal(modifyJsonForIPAPI({ location: {}, is_tor: true }).isProxy, true);
+    it('sums the vpn / tor bits up as a plain anonymizer yes', () => {
+        const detected = { anonymity: { code: 'detected' } };
+        assert.deepEqual(modifyJsonForIPAPI({ location: {}, is_vpn: true }).extended, detected);
+        assert.deepEqual(modifyJsonForIPAPI({ location: {}, is_tor: true }).extended, detected);
     });
 });
 

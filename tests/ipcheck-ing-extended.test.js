@@ -3,9 +3,13 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { toExtended, anonymityCodeOf, lineTypeOf, scenariosOf } from '../server/ipcheck-ing-extended.js';
-import { isValidExtended, EXTENDED_GATES } from '../common/ip-extended.js';
+import {
+    toExtended, anonymityCodeOf, lineTypeOf, scenariosOf, flagsOf, dimensionsOf,
+} from '../server/ipcheck-ing-extended.js';
+import { isValidExtended, EXTENDED_GATES, EXTENDED_FLAGS } from '../common/ip-extended.js';
 import { IP_TYPE_CODES } from '../common/codes/ip.js';
+import { transformDataFromIPapi } from '../frontend/utils/ip/transform-ip-data.js';
+import { listScoreTags, buildScoreExplanation } from '../frontend/utils/ip/ip-score-details.js';
 
 const GATE_VALUES = { sign_in_required: 'auth', quota_exceeded: 'quota', cooldown: 'cooldown' };
 
@@ -54,6 +58,9 @@ const stringsIn = (value) => {
 // The strings of a block, its `gate` aside ('cooldown' is both a gate and an upstream value).
 const dataStrings = ({ gate, ...rest } = {}) => stringsIn(rest);
 
+// Tags without the keys outside the flag vocabulary.
+const vocabularyOf = ({ isBogon, isBenignBot, ...rest }) => rest;
+
 describe('toExtended()', () => {
     it('maps a complete answer onto every field', () => {
         const out = toExtended(complete);
@@ -64,15 +71,22 @@ describe('toExtended()', () => {
             score: 72,
             abuse: 'low',
             scenarios: [{ id: 'email', level: 'high' }, { id: 'signup', level: 'medium' }],
-            scoreDetails: { tags: complete.advancedData.tags, dimensions },
+            scoreDetails: {
+                dimensions: {
+                    anonymity: { class: 'vpn', sources: 'multi' },
+                    reputation: { level: 'low' },
+                    network: { level: 'low' },
+                },
+            },
+            flags: vocabularyOf(complete.advancedData.tags),
         });
         assert.ok(isValidExtended(out));
     });
 
-    it('carries tags and dimensions through as the same objects', () => {
+    it('carries the tags as flags only, never under the score details', () => {
         const out = toExtended(complete);
-        assert.equal(out.scoreDetails.tags, complete.advancedData.tags);
-        assert.equal(out.scoreDetails.dimensions, dimensions);
+        assert.equal('tags' in out.scoreDetails, false);
+        assert.deepEqual(Object.keys(out.flags).sort(), [...EXTENDED_FLAGS].sort());
     });
 
     for (const [value, gate] of Object.entries(GATE_VALUES)) {
@@ -114,7 +128,7 @@ describe('toExtended()', () => {
             lineType: 'unknown',
             native: false,
             score: 100,
-            scoreDetails: { tags },
+            flags: vocabularyOf(tags),
         });
         assert.ok(isValidExtended(out));
     });
@@ -167,9 +181,17 @@ describe('toExtended()', () => {
         assert.equal('native' in out, false);
     });
 
-    it('leaves out non-object dimensions from the score details', () => {
+    it('leaves out the score details without object dimensions', () => {
         const out = toExtended({ ...geo, advancedData: { tags: { ...cleanTags }, score: 50, dimensions: 'x' } });
-        assert.deepEqual(Object.keys(out.scoreDetails), ['tags']);
+        assert.equal('scoreDetails' in out, false);
+        assert.ok(isValidExtended(out));
+    });
+
+    it('leaves out flags when no tag is a boolean of the vocabulary, keeping the block', () => {
+        const out = toExtended({ ...geo, advancedData: { tags: { isBogon: false, isVPN: 'yes' }, score: 50 } });
+        assert.equal('flags' in out, false);
+        assert.deepEqual(out.anonymity, { code: 'none' });
+        assert.ok(isValidExtended(out));
     });
 
     it('omits scenarios when they are invalid', () => {
@@ -184,6 +206,72 @@ describe('toExtended()', () => {
             const out = withScenarios(scenarios);
             assert.equal('scenarios' in out, false, JSON.stringify(scenarios));
             assert.ok(isValidExtended(out));
+        }
+    });
+});
+
+describe('flagsOf()', () => {
+    it('keeps the boolean tags of the vocabulary only', () => {
+        assert.deepEqual(
+            flagsOf({ isVPN: true, isTor: false, isBogon: true, isBenignBot: false, isProxy: 'true', isMobile: null, extra: true }),
+            { isVPN: true, isTor: false },
+        );
+        assert.equal(flagsOf({}), null);
+        assert.equal(flagsOf({ isBogon: true }), null);
+    });
+});
+
+describe('dimensionsOf()', () => {
+    it('keeps the known dimensions and their known string members', () => {
+        assert.deepEqual(dimensionsOf({
+            anonymity: { class: 'proxy', sources: 'single', firstSeen: '2026-01-02', lastSeen: '2026-03-04', count: 3 },
+            reputation: { level: 'high', lastSeen: null, reports: 9 },
+            network: { level: 'medium', asn: 64500 },
+            velocity: { level: 'low' },
+        }), {
+            anonymity: { class: 'proxy', sources: 'single', firstSeen: '2026-01-02', lastSeen: '2026-03-04' },
+            reputation: { level: 'high' },
+            network: { level: 'medium' },
+        });
+    });
+
+    it('drops non-string members and non-object dimensions, keeping an emptied one', () => {
+        assert.deepEqual(dimensionsOf({ anonymity: { class: null, sources: 2 }, reputation: 'low', network: null }), { anonymity: {} });
+        assert.deepEqual(dimensionsOf({}), {});
+        for (const value of [undefined, null, 'x', []]) assert.equal(dimensionsOf(value), null);
+    });
+});
+
+describe('score details panel over the adapter output', () => {
+    // A card shaped from raw upstream tags and dimensions, the way the panel read them before.
+    const rawCard = (advancedData) => ({
+        ip: geo.ip, isp: geo.org, asn: geo.asn, qualityScore: advancedData.score,
+        flags: advancedData.tags, scoreDimensions: advancedData.dimensions,
+    });
+    const adaptedCard = (advancedData) => ({
+        ...transformDataFromIPapi({ ...geo, extended: toExtended({ ...geo, advancedData }) }, (key) => key, 'en'),
+        ip: geo.ip,
+    });
+
+    const cases = [
+        complete.advancedData,
+        { score: 40, operatorType: 'Residential', tags: { ...cleanTags, isResidentialProxy: true },
+            dimensions: { anonymity: { class: 'residential_proxy', sources: 'single', firstSeen: null, lastSeen: '2026-09-20' },
+                reputation: { level: 'medium', lastSeen: '2026-08-01' }, network: { level: 'high', asn: 64500 } } },
+        { score: 20, operatorType: 'Hosting', tags: { ...cleanTags, isDatacenter: true, isProxy: true, isAnyAnonymizer: true, isTor: true },
+            dimensions: { anonymity: { class: 'tor', sources: 'multi', firstSeen: null, lastSeen: '2026-10-01' },
+                reputation: { level: 'high', lastSeen: null }, network: { level: 'none' } } },
+        { score: 90, operatorType: 'Wireless', tags: { ...cleanTags, isMobile: true },
+            dimensions: { anonymity: { class: null, sources: null, firstSeen: null, lastSeen: null }, reputation: null } },
+        { score: 100, operatorType: 'unknown', tags: { ...cleanTags } },
+    ];
+
+    it('lists the same attribute rows and explanation sentences', () => {
+        for (const advancedData of cases) {
+            const before = rawCard(advancedData);
+            const after = adaptedCard(advancedData);
+            assert.deepEqual(listScoreTags(after.flags), listScoreTags(before.flags));
+            assert.deepEqual(buildScoreExplanation(after), buildScoreExplanation(before));
         }
     });
 });

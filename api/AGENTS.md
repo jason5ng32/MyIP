@@ -99,11 +99,27 @@ resolver list behind `dns-resolver` (gated by
   reason? }` with the codes from `common/codes/service-errors.js`, keeping the
   upstream status.
 - **Response shape.** IP-geolocation handlers normalize to the canonical
-  frontend shape (`ip` / `country_code` / `latitude` / `asn` / `org` / …); new
-  sources match it. `timezone` is the exception (see "Response enrichment").
-  Any source may add an optional `extended` block and fill any part of it
-  (contract and validator: `common/ip-extended.js`); `ipcheck-ing` builds its
-  block in `server/ipcheck-ing-extended.js`.
+  frontend shape (`ip` / `country_code` / `latitude` / `asn` / `org` / …);
+  `timezone` is the exception (see "Response enrichment"). Any source may add
+  an optional `extended` block and fill any part of it — line type,
+  anonymizer and abuse verdicts, its own `metrics`, yes / no `flags` from a
+  fixed vocabulary (contract and validator: `common/ip-extended.js`);
+  `ipcheck-ing` builds its block in `server/ipcheck-ing-extended.js`.
+- **Adding an IP source.** One handler over `makeGeoHandler`
+  (`server/geo-handler.js`) that normalizes to that shape; its route adds
+  `withTimeZone()`. The `extended` block goes through
+  `server/source-extended.js`, whose `buildExtended` drops a block that does
+  not validate, so the base answer never depends on it. The adapter sends
+  only what the card's grid shows, computed from what the upstream states:
+  line type onto `IP_TYPE_CODES`, checked data centre → mobile → the
+  provider's company / usage type, left out when nothing matches; anonymizer
+  and abuse as a plain yes / no (`detected` / `none`, never a kind or a
+  frequency); the source's own indicators as `metrics`, never as `score`.
+  Its spec uses invented fixtures in the upstream's real shape: full, minimal
+  and all-empty answers.
+- **`api/ipinfo-io.js` skips the factory:** it asks the lookup API with the
+  token in a Bearer header; a token that API refuses with 403 is answered by
+  the legacy endpoint, and remembered for the process lifetime.
 - **`?lang` is never validated in a handler.** Pass the raw tag through:
   `lookupMaxMind` normalizes it onto the languages its data carries
   (`SUPPORTED_LANGS` in `server/datasets/maxmind-service.js`); the IPCheck.ing API proxies
