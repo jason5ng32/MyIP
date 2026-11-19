@@ -267,10 +267,13 @@
 <script setup>
 import { ref, reactive, computed } from 'vue';
 import { useMainStore } from '@/store';
+import { TOOL_BY_SLUG } from '@/data/tools.js';
+import { DNS_LEAK_TEST_DOMAIN } from '@/utils/probe-endpoints.js';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
+import { SERVICE_ERROR_CODE, AUTH_REASON } from '@/utils/codes/service-errors.js';
 import getCountryName from '@/utils/country-name.js';
 import { toApiTag } from '@/utils/locale-registry.js';
 import { Button } from '@/components/ui/button';
@@ -293,11 +296,13 @@ import { Play, Check, X, Hourglass, Info, Server, Hash, Route, MapPin, ShieldChe
 
 const { t } = useI18n();
 const store = useMainStore();
+// This tool's metered feature in the quota snapshot.
+const QUOTA_KEY = TOOL_BY_SLUG.get('enhanceddnsleaktest').quotaKey;
 const lang = computed(() => store.lang);
 
 // NS-capture session config. Token + probe FQDNs are generated client-side;
 // the NS passively captures any {nonce}.{token}.{DOMAIN} that shows up.
-const PROBE_DOMAIN = 'leak.ipcheck.ing';
+const PROBE_DOMAIN = DNS_LEAK_TEST_DOMAIN;
 const PROBE_COUNT = 4;
 const PROBE_STEP_MS = 450;   // delay between UI animation steps
 const POLL_AFTER_MS = 3500;  // wait before first fetch so NS can absorb probes
@@ -512,13 +517,13 @@ const animateProbes = async () => {
 const apiLang = () => toApiTag(lang.value);
 
 // authenticatedFetch attaches the Firebase ID token as Authorization; our
-// backend then forwards request headers to the upstream IPCheck.ing API.
+// backend forwards it, among the listed headers, to the IPCheck.ing API.
 const fetchResultOnce = async (token) => {
     const url = `/api/dnsleaktest/session/${encodeURIComponent(token)}?lang=${encodeURIComponent(apiLang())}`;
     return authenticatedFetch(url);
 };
 
-// Retry transient failures. Auth / token errors bypass the retry — there's
+// Retry transient failures. Auth and quota errors bypass the retry — there's
 // no point re-hitting the upstream with the same (rejected) credentials.
 const fetchResultWithRetry = async (token) => {
     let lastErr;
@@ -527,11 +532,10 @@ const fetchResultWithRetry = async (token) => {
             return await fetchResultOnce(token);
         } catch (err) {
             lastErr = err;
-            if (err.message.includes('Sign in required') || err.message.includes('Invalid token')
-                || err.message.includes('quota_exceeded')) {
+            if (err.code === SERVICE_ERROR_CODE.AUTH || err.code === SERVICE_ERROR_CODE.QUOTA) {
                 throw err;
             }
-            console.warn(`[dnsleak] fetch attempt ${attempt}/${FETCH_MAX_ATTEMPTS} failed:`, err.message);
+            console.warn(`[dnsleak] fetch attempt ${attempt}/${FETCH_MAX_ATTEMPTS} failed:`, err);
             if (attempt < FETCH_MAX_ATTEMPTS) await new Promise(r => setTimeout(r, FETCH_RETRY_DELAY_MS));
         }
     }
@@ -543,7 +547,7 @@ const runTest = async () => {
     // Frontend first line: skip the probe volley + polling entirely when the
     // store's quota snapshot says the month is exhausted. The backend keeps
     // enforcing the same limit (429) as the real guard.
-    if (store.quotaExceeded.dns_leak_test) {
+    if (store.quotaExceeded(QUOTA_KEY)) {
         quotaExceeded.value = true;
         return;
     }
@@ -586,18 +590,18 @@ const runTest = async () => {
         emitAppEvent('enhanceddnsleak:finished', { ...result.value });
     } catch (error) {
         console.error('Enhanced DNS leak test failed:', error);
-        if (error.message.includes('quota_exceeded')) {
+        if (error.code === SERVICE_ERROR_CODE.QUOTA) {
             // Monthly quota exhausted — the hint box (with the sponsor path)
             // replaces the generic error line.
             quotaExceeded.value = true;
-            store.markQuotaExhausted('dns_leak_test');
+            store.markQuotaExhausted(QUOTA_KEY);
             status.value = 'error';
             return;
         }
-        if (error.message.includes('Invalid token')) {
-            errorMsg.value = t('user.InvalidUserToken');
-        } else if (error.message.includes('Sign in required')) {
-            errorMsg.value = t('user.SignInToUse');
+        if (error.code === SERVICE_ERROR_CODE.AUTH) {
+            errorMsg.value = error.reason === AUTH_REASON.INVALID_TOKEN
+                ? t('user.InvalidUserToken')
+                : t('user.SignInToUse');
         } else {
             errorMsg.value = t('enhanceddnsleaktest.FetchError');
         }

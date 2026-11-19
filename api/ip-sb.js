@@ -9,7 +9,8 @@ function buildUrl(req) {
     return `https://api.ip.sb/geoip/${ipAddress}`;
 }
 
-function modifyJsonForIPSB(json) {
+// `asn` is absent for addresses the upstream has no network for.
+export function modifyJsonForIPSB(json) {
     return {
         ip: json.ip,
         city: json.city,
@@ -19,7 +20,7 @@ function modifyJsonForIPSB(json) {
         country_code: json.country_code,
         latitude: json.latitude,
         longitude: json.longitude,
-        asn: "AS" + json.asn,
+        asn: json.asn === undefined || json.asn === null ? 'N/A' : 'AS' + json.asn,
         org: json.isp
     };
 }

@@ -11,12 +11,13 @@
 // IP fields absent while their source is on cooldown or fallback.
 // `notableChanges` is the stricter check behind the change notice: only
 // what both sides carry counts (no new section, target or field), plus
-// WebRTC going from some IP to none.
+// WebRTC going from some IP to none; an IP card answered by another geo
+// source than before compares its IP alone.
 
 import { isValidIP } from '../ip/valid-ip.js';
 import { HOME_SECTION_IDS } from './snapshots.js';
 import { CONNECTIVITY_STATUS } from '../codes/connectivity.js';
-import { keyedItems, sectionFields, sameValue } from './snapshot-diff.js';
+import { keyedItems, sectionFields, sameValue, geoSourceSwitch } from './snapshot-diff.js';
 import { readField } from './snapshot-diff-format.js';
 
 // --- thresholds -------------------------------------------------------------
@@ -50,13 +51,18 @@ const fieldChanged = (from, to, field) => {
     return isPresent(a) && isPresent(b) && !sameValue(a, b);
 };
 
-// True when an item present (and usable) on both sides differs in a field.
-const keyedChanged = (id, previous, current) => {
+// True when an item present (and usable) on both sides differs in a field;
+// `fieldsOf(from, to)` narrows the fields per pair.
+const keyedChanged = (id, previous, current, fieldsOf = () => COMPARED_FIELDS[id]) => {
     const before = usableItems(id, previous);
     const after = usableItems(id, current);
     return [...after].some(([key, item]) => before.has(key)
-        && COMPARED_FIELDS[id].some((field) => fieldChanged(before.get(key), item, field)));
+        && fieldsOf(before.get(key), item).some((field) => fieldChanged(before.get(key), item, field)));
 };
+
+// Another source reads the same IP differently: across a source switch only
+// the IP itself is notable.
+const noticeIpinfoFields = (from, to) => (geoSourceSwitch(from, to) ? ['ip'] : COMPARED_FIELDS.ipinfo);
 
 // WebRTC reachability: at least one STUN server returned a valid IP. The
 // builder keeps failed servers (natType 'error' / 'unavailable', no ip), so a
@@ -141,7 +147,7 @@ export const shouldRecordSnapshot = (previous, current) => snapshotTrigger(previ
 
 // Per section, whether what both sides carry changed notably.
 const SHARED_CHANGED = {
-    ipinfo: (before, after) => keyedChanged('ipinfo', before, after),
+    ipinfo: (before, after) => keyedChanged('ipinfo', before, after, noticeIpinfoFields),
     connectivity: (before, after) => sharedTargetsChange(
         keyedItems('connectivity', before), keyedItems('connectivity', after)) !== null,
     webrtc: (before, after) => keyedChanged('webrtc', before, after)

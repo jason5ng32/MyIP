@@ -60,7 +60,7 @@ export function useMaxmind() {
                 const url = store.getDbUrl(source.id, ip, apiLang);
                 const response = await fetchWithTimeout(url);
                 const data = await response.json();
-                const ipData = transformDataFromIPapi(data, source.id, t, lang);
+                const ipData = transformDataFromIPapi(data, t, lang);
                 if (!ipData) return null;
                 const country_code = (ipData.country_code || '').toLowerCase();
                 const country = country_code

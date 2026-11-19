@@ -1,44 +1,32 @@
-// GET /api/ipblocklist?ip= — which blocklists an IP is on, from the private
+// GET /api/ipblocklist?ip= — which blocklists an IP is on, from the
 // IPCheck.ing API (`/iphitlist`: live DNSBL lookups plus static threat lists).
 // `?ip` is validated by requirePublicIP(). Sign-in is enforced upstream, so
-// the caller's headers (auth token) are forwarded as-is.
+// the listed caller headers (auth token included) are forwarded.
 
-import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../server/logger.js';
+import { ipCheckingApiErrorBody, isIpCheckingApiConfigured, requestIpCheckingApi } from '../server/ipcheck-ing-api.js';
 
 // A cold DNSBL pass queries dozens of zones under per-zone deadlines; well
 // past the default 8s, and the frontend waits a little longer than this.
 export const IP_BLOCKLIST_TIMEOUT_MS = 30000;
 
 export default async (req, res) => {
-    const apiKey = process.env.IPCHECKING_API_KEY;
-    const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
-    if (!apiKey || !apiEndpoint) {
+    if (!isIpCheckingApiConfigured()) {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    const url = new URL(`${apiEndpoint}/iphitlist`);
-    url.searchParams.set('ip', req.query.ip);
-    url.searchParams.set('key', apiKey);
-
     try {
-        const apiResponse = await fetchUpstream(url, {
-            headers: { ...req.headers },
+        const apiResponse = await requestIpCheckingApi('/iphitlist', {
+            query: { ip: req.query.ip },
+            forwardFrom: req,
             timeoutMs: IP_BLOCKLIST_TIMEOUT_MS,
         });
 
-        // Monthly quota exhausted: not a failure — pass status + code through
-        // so the frontend shows the quota hint.
-        if (apiResponse.status === 429) {
-            const errorData = await apiResponse.json().catch(() => ({}));
-            return res.status(429).json({ error: errorData.error || 'Monthly quota exceeded', code: 'quota_exceeded' });
-        }
-
-        // Sign-in problems are the visitor's state, not a failure: pass the
-        // status through so the frontend prompts sign-in.
-        if (apiResponse.status === 401 || apiResponse.status === 403) {
-            const errorData = await apiResponse.json().catch(() => ({}));
-            return res.status(apiResponse.status).json({ error: errorData.message || 'Sign in required' });
+        // Quota (429) and sign-in (401/403) are the visitor's state, not a
+        // failure: pass the status through with the coded body so the
+        // frontend shows the matching hint.
+        if (apiResponse.status === 429 || apiResponse.status === 401 || apiResponse.status === 403) {
+            return res.status(apiResponse.status).json(await ipCheckingApiErrorBody(apiResponse));
         }
 
         if (!apiResponse.ok) {

@@ -1,10 +1,10 @@
-// Score-details panel for IPCheck.ing results (ScoreDetailsPanel): a plain-
+// Score-details panel for an IP card's extended fields (ScoreDetailsPanel): a plain-
 // language explanation of the quality score, built as a list of i18n
 // sentences, and the attribute rows below it. Pure — no Vue, no fetch.
 //
-// Inputs are the transformed card fields (transform-ip-data.js): `scoreTags`,
-// `scoreDimensions`, `qualityScore`, `isp`, `asn`, `ip`. Gated responses (or
-// any without `dimensions`) yield nothing.
+// Inputs are the transformed card fields (transform-ip-data.js): `flags`,
+// `scoreDimensions`, `qualityScore`, `isp`, `asn`, `ip`. Gated cards (or
+// any without `scoreDimensions`) yield nothing.
 
 const KEY = 'ipInfos.scoreDetails';
 
@@ -49,7 +49,7 @@ export const scoreRiskTier = (score) => {
 };
 
 // One sentence per dimension, each { key, params }. Empty unless the card
-// carries the v3 `dimensions` block and a numeric score. `t` translates the
+// carries `scoreDimensions` and a numeric score. `t` translates the
 // fallback operator name; `formatDate` renders a YYYY-MM-DD day.
 export const buildScoreExplanation = (data, { t = (key) => key, formatDate = (day) => day } = {}) => {
     const dims = data?.scoreDimensions;
@@ -57,7 +57,7 @@ export const buildScoreExplanation = (data, { t = (key) => key, formatDate = (da
     const score = typeof rawScore === 'number' || /^\d+(\.\d+)?$/.test(rawScore ?? '') ? Number(rawScore) : NaN;
     if (!isPlainObject(dims) || !Number.isFinite(score)) return [];
 
-    const tags = isPlainObject(data.scoreTags) ? data.scoreTags : {};
+    const tags = isPlainObject(data.flags) ? data.flags : {};
     const sentences = [];
     const add = (key, params = {}) => sentences.push({ key: `${KEY}.explain.${key}`, params });
 

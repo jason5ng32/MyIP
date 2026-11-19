@@ -20,7 +20,8 @@ handlers share is split by who imports it:
 
 Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /
-`maxmind`), tool backends (`get-whois` / `dns-resolver` / `mac-checker` /
+`maxmind`; their routes are mounted from `api/ip-sources.js`), tool backends
+(`get-whois` / `dns-resolver` / `mac-checker` /
 `cf-radar` / `asn-history` / `asn-connectivity` / `asn-profile` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona` /
@@ -81,8 +82,9 @@ resolver list behind `dns-resolver` (gated by
 
 ## Conventions
 
-- **Handler shape.** Single default export `async (req, res) => …`: read
-  `req.query` / `req.body`, call upstream, write one response.
+- **Handler shape.** The default export is the route's handler, `async
+  (req, res) => …` (a file serving a second route exports that one by name):
+  read `req.query` / `req.body`, call upstream, write one response.
 - **Every upstream call uses `fetchUpstream`** (`common/fetch-with-timeout.js`,
   8s timeout — Radar's client raises it to 12 s, `RADAR_TIMEOUT_MS`; its own
   timeout is an `AbortError` reading `Timed out after
@@ -90,15 +92,40 @@ resolver list behind `dns-resolver` (gated by
   `fetch()` / `https.get()` — a hanging provider must
   time out. It injects a default `User-Agent` `MyIP/v<version>/<VITE_SITE_URL>`
   (`server/upstream-ua.js`; some WAFs block undici's `node` UA); caller-supplied
-  ones, incl. the private-API `{ ...req.headers }` pass-through, win.
+  ones win, incl. the visitor's `user-agent` forwarded to the IPCheck.ing API
+  (the ASN reputation request carries the default).
 - **Error shape.** `res.status(500).json({ error: error.message })` on upstream
   failure, `400` on bad input. Terse — the frontend doesn't show them verbatim.
+  The four deep-tool routes (`invisibility-test`, `dns-leak-test`, `persona`,
+  `ip-blocklist`) answer sign-in and quota failures as `{ error, code,
+  reason? }` with the codes from `common/codes/service-errors.js`, keeping the
+  upstream status.
 - **Response shape.** IP-geolocation handlers normalize to the canonical
-  frontend shape (`ip` / `country_code` / `latitude` / `asn` / `org` / …); new
-  sources match it. `timezone` is the exception (see "Response enrichment").
+  frontend shape (`ip` / `country_code` / `latitude` / `asn` / `org` / …);
+  `timezone` is the exception (see "Response enrichment"). Any source may add
+  an optional `extended` block and fill any part of it — line type,
+  anonymizer and abuse verdicts, its own `metrics`, yes / no `flags` from a
+  fixed vocabulary (contract and validator: `common/ip-extended.js`);
+  `ipcheck-ing` builds its block in `server/ipcheck-ing-extended.js`.
+- **Adding an IP source.** One handler over `makeGeoHandler`
+  (`server/geo-handler.js`) that normalizes to that shape, one row in
+  `api/ip-sources.js` (`key`, `handler`, edge TTL, readiness `gates`, and an
+  `isConfigured` exported by the adapter when it needs a key) — the route,
+  its daily-limit key and its `/api/configs` flag derive from it — and its
+  row in `frontend/data/ip-databases.js` (`tests/ip-sources.test.js` checks
+  the two match). The `extended` block goes through
+  `server/source-extended.js`, whose `buildExtended` drops a block that does
+  not validate, so the base answer never depends on it. The adapter sends
+  only what the card's grid shows, computed from what the upstream states:
+  line type onto `IP_TYPE_CODES`, checked data centre → mobile → the
+  provider's company / usage type, left out when nothing matches; anonymizer
+  and abuse as a plain yes / no (`detected` / `none`, never a kind or a
+  frequency); the source's own indicators as `metrics`, never as `score`.
+  Its spec uses invented fixtures in the upstream's real shape: full, minimal
+  and all-empty answers.
 - **`?lang` is never validated in a handler.** Pass the raw tag through:
   `lookupMaxMind` normalizes it onto the languages its data carries
-  (`SUPPORTED_LANGS` in `server/datasets/maxmind-service.js`); the private-API proxies
+  (`SUPPORTED_LANGS` in `server/datasets/maxmind-service.js`); the IPCheck.ing API proxies
   forward it for the upstream's own resolution. No allow-lists; `/api/map`'s
   `language` only gets a tag-shape check, as each value is a year-cached
   Static Maps call.
@@ -142,6 +169,15 @@ resolver list behind `dns-resolver` (gated by
   picker and `resolveDns` also read; otherwise the DoH branch would forward any
   string to four third-party endpoints.
 - `requireValidReportId()` — `/api/report/:id` route param (22-char base64url).
+- `sourceDailyLimit('<key>')` (`server/source-daily-limits.js`, not a guard
+  here) — the geo routes' daily ceiling from `IP_SOURCE_DAILY_LIMITS`
+  (`<key>=<n>`, key = the route's last segment, as listed by
+  `initSourceDailyLimits(IP_SOURCE_KEYS)`; 0 / unset = unlimited). After
+  the route's guards and readiness gate, before `withTimeZone()`: a slot is
+  held on admission and given back on a status ≥ 400 or an aborted
+  connection; a used-up day answers 429 `{ error, code: 'source_daily_limit' }`
+  (never cached). Counts reset on the server-local day, persist to
+  `common/source-limits-db/` every few seconds, and are per process.
 
 New param shape → new guard there, attached in `backend-server.js`.
 Rewrites go through `setQueryParam()` there: Express 5's `req.query` re-parses
@@ -149,12 +185,12 @@ on every read, so a direct write is lost.
 
 ### Response enrichment lives in middleware too
 
-`withTimeZone()` (`server/ip-timezone.js`), on all seven geo routes, derives
+`withTimeZone()` (`server/ip-timezone.js`), on every geo route, derives
 `timezone` (IANA name) from the `latitude` / `longitude` the handler returned
 (2xx only, the `cacheable` hook); no handler computes or forwards one. Own
 coordinates keep the zone consistent with the city beside it; only the name
 ships — the frontend renders the offset, as a 24h-cached offset breaks at every
-DST switch. A new geo source adds the middleware.
+DST switch. `backend-server.js` adds it to every `api/ip-sources.js` row.
 
 ### Offline data gates boot, not the listener
 
@@ -171,16 +207,18 @@ The Radar outage poll stays out of that window (it would stretch the ASN
 Profile's no-degraded-caching span); a request that finds it empty fills it
 on demand.
 
-### Private-API header pass-through (intentional exception)
+### IPCheck.ing API requests go through one helper with a header list
 
-Handlers proxying our private IPCheck.ing API (`ipcheck-ing`,
+Handlers proxying the IPCheck.ing API (`ipcheck-ing`,
 `invisibility-test`, `update-user-achievement`, `get-user-info`,
 `dns-leak-test`, `persona`, `ip-blocklist`, and `asn-profile`'s reputation via
-`server/asn-reputation.js`) forward the caller's headers upstream (`headers: {
-...req.headers }`) — the upstream needs caller context (Accept-Language, auth
-tokens). `persona` strips the framing headers (`host` / `content-length` / …)
-first, as it re-serializes the body. Do **not** replicate for third-party
-upstreams; those get only what's explicitly needed.
+`server/asn-reputation.js`) send their requests through
+`server/ipcheck-ing-api.js`. It forwards a fixed list of the caller's headers
+(`authorization`, `accept-language`, `user-agent`, `cf-connecting-ip`,
+`x-forwarded-for`; `FORWARDED_HEADERS`) and sets `content-type` itself for
+JSON bodies; handlers never pass headers of their own. The ASN reputation
+request carries no caller headers. Third-party upstreams get only what's
+explicitly needed.
 
 ### Firebase Auth handler proxy
 
@@ -197,8 +235,8 @@ guards, caching or per-request logs.
 
 Every `/api/*` response defaults to `Cache-Control: no-store`; slowly-changing
 public routes opt in via `cacheable(maxAge)` (`server/cache-control.js`) in
-`backend-server.js`, e.g. `cacheable(24 * 60 * 60)` (TTLs written that way, not
-raw seconds). `maxAge` may be a `(req) => seconds` resolver (cfradar: its view's
+`backend-server.js` (geo routes: their row's `cacheSeconds`), e.g.
+`cacheable(24 * 60 * 60)` (TTLs written that way, not raw seconds). `maxAge` may be a `(req) => seconds` resolver (cfradar: its view's
 TTL; falsy = no-store). `{ cacheIf }` vetoes the full TTL for a 2xx body,
 `{ degradedMaxAge }` gives a vetoed one a shorter TTL instead of no-store:
 `/api/asn-profile` caches a complete answer (no section `error` / `incomplete`;
@@ -207,8 +245,10 @@ upstreams fail for some ASes every time — except inside the boot window
 (`isOfflineBootstrapping`); cfradar caches no partial view answer
 (`isCompleteRadarAnswer`). The ASN family (profile, Radar `asn` /
 `bgp-prefixes`) shares 7 days. Only status < 400 is cached; handlers
-never touch `Cache-Control`. **Auth'd / per-user endpoints must not be
-wrapped** — their caching belongs to the upstream owning the auth context.
+never touch `Cache-Control`, except `google-map`'s image stream, which
+bypasses the JSON hook and applies the stashed `res.locals.cacheControl`.
+**Auth'd / per-user endpoints must not be wrapped** — their caching belongs
+to the upstream owning the auth context.
 
 ## Testing
 

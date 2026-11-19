@@ -148,8 +148,8 @@ const SECTION_SPECS = {
             timezone: opt(timeZone()),
             asn: opt(str(16)),
             isp: opt(str(128)),
-            // IPCheck.ing-source enrichments — absent on other sources, when
-            // the upstream sign-in-gates them, or when the value is 'unknown'
+            // Extended fields — absent when the source gives none, when the
+            // card is gated, or when the value is 'unknown'
             // (an unknown line type carries no diagnostic signal).
             anonymity: opt(oneOf(...ANONYMITY_CODES)),
             ipType: opt(oneOf(...IP_TYPE_CODES)),
@@ -161,6 +161,8 @@ const SECTION_SPECS = {
             // Scenario friction, Snapshots only: scenario id → level, never reasons.
             scenarios: opt(localOnly(obj(Object.fromEntries(SCENARIO_FRICTION_IDS
                 .map((id) => [id, opt(oneOf(...SCENARIO_FRICTION_LEVELS))]))))),
+            // The geo source that answered, Snapshots only: its source id.
+            geoSource: opt(localOnly(int(0, 63))),
         })),
     }),
     connectivity: obj({

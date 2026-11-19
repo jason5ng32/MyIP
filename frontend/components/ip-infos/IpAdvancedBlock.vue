@@ -1,6 +1,6 @@
-<!-- Advanced block (IPCheck.ing source only): locked CTA + `***` preview when gated, otherwise the
+<!-- Advanced block (the card's extended fields): locked CTA + `***` preview when gated, otherwise the
      label-value grid with the single-select score / friction details frame under it. One of
-     IpDetailPanel's root siblings; its own root carries the collapsed / source gates. -->
+     IpDetailPanel's root siblings; its own root carries the collapsed / field-presence checks. -->
 <template>
     <div v-if="!collapsed" v-show="showAdvancedBlock" class="px-4 pb-3 border-t pt-3 space-y-2.5">
 
@@ -75,7 +75,7 @@
                     <dd class="font-normal wrap-break-word">
                         {{ data.anonymity }}
                     </dd>
-                    <!-- Anonymizing service, when the API named one. -->
+                    <!-- Anonymizing service, when the source named one. -->
                     <dd v-if="anonymityService" class="font-normal wrap-break-word">
                         <span class="text-muted-foreground font-normal text-xs">{{ anonymityService }}</span>
                     </dd>
@@ -129,6 +129,15 @@
                         <span>{{ t('ipInfos.abuseLevel.label') }}</span>
                     </dt>
                     <dd class="font-normal wrap-break-word">{{ t(ABUSE_LEVEL_I18N_KEYS[abuseLevel]) }}</dd>
+                </div>
+
+                <!-- Source metrics: each the source's own indicator under its own name, as plain text. -->
+                <div v-for="metric in sourceMetrics" :key="metric.id">
+                    <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        <Activity class="size-3.5" />
+                        <span>{{ t(`ipInfos.sourceMetrics.${metric.id}`) }}</span>
+                    </dt>
+                    <dd class="font-normal wrap-break-word" :class="metric.ratio && 'tabular-nums'">{{ metric.text }}</dd>
                 </div>
 
                 <!-- Scenario friction: one tone dot per scenario, low → high (deliberately not a score
@@ -217,9 +226,12 @@ import { isPlainClick } from '@/utils/nav-target.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { frictionDots, frictionShares } from '@/utils/ip/scenario-friction.js';
 import { ABUSE_LEVELS } from '@/utils/codes/ip.js';
+import { LINE_TYPE_UNKNOWN } from '@/utils/ip/ip-extended.js';
+import { hasExtendedFields } from '@/utils/ip/transform-ip-data.js';
 import { ABUSE_LEVEL_I18N_KEYS } from '@/utils/codes/ip-labels.js';
 import ScenarioFrictionPanel from './ScenarioFrictionPanel.vue';
 import ScoreDetailsPanel from './ScoreDetailsPanel.vue';
+import { listSourceMetrics } from '@/utils/ip/source-fields.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -232,6 +244,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Icon } from '@iconify/vue';
 import {
+    Activity,
     ArrowRight,
     ChevronDown,
     CircleQuestionMark,
@@ -252,8 +265,6 @@ const store = useMainStore();
 
 const props = defineProps({
     data: { type: Object, required: true },
-    ipGeoSource: { type: Number, required: true },
-    configs: { type: Object, required: true },
     collapsed: { type: Boolean, default: false },
 });
 
@@ -265,33 +276,13 @@ const openUsageDialog = () => {
     store.setTriggerUserBenefits(true);
 };
 
-// Advanced block only surfaces for the IPCheck.ing source (ipGeoSource === 0).
-const showAdvancedBlock = computed(() => props.ipGeoSource === 0 && Boolean(props.data));
+// Shown when the card carries a gate or any extended field (transform-ip-data.js).
+const showAdvancedBlock = computed(() => hasExtendedFields(props.data));
 
-// Backend gating sentinels for the advanced fields (see transform-ip-data.js).
-const GATED_VALUES = new Set(['sign_in_required', 'quota_exceeded', 'cooldown']);
-const isGatedValue = (value) => GATED_VALUES.has(value);
-
-// If every advanced field is masked → show the single CTA + preview grid instead
-// of rendering four individual gated rows. Each sentinel picks its own copy.
-const allAdvancedLocked = computed(() =>
-    props.data.type === 'sign_in_required' &&
-    props.data.anonymity === 'sign_in_required' &&
-    props.data.isNativeIP === 'sign_in_required' &&
-    props.data.qualityScore === 'sign_in_required'
-);
-const allAdvancedQuotaExceeded = computed(() =>
-    props.data.type === 'quota_exceeded' &&
-    props.data.anonymity === 'quota_exceeded' &&
-    props.data.isNativeIP === 'quota_exceeded' &&
-    props.data.qualityScore === 'quota_exceeded'
-);
-const allAdvancedCooldown = computed(() =>
-    props.data.type === 'cooldown' &&
-    props.data.anonymity === 'cooldown' &&
-    props.data.isNativeIP === 'cooldown' &&
-    props.data.qualityScore === 'cooldown'
-);
+// A gated card shows the single CTA + preview grid; each gate picks its own copy.
+const allAdvancedLocked = computed(() => props.data.extendedGate === 'auth');
+const allAdvancedQuotaExceeded = computed(() => props.data.extendedGate === 'quota');
+const allAdvancedCooldown = computed(() => props.data.extendedGate === 'cooldown');
 const gatedCta = computed(() => {
     if (allAdvancedQuotaExceeded.value) return t('ipInfos.advancedQuotaCta');
     if (allAdvancedCooldown.value) return t('ipInfos.advancedCooldownCta');
@@ -299,22 +290,15 @@ const gatedCta = computed(() => {
 });
 
 const showTypeBadge = computed(() =>
-    props.data.type && !isGatedValue(props.data.type)
-    && props.data.type !== t('ipInfos.advancedData.type.unknownType')
+    Boolean(props.data.type) && props.data.ipTypeCode !== LINE_TYPE_UNKNOWN
 );
-const showAnonymityBadge = computed(() =>
-    Boolean(props.data.anonymity) && !isGatedValue(props.data.anonymity)
-);
-// "Provider · protocol"; both are null unless the API named a service.
+const showAnonymityBadge = computed(() => Boolean(props.data.anonymity));
+// "Provider · protocol"; both are null unless the source named a service.
 const anonymityService = computed(() =>
     [props.data.anonymityProvider, props.data.anonymityProtocol].filter(Boolean).join(' · ')
 );
-const showNativeBadge = computed(() =>
-    props.data.isNativeIP !== undefined && !isGatedValue(props.data.isNativeIP)
-);
-const showQualityScore = computed(() =>
-    props.data.qualityScore !== undefined && !isGatedValue(props.data.qualityScore)
-);
+const showNativeBadge = computed(() => props.data.isNativeIP !== undefined);
+const showQualityScore = computed(() => props.data.qualityScore !== undefined);
 
 // Locked field preview: 4 advanced fields shown as "label + ***" while gated,
 // with the signed-in grid's icons.
@@ -344,23 +328,23 @@ const qualityTone = computed(() => {
     return 'fail';
 });
 
-// Score-details panel (IPCheck.ing source): explanation sentences (need
+// Score-details panel: explanation sentences (need
 // `dimensions`) and attribute rows. Both are empty for gated data, and the
 // toggle only shows when either has content.
 const scoreExplanation = computed(() => buildScoreExplanation(props.data, {
     t,
     formatDate: (day) => formatIsoDate(day, locale.value),
 }));
-const scoreTagRows = computed(() => listScoreTags(props.data.scoreTags));
+const scoreTagRows = computed(() => listScoreTags(props.data.flags));
 const hasScoreDetails = computed(() =>
     showAdvancedBlock.value && (scoreExplanation.value.length > 0 || scoreTagRows.value.length > 0)
 );
 
-// Abuse level from the v3 reputation dimension (ABUSE_LEVELS); anything else hides the cell.
-const abuseLevel = computed(() => {
-    const level = props.data.scoreDimensions?.reputation?.level;
-    return ABUSE_LEVELS.includes(level) ? level : '';
-});
+// Abuse level (ABUSE_LEVELS); anything else hides the cell.
+const abuseLevel = computed(() => (ABUSE_LEVELS.includes(props.data.abuseLevel) ? props.data.abuseLevel : ''));
+
+// Source metrics (source-fields.js); unknown ids are skipped.
+const sourceMetrics = computed(() => listSourceMetrics(props.data));
 
 // Scenario friction: normalized scenarios (transform-ip-data.js), one dot each.
 const { dotClass } = useStatusTone();
@@ -399,7 +383,7 @@ watch(hasFriction, (has) => { if (!has && openDetail.value === 'friction') isDet
 // Blocklist Check entry: hidden when the tool is gated off; `q` only prefills.
 const router = useRouter();
 const blocklistHref = computed(() => (
-    isToolAvailable(TOOL_BY_SLUG.get('blocklist'), props.configs) && props.data.ip
+    isToolAvailable(TOOL_BY_SLUG.get('blocklist'), store.capabilities) && props.data.ip
         ? `/tools/blocklist?q=${encodeURIComponent(props.data.ip)}`
         : ''
 ));
@@ -413,7 +397,7 @@ const openBlocklist = (e) => {
 
 // Persona Check invitation closing the friction details: dropped when the tool is gated off.
 const personacheckHref = computed(() => (
-    isToolAvailable(TOOL_BY_SLUG.get('personacheck'), props.configs) ? '/tools/personacheck' : ''
+    isToolAvailable(TOOL_BY_SLUG.get('personacheck'), store.capabilities) ? '/tools/personacheck' : ''
 ));
 const openPersonacheck = (e) => {
     if (!isPlainClick(e)) return;

@@ -1883,6 +1883,7 @@
       "proxySuspected": "Proxy probable",
       "vpn": "VPN",
       "vpnSuspected": "VPN probable",
+      "detected": "Détecté",
       "none": "Non détecté"
     },
     "qualityScore": "Qualité IP",
@@ -2022,7 +2023,12 @@
       "none": "Non détectée",
       "low": "Occasionnelle",
       "medium": "Modérée",
-      "high": "Fréquente"
+      "high": "Fréquente",
+      "detected": "Détectée"
+    },
+    "sourceMetrics": {
+      "fraudScore": "Score de fraude",
+      "abuserScore": "Score d'abus du réseau"
     },
     "scenarioFriction": {
       "label": "Friction par scénario",
@@ -2058,6 +2064,11 @@
       },
       "personaHint": "Au-delà de l'IP, les plateformes tiennent compte de plusieurs facteurs pour décider des restrictions à appliquer. Vous voulez savoir si votre profil global correspond à ce que vous attendez ?",
       "personaLink": "Lancer la vérification de persona"
+    },
+    "sourceFields": {
+      "source": "Source des données",
+      "switch": "changer",
+      "sentence": "Base de données de géolocalisation utilisée : {source} ({switch})."
     },
     "countryTraffic": {
       "subtitle": "Répartition hebdomadaire de l'activité en ligne de ce pays/région — affichez uniquement le trafic généré par des humains, ou tout le trafic (bots et trafic automatisé inclus).",

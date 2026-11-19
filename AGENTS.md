@@ -40,7 +40,7 @@ Licensed under AGPL-3.0-only (`LICENSE`).
 | Error monitoring | Sentry — optional & env-gated on both halves: `@sentry/vue` (no `VITE_SENTRY_DSN_FRONTEND`, no Sentry in the build — see frontend/AGENTS.md) + `@sentry/node` (no `SENTRY_DSN_BACKEND`, never loaded — see api/AGENTS.md) |
 | PWA | `manifest.webmanifest` only — installable but online-only, no service worker |
 | Tests | Node built-in test runner (`node --test`) |
-| Runtime libs | chart.js · chartjs-chart-geo · @cloudflare/speedtest · maxmind · whoiser · thumbmarkjs · ua-parser-js · detect-gpu · @vueuse/core |
+| Runtime libs | chart.js · chartjs-chart-geo · @cloudflare/speedtest · maxmind · whoiser · thumbmarkjs · ua-parser-js · @vueuse/core |
 
 ## Commands
 
@@ -87,6 +87,9 @@ use npm / yarn — they'd produce a competing lockfile.
   TypeScript migration.
 - **English by default** for code comments, commit messages, and AGENTS.md.
   Locale packs obviously carry their own language; planning docs are free.
+- **Name the service, not its status.** Public text (code, comments, tests,
+  docs) never describes the IPCheck.ing API as non-public; name it "the
+  IPCheck.ing API", or describe the capability (`ipChecking`, sign-in).
 
 ### Functions
 
@@ -113,6 +116,12 @@ allowlist names each known exception, and fails once one is gone):
   recording module, `report-schema.js` and the report builders only import
   it. Its code → i18n-key map lives once in `utils/codes/<domain>-labels.js`,
   used by every view (live card, report page, Snapshots diff).
+
+Beside it, `tests/provider-neutrality.test.js` keeps the core neutral about
+the IPCheck.ing API: identity gates, source-id `0` checks, `advancedData`
+reads, quoted gate strings, whole header spreads, its env variables and its
+hostname / name in code are allowed only in listed files (lists only shrink),
+and the naming rule above is checked in all public text.
 
 ### Comments
 

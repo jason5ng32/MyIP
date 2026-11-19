@@ -1,22 +1,25 @@
 // IP database definitions
 //
-// Each item: { id, text, url, enabled, configKey? }
+// Each item: { id, text, url, enabled, configKey?, extended?, quotaKey?, attribution? }
 // - id    stable identifier, stored in visitors' localStorage (userPreferences.ipGeoSource):
-//         never renumber; reorder the array instead
+//         a stored number names whichever source holds it, so don't renumber casually
 // - text  UI display name, also lookup key (e.g. `WebRtcTest.vue` looks for "MaxMind")
 // - url   template string, {{ip}} and {{lang}} will be replaced by buildDbUrl()
 // - enabled   availability, derived from /api/configs (runtime failures never touch it)
 // - configKey /api/configs flag gating this source; absent = key-free, always available
+// - extended  true when the source's answer carries the `extended` block (common/ip-extended.js)
+// - quotaKey  the metered feature's key in the signed-in user's quota snapshot
+// - attribution  { url }: the provider's home page, linked from the IP section's data-source sentence
 // Array order is the Preferences list order and the fallback walk order.
 
 export const IP_DATABASES = [
-  { id: 0, text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true, configKey: 'ipChecking' },
-  { id: 3, text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true, configKey: 'ipapiis' },
-  { id: 1, text: 'IPinfo.io', url: '/api/ipinfo?ip={{ip}}', enabled: true, configKey: 'ipInfo' },
-  { id: 2, text: 'IP-API.com', url: '/api/ipapicom?ip={{ip}}&lang={{lang}}', enabled: true },
-  { id: 4, text: 'IP2Location.io', url: '/api/ip2location?ip={{ip}}', enabled: true, configKey: 'ip2location' },
-  { id: 5, text: 'IP.sb', url: '/api/ipsb?ip={{ip}}', enabled: true },
-  { id: 6, text: 'MaxMind', url: '/api/maxmind?ip={{ip}}&lang={{lang}}', enabled: true },
+  { id: 0, text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true, configKey: 'ipChecking', extended: true, quotaKey: 'ipinfo', attribution: { url: 'https://ipcheck.ing/' } },
+  { id: 1, text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true, configKey: 'ipapiis', extended: true, attribution: { url: 'https://ipapi.is/' } },
+  { id: 2, text: 'IP2Location.io', url: '/api/ip2locationio?ip={{ip}}', enabled: true, configKey: 'ip2locationio', extended: true, attribution: { url: 'https://www.ip2location.io/' } },
+  { id: 3, text: 'IP-API.com', url: '/api/ipapicom?ip={{ip}}&lang={{lang}}', enabled: true, extended: true, attribution: { url: 'https://ip-api.com/' } },
+  { id: 4, text: 'IP.sb', url: '/api/ipsb?ip={{ip}}', enabled: true, attribution: { url: 'https://ip.sb/' } },
+  { id: 5, text: 'IPinfo.io', url: '/api/ipinfoio?ip={{ip}}', enabled: true, configKey: 'ipinfoio', attribution: { url: 'https://ipinfo.io/' } },
+  { id: 6, text: 'MaxMind', url: '/api/maxmind?ip={{ip}}&lang={{lang}}', enabled: true, attribution: { url: 'https://www.maxmind.com/' } },
 ];
 
 /**

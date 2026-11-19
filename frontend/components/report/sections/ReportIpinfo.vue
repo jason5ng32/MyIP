@@ -62,7 +62,7 @@
 
 <script setup>
 // Read-only renderer for the ipinfo report section: one row per IP source.
-// The IPCheck.ing-source enrichment columns (anonymity verdict, line type,
+// The extended-field columns (anonymity verdict, line type,
 // ASN-geo match, quality score, abuse activity) appear only when at least
 // one card carries them — enums map back to the IP card's own labels in the
 // viewer's locale.

@@ -1883,6 +1883,7 @@
       "proxySuspected": "Possível proxy",
       "vpn": "VPN",
       "vpnSuspected": "Possível VPN",
+      "detected": "Detectado",
       "none": "Não detectado"
     },
     "qualityScore": "Qualidade do IP",
@@ -2022,7 +2023,12 @@
       "none": "Não detectada",
       "low": "Ocasional",
       "medium": "Moderada",
-      "high": "Frequente"
+      "high": "Frequente",
+      "detected": "Detectada"
+    },
+    "sourceMetrics": {
+      "fraudScore": "Pontuação de fraude",
+      "abuserScore": "Pontuação de abuso da rede"
     },
     "scenarioFriction": {
       "label": "Atrito por cenário",
@@ -2058,6 +2064,11 @@
       },
       "personaHint": "Além do IP, as plataformas consideram vários outros fatores para decidir quais limites aplicar. Quer saber se o seu perfil geral corresponde ao que você espera?",
       "personaLink": "Fazer a verificação de persona"
+    },
+    "sourceFields": {
+      "source": "Fonte dos dados",
+      "switch": "trocar",
+      "sentence": "Banco de geolocalização em uso: {source} ({switch})."
     },
     "countryTraffic": {
       "subtitle": "Distribuição semanal da atividade online deste país/região — veja apenas o tráfego gerado por humanos ou todo o tráfego (incluindo bots/tráfego automatizado).",

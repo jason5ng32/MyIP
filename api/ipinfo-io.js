@@ -1,17 +1,22 @@
-// /api/ipinfo — geolocation source handler backed by ipinfo.io.
+// /api/ipinfoio — geolocation source handler backed by ipinfo.io.
 // Picks a random API token (when configured) and normalizes the response
 // into the canonical geo shape via the shared makeGeoHandler factory.
 
 import getCountryName from '../common/country-name.js';
 import { makeGeoHandler } from '../server/geo-handler.js';
 
+// IPINFO_API_TOKEN is the pre-rename spelling — keep reading it so
+// existing deployments don't lose the token on upgrade.
+const rawTokens = () => process.env.IPINFO_API_KEY || process.env.IPINFO_API_TOKEN;
+
+// Whether a token is set; /api/configs reports it as the `ipinfoio` flag.
+export const isConfigured = () => Boolean(rawTokens());
+
 function buildUrl(req) {
     const ipAddress = req.query.ip;
 
     // Build request URL for ipinfo.io.
-    // IPINFO_API_TOKEN is the pre-rename spelling — keep reading it so
-    // existing deployments don't lose the token on upgrade.
-    const tokens = (process.env.IPINFO_API_KEY || process.env.IPINFO_API_TOKEN || '').split(',');
+    const tokens = (rawTokens() || '').split(',');
     const token = tokens[Math.floor(Math.random() * tokens.length)];
 
     const url_hasToken = `https://ipinfo.io/${ipAddress}?token=${token}`;

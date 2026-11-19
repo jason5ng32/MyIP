@@ -1,23 +1,13 @@
-import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../server/logger.js';
+import { isIpCheckingApiConfigured, requestIpCheckingApi } from '../server/ipcheck-ing-api.js';
 
 export default async (req, res) => {
-    const key = process.env.IPCHECKING_API_KEY;
-
-    if (!key) {
+    if (!isIpCheckingApiConfigured()) {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    // Build request
-    const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
-    const url = new URL(`${apiEndpoint}/userinfo?key=${key}`);
-
     try {
-        const apiResponse = await fetchUpstream(url, {
-            headers: {
-                ...req.headers,
-            }
-        });
+        const apiResponse = await requestIpCheckingApi('/userinfo', { forwardFrom: req });
 
         if (!apiResponse.ok) {
             throw new Error(`API responded with status: ${apiResponse.status}`);

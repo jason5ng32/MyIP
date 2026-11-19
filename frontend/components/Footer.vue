@@ -151,7 +151,7 @@
       <!-- Signature bar: every deployment; the copyright only when self-hosted -->
       <div class="flex flex-col items-center gap-y-1.5 border-t border-secondary py-6 text-center text-xs opacity-70">
         <span>Created by Jason Ng with love</span>
-        <span v-if="!configs.originalSite">
+        <span v-if="!isUpstreamSite()">
           {{ t('page.copyRightName') }}
           <a :href="t('page.copyRightLink')" target="_blank" rel="noopener"
             class="text-foreground/80 hover:text-foreground hover:underline">
@@ -175,6 +175,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { docsUrl } from '@/utils/docs-url.js';
+import { isUpstreamSite } from '@/utils/upstream-site.js';
 import { Terminal, Feather } from '@lucide/vue';
 import brandIcon from './svgicons/Brand.vue';
 import { Icon } from '@iconify/vue';
@@ -191,7 +192,6 @@ const emit = defineEmits(['open-shortcut-guide']);
 const { t, locale } = useI18n();
 
 const store = useMainStore();
-const configs = computed(() => store.configs);
 
 // Festival theme's footer trim, if the active festival has one.
 const { footerTrim: festivalFooterTrim } = useFestivalSkin();

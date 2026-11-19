@@ -2446,5 +2446,44 @@
         }
       }
     ]
+  },
+  {
+    "version": "v8.3.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Different IP data sources can now show their own distinctive data fields",
+          "zh": "不同的 IP 数据源现在可以展示其独特的数据字段",
+          "zh-TW": "不同的 IP 資料來源現在可以顯示其獨有的資料欄位",
+          "fr": "Les différentes sources de données IP peuvent désormais afficher leurs propres champs de données",
+          "ru": "Разные источники данных об IP теперь могут показывать собственные поля данных",
+          "pt-BR": "Diferentes fontes de dados de IP agora podem exibir seus próprios campos de dados"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Reworked the program's architecture to make plugging in more IP data sources easier",
+          "zh": "优化了程序的架构，为接入更多的 IP 数据源提供更便捷的通道",
+          "zh-TW": "最佳化了程式架構，讓接入更多 IP 資料來源更加便捷",
+          "fr": "Architecture du programme optimisée pour faciliter l'intégration de nouvelles sources de données IP",
+          "ru": "Оптимизирована архитектура программы: подключать новые источники данных об IP стало проще",
+          "pt-BR": "Arquitetura do programa otimizada para facilitar a integração de mais fontes de dados de IP"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
+      }
+    ]
   }
 ]

@@ -39,6 +39,20 @@ Every file opens with a header comment stating its purpose — read those.
   report pipeline → `report/` (section titles: `report-sections.js`); the pure
   layer of one feature (a tool, a section, Pulse) → `features/`; per-source
   probe modules keep their own dirs (`getips/`, `dnsleaks/`, `persona/`).
+- **IP card extended fields:** a geo source's answer may carry an `extended`
+  block (`common/ip-extended.js`, bridged by `utils/ip/ip-extended.js`);
+  `utils/ip/transform-ip-data.js` maps it to card fields and the advanced
+  block renders by field presence: line type, anonymizer and abuse verdicts
+  (a plain `detected` / `none` from the other sources), a source's own
+  `metrics` as plain-text cells, never the quality score. A gated card
+  carries only `extendedGate`.
+- **Data-source sentence:** `IpSourceBlock.vue`, inline after the IP section's
+  notes (`IpInfos.vue`; hidden with them in simple mode): the source that
+  answered a card, else the one selected in Preferences (`answeringSource` →
+  its `data/ip-databases.js` row, the name linking `attribution.url`) and a
+  switch that opens Preferences at the picker, as
+  `ipInfos.sourceFields.sentence` slots. Cards carry no geo-source row;
+  `geoSourceId` stays for the sentence, the cache and Snapshots.
 
 ### Achievements are event-driven
 
@@ -67,6 +81,8 @@ one owner (`use-app-command.js`, scope-bound, setup-time), and
 `dispatchAppCommand` resolves with its result. Payload = one plain JSON object
 shaped at registration; rejections are `appCommandError(code, message)` with
 reserved `auth` / `quota` / `input` (the bus adds `unavailable` / `timeout`).
+HTTP failures from the deep tools carry the same `auth` / `quota` codes
+(`utils/codes/service-errors.js`), set on the error by `authenticatedFetch`.
 Cross-component triggers use the bus, never template refs (refs stay for UI
 chrome); tools register at setup, callers `waitForAppCommand` first.
 
@@ -77,9 +93,16 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
   `router.push`es, modified clicks stay the browser's), Nav, shortcuts
   (`Advanced.vue`'s exposed `openTool`), in-app links. `/?tool=<slug>` is only
   a replace-redirect in the router's `beforeEach` (`utils/legacy-tool-link.js`).
-- Gates (`requiresOriginalSite`, `requiresConfig: '<configs key>'`, e.g. `asn` →
-  `cloudFlare`) decide listing only, via `isToolAvailable()` / `listedTools()`
-  (card grid, Nav); a `/tools/:slug` link is never gated.
+- Gates (`requiresAccount`, `requiresConfig: '<key>'` or an array of keys,
+  all required, e.g. `asn` → `cloudFlare`, the deep tools → `ipChecking` +
+  account, Invisibility / Enhanced DNS Leak also their probe endpoint) decide
+  listing only, via `isToolAvailable()` / `listedTools()` over the store's
+  `capabilities` (configs + `accounts` + the build-time probe facts of
+  `utils/probe-endpoints.js`; card grid, Nav, shortcuts); a `/tools/:slug`
+  link is never gated. `quotaKey` on a tool or an IP source names its metered
+  feature in the quota snapshot (`store.quotaExceeded(key)`, the usage
+  dialog). Features gate on capabilities; `isUpstreamSite()` is the only
+  identity check (the footer credit line, the IP probes' JSON endpoint).
 - `App.vue` keeps Home and `ToolPage` alive (`KeepAlive`); `ToolPage` keeps up
   to 8 tools alive per slug, dropped on sign-out / account switch
   (`utils/tool-cache.js`). Back / forward is plain history; the breadcrumb's
@@ -99,7 +122,7 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
 ### ASN Profile
 
 - One `/api/asn-profile` request, one loading state, then the whole page; a
-  section (reputation included — no `configs.originalSite` check) renders only
+  section (reputation included — no capability check) renders only
   when its `status` is `ok`. `ASNConnectivity.vue` gets `:bordered="false"`
   (the card draws the border) and keeps its expand-to-drawer; its defaults
   keep IPCard / QueryIP unchanged.
@@ -121,7 +144,7 @@ Clear all cover the whole list; the toolbar under them scopes both tabs
 (`scopedRows`): search with `country:` / `asn:` / `block:` tokens, batch,
 starred. Analysis entries toggle those tokens (`toggleQueryPick`), never a tab
 switch. Anything per IP stays single-IP: a row opens the QueryIP dialog or
-links to the Blocklist tool — no bulk path to the private API.
+links to the Blocklist tool — no bulk path to the IPCheck.ing API.
 
 ### Snapshots
 
@@ -139,7 +162,9 @@ this load records one automatically into localStorage → a View toast at
 15 s; and the change notice: the
 recorder emits `snapshot:changed` when this visit's snapshot differs from
 the previous one in what both carry (`notableChanges`, stricter than the
-smart trigger: no new section / target / field; WebRTC going dark counts);
+smart trigger: no new section / target / field; WebRTC going dark counts;
+an IP card answered by another geo source — its local-only `geoSource` —
+compares its IP alone, and the diff names both sources);
 `use-snapshot-notice.js` queues it, waiting for 35 s or the Speed Test
 section (away from the IP cards' actions). Schema changes can invalidate
 stored data.
@@ -252,6 +277,10 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   `when: { delayMs, reach }` = `use-attention-gate.js`, `action.to` a route,
   `track` / `action.track` = `trackEvent` args on show / click),
   run by `use-toast-queue.js` in `Toast.vue` — never feature code there.
+- **Preferences at a section** — `store.openPreferencesAt(sectionId)` (the
+  section's element id) sets the one-shot `preferencesFocus`; `Preferences.vue`
+  clears it, scrolls there and briefly rings it. Never touch the panel's DOM
+  (IpSourceBlock).
 - **Site navigation** — one `Nav.vue` in `App.vue` above every route (fixed;
   `index.html` pads the body for it), never per page; `User` / `Preferences`
   sit beside it, one each. What a click does on the current route is
@@ -261,7 +290,8 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   - The link row collapses to the hamburger + Sheet when `use-nav-overflow.js`
     measures it doesn't fit (no breakpoint); `isMobile` only drives phone behaviour.
 - **Footer** — four columns on the Advanced Tools grid: brand / Project / Docs
-  & Support / Clients (only the CLI entry is gated, on the curl domains);
+  & Support / Clients (gated: the CLI entry, on the curl domains, and the
+  project credit line, hidden on the upstream site — `utils/upstream-site.js`);
   never repeats on-page content (tools, sections); the static shell renders in
   `Footer.vue`, while About / Changelog / Acknowledgement and the CLI dialog
   load lazily in `widgets/Footer*.vue` when opened.

@@ -11,6 +11,7 @@ import { createDefaultPreferences, PREFS_STORAGE_KEY } from './data/default-pref
 import { sanitizeLists } from './utils/features/connectivity-lists.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
+import { PROBE_CAPABILITIES } from './utils/probe-endpoints.js';
 const { t } = i18n.global;
 
 // The two sign-in buttons. `other` is the provider to point a visitor at when
@@ -67,7 +68,11 @@ export const useMainStore = defineStore('main', {
       ipv64Domain: import.meta.env?.VITE_CURL_IPV64_DOMAIN,
     },
     isFireBaseSet,
+    // Build-time probe endpoints configured (utils/probe-endpoints.js).
+    probeCapabilities: { ...PROBE_CAPABILITIES },
     openSheet: null,
+    // Preferences section id to reveal once the panel shows; Preferences.vue clears it.
+    preferencesFocus: null,
     loadingStatus: createLoadingStatus(),
     isDarkMode: false,
     isMobile: false,
@@ -98,6 +103,10 @@ export const useMainStore = defineStore('main', {
     allHasLoaded: (state) => {
       return Object.values(state.loadingStatus).every(status => status);
     },
+    // What the deployment offers, for feature gates (utils/tool-availability.js):
+    // the /api/configs flags plus the build-time facts — `accounts` (the
+    // sign-in setup) and the probe endpoints (`invisibilityProbe`, `dnsLeakProbe`).
+    capabilities: (state) => ({ ...state.configs, ...state.probeCapabilities, accounts: state.isFireBaseSet }),
     curlDomainsHadSet: (state) => {
       return state.curl.ipv4Domain && state.curl.ipv6Domain && state.curl.ipv64Domain;
     },
@@ -114,25 +123,13 @@ export const useMainStore = defineStore('main', {
         };
       });
     },
-    // Per-feature "monthly quota exhausted" booleans, derived from the
-    // /api/getuserinfo quota snapshot in remoteUserInfo. Frontend first line
-    // only — the backend enforces the same limits authoritatively; absent
-    // data (signed out, old backend, fetch pending) reads as not exceeded.
-    //
-    // Metering differs per feature: invisibility_test / dns_leak_test /
-    // persona_check / ip_hitlist count requests, so exhausted means every
-    // further run is blocked and their components use this as a pre-flight gate.
-    quotaExceeded: (state) => {
-      const features = state.remoteUserInfo?.quota?.features || {};
-      const exceeded = (key) => features[key]?.exhausted === true;
-      return {
-        ipinfo: exceeded('ipinfo'),
-        invisibility_test: exceeded('invisibility_test'),
-        dns_leak_test: exceeded('dns_leak_test'),
-        persona_check: exceeded('persona_check'),
-        ip_hitlist: exceeded('ip_hitlist'),
-      };
-    },
+    // quotaExceeded(quotaKey): whether a metered feature's monthly quota is
+    // exhausted, from the /api/getuserinfo quota snapshot in remoteUserInfo.
+    // Keys come from the registries (`quotaKey` in data/tools.js and
+    // data/ip-databases.js). Frontend first line only — the backend enforces
+    // the same limits; absent data (signed out, old backend, fetch pending)
+    // reads as not exceeded. The tools use it as a pre-flight gate.
+    quotaExceeded: (state) => (key) => state.remoteUserInfo?.quota?.features?.[key]?.exhausted === true,
   },
 
   actions: {
@@ -195,6 +192,14 @@ export const useMainStore = defineStore('main', {
     },
     toggleSheet(name) {
       this.openSheet = (this.openSheet === name) ? null : name;
+    },
+    // Opens Preferences scrolled to one section (its element id, e.g. 'Pref_ipGeoSource').
+    openPreferencesAt(sectionId) {
+      this.preferencesFocus = sectionId;
+      this.openSheet = 'preferences';
+    },
+    clearPreferencesFocus() {
+      this.preferencesFocus = null;
     },
     // set dark mode
     setDarkMode(value) {
@@ -381,7 +386,7 @@ export const useMainStore = defineStore('main', {
     setTriggerUserBenefits(value) {
       this.triggerUserBenefits = value;
     },
-    // Backend replied 429 quota_exceeded for a feature: pin the local snapshot
+    // Backend answered with the quota code for a feature: pin the local snapshot
     // to exhausted so the quotaExceeded getter flips without a refetch.
     markQuotaExhausted(feature) {
       const quotaFeature = this.remoteUserInfo?.quota?.features?.[feature];

@@ -42,7 +42,8 @@ import serviceStatusHandler, {
 } from '../api/service-status.js';
 import createReportHandler, { getReport as getReportHandler, normalizeTtlDays } from '../api/share-report.js';
 import { modifyJsonForIPAPI } from '../api/ipapi-is.js';
-import { modifyJson as modifyJsonForIpinfo } from '../api/ipinfo-io.js';
+import { modifyJsonForIPSB } from '../api/ip-sb.js';
+import { modifyJson as modifyJsonForIpinfoio } from '../api/ipinfo-io.js';
 import { REPORT_VERSION } from '../common/report-schema.js';
 import logger from '../server/logger.js';
 
@@ -57,6 +58,41 @@ function createRequest(options = {}) {
     if (referer !== undefined) headers.referer = referer;
     return { method, headers, query, body };
 }
+
+// Visitor headers: the listed ones reach the IPCheck.ing API, the rest
+// (plus createRequest's referer) never do.
+const FORWARDED_VISITOR_HEADERS = {
+    authorization: 'Bearer t',
+    'accept-language': 'de-DE',
+    'user-agent': 'VisitorBrowser/1.0',
+    'cf-connecting-ip': '203.0.113.7',
+    'x-forwarded-for': '203.0.113.7',
+};
+const DROPPED_VISITOR_HEADERS = {
+    host: 'myip.example', cookie: 'session=1', origin: 'https://myip.example',
+    'content-length': '999', 'content-type': 'application/json',
+};
+
+const withVisitorHeaders = (req) => {
+    Object.assign(req.headers, FORWARDED_VISITOR_HEADERS, DROPPED_VISITOR_HEADERS);
+    return req;
+};
+
+// The exact header set sent upstream: the listed visitor headers plus `extra`.
+const assertForwardedHeaders = (headers, extra = {}) => {
+    assert.deepEqual(headers, { ...FORWARDED_VISITOR_HEADERS, ...extra });
+    for (const name of ['host', 'cookie', 'referer', 'content-length']) assert.equal(name in headers, false, name);
+};
+
+// IPCheck.ing API failure bodies as it sends them, and the coded bodies the
+// tool routes answer with.
+const UPSTREAM_SIGN_IN_REQUIRED = { error: 'Sign in required', message: 'Authorization header is missing.', code: 'sign_in_required' };
+const UPSTREAM_INVALID_TOKEN = { error: 'Invalid token', message: 'Firebase ID token has expired.', code: 'invalid_token' };
+const UPSTREAM_QUOTA = { error: 'Monthly quota exceeded', code: 'quota_exceeded' };
+const CODED_SIGN_IN_REQUIRED = { error: 'Sign in required', code: 'auth', reason: 'sign_in_required' };
+const CODED_INVALID_TOKEN = { error: 'Invalid token', code: 'auth', reason: 'invalid_token' };
+const CODED_QUOTA = { error: 'Monthly quota exceeded', code: 'quota' };
+const upstreamAnswer = (status, body) => async () => new Response(JSON.stringify(body), { status });
 
 function createResponse() {
     return {
@@ -106,20 +142,34 @@ describe('configs handler', () => {
         assert.deepEqual(res.body, { message: 'Method Not Allowed' });
     });
 
-    it('returns boolean config flags for localhost requests', () => {
+    it('returns exactly the boolean config flags plus the bulk lookup source', () => {
         const res = createResponse();
         configsHandler(createRequest(), res);
         assert.equal(res.statusCode, 200);
-        for (const key of ['map', 'ipInfo', 'ipChecking', 'ip2location', 'originalSite', 'cloudFlare', 'ipapiis', 'reportSharing']) {
+        const flags = ['map', 'ipinfoio', 'ipChecking', 'ip2locationio', 'cloudFlare', 'ipapiis', 'reportSharing'];
+        for (const key of flags) {
             assert.equal(typeof res.body[key], 'boolean');
         }
-        assert.equal(res.body.originalSite, false);
+        assert.deepEqual(Object.keys(res.body).sort(), [...flags, 'bulkLookupSource'].sort());
     });
 
     it('names the bulk lookup source as a string', () => {
         const res = createResponse();
         configsHandler(createRequest(), res);
         assert.equal(res.body.bulkLookupSource, 'maxmind');
+    });
+
+    it('ipChecking needs both the API key and the endpoint', () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        const keyOnly = createResponse();
+        configsHandler(createRequest(), keyOnly);
+        assert.equal(keyOnly.body.ipChecking, false);
+
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        const both = createResponse();
+        configsHandler(createRequest(), both);
+        assert.equal(both.body.ipChecking, true);
     });
 
     it('honors the pre-rename env spellings as fallbacks', () => {
@@ -129,7 +179,7 @@ describe('configs handler', () => {
         process.env.CLOUDFLARE_API = 'legacy-key';
         const res = createResponse();
         configsHandler(createRequest(), res);
-        assert.equal(res.body.ipInfo, true);
+        assert.equal(res.body.ipinfoio, true);
         assert.equal(res.body.cloudFlare, true);
     });
 });
@@ -442,28 +492,38 @@ describe('persona handler', () => {
             };
         };
 
-        const req = createRequest({ method: 'POST', body: { persona: { country: 'JP' } } });
-        req.headers['accept-language'] = 'ja-JP,ja;q=0.9';
-        // Framing headers describe this hop; the body is re-serialized here, so
-        // forwarding them would announce a length that no longer matches.
-        req.headers['content-length'] = '999';
-        req.headers.host = 'ipcheck.ing';
-        req.headers['content-type'] = 'application/json';
+        const req = withVisitorHeaders(createRequest({ method: 'POST', body: { persona: { country: 'JP' } } }));
         const res = createResponse();
         await personaEvaluateHandler(req, res);
 
         assert.equal(res.statusCode, 200);
         assert.equal(res.body.grade, 'B');
         // The visitor's own Accept-Language is one of the things being checked,
-        // so it has to reach the evaluator untouched.
-        assert.equal(requested.options.headers['accept-language'], 'ja-JP,ja;q=0.9');
-        assert.equal('content-length' in requested.options.headers, false);
-        assert.equal('host' in requested.options.headers, false);
-        // Exactly one content-type reaches the upstream: two would arrive as
-        // "application/json, application/json" and be refused with 415.
-        assert.equal(requested.options.headers['Content-Type'], 'application/json');
-        assert.equal('content-type' in requested.options.headers, false);
+        // so it has to reach the evaluator untouched. The body is re-serialized
+        // here: exactly one content-type goes along (two would arrive as
+        // "application/json, application/json" and be refused with 415), and
+        // no content-length.
+        assertForwardedHeaders(requested.options.headers, { 'content-type': 'application/json' });
+        assert.equal(requested.options.body, JSON.stringify({ persona: { country: 'JP' } }));
         assert.match(requested.url, /\/persona\/evaluate\?key=test-key$/);
+    });
+
+    it('answers an upstream failure with its status and the coded body', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        for (const [status, upstream, coded] of [
+            [403, UPSTREAM_SIGN_IN_REQUIRED, CODED_SIGN_IN_REQUIRED],
+            [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
+            [429, UPSTREAM_QUOTA, CODED_QUOTA],
+            [400, { error: 'Invalid country' }, { error: 'Invalid country' }],
+        ]) {
+            globalThis.fetch = upstreamAnswer(status, upstream);
+            const res = createResponse();
+            await personaEvaluateHandler(
+                createRequest({ method: 'POST', body: { persona: { country: 'JP' } } }), res);
+            assert.equal(res.statusCode, status);
+            assert.deepEqual(res.body, coded);
+        }
     });
 
     it('answers 502 when the evaluator cannot be reached', async () => {
@@ -645,18 +705,57 @@ describe('invisibility-test handler', () => {
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
 
-    it('passes an upstream auth rejection through as its own 4xx, not a 500', async () => {
+    it('passes upstream sign-in and quota rejections through with their status and code', async () => {
         process.env.IPCHECKING_API_KEY = 'test-key';
         process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
-        globalThis.fetch = async () => ({
-            status: 403,
-            ok: false,
-            json: async () => ({ message: 'Authorization header is missing.' }),
-        });
+        for (const [status, upstream, coded] of [
+            [403, UPSTREAM_SIGN_IN_REQUIRED, CODED_SIGN_IN_REQUIRED],
+            [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
+            [429, UPSTREAM_QUOTA, CODED_QUOTA],
+        ]) {
+            globalThis.fetch = upstreamAnswer(status, upstream);
+            const res = createResponse();
+            await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
+            assert.equal(res.statusCode, status);
+            assert.deepEqual(res.body, coded);
+        }
+    });
+
+    it('answers a not-yet-computed upstream 404 as pending', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        globalThis.fetch = upstreamAnswer(404, { error: 'Data not found' });
         const res = createResponse();
         await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
-        assert.equal(res.statusCode, 403);
-        assert.deepEqual(res.body, { error: 'Authorization header is missing.' });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { status: 'pending' });
+    });
+
+    it('reports missing API key when only the endpoint is unset', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        globalThis.fetch = async () => assert.fail('no upstream call');
+        const res = createResponse();
+        await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    it('asks /getpdresult with the apikey and the listed caller headers; a 202 body passes through', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        let called;
+        globalThis.fetch = async (url, init) => {
+            called = { url: new URL(String(url)), init };
+            return new Response(JSON.stringify({ status: 'pending' }), { status: 202 });
+        };
+        const res = createResponse();
+        await invisibilityHandler(withVisitorHeaders(createRequest({ query: { id: 'a'.repeat(28) } })), res);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { status: 'pending' });
+        assert.equal(called.url.pathname, `/getpdresult/${'a'.repeat(28)}`);
+        assert.equal(called.url.searchParams.get('apikey'), 'test-key');
+        assertForwardedHeaders(called.init.headers);
     });
 });
 
@@ -677,15 +776,14 @@ describe('ip-blocklist handler', () => {
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
 
-    it('asks /iphitlist for the ip with the system key and forwards the caller headers', async () => {
+    it('asks /iphitlist for the ip with the system key and the listed caller headers', async () => {
         configure();
         let called;
         globalThis.fetch = async (url, init) => {
             called = { url: new URL(url), init };
             return { status: 200, ok: true, json: async () => ({ ip: '1.1.1.1', summary: { listed: 0 } }) };
         };
-        const req = createRequest({ query: { ip: '1.1.1.1' } });
-        req.headers.authorization = 'Bearer t';
+        const req = withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1' } }));
         const res = createResponse();
         await ipBlocklistHandler(req, res);
         assert.equal(res.statusCode, 200);
@@ -693,25 +791,30 @@ describe('ip-blocklist handler', () => {
         assert.equal(called.url.pathname, '/iphitlist');
         assert.equal(called.url.searchParams.get('ip'), '1.1.1.1');
         assert.equal(called.url.searchParams.get('key'), 'test-key');
-        assert.equal(called.init.headers.authorization, 'Bearer t');
+        assertForwardedHeaders(called.init.headers);
     });
 
-    it('passes an upstream sign-in rejection through as its own 4xx', async () => {
+    it('passes an upstream sign-in rejection through as 403 with the auth code', async () => {
         configure();
-        globalThis.fetch = async () => ({ status: 403, ok: false, json: async () => ({ message: 'Sign in required' }) });
-        const res = createResponse();
-        await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
-        assert.equal(res.statusCode, 403);
-        assert.deepEqual(res.body, { error: 'Sign in required' });
+        for (const [upstream, coded] of [
+            [{ error: 'Sign in required' }, CODED_SIGN_IN_REQUIRED],
+            [UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
+        ]) {
+            globalThis.fetch = upstreamAnswer(403, upstream);
+            const res = createResponse();
+            await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, coded);
+        }
     });
 
-    it('passes an exhausted monthly quota through as 429 quota_exceeded', async () => {
+    it('passes an exhausted monthly quota through as 429 with the quota code', async () => {
         configure();
-        globalThis.fetch = async () => ({ status: 429, ok: false, json: async () => ({ error: 'Monthly quota exceeded' }) });
+        globalThis.fetch = upstreamAnswer(429, UPSTREAM_QUOTA);
         const res = createResponse();
         await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
         assert.equal(res.statusCode, 429);
-        assert.deepEqual(res.body, { error: 'Monthly quota exceeded', code: 'quota_exceeded' });
+        assert.deepEqual(res.body, CODED_QUOTA);
     });
 
     it('turns any other upstream failure into a 500', async () => {
@@ -922,6 +1025,25 @@ describe('update-user-achievement handler', () => {
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
+
+    it('PUTs the re-serialized body as JSON with the listed caller headers', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        let called;
+        globalThis.fetch = async (url, init) => {
+            called = { url: new URL(String(url)), init };
+            return new Response(JSON.stringify({ ok: true }), { status: 200 });
+        };
+        const res = createResponse();
+        await updateAchievementHandler(withVisitorHeaders(createRequest({ method: 'PUT', body: { name: 'X' } })), res);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { ok: true });
+        assert.equal(called.url.pathname, '/updateuserachievements');
+        assert.equal(called.url.searchParams.get('key'), 'test-key');
+        assert.equal(called.init.method, 'PUT');
+        assert.equal(called.init.body, JSON.stringify({ name: 'X' }));
+        assertForwardedHeaders(called.init.headers, { 'content-type': 'application/json' });
+    });
 });
 
 // -- get-user-info handler ------------------------------------------------
@@ -933,6 +1055,33 @@ describe('get-user-info handler', () => {
         await getUserInfoHandler(createRequest(), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    it('reports missing API key when only the endpoint is unset', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        globalThis.fetch = async () => assert.fail('no upstream call');
+        const res = createResponse();
+        await getUserInfoHandler(createRequest(), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    it('asks /userinfo with the system key and the listed caller headers', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        let called;
+        globalThis.fetch = async (url, init) => {
+            called = { url: new URL(String(url)), init };
+            return new Response(JSON.stringify({ uid: 'u1' }), { status: 200 });
+        };
+        const res = createResponse();
+        await getUserInfoHandler(withVisitorHeaders(createRequest()), res);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { uid: 'u1' });
+        assert.equal(called.url.pathname, '/userinfo');
+        assert.equal(called.url.searchParams.get('key'), 'test-key');
+        assertForwardedHeaders(called.init.headers);
     });
 });
 
@@ -978,6 +1127,45 @@ describe('dns-leak-test getSessionResult', () => {
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
 
+    it('forwards the listed caller headers and passes the upstream status through', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        let called;
+        globalThis.fetch = async (url, init) => {
+            called = { url: new URL(String(url)), init };
+            return new Response(JSON.stringify(UPSTREAM_SIGN_IN_REQUIRED), { status: 403 });
+        };
+        const res = createResponse();
+        const req = withVisitorHeaders({ method: 'GET', headers: { referer: 'http://localhost/' }, query: {}, params: { token: 'a'.repeat(32) } });
+        await dnsLeakGetResult(req, res);
+        assert.equal(res.statusCode, 403);
+        assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+        assert.equal(called.url.pathname, `/dnsleaktest/session/${'a'.repeat(32)}`);
+        assertForwardedHeaders(called.init.headers);
+    });
+
+    it('answers invalid-token and quota rejections with their status and code', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        for (const [status, upstream, coded] of [
+            [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
+            [429, UPSTREAM_QUOTA, CODED_QUOTA],
+        ]) {
+            globalThis.fetch = upstreamAnswer(status, upstream);
+            const res = createResponse();
+                await dnsLeakGetResult({ method: 'GET', headers: {}, query: {}, params: { token: 'a'.repeat(32) } }, res);
+            assert.equal(res.statusCode, status);
+            assert.deepEqual(res.body, coded);
+        }
+    });
+
+    it('answers a malformed session token with 400 and no auth code', async () => {
+        const res = createResponse();
+        await dnsLeakGetResult({ method: 'GET', headers: {}, query: {}, params: { token: 'abc' } }, res);
+        assert.equal(res.statusCode, 400);
+        assert.equal('code' in res.body, false);
+    });
+
     // ?lang is a pass-through: the upstream owns tag resolution, so the handler
     // neither validates nor substitutes a default.
     describe('lang forwarding', () => {
@@ -989,10 +1177,8 @@ describe('dns-leak-test getSessionResult', () => {
                 requested = new URL(String(url));
                 return { status: 200, ok: true, json: async () => ({}) };
             };
-            // The success path sets a Cache-Control header on the way out.
             const res = createResponse();
-            res.set = () => res;
-            await dnsLeakGetResult({
+                await dnsLeakGetResult({
                 method: 'GET', headers: {}, query,
                 params: { token: 'a'.repeat(32) },
             }, res);
@@ -1032,13 +1218,97 @@ describe('ipcheck-ing handler', () => {
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
+
+    const geo = { ip: '1.1.1.1', country: 'AU', latitude: -33.86, longitude: 151.2, asn: 'AS13335', org: 'Cloudflare' };
+    const callWith = async (upstream) => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.test';
+        globalThis.fetch = upstream;
+        const res = createResponse();
+        await ipcheckIngHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        return res;
+    };
+    const answering = (body) => async () => new Response(JSON.stringify(body), { status: 200 });
+    const silenced = async (run) => {
+        const originalError = logger.error;
+        logger.error = () => {};
+        try { return await run(); } finally { logger.error = originalError; }
+    };
+
+    it('answers the geo fields and the extended block, without the advanced data', async () => {
+        const advancedData = { score: 88, operatorType: 'Business', tags: { isNative: true } };
+        const res = await callWith(answering({ ...geo, advancedData }));
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, {
+            ...geo,
+            extended: {
+                anonymity: { code: 'none' }, lineType: 'business', native: true, score: 88,
+                flags: advancedData.tags,
+            },
+        });
+    });
+
+    it('answers a gated block without the advanced data', async () => {
+        const gated = 'sign_in_required';
+        const advancedData = { score: gated, operatorType: gated, anonymityProvider: gated, anonymityProtocol: gated, tags: gated };
+        const res = await callWith(answering({ ...geo, advancedData }));
+        assert.deepEqual(res.body, { ...geo, extended: { gate: 'auth' } });
+    });
+
+    it('drops advanced data with no usable block', async () => {
+        const res = await callWith(answering({ ...geo, advancedData: { score: 88 } }));
+        assert.deepEqual(res.body, geo);
+    });
+
+    it('answers the geo fields alone when there is no advanced data', async () => {
+        const res = await callWith(answering(geo));
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, geo);
+    });
+
+    it('answers 500 when the upstream fails or is unreachable', async () => {
+        const failing = await silenced(() => callWith(async () => new Response('busy', { status: 503 })));
+        assert.equal(failing.statusCode, 500);
+        assert.deepEqual(failing.body, { error: 'API responded with status: 503' });
+        const down = await silenced(() => callWith(async () => { throw new Error('network down'); }));
+        assert.equal(down.statusCode, 500);
+        assert.match(down.body.error, /network down/);
+    });
+
+    it('reports missing API key when only the endpoint is unset', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        globalThis.fetch = async () => assert.fail('no upstream call');
+        const res = createResponse();
+        await ipcheckIngHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    it('encodes lang and sends the listed caller headers', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.test';
+        let called;
+        globalThis.fetch = async (url, init) => {
+            called = { url: new URL(String(url)), init };
+            return new Response(JSON.stringify(geo), { status: 200 });
+        };
+        const res = createResponse();
+        await ipcheckIngHandler(withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1', lang: 'en&ip=10.0.0.1' } })), res);
+        assert.equal(res.statusCode, 200);
+        assert.equal(called.url.pathname, '/ipinfo');
+        assert.equal(called.url.searchParams.get('key'), 'test-key');
+        assert.deepEqual(called.url.searchParams.getAll('ip'), ['1.1.1.1']);
+        assert.equal(called.url.searchParams.get('lang'), 'en&ip=10.0.0.1');
+        assertForwardedHeaders(called.init.headers);
+    });
 });
 
 // -- asn-profile handler ---------------------------------------------------
 // Composition and deadlines are covered in tests/asn-profile-aggregate.test.js;
 // here: unconfigured sources read as disabled, failing upstreams as error,
-// a partial Radar answer, the local PeeringDB section, and the private-API
-// pass-through for the reputation section.
+// a partial Radar answer, the local PeeringDB section, and the reputation
+// request to the IPCheck.ing API, which carries no visitor header.
 
 describe('asn-profile handler', () => {
     it('answers 200 with per-section statuses when only some sources work', async () => {
@@ -1119,7 +1389,7 @@ describe('asn-profile handler', () => {
         }
     });
 
-    it('forwards the caller headers to the private API for reputation', async () => {
+    it('asks the IPCheck.ing API for reputation without any visitor header', async () => {
         delete process.env.CLOUDFLARE_API_KEY;
         delete process.env.CLOUDFLARE_API;
         process.env.IPCHECKING_API_KEY = 'test-key';
@@ -1137,8 +1407,7 @@ describe('asn-profile handler', () => {
             }
             throw new Error('network down');
         };
-        const req = createRequest({ query: { asn: '64511' } });
-        req.headers['accept-language'] = 'de-DE';
+        const req = withVisitorHeaders(createRequest({ query: { asn: '64511' } }));
         const res = createResponse();
         await asnProfileHandler(req, res);
 
@@ -1147,7 +1416,21 @@ describe('asn-profile handler', () => {
         assert.deepEqual(res.body.reputation, payload);
         assert.equal(requested.url.searchParams.get('asn'), '64511');
         assert.equal(requested.url.searchParams.get('key'), 'test-key');
-        assert.equal(requested.options.headers['accept-language'], 'de-DE');
+        assert.deepEqual(requested.options.headers, {});
+    });
+});
+
+// -- ip-sb normalizer -----------------------------------------------------
+// Pure transform, no fetch involved.
+
+describe('ip-sb normalize', () => {
+    it('prefixes the ASN', () => {
+        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7', asn: 64500 }).asn, 'AS64500');
+    });
+
+    it('answers N/A when the upstream sends no ASN', () => {
+        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7' }).asn, 'N/A');
+        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7', asn: null }).asn, 'N/A');
     });
 });
 
@@ -1161,7 +1444,7 @@ describe('ipinfo-io normalize', () => {
     ];
 
     it('maps a fully populated upstream payload', () => {
-        const out = modifyJsonForIpinfo({
+        const out = modifyJsonForIpinfoio({
             ip: '8.8.8.8',
             city: 'Mountain View',
             region: 'California',
@@ -1179,7 +1462,7 @@ describe('ipinfo-io normalize', () => {
 
     it('degrades coordinates to null when the upstream omits loc', () => {
         // Anycast ranges answer 200 without loc.
-        const out = modifyJsonForIpinfo({
+        const out = modifyJsonForIpinfoio({
             ip: '104.28.212.153', city: 'Los Angeles', country: 'US', org: 'AS13335 Cloudflare, Inc.',
         });
         assert.equal(out.latitude, null);
@@ -1188,34 +1471,34 @@ describe('ipinfo-io normalize', () => {
     });
 
     it('degrades a partial or non-numeric loc to null', () => {
-        assert.equal(modifyJsonForIpinfo({ loc: '37.4056' }).longitude, null);
-        assert.equal(modifyJsonForIpinfo({ loc: '' }).latitude, null);
-        assert.equal(modifyJsonForIpinfo({ loc: 'unknown,unknown' }).latitude, null);
-        assert.equal(modifyJsonForIpinfo({ loc: ',-122.0775' }).latitude, null);
+        assert.equal(modifyJsonForIpinfoio({ loc: '37.4056' }).longitude, null);
+        assert.equal(modifyJsonForIpinfoio({ loc: '' }).latitude, null);
+        assert.equal(modifyJsonForIpinfoio({ loc: 'unknown,unknown' }).latitude, null);
+        assert.equal(modifyJsonForIpinfoio({ loc: ',-122.0775' }).latitude, null);
         // 0 is a real coordinate, not a blank one.
-        assert.equal(modifyJsonForIpinfo({ loc: '0,0' }).latitude, 0);
+        assert.equal(modifyJsonForIpinfoio({ loc: '0,0' }).latitude, 0);
     });
 
     it('empties asn / org when the upstream omits org', () => {
-        const out = modifyJsonForIpinfo({ ip: '8.8.8.8', country: 'US', loc: '37.4,-122.0' });
+        const out = modifyJsonForIpinfoio({ ip: '8.8.8.8', country: 'US', loc: '37.4,-122.0' });
         assert.equal(out.asn, '');
         assert.equal(out.org, '');
     });
 
     it('uses ICU country names and accepts lowercase upstream codes', () => {
-        assert.equal(modifyJsonForIpinfo({ country: 'TR' }).country_name, 'Türkiye');
-        assert.equal(modifyJsonForIpinfo({ country: 'us' }).country_name, 'United States');
+        assert.equal(modifyJsonForIpinfoio({ country: 'TR' }).country_name, 'Türkiye');
+        assert.equal(modifyJsonForIpinfoio({ country: 'us' }).country_name, 'United States');
     });
 
     it('falls back to Unknown Country for absent, unknown or malformed codes', () => {
         for (const country of [undefined, null, '', 'XX', 'ZZ', 'T1', 'USA', 123, {}]) {
-            assert.equal(modifyJsonForIpinfo({ country }).country_name, 'Unknown Country');
+            assert.equal(modifyJsonForIpinfoio({ country }).country_name, 'Unknown Country');
         }
     });
 
     it('survives a bogon payload and still emits the canonical shape', () => {
         // ipinfo.io answers {"ip":…,"bogon":true} — no loc, org or country.
-        const out = modifyJsonForIpinfo({ ip: '192.0.2.1', bogon: true });
+        const out = modifyJsonForIpinfoio({ ip: '192.0.2.1', bogon: true });
         assert.equal(out.ip, '192.0.2.1');
         for (const key of CANONICAL_KEYS) {
             assert.ok(key in out, `${key} must stay present in the response`);
@@ -1224,7 +1507,7 @@ describe('ipinfo-io normalize', () => {
 
     it('survives an empty or null upstream body', () => {
         for (const payload of [{}, null, undefined]) {
-            const out = modifyJsonForIpinfo(payload);
+            const out = modifyJsonForIpinfoio(payload);
             for (const key of CANONICAL_KEYS) {
                 assert.ok(key in out, `${key} must stay present in the response`);
             }
@@ -1249,8 +1532,9 @@ describe('ipapi-is normalize', () => {
         assert.equal(out.city, 'Mountain View');
         assert.equal(out.country_code, 'US');
         assert.equal(out.asn, 'AS15169');
-        assert.equal(out.isHosting, true);
-        assert.equal(out.isProxy, false);
+        assert.equal(out.extended.lineType, 'hosting');
+        assert.equal('isHosting' in out, false);
+        assert.equal('isProxy' in out, false);
     });
 
     it('falls back to N/A when the upstream places no location', () => {
@@ -1261,13 +1545,13 @@ describe('ipapi-is normalize', () => {
             assert.equal(out[key], 'N/A', `${key} should degrade to N/A`);
         }
         assert.equal(out.asn, 'N/A');
-        assert.equal(out.isHosting, false);
-        assert.equal(out.isProxy, false);
+        assert.equal(out.extended, undefined);
     });
 
-    it('flags a proxy when any of the vpn / tor / proxy bits is set', () => {
-        assert.equal(modifyJsonForIPAPI({ location: {}, is_vpn: true }).isProxy, true);
-        assert.equal(modifyJsonForIPAPI({ location: {}, is_tor: true }).isProxy, true);
+    it('sums the vpn / tor bits up as a plain anonymizer yes', () => {
+        const detected = { anonymity: { code: 'detected' } };
+        assert.deepEqual(modifyJsonForIPAPI({ location: {}, is_vpn: true }).extended, detected);
+        assert.deepEqual(modifyJsonForIPAPI({ location: {}, is_tor: true }).extended, detected);
     });
 });
 

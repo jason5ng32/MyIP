@@ -1883,6 +1883,7 @@
       "proxySuspected": "疑似代理",
       "vpn": "VPN",
       "vpnSuspected": "疑似 VPN",
+      "detected": "偵測到",
       "none": "未偵測到"
     },
     "qualityScore": "IP 品質評分",
@@ -2022,7 +2023,12 @@
       "none": "未偵測到",
       "low": "較少",
       "medium": "中等",
-      "high": "較多"
+      "high": "較多",
+      "detected": "偵測到"
+    },
+    "sourceMetrics": {
+      "fraudScore": "詐欺評分",
+      "abuserScore": "網路濫用者評分"
     },
     "scenarioFriction": {
       "label": "場景摩擦",
@@ -2058,6 +2064,11 @@
       },
       "personaHint": "除了 IP，平台還會參考多個因素來判斷觸發何種限制。想知道你目前的綜合畫像是否與你的預期一致？",
       "personaLink": "執行深度畫像檢測"
+    },
+    "sourceFields": {
+      "source": "資料來源",
+      "switch": "切換",
+      "sentence": "目前使用的地理位置資料庫：{source}（{switch}）。"
     },
     "countryTraffic": {
       "subtitle": "該國家/地區的每週網路活躍分布——你可以選擇僅看人類所產生的流量或全部流量（包含機器人/自動化流量）。",

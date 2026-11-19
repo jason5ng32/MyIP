@@ -1,11 +1,10 @@
 // Lazy loader + controller for the GitBook Docs Assistant embed.
 //
-// Gated three ways: the docs site origin comes from `VITE_DOCS_URL`
-// (build-time — empty means the whole feature is absent); the nav entry
-// points only render on the canonical deployment (`configs.originalSite`),
-// since the assistant answers from IPCheck.ing's own docs site; and the
-// assistant itself is a sign-in benefit — entry points are visible to
-// everyone, but a signed-out interaction only prompts to sign in.
+// Gated two ways: the docs site origin comes from `VITE_DOCS_URL`
+// (build-time — empty means the whole feature is absent), and the assistant
+// is a sign-in benefit — the nav entry points render only where sign-in is
+// configured (`utils/docs-assistant-gate.js`), are visible to everyone there,
+// and a signed-out interaction only prompts to sign in.
 //
 // Nothing loads until the visitor actually asks for docs: the embed script
 // (served by the docs site) is injected on demand, then the assistant panel

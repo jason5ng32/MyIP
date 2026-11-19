@@ -7,18 +7,13 @@ import logger from './server/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
     requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './server/guards.js';
 import { withTimeZone } from './server/ip-timezone.js';
+import { initSourceDailyLimits, sourceDailyLimit } from './server/source-daily-limits.js';
 import { inspectAllowedDomains } from './server/referer-check.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
 // IP Info
-import ipinfoHandler from './api/ipinfo-io.js';
-import ipapicomHandler from './api/ipapi-com.js';
-import ipCheckingHandler from './api/ipcheck-ing.js';
-import ipapiisHandler from './api/ipapi-is.js';
-import ip2locationHandler from './api/ip2location-io.js';
-import ipsbHandler from './api/ip-sb.js';
-import maxmindHandler from './api/maxmind.js';
+import { IP_SOURCES, IP_SOURCE_KEYS } from './api/ip-sources.js';
 // Others
 import cfRadarHandler from './api/cf-radar.js';
 import { RADAR_VIEWS, isCompleteRadarAnswer, hasRadarApiKey, startOutagePolling } from './server/cf-radar.js';
@@ -135,6 +130,12 @@ const needsAsGraph = requireOfflineData([isAsRelLoaded, isAsOrgLoaded]);
 const needsOui = requireOfflineData([isOuiLoaded]);
 const needsServiceStatus = requireOfflineData([isServiceStatusPrimed]);
 
+// Daily ceiling per IP source (IP_SOURCE_DAILY_LIMITS): on each geo route
+// (mounted below from api/ip-sources.js) after its validation and readiness
+// gates, so a refused request never holds a slot, and before the answer
+// chain, so a 429 is never cached.
+initSourceDailyLimits(IP_SOURCE_KEYS);
+
 const FIVE_MIN_CACHE = 5 * 60;
 const ONE_HOUR_CACHE = 60 * 60;
 const ONE_DAY_CACHE = 24 * 60 * 60;
@@ -146,13 +147,18 @@ const ONE_YEAR_CACHE = 365 * 24 * 60 * 60;
 // Short Cache
 app.get('/api/service-status', needsServiceStatus, cacheable(FIVE_MIN_CACHE), serviceStatusHandler);
 app.get('/api/service-status/detail', requireValidProviderId(), needsServiceStatus, cacheable(FIVE_MIN_CACHE), serviceStatusDetailHandler);
+// IP-geolocation sources, one route per api/ip-sources.js row; edge-cached
+// for the row's cacheSeconds, no-store without it.
+for (const source of IP_SOURCES) {
+    app.get(`/api/${source.key}`,
+        requirePublicIP(),
+        ...(source.gates ?? []),
+        sourceDailyLimit(source.key),
+        withTimeZone(),
+        ...(source.cacheSeconds ? [cacheable(source.cacheSeconds)] : []),
+        source.handler);
+}
 // Cache for 1 day
-app.get('/api/ipinfo', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipinfoHandler);
-app.get('/api/ipapicom', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapicomHandler);
-app.get('/api/ipsb', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipsbHandler);
-app.get('/api/ipapiis', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapiisHandler);
-app.get('/api/ip2location', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ip2locationHandler);
-app.get('/api/maxmind', requirePublicIP(), needsMaxMind, withTimeZone(), cacheable(ONE_DAY_CACHE), maxmindHandler);
 app.get('/api/whois', normalizeAsnQuery(), cacheable(ONE_DAY_CACHE), getWhois);
 app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
@@ -193,7 +199,6 @@ app.get('/api/macchecker', needsOui, cacheable(THIRTY_DAYS_CACHE), macChecker);
 // Long Cache
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
-app.get('/api/ipchecking', requirePublicIP(), withTimeZone(), ipCheckingHandler);
 app.get('/api/dnsresolver', requireValidDomain('hostname'), requireValidRecordType(), dnsResolver);
 app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
 app.get('/api/invisibility', invisibilitytestHandler);

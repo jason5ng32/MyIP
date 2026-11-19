@@ -81,6 +81,18 @@ describe('store — sheet toggling', () => {
     s.toggleSheet('tools');
     assert.equal(s.openSheet, 'tools');
   });
+
+  it('openPreferencesAt opens Preferences with a section to reveal, cleared once shown', () => {
+    const s = useMainStore();
+    assert.equal(s.preferencesFocus, null);
+    s.setOpenSheet('pulse');
+    s.openPreferencesAt('Pref_ipGeoSource');
+    assert.equal(s.openSheet, 'preferences');
+    assert.equal(s.preferencesFocus, 'Pref_ipGeoSource');
+    s.clearPreferencesFocus();
+    assert.equal(s.preferencesFocus, null);
+    assert.equal(s.openSheet, 'preferences');
+  });
 });
 
 describe('store — dark mode side effect', () => {
@@ -214,6 +226,41 @@ describe('store — getters', () => {
     assert.ok(!active.find((db) => db.id === firstId));
   });
 
+  it('capabilities spreads configs and adds accounts from the sign-in setup', () => {
+    const s = useMainStore();
+    s.configs = { ipChecking: true, cloudFlare: false };
+    s.isFireBaseSet = false;
+    s.probeCapabilities = { invisibilityProbe: false, dnsLeakProbe: false };
+    const base = { ipChecking: true, cloudFlare: false, invisibilityProbe: false, dnsLeakProbe: false };
+    assert.deepEqual(s.capabilities, { ...base, accounts: false });
+    s.isFireBaseSet = true;
+    assert.deepEqual(s.capabilities, { ...base, accounts: true });
+  });
+
+  it('capabilities carries the build-time probe facts, never configs values', () => {
+    const s = useMainStore();
+    s.configs = { invisibilityProbe: true, dnsLeakProbe: true };
+    s.probeCapabilities = { invisibilityProbe: false, dnsLeakProbe: true };
+    assert.equal(s.capabilities.invisibilityProbe, false);
+    assert.equal(s.capabilities.dnsLeakProbe, true);
+  });
+
+  it('probe facts default to off without the build-time variables', () => {
+    const s = useMainStore();
+    // No VITE_INVISIBILITY_TEST_SCRIPT_URL / VITE_DNS_LEAK_TEST_DOMAIN in Node tests.
+    assert.deepEqual(s.probeCapabilities, { invisibilityProbe: false, dnsLeakProbe: false });
+  });
+
+  it('capabilities.accounts follows the sign-in setup, never a configs value', () => {
+    const s = useMainStore();
+    s.configs = { accounts: true };
+    s.isFireBaseSet = false;
+    assert.equal(s.capabilities.accounts, false);
+    s.configs = { accounts: false };
+    s.isFireBaseSet = true;
+    assert.equal(s.capabilities.accounts, true);
+  });
+
   it('curlDomainsHadSet is false when env not set', () => {
     const s = useMainStore();
     // In Node tests we don't inject VITE_CURL_* → curl.* is undefined → getter is falsy
@@ -326,18 +373,18 @@ describe('store — quota snapshot', () => {
   // The backend's /userinfo quota carries percentages only.
   const snapshot = (features) => ({ quota: { isSponsor: false, features } });
 
-  it('quotaExceeded reads the exhausted flag, not the percentage', () => {
+  it('quotaExceeded(key) reads the exhausted flag, not the percentage', () => {
     const s = useMainStore();
     s.remoteUserInfo = snapshot({
       ipinfo: { percent: 100, exhausted: true },
       dns_leak_test: { percent: 99, exhausted: false },
     });
-    assert.equal(s.quotaExceeded.ipinfo, true);
-    assert.equal(s.quotaExceeded.dns_leak_test, false);
+    assert.equal(s.quotaExceeded('ipinfo'), true);
+    assert.equal(s.quotaExceeded('dns_leak_test'), false);
     // Absent features and a missing snapshot read as not exceeded.
-    assert.equal(s.quotaExceeded.persona_check, false);
+    assert.equal(s.quotaExceeded('persona_check'), false);
     s.remoteUserInfo = null;
-    assert.equal(s.quotaExceeded.ipinfo, false);
+    assert.equal(s.quotaExceeded('ipinfo'), false);
   });
 
   it('markQuotaExhausted pins a feature to exhausted after a 429', () => {
@@ -345,13 +392,13 @@ describe('store — quota snapshot', () => {
     s.remoteUserInfo = snapshot({ invisibility_test: { percent: 42, exhausted: false } });
     s.markQuotaExhausted('invisibility_test');
     assert.deepEqual(s.remoteUserInfo.quota.features.invisibility_test, { percent: 100, exhausted: true });
-    assert.equal(s.quotaExceeded.invisibility_test, true);
+    assert.equal(s.quotaExceeded('invisibility_test'), true);
   });
 
   it('quotaExceeded covers the IP Blocklist Check (ip_hitlist)', () => {
     const s = useMainStore();
     s.remoteUserInfo = snapshot({ ip_hitlist: { percent: 100, exhausted: true } });
-    assert.equal(s.quotaExceeded.ip_hitlist, true);
+    assert.equal(s.quotaExceeded('ip_hitlist'), true);
   });
 
   it('markQuotaExhausted is a no-op without a snapshot for the feature', () => {

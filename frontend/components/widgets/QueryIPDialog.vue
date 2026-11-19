@@ -34,7 +34,7 @@
                         </FitText>
                     </div>
 
-                    <IpDetailPanel :data="modalQueryResult" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
+                    <IpDetailPanel :data="modalQueryResult" :asn-infos="asnInfos"
                         :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
                         :configs="configs" :is-dark-mode="isDarkMode" map-mode="inline"
                         country-traffic-mode="inline" @view-usage="setOpen(false)"
@@ -150,7 +150,7 @@ const fetchIPForModal = async (ip) => {
             const url = store.getDbUrl(source.id, ip, selectedLang);
             const response = await authenticatedFetch(url);
             if (!call.isCurrent()) return;
-            modalQueryResult.value = { ...transformDataFromIPapi(response, source.id, t, lang.value), ip };
+            modalQueryResult.value = { ...transformDataFromIPapi(response, t, lang.value), ip };
             isChecking.value = 'idle';
             call.done();
             emit('result', { ip, sourceId: source.id, data: modalQueryResult.value });

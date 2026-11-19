@@ -354,8 +354,8 @@ const openDetails = (ip) => {
     detailsOpen.value = true;
 };
 
-// The Blocklist tool's own registry gate (original site only).
-const blocklistAvailable = computed(() => isToolAvailable(TOOL_BY_SLUG.get('blocklist'), store.configs));
+// The Blocklist tool's own registry gate (IPCheck.ing API + sign-in).
+const blocklistAvailable = computed(() => isToolAvailable(TOOL_BY_SLUG.get('blocklist'), store.capabilities));
 
 const tableProps = computed(() => ({
     sortKey: sortKey.value,

@@ -199,16 +199,18 @@
 
 <script setup>
 // IP Blocklist Check: which blocklists an IP is on — live DNSBLs and static
-// threat lists — via /api/ipblocklist (the private API's /iphitlist; signed-in
-// users, original site only). Verdict / row split live in
+// threat lists — via /api/ipblocklist (the IPCheck.ing API's /iphitlist; signed-in
+// users, API configured). Verdict / row split live in
 // utils/features/ip-blocklist.js. A `?q=` IP is prefilled, never run: the
 // visitor may be signed out or out of quota.
 import { ref, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
+import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
+import { SERVICE_ERROR_CODE, AUTH_REASON } from '@/utils/codes/service-errors.js';
 import { isoToDateTime, formatIsoDate } from '@/utils/time-utils.js';
 import { blocklistVerdict, listedCounts, splitPart, itemTone, reasonMessage } from '@/utils/features/ip-blocklist.js';
 import { selectableIPs, classifyTarget } from '@/composables/use-globalping-measurement';
@@ -229,6 +231,8 @@ import {
 
 const { t, te } = useI18n();
 const store = useMainStore();
+// This tool's metered feature in the quota snapshot.
+const QUOTA_KEY = TOOL_BY_SLUG.get('blocklist').quotaKey;
 const route = useRoute();
 const router = useRouter();
 const lang = computed(() => store.lang);
@@ -348,7 +352,7 @@ const runCheck = async () => {
     if (inputInvalid.value) return;
     // Frontend first line: the quota snapshot already says the month is used
     // up. The backend enforces the same limit (429) as the real guard.
-    if (store.quotaExceeded.ip_hitlist) {
+    if (store.quotaExceeded(QUOTA_KEY)) {
         quotaExceeded.value = true;
         return;
     }
@@ -368,17 +372,17 @@ const runCheck = async () => {
         const body = await authenticatedFetch(`/api/ipblocklist?ip=${encodeURIComponent(ip)}`, 'GET', null, CLIENT_TIMEOUT_MS);
         if (!isStale()) result.value = body;
     } catch (error) {
-        // 429: monthly quota exhausted — show the quota hint, not an error.
-        if (error.status === 429) {
+        // Monthly quota exhausted — show the quota hint, not an error.
+        if (error.code === SERVICE_ERROR_CODE.QUOTA) {
             quotaExceeded.value = true;
-            store.markQuotaExhausted('ip_hitlist');
+            store.markQuotaExhausted(QUOTA_KEY);
             return;
         }
         console.error('IP blocklist check failed:', error);
         if (isStale()) return;
-        // 401/403: the visitor's sign-in state, not a failure to retry.
-        if (error.status === 401 || error.status === 403) {
-            errorMsg.value = error.message.includes('Invalid token') ? t('user.InvalidUserToken') : t('user.SignInToUse');
+        // The visitor's sign-in state, not a failure to retry.
+        if (error.code === SERVICE_ERROR_CODE.AUTH) {
+            errorMsg.value = error.reason === AUTH_REASON.INVALID_TOKEN ? t('user.InvalidUserToken') : t('user.SignInToUse');
         } else {
             errorMsg.value = t('ipblocklist.FetchError');
         }

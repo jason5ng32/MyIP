@@ -137,7 +137,7 @@
                     </template>
                 </div>
 
-                <!-- ============ Reputation (backend sends it on the official site only) ============ -->
+                <!-- ============ Reputation (sent when the IPCheck.ing API is configured) ============ -->
                 <div v-if="reputation" class="rounded-lg border bg-card p-4 space-y-4 min-w-0">
                     <div class="space-y-1">
                         <div class="flex items-start justify-between gap-2">

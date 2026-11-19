@@ -14,7 +14,7 @@
       </header>
 
       <!-- Content (scrollable) -->
-      <div class="flex-1 overflow-y-auto px-5 py-5 space-y-6">
+      <div ref="scrollArea" class="flex-1 overflow-y-auto px-5 py-5 space-y-6">
         <!-- Top note -->
         <p class="text-xs text-muted-foreground leading-relaxed">
           {{ t('nav.preferences.preferenceTips') }}
@@ -244,7 +244,7 @@
 </template>
 
 <script setup>
-import { computed, watch, h } from 'vue';
+import { computed, watch, h, ref, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -286,6 +286,31 @@ const isOpen = computed(() => store.openSheet === 'preferences');
 const onOpenChange = (val) => {
   store.setOpenSheet(val ? 'preferences' : null);
 };
+
+// Section reveal (store.openPreferencesAt): once the panel shows, scroll the
+// named section into view, ring it briefly, and clear the request.
+const scrollArea = ref(null);
+const EMPHASIS = ['rounded-md', 'ring-2', 'ring-action/50', 'ring-offset-4', 'ring-offset-background'];
+const EMPHASIS_FADE = ['transition-shadow', 'duration-700'];
+let emphasisTimers = [];
+const revealSection = (id) => {
+  const section = scrollArea.value?.querySelector(`#${id}`);
+  if (!section) return;
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  section.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
+  emphasisTimers.forEach(clearTimeout);
+  section.classList.add(...EMPHASIS_FADE, ...EMPHASIS);
+  emphasisTimers = [
+    setTimeout(() => section.classList.remove(...EMPHASIS), 1600),
+    setTimeout(() => section.classList.remove(...EMPHASIS_FADE), 2400),
+  ];
+};
+watch(() => isOpen.value && store.preferencesFocus, async (id) => {
+  if (!id) return;
+  store.clearPreferencesFocus();
+  await nextTick();
+  requestAnimationFrame(() => revealSection(id));
+}, { immediate: true });
 
 // Text-only options — the picker deliberately shows no flags: a language
 // isn't a country (e.g. English under a US flag reads wrong to Brits).

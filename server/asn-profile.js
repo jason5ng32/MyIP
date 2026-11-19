@@ -34,7 +34,7 @@ const UPSTREAM_DEFAULT_MS = 8000; // fetchUpstream's default
 //   prefixes     one Radar pfx2as call (Radar timeout) + local MaxMind
 //   whois        IANA bootstrap (default, cached 24 h), then RDAP autnum
 //   connectivity local CAIDA + RIPEstat name fallback (3 s, in parallel)
-//   rank / reputation  ASRank GraphQL / private API
+//   rank / reputation  ASRank GraphQL / IPCheck.ing API
 //   peeringdb    local index, no I/O
 export const INNER_TIMEOUTS = {
     radar: RADAR_TIMEOUT_MS,

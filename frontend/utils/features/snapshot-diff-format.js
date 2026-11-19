@@ -4,15 +4,18 @@
 // one item), a line per field — and formats the recorded values. Marks mean
 // removed / added like any code diff, never worse / better (plan red line).
 // `viewed` is the snapshot shown, `compared` the baseline. Also the inline
-// (word-level) segments of a changed value.
+// (word-level) segments of a changed value. An IP card answered by another
+// geo source than its baseline opens with one context line naming both.
 
 import {
     keyedItems, sectionFields, fieldKind, speedTier, sameValue, DISPLAY_FRACTION_DIGITS,
+    GEO_SOURCE_FIELD, geoSourceSwitch,
 } from './snapshot-diff.js';
 import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS, ABUSE_LEVEL_I18N_KEYS } from '../codes/ip-labels.js';
 import { SCENARIOS, scenarioNameKey, verdictKey } from '../ip/scenario-friction.js';
 import { CONNECTIVITY_STATUS_KEYS } from '../codes/connectivity-labels.js';
 import { natTypeKey } from '../codes/webrtc-labels.js';
+import { IP_DATABASES } from '../../data/ip-databases.js';
 
 const SCENARIO_BY_FIELD = new Map(SCENARIOS.map((scenario) => [`scenarios.${scenario.id}`, scenario]));
 
@@ -29,6 +32,7 @@ export const sectionFieldOrder = (sectionId) => sectionFields(sectionId).filter(
 // scenario friction reuse the IP card's own labels.
 export const fieldLabelKey = (field) => {
     if (field === 'abuseLevel') return 'ipInfos.abuseLevel.label';
+    if (field === GEO_SOURCE_FIELD) return 'ipInfos.sourceFields.source';
     if (SCENARIO_BY_FIELD.has(field)) return scenarioNameKey(SCENARIO_BY_FIELD.get(field));
     return `snapshots.fields.${field}`;
 };
@@ -48,6 +52,10 @@ const MS_FIELDS = new Set(['timeMs', 'minTimeMs', 'latencyMs', 'jitterMs', 'load
 const MBPS_FIELDS = new Set(['downloadMbps', 'uploadMbps']);
 
 export const EMPTY_VALUE = '—';
+
+// A geo source id by its display name (never translated), else the id.
+const SOURCE_NAMES = new Map(IP_DATABASES.map((db) => [db.id, db.text]));
+const sourceName = (id) => SOURCE_NAMES.get(id) ?? String(id);
 
 const isEmpty = (value) => value === undefined || value === null || value === '';
 
@@ -70,6 +78,7 @@ export const formatFieldValue = (field, value, { t = (key) => key, countryName, 
     if (field === 'status') return label(CONNECTIVITY_STATUS_KEYS);
     if (field === 'natType') return t(natTypeKey(value));
     if (field === 'abuseLevel') return label(ABUSE_LEVEL_I18N_KEYS);
+    if (field === GEO_SOURCE_FIELD) return [value].flat().map(sourceName).join(' → ');
     if (SCENARIO_BY_FIELD.has(field)) return t(verdictKey({ ...SCENARIO_BY_FIELD.get(field), level: value }));
     if (field.startsWith('qualities.')) return t(`speedtest.quality.${value}`);
     if (typeof value !== 'number') return String(value);
@@ -131,6 +140,14 @@ const compareLines = (sectionId, viewed, compared, showDrift) => {
     });
 };
 
+// The source switch line of an IP card pair: context, its value [from, to].
+const sourceLines = (sectionId, viewed, compared) => {
+    const sourceSwitch = sectionId === 'ipinfo' ? geoSourceSwitch(compared, viewed) : null;
+    return sourceSwitch
+        ? [{ field: GEO_SOURCE_FIELD, kind: fieldKind(GEO_SOURCE_FIELD), mark: ' ', value: sourceSwitch, otherValue: undefined }]
+        : [];
+};
+
 const makeHunk = (key, name, status, lines) => {
     const changedCount = lines.filter((line) => line.mark === '-').length;
     // Open: a plain view, or a compared item with a −/+ line.
@@ -142,7 +159,8 @@ const makeHunk = (key, name, status, lines) => {
 // 'both' (compared), 'onlyViewed' / 'onlyCompared' (one side only, not
 // compared: plain lines, closed), 'single' (nothing to compare with: no
 // comparison chosen, or the compared snapshot lacks the section; open).
-// Line: { field, kind, mark: ' ' | '-' | '+' | '±', value, otherValue }.
+// Line: { field, kind, mark: ' ' | '-' | '+' | '±', value, otherValue }; the
+// `geoSource` line's value is the [compared, viewed] source id pair.
 // `diffSection` is diffSnapshots()'s section, null when not comparing.
 // Viewed order first, then the items only the compared snapshot holds.
 export const buildHunks = (sectionId, diffSection, viewedSection, comparedSection, { showDrift = false } = {}) => {
@@ -157,7 +175,10 @@ export const buildHunks = (sectionId, diffSection, viewedSection, comparedSectio
     const hunks = [...viewed].map(([key, item]) => {
         const name = hunkName(sectionId, key, item);
         if (!compared.has(key)) return makeHunk(key, name, 'onlyViewed', contextLines(sectionId, item));
-        return makeHunk(key, name, 'both', compareLines(sectionId, item, compared.get(key), showDrift));
+        return makeHunk(key, name, 'both', [
+            ...sourceLines(sectionId, item, compared.get(key)),
+            ...compareLines(sectionId, item, compared.get(key), showDrift),
+        ]);
     });
     for (const [key, item] of compared) {
         if (viewed.has(key)) continue;
@@ -195,7 +216,10 @@ export const splitRows = (hunk) => {
         }
         if (hunk.status === 'onlyCompared') row.left = line;
         else if (hunk.status !== 'both') row.right = line;
-        else if (line.mark === '-') row.left = line;
+        else if (line.field === GEO_SOURCE_FIELD) {
+            row.left = { ...line, value: line.value[0] };
+            row.right = { ...line, value: line.value[1] };
+        } else if (line.mark === '-') row.left = line;
         else if (line.mark === '+') row.right = line;
         else {
             row.left = { ...line, value: line.otherValue, otherValue: line.value };

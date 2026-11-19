@@ -3,13 +3,15 @@
 // apart from changes, semantic vs drift rows, numbers compared at display
 // precision, the speed tier as a noise gate, one-sided sections as "not
 // run", and rows that carry no verdict. keyedItems hands renderers the same keys.
+// A card's answering geo source opens its rows only when both sides name a
+// different one.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
     diffSnapshots, fieldKind, speedTier, SPEED_TIER_THRESHOLDS_MBPS, keyedItems,
-    atDisplayPrecision, sameValue, DISPLAY_FRACTION_DIGITS,
+    atDisplayPrecision, sameValue, DISPLAY_FRACTION_DIGITS, geoSourceSwitch,
 } from '../frontend/utils/features/snapshot-diff.js';
 import { createSnapshot } from '../frontend/utils/features/snapshots.js';
 import { REPORT_VERSION, validateReport } from '../common/report-schema.js';
@@ -334,5 +336,36 @@ describe('snapshot diff — keyedItems', () => {
     it('is empty for speedtest or a missing section', () => {
         assert.equal(keyedItems('speedtest', { downloadMbps: 10 }).size, 0);
         assert.equal(keyedItems('webrtc', undefined).size, 0);
+    });
+});
+
+describe('snapshot diff — the answering geo source', () => {
+    const left = snap({ cards: [card('ipcheck', '8.8.8.8', { ipType: 'residential', geoSource: 0 })] });
+    const viewed = (geoSource) => snap({ cards: [card('ipcheck', '8.8.8.8', { ipType: 'hosting', geoSource })] });
+
+    it('opens the card\'s rows with one unhighlighted row when the sources differ', () => {
+        const { rows } = diffSnapshots(left, viewed(3)).sections.ipinfo;
+        assert.deepEqual(rows[0], {
+            key: 'ipcheck', field: 'geoSource', from: 0, to: 3, kind: 'info', changed: true, highlight: false,
+        });
+        assert.equal(rows.filter((row) => row.field === 'geoSource').length, 1);
+        assert.equal(rows.find((row) => row.field === 'ipType').highlight, true, 'other rows as before');
+    });
+
+    it('lists no source row when equal or absent on a side', () => {
+        for (const right of [viewed(0), viewed(undefined)]) {
+            const { rows } = diffSnapshots(left, right).sections.ipinfo;
+            assert.equal(rows.some((row) => row.field === 'geoSource'), false);
+        }
+        const older = snap({ cards: [card('ipcheck', '8.8.8.8')] });
+        assert.equal(diffSnapshots(older, viewed(3)).sections.ipinfo.rows.some((row) => row.field === 'geoSource'), false);
+    });
+
+    it('geoSourceSwitch needs an integer id on both sides', () => {
+        assert.deepEqual(geoSourceSwitch({ geoSource: 0 }, { geoSource: 2 }), [0, 2]);
+        assert.equal(geoSourceSwitch({ geoSource: 2 }, { geoSource: 2 }), null);
+        assert.equal(geoSourceSwitch({}, { geoSource: 2 }), null);
+        assert.equal(geoSourceSwitch({ geoSource: '0' }, { geoSource: 2 }), null);
+        assert.equal(geoSourceSwitch(undefined, { geoSource: 2 }), null);
     });
 });

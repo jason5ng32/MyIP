@@ -5,7 +5,7 @@
 //     test sections aren't here, they're reached via the command bus
 //   - store: main store
 //   - t: i18n translation function
-//   - configs: computed(() => store.configs)
+//   - capabilities: computed(() => store.capabilities)
 //   - userPreferences: computed(() => store.userPreferences)
 //
 // Output:
@@ -31,6 +31,8 @@ import { registerShortcuts, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement, SECTION_SCROLL_OFFSET } from '../utils/scroll-to.js';
 import { useRouteActive } from './use-route-active.js';
 import { hasPulseBackend } from '../utils/features/pulse-beacon.js';
+import { isToolAvailable } from '../utils/tool-availability.js';
+import { TOOL_BY_SLUG } from '../data/tools.js';
 
 // A shortcut only kicks the run off — completion is the owner's business —
 // so a failed dispatch just logs.
@@ -40,7 +42,7 @@ const runCommand = (name, payload) => {
     });
 };
 
-const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
+const buildShortcutConfig = ({ refs, store, t, capabilities, userPreferences }) => {
     const {
         queryIPRef,
         helpModalRef,
@@ -207,37 +209,29 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         },
     ];
 
-    if (configs.value.originalSite) {
-        config.push({
-            keys: 'i',
-            action: () => goToAdvancedTool('invisibilitytest'),
-            description: t('shortcutKeys.InvisibilityTest'),
-        });
+    // Gated tools' keys follow each tool's own registry gate.
+    const toolKeys = [
+        { keys: 'i', slug: 'invisibilitytest', description: t('shortcutKeys.InvisibilityTest') },
         // Uppercase D mirrors lowercase `d` (refresh homepage DNS leak test) —
-        // `D` opens the in-depth version of the same feature. Gated on
-        // originalSite since the advanced card itself is gated the same way.
-        config.push({
-            keys: 'D',
-            action: () => goToAdvancedTool('enhanceddnsleaktest'),
-            description: t('shortcutKeys.EnhancedDnsLeakTest'),
-        });
+        // `D` opens the in-depth version of the same feature.
+        { keys: 'D', slug: 'enhanceddnsleaktest', description: t('shortcutKeys.EnhancedDnsLeakTest') },
         // Uppercase B: lowercase `b` belongs to Browser Info.
-        config.push({
-            keys: 'B',
-            action: () => goToAdvancedTool('blocklist'),
-            description: t('shortcutKeys.IpBlocklist'),
-        });
+        { keys: 'B', slug: 'blocklist', description: t('shortcutKeys.IpBlocklist') },
         // Uppercase P: lowercase `p` belongs to Earth Online.
+        { keys: 'P', slug: 'personacheck', description: t('shortcutKeys.PersonaCheck') },
+    ];
+    for (const { keys, slug, description } of toolKeys) {
+        if (!isToolAvailable(TOOL_BY_SLUG.get(slug), capabilities.value)) continue;
         config.push({
-            keys: 'P',
-            action: () => goToAdvancedTool('personacheck'),
-            description: t('shortcutKeys.PersonaCheck'),
+            keys,
+            action: () => goToAdvancedTool(slug),
+            description,
         });
     }
 
     // Uppercase A: lowercase `a` belongs to the IP calculator. Gated like the
     // ASN Profile card itself (data/tools.js `requiresConfig`).
-    if (configs.value.cloudFlare) {
+    if (capabilities.value.cloudFlare) {
         config.push({
             keys: 'A',
             action: () => goToAdvancedTool('asn'),
@@ -246,7 +240,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
     }
 
     // Mirrors the Earth Online entry's visibility (widgets/Pulse.vue).
-    if (hasPulseBackend || configs.value.cloudFlare) {
+    if (hasPulseBackend || capabilities.value.cloudFlare) {
         config.push({
             keys: 'p',
             action: () => {
@@ -260,7 +254,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
     return config;
 };
 
-export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
+export const useShortcuts = ({ refs, store, t, capabilities, userPreferences }) => {
     // Suspending the map behind an overlay is the primitives' job
     // (composables/use-overlay-shortcuts.js), so nothing is wired here.
     //
@@ -277,7 +271,7 @@ export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
     }
 
     const registerShortcutKeys = () => {
-        registerShortcuts(buildShortcutConfig({ refs, store, t, configs, userPreferences }));
+        registerShortcuts(buildShortcutConfig({ refs, store, t, capabilities, userPreferences }));
     };
 
     watch(active, (isActive) => {
@@ -288,13 +282,13 @@ export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
 
     const loadShortcuts = () => {
         // Register immediately so the base keys work from the first paint;
-        // config-gated keys (originalSite's i/D/P, pulse's p) fill in when
+        // config-gated keys (the deep tools' i/D/B/P, pulse's p) fill in when
         // /api/configs lands (`{}` → data, once per page load) and the watcher
         // rebuilds the map. keyMap is mutated in place (utils/shortcut.js),
         // so the help modal's reference stays current across rebuilds.
         loaded = true;
         if (active.value) registerShortcutKeys();
-        watch(configs, () => {
+        watch(capabilities, () => {
             if (!disposed && active.value) registerShortcutKeys();
         });
         // Help is an async component (Home.vue): on slow networks its chunk
