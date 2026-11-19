@@ -1,4 +1,4 @@
-<!-- The IP section's inline data-source sentence: the source answering (the Preferences choice, or the one a fallback landed on), linking to its site, and a way to switch it. -->
+<!-- The IP section's inline data-source sentence: the source answering (the Preferences choice, or the one a fallback landed on), linking to its site, and a link to its picker in Preferences. -->
 <template>
   <i18n-t v-if="selectedSource" keypath="ipInfos.sourceFields.sentence" tag="span" scope="global">
     <template #source>
@@ -6,9 +6,9 @@
         class="underline underline-offset-2 hover:text-foreground">{{ selectedSource.text }}</a>
       <template v-else>{{ selectedSource.text }}</template>
     </template>
-    <template #switch>
+    <template #preferences>
       <button type="button" @click="openSourcePicker"
-        class="inline cursor-pointer p-0 align-baseline underline underline-offset-2 hover:text-foreground">{{ t('ipInfos.sourceFields.switch') }}</button>
+        class="inline cursor-pointer p-0 align-baseline underline underline-offset-2 hover:text-foreground">{{ t('ipInfos.sourceFields.preferences') }}</button>
     </template>
   </i18n-t>
 </template>

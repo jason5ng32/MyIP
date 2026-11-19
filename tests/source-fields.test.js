@@ -48,12 +48,12 @@ describe('listSourceMetrics()', () => {
 });
 
 describe('data-source sentence copy', () => {
-    it('every full locale has the label, the switch and the sentence with both slots', () => {
+    it('every full locale has the label, the Preferences link and the sentence with both slots', () => {
         for (const code of FULL_LOCALE_CODES) {
             const pack = JSON.parse(readFileSync(new URL(`../frontend/locales/${code}.json`, import.meta.url), 'utf8'));
-            assert.deepEqual(Object.keys(pack.ipInfos.sourceFields).sort(), ['sentence', 'source', 'switch'], code);
-            for (const key of ['sentence', 'source', 'switch']) assert.ok(pack.ipInfos.sourceFields[key].trim(), `${code}: ${key}`);
-            for (const slot of ['{source}', '{switch}']) assert.ok(pack.ipInfos.sourceFields.sentence.includes(slot), `${code}: ${slot}`);
+            assert.deepEqual(Object.keys(pack.ipInfos.sourceFields).sort(), ['preferences', 'sentence', 'source'], code);
+            for (const key of ['preferences', 'sentence', 'source']) assert.ok(pack.ipInfos.sourceFields[key].trim(), `${code}: ${key}`);
+            for (const slot of ['{source}', '{preferences}']) assert.ok(pack.ipInfos.sourceFields.sentence.includes(slot), `${code}: ${slot}`);
         }
     });
 });

@@ -2067,8 +2067,8 @@
     },
     "sourceFields": {
       "source": "Fonte dos dados",
-      "switch": "trocar",
-      "sentence": "Banco de geolocalização em uso: {source} ({switch})."
+      "preferences": "Preferências",
+      "sentence": "Banco de geolocalização em uso: {source}. Você pode alterá-lo em {preferences}."
     },
     "countryTraffic": {
       "subtitle": "Distribuição semanal da atividade online deste país/região — veja apenas o tráfego gerado por humanos ou todo o tráfego (incluindo bots/tráfego automatizado).",

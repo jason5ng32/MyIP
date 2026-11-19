@@ -2067,8 +2067,8 @@
     },
     "sourceFields": {
       "source": "数据来源",
-      "switch": "切换",
-      "sentence": "当前使用的地理位置数据库：{source}（{switch}）。"
+      "preferences": "偏好设置",
+      "sentence": "当前使用的地理位置数据库：{source}。你可以在{preferences}里面修改。"
     },
     "countryTraffic": {
       "subtitle": "该国家/地区的每周网络活跃分布—— 你可以选择仅看人类所产生的流量或全部流量（包含机器人/自动化流量）。",

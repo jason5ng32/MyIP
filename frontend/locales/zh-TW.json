@@ -2067,8 +2067,8 @@
     },
     "sourceFields": {
       "source": "資料來源",
-      "switch": "切換",
-      "sentence": "目前使用的地理位置資料庫：{source}（{switch}）。"
+      "preferences": "偏好設定",
+      "sentence": "目前使用的地理位置資料庫：{source}。你可以在{preferences}裡面修改。"
     },
     "countryTraffic": {
       "subtitle": "該國家/地區的每週網路活躍分布——你可以選擇僅看人類所產生的流量或全部流量（包含機器人/自動化流量）。",

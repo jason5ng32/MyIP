@@ -2067,8 +2067,8 @@
     },
     "sourceFields": {
       "source": "Data source",
-      "switch": "change",
-      "sentence": "Geolocation database in use: {source} ({switch})."
+      "preferences": "Preferences",
+      "sentence": "Geolocation database in use: {source}. You can change it in {preferences}."
     },
     "countryTraffic": {
       "subtitle": "Typical weekly online activity in this country/region — view human-generated traffic only, or all traffic (including bot/automated traffic).",
