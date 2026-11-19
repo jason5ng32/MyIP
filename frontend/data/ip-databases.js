@@ -15,7 +15,7 @@
 export const IP_DATABASES = [
   { id: 0, text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true, configKey: 'ipChecking', extended: true, quotaKey: 'ipinfo', attribution: { url: 'https://ipcheck.ing/' } },
   { id: 3, text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true, configKey: 'ipapiis', extended: true, attribution: { url: 'https://ipapi.is/' } },
-  { id: 1, text: 'IPinfo.io', url: '/api/ipinfo?ip={{ip}}', enabled: true, configKey: 'ipInfo', extended: true, attribution: { url: 'https://ipinfo.io/' } },
+  { id: 1, text: 'IPinfo.io', url: '/api/ipinfo?ip={{ip}}', enabled: true, configKey: 'ipInfo', attribution: { url: 'https://ipinfo.io/' } },
   { id: 2, text: 'IP-API.com', url: '/api/ipapicom?ip={{ip}}&lang={{lang}}', enabled: true, extended: true, attribution: { url: 'https://ip-api.com/' } },
   { id: 4, text: 'IP2Location.io', url: '/api/ip2location?ip={{ip}}', enabled: true, configKey: 'ip2location', extended: true, attribution: { url: 'https://www.ip2location.io/' } },
   { id: 5, text: 'IP.sb', url: '/api/ipsb?ip={{ip}}', enabled: true, attribution: { url: 'https://ip.sb/' } },

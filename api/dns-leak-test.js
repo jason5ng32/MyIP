@@ -45,7 +45,6 @@ export async function getSessionResult(req, res) {
             ? await apiResponse.json().catch(() => ({}))
             : await ipCheckingApiErrorBody(apiResponse);
 
-        res.set('Cache-Control', 'no-store');
         res.status(apiResponse.status).json(data);
     } catch (error) {
         logger.error({ err: error }, 'dnsleaktest upstream fetch failed');

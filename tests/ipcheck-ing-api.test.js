@@ -191,16 +191,24 @@ describe('requestIpCheckingApi', () => {
 describe('ipCheckingApiErrorBody', () => {
     const answer = (status, body) => new Response(body === undefined ? '' : JSON.stringify(body), { status });
 
-    it('codes a 403 saying the token is invalid as auth / invalid_token', async () => {
-        const body = await ipCheckingApiErrorBody(answer(403, {
-            error: 'Invalid token', message: 'Firebase ID token has expired.', code: 'auth/id-token-expired',
-        }));
-        assert.deepEqual(body, { error: 'Invalid token', code: SERVICE_ERROR_CODE.AUTH, reason: AUTH_REASON.INVALID_TOKEN });
+    it('reads the auth reason from the upstream code, never from its text', async () => {
+        for (const [code, reason] of [
+            ['invalid_token', AUTH_REASON.INVALID_TOKEN],
+            ['sign_in_required', AUTH_REASON.SIGN_IN_REQUIRED],
+        ]) {
+            for (const status of [401, 403]) {
+                assert.deepEqual(await ipCheckingApiErrorBody(answer(status, { error: 'Sign in required', code })),
+                    { error: 'Sign in required', code: SERVICE_ERROR_CODE.AUTH, reason }, `${status} ${code}`);
+            }
+        }
+        const textOnly = await ipCheckingApiErrorBody(answer(403, { error: 'Invalid token' }));
+        assert.deepEqual(textOnly, { error: 'Invalid token', code: SERVICE_ERROR_CODE.AUTH, reason: AUTH_REASON.SIGN_IN_REQUIRED });
     });
 
-    it('codes any other 403 as auth / sign_in_required', async () => {
+    it('reads an unknown or missing code as sign_in_required', async () => {
         for (const upstream of [
-            { error: 'Sign in required', message: 'Authorization header is missing.', code: '401' },
+            { error: 'Sign in required', code: 'auth/id-token-expired' },
+            { error: 'Sign in required', code: 401 },
             { message: 'Authorization header is missing.' },
             {},
         ]) {

@@ -81,8 +81,9 @@ resolver list behind `dns-resolver` (gated by
 
 ## Conventions
 
-- **Handler shape.** Single default export `async (req, res) => …`: read
-  `req.query` / `req.body`, call upstream, write one response.
+- **Handler shape.** The default export is the route's handler, `async
+  (req, res) => …` (a file serving a second route exports that one by name):
+  read `req.query` / `req.body`, call upstream, write one response.
 - **Every upstream call uses `fetchUpstream`** (`common/fetch-with-timeout.js`,
   8s timeout — Radar's client raises it to 12 s, `RADAR_TIMEOUT_MS`; its own
   timeout is an `AbortError` reading `Timed out after
@@ -117,9 +118,6 @@ resolver list behind `dns-resolver` (gated by
   frequency); the source's own indicators as `metrics`, never as `score`.
   Its spec uses invented fixtures in the upstream's real shape: full, minimal
   and all-empty answers.
-- **`api/ipinfo-io.js` skips the factory:** it asks the lookup API with the
-  token in a Bearer header; a token that API refuses with 403 is answered by
-  the legacy endpoint, and remembered for the process lifetime.
 - **`?lang` is never validated in a handler.** Pass the raw tag through:
   `lookupMaxMind` normalizes it onto the languages its data carries
   (`SUPPORTED_LANGS` in `server/datasets/maxmind-service.js`); the IPCheck.ing API proxies
@@ -233,8 +231,10 @@ upstreams fail for some ASes every time — except inside the boot window
 (`isOfflineBootstrapping`); cfradar caches no partial view answer
 (`isCompleteRadarAnswer`). The ASN family (profile, Radar `asn` /
 `bgp-prefixes`) shares 7 days. Only status < 400 is cached; handlers
-never touch `Cache-Control`. **Auth'd / per-user endpoints must not be
-wrapped** — their caching belongs to the upstream owning the auth context.
+never touch `Cache-Control`, except `google-map`'s image stream, which
+bypasses the JSON hook and applies the stashed `res.locals.cacheControl`.
+**Auth'd / per-user endpoints must not be wrapped** — their caching belongs
+to the upstream owning the auth context.
 
 ## Testing
 

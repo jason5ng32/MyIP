@@ -86,8 +86,8 @@ const assertForwardedHeaders = (headers, extra = {}) => {
 
 // IPCheck.ing API failure bodies as it sends them, and the coded bodies the
 // tool routes answer with.
-const UPSTREAM_SIGN_IN_REQUIRED = { error: 'Sign in required', message: 'Authorization header is missing.', code: '401' };
-const UPSTREAM_INVALID_TOKEN = { error: 'Invalid token', message: 'Firebase ID token has expired.', code: 'auth/id-token-expired' };
+const UPSTREAM_SIGN_IN_REQUIRED = { error: 'Sign in required', message: 'Authorization header is missing.', code: 'sign_in_required' };
+const UPSTREAM_INVALID_TOKEN = { error: 'Invalid token', message: 'Firebase ID token has expired.', code: 'invalid_token' };
 const UPSTREAM_QUOTA = { error: 'Monthly quota exceeded', code: 'quota_exceeded' };
 const CODED_SIGN_IN_REQUIRED = { error: 'Sign in required', code: 'auth', reason: 'sign_in_required' };
 const CODED_INVALID_TOKEN = { error: 'Invalid token', code: 'auth', reason: 'invalid_token' };
@@ -1136,7 +1136,6 @@ describe('dns-leak-test getSessionResult', () => {
             return new Response(JSON.stringify(UPSTREAM_SIGN_IN_REQUIRED), { status: 403 });
         };
         const res = createResponse();
-        res.set = () => res;
         const req = withVisitorHeaders({ method: 'GET', headers: { referer: 'http://localhost/' }, query: {}, params: { token: 'a'.repeat(32) } });
         await dnsLeakGetResult(req, res);
         assert.equal(res.statusCode, 403);
@@ -1154,8 +1153,7 @@ describe('dns-leak-test getSessionResult', () => {
         ]) {
             globalThis.fetch = upstreamAnswer(status, upstream);
             const res = createResponse();
-            res.set = () => res;
-            await dnsLeakGetResult({ method: 'GET', headers: {}, query: {}, params: { token: 'a'.repeat(32) } }, res);
+                await dnsLeakGetResult({ method: 'GET', headers: {}, query: {}, params: { token: 'a'.repeat(32) } }, res);
             assert.equal(res.statusCode, status);
             assert.deepEqual(res.body, coded);
         }
@@ -1179,10 +1177,8 @@ describe('dns-leak-test getSessionResult', () => {
                 requested = new URL(String(url));
                 return { status: 200, ok: true, json: async () => ({}) };
             };
-            // The success path sets a Cache-Control header on the way out.
             const res = createResponse();
-            res.set = () => res;
-            await dnsLeakGetResult({
+                await dnsLeakGetResult({
                 method: 'GET', headers: {}, query,
                 params: { token: 'a'.repeat(32) },
             }, res);
@@ -1239,13 +1235,12 @@ describe('ipcheck-ing handler', () => {
         try { return await run(); } finally { logger.error = originalError; }
     };
 
-    it('passes the answer through and adds the extended block', async () => {
+    it('answers the geo fields and the extended block, without the advanced data', async () => {
         const advancedData = { score: 88, operatorType: 'Business', tags: { isNative: true } };
         const res = await callWith(answering({ ...geo, advancedData }));
         assert.equal(res.statusCode, 200);
         assert.deepEqual(res.body, {
             ...geo,
-            advancedData,
             extended: {
                 anonymity: { code: 'none' }, lineType: 'business', native: true, score: 88,
                 flags: advancedData.tags,
@@ -1253,11 +1248,16 @@ describe('ipcheck-ing handler', () => {
         });
     });
 
-    it('answers a gated block beside the untouched advanced data', async () => {
+    it('answers a gated block without the advanced data', async () => {
         const gated = 'sign_in_required';
         const advancedData = { score: gated, operatorType: gated, anonymityProvider: gated, anonymityProtocol: gated, tags: gated };
         const res = await callWith(answering({ ...geo, advancedData }));
-        assert.deepEqual(res.body, { ...geo, advancedData, extended: { gate: 'auth' } });
+        assert.deepEqual(res.body, { ...geo, extended: { gate: 'auth' } });
+    });
+
+    it('drops advanced data with no usable block', async () => {
+        const res = await callWith(answering({ ...geo, advancedData: { score: 88 } }));
+        assert.deepEqual(res.body, geo);
     });
 
     it('answers the geo fields alone when there is no advanced data', async () => {
@@ -1420,6 +1420,20 @@ describe('asn-profile handler', () => {
     });
 });
 
+// -- ip-sb normalizer -----------------------------------------------------
+// Pure transform, no fetch involved.
+
+describe('ip-sb normalize', () => {
+    it('prefixes the ASN', () => {
+        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7', asn: 64500 }).asn, 'AS64500');
+    });
+
+    it('answers N/A when the upstream sends no ASN', () => {
+        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7' }).asn, 'N/A');
+        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7', asn: null }).asn, 'N/A');
+    });
+});
+
 // -- ipinfo-io normalizer -------------------------------------------------
 // Pure transform, no fetch involved.
 
@@ -1498,20 +1512,6 @@ describe('ipinfo-io normalize', () => {
                 assert.ok(key in out, `${key} must stay present in the response`);
             }
         }
-    });
-});
-
-// -- ip-sb normalizer -----------------------------------------------------
-// Pure transform, no fetch involved.
-
-describe('ip-sb normalize', () => {
-    it('prefixes the ASN', () => {
-        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7', asn: 64500 }).asn, 'AS64500');
-    });
-
-    it('answers N/A when the upstream sends no ASN', () => {
-        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7' }).asn, 'N/A');
-        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7', asn: null }).asn, 'N/A');
     });
 });
 

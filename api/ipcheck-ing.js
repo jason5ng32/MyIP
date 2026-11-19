@@ -1,5 +1,5 @@
 import logger from '../server/logger.js';
-import { toExtended } from '../server/ipcheck-ing-extended.js';
+import { toPublicAnswer } from '../server/ipcheck-ing-extended.js';
 import { isIpCheckingApiConfigured, requestIpCheckingApi } from '../server/ipcheck-ing-api.js';
 
 export default async (req, res) => {
@@ -23,10 +23,7 @@ export default async (req, res) => {
             throw new Error(`API responded with status: ${apiResponse.status}`);
         }
 
-        // The answer as sent, plus the generic `extended` block when it has one.
-        const data = await apiResponse.json();
-        const extended = toExtended(data);
-        res.json(extended ? { ...data, extended } : data);
+        res.json(toPublicAnswer(await apiResponse.json()));
     } catch (error) {
         logger.error({ err: error, ip: ipAddress, lang }, 'ipcheck-ing handler failed');
         res.status(500).json({ error: error.message });

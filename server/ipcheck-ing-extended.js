@@ -120,3 +120,11 @@ export const toExtended = (answer) => {
         flags: flagsOf(tags) ?? undefined,
     });
 };
+
+// The route's answer: the upstream answer without `advancedData`, plus its `extended` block when it has one.
+export const toPublicAnswer = (answer) => {
+    if (!isPlainObject(answer)) return answer;
+    const { advancedData, ...geo } = answer;
+    const extended = toExtended(answer);
+    return extended ? { ...geo, extended } : geo;
+};

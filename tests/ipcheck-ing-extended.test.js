@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
-    toExtended, anonymityCodeOf, lineTypeOf, scenariosOf, flagsOf, dimensionsOf,
+    toExtended, toPublicAnswer, anonymityCodeOf, lineTypeOf, scenariosOf, flagsOf, dimensionsOf,
 } from '../server/ipcheck-ing-extended.js';
 import { isValidExtended, EXTENDED_GATES, EXTENDED_FLAGS } from '../common/ip-extended.js';
 import { IP_TYPE_CODES } from '../common/codes/ip.js';
@@ -207,6 +207,31 @@ describe('toExtended()', () => {
             assert.equal('scenarios' in out, false, JSON.stringify(scenarios));
             assert.ok(isValidExtended(out));
         }
+    });
+});
+
+describe('toPublicAnswer()', () => {
+    it('answers the geo fields and the extended block, without the advanced data', () => {
+        const out = toPublicAnswer(complete);
+        assert.equal('advancedData' in out, false);
+        assert.deepEqual(out, { ...geo, extended: toExtended(complete) });
+    });
+
+    it('answers a gated block without the advanced data', () => {
+        for (const [value, gate] of Object.entries(GATE_VALUES)) {
+            assert.deepEqual(toPublicAnswer(gatedAnswer(value)), { ...geo, extended: { gate } }, value);
+        }
+    });
+
+    it('drops advanced data that yields no block, and keeps a plain geo answer as is', () => {
+        for (const advancedData of [{ score: 50 }, null, 'sign_in_required']) {
+            assert.deepEqual(toPublicAnswer({ ...geo, advancedData }), geo);
+        }
+        assert.deepEqual(toPublicAnswer(geo), geo);
+    });
+
+    it('passes a non-object answer through', () => {
+        for (const answer of [null, undefined, [], 'x']) assert.deepEqual(toPublicAnswer(answer), answer);
     });
 });
 

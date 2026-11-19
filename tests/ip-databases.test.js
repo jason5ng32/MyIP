@@ -33,7 +33,7 @@ describe('IP_DATABASES', () => {
 
   it('marks the sources whose answer carries the extended block', () => {
     const extended = IP_DATABASES.filter((d) => d.extended === true).map((d) => d.id);
-    assert.deepEqual([...extended].sort((a, b) => a - b), [0, 1, 2, 3, 4]);
+    assert.deepEqual([...extended].sort((a, b) => a - b), [0, 2, 3, 4]);
     for (const db of IP_DATABASES) assert.ok(db.extended === undefined || db.extended === true, db.text);
   });
 

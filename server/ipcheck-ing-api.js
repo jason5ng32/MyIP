@@ -62,15 +62,17 @@ export const requestIpCheckingApi = async (path, {
 
 const DEFAULT_ERROR_TEXT = { 401: 'Sign in required', 403: 'Sign in required', 429: 'Monthly quota exceeded' };
 
+const AUTH_REASONS = new Set(Object.values(AUTH_REASON));
+
 // The uniform body { error, code?, reason? } for a failed upstream Response:
-// 401 / 403 → auth (invalid_token when the upstream says so, else sign_in_required),
-// 429 → quota, any other status → no code.
+// 401 / 403 → auth, its reason the upstream `code` when it is a known auth
+// reason, else sign_in_required; 429 → quota; any other status → no code.
 export const ipCheckingApiErrorBody = async (response) => {
     const data = await response.json().catch(() => null);
     const upstreamText = typeof data?.error === 'string' && data.error ? data.error : undefined;
     const error = upstreamText ?? DEFAULT_ERROR_TEXT[response.status] ?? `Upstream status ${response.status}`;
     if (response.status === 401 || response.status === 403) {
-        const reason = /invalid token/i.test(upstreamText ?? '') ? AUTH_REASON.INVALID_TOKEN : AUTH_REASON.SIGN_IN_REQUIRED;
+        const reason = AUTH_REASONS.has(data?.code) ? data.code : AUTH_REASON.SIGN_IN_REQUIRED;
         return { error, code: SERVICE_ERROR_CODE.AUTH, reason };
     }
     if (response.status === 429) return { error, code: SERVICE_ERROR_CODE.QUOTA };
