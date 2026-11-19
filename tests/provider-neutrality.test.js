@@ -13,7 +13,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CODE_DIRS = ['frontend', 'api', 'server', 'common'];
-const CODE_SKIP = new Set(['node_modules', 'frontend/locales', 'frontend/components/ui']);
+// frontend/data/banners is deploy-time data kept out of git.
+const CODE_SKIP = new Set(['node_modules', 'frontend/locales', 'frontend/components/ui', 'frontend/data/banners']);
 const CODE_EXT = /\.(js|vue)$/;
 const ROOT_ENTRIES = ['backend-server.js', 'frontend-server.js', 'sentry-instrument.js', 'vite.config.js'];
 const DOC_DIRS = ['frontend', 'api', 'server', 'common', '.github'];
@@ -222,8 +223,6 @@ const RULES = [
             'frontend/components/ToolPage.vue': 'a page: its title suffix',
             'frontend/components/PrivacyPolicy.vue': 'a page: its title suffix',
             'frontend/components/report/ReportPage.vue': 'a page: its title suffix',
-            'frontend/data/banners/ipinfo.js': 'a homepage banner: its link utm source',
-            'frontend/data/banners/speedtest.js': 'a homepage banner: its copy',
             'frontend/components/advanced-tools/RuleTest.vue': 'the Rule Test tool: its probe hostnames',
             'vite.config.js': 'the build config: dev server allowedHosts',
         },
