@@ -158,13 +158,16 @@ const previewOpen = ref(false);
 // Sections produced by an Advanced Tool follow that tool's listing gate
 // (sign-in, the IPCheck.ing API, a probe endpoint where needed), so the checklist never carries a
 // permanently-"not tested" entry for a tool this deployment doesn't list.
+// A section that has a result always shows: it is preselected, so it must
+// be there to untick.
 const TOOL_SECTIONS = new Map([
     ['invisibility', 'invisibilitytest'],
     ['enhanceddnsleak', 'enhanceddnsleaktest'],
     ['persona', 'personacheck'],
 ]);
 const visibleSectionIds = computed(() => REPORT_SECTION_IDS.filter((id) =>
-    !TOOL_SECTIONS.has(id) || isToolAvailable(TOOL_BY_SLUG.get(TOOL_SECTIONS.get(id)), store.capabilities)));
+    !TOOL_SECTIONS.has(id) || availableSectionIds.value.includes(id)
+    || isToolAvailable(TOOL_BY_SLUG.get(TOOL_SECTIONS.get(id)), store.capabilities)));
 
 const hasSelection = computed(() => selectedIds.value.length > 0);
 
