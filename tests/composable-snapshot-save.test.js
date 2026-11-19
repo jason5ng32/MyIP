@@ -2,8 +2,9 @@
 // over a stubbed command bus, router and recorder API: filing this visit's
 // results directly, running a cached Home's tests in place (the command set
 // per `autoRun*` preference; always a manual snapshot once the sections
-// settle, automatic recording or not), the trip through a Home that never
-// mounted and back, failures and the one-run guard.
+// settle, automatic recording or not; connectivity once its grid settles),
+// the trip through a Home that never mounted and back, failures and the
+// one-run guard.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -16,14 +17,20 @@ import { appCommandError } from '../frontend/utils/app-commands.js';
 
 const ALL_ON = { autoRunConnectivity: true, autoRunWebRTC: true, autoRunDnsLeak: true };
 
+// `done` once settled, so a later call by the same name gets a fresh one.
 const deferred = () => {
-    let resolve;
-    let reject;
-    const promise = new Promise((res, rej) => {
-        resolve = res;
-        reject = rej;
+    const d = { done: false };
+    d.promise = new Promise((res, rej) => {
+        d.resolve = (value) => {
+            d.done = true;
+            res(value);
+        };
+        d.reject = (error) => {
+            d.done = true;
+            rej(error);
+        };
     });
-    return { promise, resolve, reject };
+    return d;
 };
 
 const flush = () => new Promise((resolve) => setImmediate(resolve));
@@ -42,7 +49,8 @@ const fakeSnapshots = ({ canTake = false, taken = 'manual-1' } = {}) => {
     };
 };
 
-// Every dispatched command and awaited event settles when the test says so.
+// Every dispatched command and awaited event settles when the test says so;
+// `settle(name)` is the latest call's, a call after it settled a new one.
 const fakeBus = ({ mounted = true } = {}) => {
     const log = [];
     const pending = new Map();
@@ -50,21 +58,25 @@ const fakeBus = ({ mounted = true } = {}) => {
         if (!pending.has(name)) pending.set(name, deferred());
         return pending.get(name);
     };
+    const call = (name) => {
+        if (pending.get(name)?.done) pending.delete(name);
+        return settle(name).promise;
+    };
     return {
         log,
         settle,
         hasAppCommand: () => mounted,
         dispatchAppCommand: (name, payload, options) => {
             log.push(['dispatch', name, payload, options]);
-            return settle(name).promise;
+            return call(name);
         },
         waitForAppCommand: (name) => {
             log.push(['waitCommand', name]);
             return Promise.resolve();
         },
-        waitForAppEvent: (name) => {
-            log.push(['waitEvent', name]);
-            return settle(name).promise;
+        waitForAppEvent: (name, options) => {
+            log.push(['waitEvent', name, undefined, options]);
+            return call(name);
         },
     };
 };
@@ -92,6 +104,8 @@ const setup = ({ prefs = ALL_ON, canTake = false, mounted = true, taken } = {}) 
     });
     return { snapshots, bus, router, saving, save };
 };
+
+const eventWaits = (bus, name) => bus.log.filter(([kind, event]) => kind === 'waitEvent' && event === name).length;
 
 const dispatched = (bus) => bus.log.filter(([kind]) => kind === 'dispatch').map(([, name, payload]) => [name, payload]);
 
@@ -157,12 +171,79 @@ describe('useSnapshotSave', () => {
         assert.deepEqual(snapshots.calls, ['takeSnapshot']);
     });
 
+    it('waits in place for a settled connectivity grid, not a multi-round first pass', async () => {
+        const { snapshots, bus, save } = setup({ prefs: { autoRunConnectivity: true } });
+        const run = save();
+        bus.settle('ipinfo:refresh').resolve({});
+        bus.settle('connectivity:run').resolve({ settled: false, targets: [] });
+        await flush();
+        assert.deepEqual(snapshots.calls, [], 'round 1 is not filed');
+        assert.equal(eventWaits(bus, 'connectivity:finished'), 1);
+        bus.settle('connectivity:finished').resolve({ settled: false, targets: [] });
+        await flush();
+        assert.deepEqual(snapshots.calls, [], 'still unsettled');
+        assert.equal(eventWaits(bus, 'connectivity:finished'), 2);
+        assert.ok(bus.log.every(([, , , options]) => options?.timeoutMs === 1000));
+        bus.settle('connectivity:finished').resolve({ settled: true, targets: [] });
+        assert.deepEqual(await run, { status: 'saved', id: 'manual-1' });
+        assert.deepEqual(snapshots.calls, ['takeSnapshot']);
+    });
+
+    it('files at once on a connectivity result already settled, or without `settled`', async () => {
+        for (const result of [{ settled: true, targets: [] }, { targets: [] }, undefined]) {
+            const { snapshots, bus, save } = setup({ prefs: { autoRunConnectivity: true } });
+            const run = save();
+            bus.settle('ipinfo:refresh').resolve({});
+            bus.settle('connectivity:run').resolve(result);
+            assert.deepEqual(await run, { status: 'saved', id: 'manual-1' }, JSON.stringify(result));
+            assert.deepEqual(snapshots.calls, ['takeSnapshot']);
+            assert.equal(eventWaits(bus, 'connectivity:finished'), 0);
+        }
+    });
+
+    it('still files when the wait for a settled grid times out', async () => {
+        const { snapshots, bus, save } = setup({ prefs: { autoRunConnectivity: true } });
+        const run = save();
+        bus.settle('ipinfo:refresh').resolve({});
+        bus.settle('connectivity:run').resolve({ settled: false, targets: [] });
+        await flush();
+        bus.settle('connectivity:finished').reject(appCommandError('timeout', 'slow'));
+        assert.deepEqual(await run, { status: 'saved', id: 'manual-1' });
+        assert.deepEqual(snapshots.calls, ['takeSnapshot']);
+    });
+
+    it('waits on Home for a settled connectivity grid before the manual snapshot', async () => {
+        const { snapshots, bus, router, save } = setup({ mounted: false, prefs: { autoRunConnectivity: true } });
+        const run = save();
+        await flush();
+        bus.settle('ipinfo:finished').resolve({});
+        bus.settle('connectivity:finished').resolve({ settled: false, targets: [] });
+        await flush();
+        assert.deepEqual(snapshots.calls, [], 'round 1 is not filed');
+        assert.equal(eventWaits(bus, 'connectivity:finished'), 2);
+        bus.settle('connectivity:finished').resolve({ settled: true, targets: [] });
+        assert.deepEqual(await run, { status: 'returned', id: 'manual-1' });
+        assert.deepEqual(snapshots.calls, ['takeSnapshot']);
+        assert.deepEqual(router.pushes.at(-1), { path: SNAPSHOTS_PATH, query: { q: 'manual-1' } });
+    });
+
+    it('proceeds on Home when the first connectivity grid is already settled', async () => {
+        const { snapshots, bus, save } = setup({ mounted: false, prefs: { autoRunConnectivity: true } });
+        const run = save();
+        await flush();
+        bus.settle('ipinfo:finished').resolve({});
+        bus.settle('connectivity:finished').resolve({ settled: true, targets: [] });
+        assert.deepEqual(await run, { status: 'returned', id: 'manual-1' });
+        assert.deepEqual(snapshots.calls, ['takeSnapshot']);
+        assert.equal(eventWaits(bus, 'connectivity:finished'), 1);
+    });
+
     it('goes through a Home that never mounted and returns to the snapshot', async () => {
         const { snapshots, bus, router, save } = setup({ mounted: false });
         const run = save();
         await flush();
         // Listens before navigating; runs nothing itself (Home's load does).
-        assert.deepEqual(bus.log.slice(0, 5), [
+        assert.deepEqual(bus.log.slice(0, 5).map(([kind, name]) => [kind, name]), [
             ['waitEvent', 'ipinfo:finished'],
             ['waitEvent', 'connectivity:finished'],
             ['waitEvent', 'webrtc:finished'],

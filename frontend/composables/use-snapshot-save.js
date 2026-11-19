@@ -4,8 +4,9 @@
 // runs ipinfo plus the `autoRun*` sections in place (never the speed test);
 // a Home that never mounted is visited — its own initial load runs them — and
 // the page comes back to `/tools/snapshots?q=<id>` while still on Home.
-// Either way, once ipinfo resolves and the other sections settle, it files a
-// manual snapshot: a frozen copy, whatever `snapshotsAuto` (the recorder's
+// Either way, once ipinfo resolves and the other sections settle (connectivity
+// on a settled grid, not a multi-round pass's first one), it files a manual
+// snapshot: a frozen copy, whatever `snapshotsAuto` (the recorder's
 // automatic snapshot of the same load keeps updating beside it).
 // One run at a time, app-wide.
 
@@ -18,8 +19,9 @@ export const SNAPSHOT_SAVE_TIMEOUT_MS = 60 * 1000;
 export const SNAPSHOTS_PATH = '/tools/snapshots';
 
 // The homepage sections besides ipinfo, as the initial load gates them.
+// `settles`: a result published with `settled: false` is followed by more.
 const SECTION_RUNS = [
-    { pref: 'autoRunConnectivity', command: 'connectivity:run', event: 'connectivity:finished', payload: { trigger: 'refresh' } },
+    { pref: 'autoRunConnectivity', command: 'connectivity:run', event: 'connectivity:finished', payload: { trigger: 'refresh' }, settles: true },
     { pref: 'autoRunWebRTC', command: 'webrtc:run', event: 'webrtc:finished', payload: { isRefresh: true } },
     { pref: 'autoRunDnsLeak', command: 'dnsleak:run', event: 'dnsleak:finished', payload: { isRefresh: true } },
 ];
@@ -34,6 +36,14 @@ export const useSnapshotSave = ({
     const { canTakeSnapshot, takeSnapshot } = snapshots;
     const sectionRuns = () => SECTION_RUNS.filter(({ pref }) => store.userPreferences?.[pref]);
 
+    // A section's first result, then its later events until one is settled
+    // (a payload without `settled` counts as settled).
+    const untilSettled = async (first, { event, settles }, options) => {
+        let payload = await first;
+        while (settles && payload?.settled === false) payload = await bus.waitForAppEvent(event, options);
+        return payload;
+    };
+
     // A manual snapshot once the other sections settle, so it holds them too.
     const resolveSnapshot = async (rest) => {
         await Promise.allSettled(rest);
@@ -44,7 +54,7 @@ export const useSnapshotSave = ({
     const runInPlace = async () => {
         const options = { timeoutMs };
         const ipinfo = bus.dispatchAppCommand('ipinfo:refresh', {}, options);
-        const rest = sectionRuns().map(({ command, payload }) => bus.dispatchAppCommand(command, payload, options));
+        const rest = sectionRuns().map((run) => untilSettled(bus.dispatchAppCommand(run.command, run.payload, options), run, options));
         rest.forEach((promise) => promise.catch(() => {})); // settled below, or abandoned
         await ipinfo;
         return resolveSnapshot(rest);
@@ -54,7 +64,7 @@ export const useSnapshotSave = ({
     const runViaHome = async () => {
         const options = { timeoutMs };
         const ipinfo = bus.waitForAppEvent('ipinfo:finished', options);
-        const rest = sectionRuns().map(({ event }) => bus.waitForAppEvent(event, options));
+        const rest = sectionRuns().map((run) => untilSettled(bus.waitForAppEvent(run.event, options), run, options));
         [ipinfo, ...rest].forEach((promise) => promise.catch(() => {})); // awaited below, or abandoned
         await router.push('/');
         await bus.waitForAppCommand('ipinfo:refresh', options);
