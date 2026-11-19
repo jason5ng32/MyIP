@@ -156,7 +156,7 @@ const ttlDays = ref(String(REPORT_TTL_DAYS[0]));
 const previewOpen = ref(false);
 
 // Sections produced by an Advanced Tool follow that tool's listing gate
-// (sign-in + the IPCheck.ing API), so the checklist never carries a
+// (sign-in, the IPCheck.ing API, a probe endpoint where needed), so the checklist never carries a
 // permanently-"not tested" entry for a tool this deployment doesn't list.
 const TOOL_SECTIONS = new Map([
     ['invisibility', 'invisibilitytest'],

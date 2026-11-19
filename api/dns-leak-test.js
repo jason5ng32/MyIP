@@ -1,4 +1,4 @@
-// Enhanced DNS leak detection — thin proxy to the main IPCheck.ing API.
+// Enhanced DNS leak detection — thin proxy to the IPCheck.ing API.
 //
 //   - validates the 32-hex token locally (fail fast before any network hop),
 //   - forwards the listed caller headers (notably Authorization: Bearer <Firebase ID>),

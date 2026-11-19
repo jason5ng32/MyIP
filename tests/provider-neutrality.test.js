@@ -1,8 +1,8 @@
 // Keeps the open-source core neutral about the IPCheck.ing API: each rule
 // names a pattern the core must not use, matched on code with comments
-// stripped. Files still allowed to match are listed per rule — permanent
-// ones with a reason, transitional ones with the phase that cleans them —
-// and a listed file that no longer matches fails, so the lists only shrink.
+// stripped. Files still allowed to match are listed per rule with the
+// reason, and a listed file that no longer matches fails, so the lists only
+// shrink.
 // The wording rule reads raw text (comments, tests, docs) and has no list.
 
 import assert from 'node:assert/strict';
@@ -17,7 +17,6 @@ const CODE_SKIP = new Set(['node_modules', 'frontend/locales', 'frontend/compone
 const CODE_EXT = /\.(js|vue)$/;
 const ROOT_ENTRIES = ['backend-server.js', 'frontend-server.js', 'sentry-instrument.js', 'vite.config.js'];
 const DOC_DIRS = ['frontend', 'api', 'server', 'common', '.github'];
-const PHASES = new Set(['02', '03', '04', '05']);
 
 // --- scan -------------------------------------------------------------------
 
@@ -162,20 +161,18 @@ const NEGATED_SOURCE = /!\s*([\w$]+\??\.)*ipGeoSource\b/;
 const ZERO_COMPARE = /(?<![!=<>])===?\s*0(?![\d.])|(?<![\w.])0\s*===?(?!=)/;
 
 // Each rule: `test(code)` on comment-stripped code, `applies(path)` for its
-// scope, and its two lists (path → reason, path → phase that removes it).
+// scope, and the files allowed to match (path → what the file is).
 const RULES = [
     {
         name: 'no identity gate',
         test: (code) => new RegExp(IDENTITY_WORDS.join('|')).test(code),
         permanent: {},
-        transitional: {},
     },
     {
         name: 'no source-id 0 check on ipGeoSource',
         test: (code) => code.split('\n').some((line) => NEGATED_SOURCE.test(line)
             || (/\bipGeoSource\b/.test(line) && ZERO_COMPARE.test(line))),
         permanent: {},
-        transitional: {},
     },
     {
         name: `no data access to ${ADVANCED} (i18n keys aside)`,
@@ -183,59 +180,54 @@ const RULES = [
         permanent: {
             'server/ipcheck-ing-extended.js': 'the adapter that parses the IPCheck.ing API answer',
         },
-        transitional: {},
     },
     {
         name: 'no quoted gate strings',
         test: (code) => /(['"`])(sign_in_required|quota_exceeded)\1/.test(code),
         permanent: {
             'server/ipcheck-ing-extended.js': 'the adapter that parses the IPCheck.ing API answer',
-            'common/codes/service-errors.js': 'the auth reason code list',
+            'common/codes/service-errors.js': 'the service error code list, auth reasons included',
         },
-        transitional: {},
     },
     {
         name: 'no whole request headers in api/ and server/',
         applies: inBackend,
         test: (code) => WHOLE_REQ_HEADERS.test(code) || HEADERS_SPREAD.test(code.replace(PLACEHOLDER, '')),
         permanent: {
-            'api/sentry-tunnel.js': 'visitorIpFrom reads the cf-connecting-ip header only',
+            'api/sentry-tunnel.js': 'the Sentry tunnel: visitorIpFrom reads cf-connecting-ip only',
         },
-        transitional: {},
     },
     {
         name: 'no reads of the IPCheck.ing API env variables',
         test: (code) => new RegExp(`\\b(${ENV_WORDS.join('|')})\\b`).test(code),
         permanent: {
-            'api/configs.js': 'derives the ipChecking flag',
+            'api/configs.js': 'the configs route, which derives the ipChecking flag',
             'server/ipcheck-ing-api.js': 'the adapter that sends requests to the IPCheck.ing API',
         },
-        transitional: {},
     },
     {
         name: 'no IPCheck.ing hostname or name in code',
         test: (code) => /ipcheck\.ing/i.test(code),
         permanent: {
-            'frontend/utils/upstream-site.js': 'the one identity check',
-            'frontend/utils/getips/ipchecking4.js': 'public IP probe endpoint, named provider',
-            'frontend/utils/getips/ipchecking6.js': 'public IP probe endpoint, named provider',
-            'frontend/utils/getips/ipchecking64.js': 'public IP probe endpoint, named provider',
-            'frontend/data/ip-databases.js': 'IP source display name',
-            'frontend/components/IpInfos.vue': 'card source display names',
-            'frontend/utils/ip/asn-profile-view.js': 'reputation source display name',
-            'frontend/data/achievement-rules.js': 'achievement rule on the query text',
-            'frontend/components/Footer.vue': 'footer link',
-            'frontend/components/widgets/FooterAcknowledgements.vue': 'acknowledgement link',
-            'frontend/utils/docs-url.js': 'docs site origin',
-            'frontend/components/ToolPage.vue': 'page title suffix',
-            'frontend/components/PrivacyPolicy.vue': 'page title suffix',
-            'frontend/components/report/ReportPage.vue': 'page title suffix',
-            'frontend/data/banners/ipinfo.js': 'banner link',
-            'frontend/data/banners/speedtest.js': 'banner copy',
-            'frontend/components/advanced-tools/RuleTest.vue': 'rule-test probe hostnames',
-            'vite.config.js': 'dev server allowedHosts',
+            'frontend/utils/upstream-site.js': 'the one identity check: the upstream hostnames',
+            'frontend/utils/getips/ipchecking4.js': 'an IP probe: its public endpoint and provider name',
+            'frontend/utils/getips/ipchecking6.js': 'an IP probe: its public endpoint and provider name',
+            'frontend/utils/getips/ipchecking64.js': 'an IP probe: its public endpoint and provider name',
+            'frontend/data/ip-databases.js': 'the IP source list: the source display name',
+            'frontend/components/IpInfos.vue': 'the IP cards: the probe display names',
+            'frontend/utils/ip/asn-profile-view.js': 'the ASN Profile view: the reputation source name',
+            'frontend/data/achievement-rules.js': 'the achievement rules: one matches the Whois query text',
+            'frontend/components/Footer.vue': 'the footer: the lite site link',
+            'frontend/components/widgets/FooterAcknowledgements.vue': 'the acknowledgements: utm source of a sponsor link',
+            'frontend/utils/docs-url.js': 'the docs link builder: the docs site origin',
+            'frontend/components/ToolPage.vue': 'a page: its title suffix',
+            'frontend/components/PrivacyPolicy.vue': 'a page: its title suffix',
+            'frontend/components/report/ReportPage.vue': 'a page: its title suffix',
+            'frontend/data/banners/ipinfo.js': 'a homepage banner: its link utm source',
+            'frontend/data/banners/speedtest.js': 'a homepage banner: its copy',
+            'frontend/components/advanced-tools/RuleTest.vue': 'the Rule Test tool: its probe hostnames',
+            'vite.config.js': 'the build config: dev server allowedHosts',
         },
-        transitional: {},
     },
 ];
 
@@ -343,7 +335,7 @@ describe('provider neutrality', () => {
     for (const rule of RULES) {
         describe(rule.name, () => {
             const hits = hitsOf(rule, sources);
-            const listed = { ...rule.permanent, ...rule.transitional };
+            const listed = rule.permanent;
 
             it('matches only listed files', () => {
                 assert.deepEqual(hits.filter((path) => !(path in listed)), []);
@@ -353,10 +345,8 @@ describe('provider neutrality', () => {
                 assert.deepEqual(Object.keys(listed).filter((path) => !hits.includes(path)), []);
             });
 
-            it('lists each file once, transitional ones with a later phase', () => {
-                assert.deepEqual(Object.keys(rule.permanent).filter((path) => path in rule.transitional), []);
-                assert.deepEqual(Object.entries(rule.transitional).filter(([, phase]) => !PHASES.has(phase)), []);
-                assert.ok(Object.values(rule.permanent).every((reason) => reason.length > 0));
+            it('gives every listed file a reason', () => {
+                assert.deepEqual(Object.entries(listed).filter(([, reason]) => !reason.trim()), []);
             });
         });
     }

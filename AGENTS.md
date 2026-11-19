@@ -40,7 +40,7 @@ Licensed under AGPL-3.0-only (`LICENSE`).
 | Error monitoring | Sentry — optional & env-gated on both halves: `@sentry/vue` (no `VITE_SENTRY_DSN_FRONTEND`, no Sentry in the build — see frontend/AGENTS.md) + `@sentry/node` (no `SENTRY_DSN_BACKEND`, never loaded — see api/AGENTS.md) |
 | PWA | `manifest.webmanifest` only — installable but online-only, no service worker |
 | Tests | Node built-in test runner (`node --test`) |
-| Runtime libs | chart.js · chartjs-chart-geo · @cloudflare/speedtest · maxmind · whoiser · thumbmarkjs · ua-parser-js · detect-gpu · @vueuse/core |
+| Runtime libs | chart.js · chartjs-chart-geo · @cloudflare/speedtest · maxmind · whoiser · thumbmarkjs · ua-parser-js · @vueuse/core |
 
 ## Commands
 

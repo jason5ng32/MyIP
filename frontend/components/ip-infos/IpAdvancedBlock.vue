@@ -75,7 +75,7 @@
                     <dd class="font-normal wrap-break-word">
                         {{ data.anonymity }}
                     </dd>
-                    <!-- Anonymizing service, when the API named one. -->
+                    <!-- Anonymizing service, when the source named one. -->
                     <dd v-if="anonymityService" class="font-normal wrap-break-word">
                         <span class="text-muted-foreground font-normal text-xs">{{ anonymityService }}</span>
                     </dd>
@@ -293,7 +293,7 @@ const showTypeBadge = computed(() =>
     Boolean(props.data.type) && props.data.ipTypeCode !== LINE_TYPE_UNKNOWN
 );
 const showAnonymityBadge = computed(() => Boolean(props.data.anonymity));
-// "Provider · protocol"; both are null unless the API named a service.
+// "Provider · protocol"; both are null unless the source named a service.
 const anonymityService = computed(() =>
     [props.data.anonymityProvider, props.data.anonymityProtocol].filter(Boolean).join(' · ')
 );

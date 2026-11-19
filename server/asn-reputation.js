@@ -1,4 +1,4 @@
-// ASN reputation from the main IPCheck.ing API
+// ASN reputation from the IPCheck.ing API.
 
 import { requestIpCheckingApi } from './ipcheck-ing-api.js';
 

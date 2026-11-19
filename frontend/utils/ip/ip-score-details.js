@@ -4,7 +4,7 @@
 //
 // Inputs are the transformed card fields (transform-ip-data.js): `flags`,
 // `scoreDimensions`, `qualityScore`, `isp`, `asn`, `ip`. Gated cards (or
-// any without `dimensions`) yield nothing.
+// any without `scoreDimensions`) yield nothing.
 
 const KEY = 'ipInfos.scoreDetails';
 
@@ -49,7 +49,7 @@ export const scoreRiskTier = (score) => {
 };
 
 // One sentence per dimension, each { key, params }. Empty unless the card
-// carries the v3 `dimensions` block and a numeric score. `t` translates the
+// carries `scoreDimensions` and a numeric score. `t` translates the
 // fallback operator name; `formatDate` renders a YYYY-MM-DD day.
 export const buildScoreExplanation = (data, { t = (key) => key, formatDate = (day) => day } = {}) => {
     const dims = data?.scoreDimensions;

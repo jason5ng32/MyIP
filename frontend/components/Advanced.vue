@@ -83,7 +83,7 @@ const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const router = useRouter();
 
-// Card groups behind the deployment gates (sign-in / configs flag, see
+// Card groups behind the deployment gates (sign-in, configs flags, probe facts; see
 // utils/tool-availability.js). Reactive on configs, so gated cards appear the
 // moment configs land.
 const cardGroups = computed(() => groupToolsByCategory(

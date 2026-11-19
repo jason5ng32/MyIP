@@ -1,6 +1,6 @@
 // POST /api/persona/evaluate — Persona Check.
 //
-// Thin proxy to the main IPCheck.ing API, which owns the evaluation this
+// Thin proxy to the IPCheck.ing API, which owns the evaluation this
 // deployment deliberately does not carry. One observation in, one graded
 // report out; per-visitor, never cached. The listed caller headers travel
 // upstream (the evaluator needs the request context); results come back as

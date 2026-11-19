@@ -12,9 +12,8 @@
 //                 handler wants extra fields (e.g. lang) on the error log
 //   - normalize : (json) => canonical response object
 //
-// buildUrl runs before the try block so any env-key selection it performs
-// keeps its current behavior (e.g. throwing on a missing key surfaces the
-// same way the original inline handlers did).
+// buildUrl runs before the try block, so a throw from it (e.g. a missing
+// key) reaches Express's error handler rather than the catch below.
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from './logger.js';

@@ -517,7 +517,7 @@ const animateProbes = async () => {
 const apiLang = () => toApiTag(lang.value);
 
 // authenticatedFetch attaches the Firebase ID token as Authorization; our
-// backend then forwards request headers to the upstream IPCheck.ing API.
+// backend forwards it, among the listed headers, to the IPCheck.ing API.
 const fetchResultOnce = async (token) => {
     const url = `/api/dnsleaktest/session/${encodeURIComponent(token)}?lang=${encodeURIComponent(apiLang())}`;
     return authenticatedFetch(url);

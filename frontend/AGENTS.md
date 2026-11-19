@@ -50,7 +50,7 @@ Every file opens with a header comment stating its purpose — read those.
   notes (`IpInfos.vue`; hidden with them in simple mode): the source selected
   in Preferences (`ipGeoSource` → its `data/ip-databases.js` row, the name
   linking `attribution.url`) and a switch that opens Preferences at the
-  picker, as `ipInfos.sourceFields.sentence` slots. Cards carry no source row;
+  picker, as `ipInfos.sourceFields.sentence` slots. Cards carry no geo-source row;
   `geoSourceId` stays for the cache and Snapshots.
 
 ### Achievements are event-driven
