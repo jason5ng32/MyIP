@@ -210,6 +210,15 @@ describe('snapshot diff — display precision', () => {
         assert.equal(sameValue(0, undefined), false);
     });
 
+    it('rounds half-way values the way the display does, not toFixed', () => {
+        assert.equal(atDisplayPrecision(1.15), 1.2);
+        assert.equal(atDisplayPrecision(1.15), Number((1.15).toLocaleString('en', { maximumFractionDigits: 1 })));
+        assert.equal(sameValue(1.14, 1.15), false);
+        assert.equal(sameValue(1.15, 1.2), true);
+        assert.equal(atDisplayPrecision(-1.15), -1.2);
+        assert.equal(atDisplayPrecision(1234567.06), 1234567.1);
+    });
+
     it('measurements that read the same are not changed rows', () => {
         const left = snap({ ...BASE, cards: [card('ipcheck', '8.8.8.8', { qualityScore: 87.51 }), BASE.cards[1]],
             speed: { ...BASE.speed, downloadMbps: 95.03, latencyMs: 12.04 } });

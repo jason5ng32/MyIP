@@ -41,11 +41,17 @@ export const fieldKind = (field) => {
 // Fraction digits a recorded number is shown with (snapshot-diff-format.js).
 export const DISPLAY_FRACTION_DIGITS = 1;
 
-// A number as it reads once shown (toFixed rounds like Intl's default);
-// anything else as is.
+// Rounds like the display's Intl formatting (toFixed differs on binary
+// half-way values: 1.15 → 1.1, Intl 1.2). Rounding doesn't depend on the
+// locale, only separators do, so a fixed 'en' with no grouping parses back.
+const DISPLAY_ROUNDING = new Intl.NumberFormat('en', {
+    maximumFractionDigits: DISPLAY_FRACTION_DIGITS, useGrouping: false,
+});
+
+// A number as it reads once shown; anything else as is.
 export const atDisplayPrecision = (value) =>
     (typeof value === 'number' && Number.isFinite(value)
-        ? Number(value.toFixed(DISPLAY_FRACTION_DIGITS)) : value);
+        ? Number(DISPLAY_ROUNDING.format(value)) : value);
 
 // Equal as displayed: 95.03 and 95.04 both read 95.
 export const sameValue = (a, b) => atDisplayPrecision(a) === atDisplayPrecision(b);
