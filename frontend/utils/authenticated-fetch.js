@@ -9,9 +9,10 @@ import { fetchWithTimeout } from './fetch-with-timeout.js';
 // Bounded label for a failed authenticatedFetch
 export const fetchErrorLabel = (error) => (error?.status ? `HTTP ${error.status}` : 'network');
 
-// Log one IP-geolocation source failing, at the level it deserves. 403 should be logged as a warning, everything else as an error.
+// Log one IP-geolocation source failing, at the level it deserves: a 403 or a
+// reached daily limit (429) is a warning, everything else an error.
 export const logSourceFetchFailure = (message, error) => {
-    if (error?.status === 403) console.warn(message, error);
+    if (error?.status === 403 || error?.status === 429) console.warn(message, error);
     else console.error(message, error);
 };
 

@@ -63,6 +63,22 @@ describe('transformDataFromIPapi()', () => {
     assert.equal(out.mapUrl_dark, '');
   });
 
+  it('keeps a coordinate of 0 and maps it', () => {
+    const out = transformDataFromIPapi({ ...basicRaw, latitude: 0, longitude: 0 }, t, 'en');
+    assert.equal(out.latitude, 0);
+    assert.equal(out.longitude, 0);
+    assert.equal(out.mapUrl, '/api/map?latitude=0.0&longitude=0.0&language=en');
+  });
+
+  it('omits map URLs when a coordinate is not a number', () => {
+    for (const value of ['N/A', '', null, ' ']) {
+      const out = transformDataFromIPapi({ ...basicRaw, latitude: value }, t, 'en');
+      assert.equal(out.mapUrl, '', JSON.stringify(value));
+      assert.equal(out.mapUrl_dark, '', JSON.stringify(value));
+    }
+    assert.equal(transformDataFromIPapi({ ...basicRaw, latitude: 'N/A' }, t, 'en').latitude, 'N/A');
+  });
+
   it('builds map URLs with language + dark variant when lat/lon present', () => {
     const out = transformDataFromIPapi(basicRaw, t, 'zh');
     // Map request coords are quantized to 1 decimal for CF edge-cache sharing,

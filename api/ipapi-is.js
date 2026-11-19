@@ -5,6 +5,9 @@
 import { makeGeoHandler } from '../server/geo-handler.js';
 import { anyOf, buildExtended, buildMetric, detectedCode } from '../server/source-extended.js';
 
+// Whether a key is set; /api/configs reports it as the `ipapiis` flag.
+export const isConfigured = () => Boolean(process.env.IPAPIIS_API_KEY);
+
 function buildUrl(req) {
     const ipAddress = req.query.ip;
 
@@ -53,8 +56,8 @@ export function modifyJsonForIPAPI(json) {
         country: location.country_code || 'N/A',
         country_name: location.country || 'N/A',
         country_code: location.country_code || 'N/A',
-        latitude: location.latitude || 'N/A',
-        longitude: location.longitude || 'N/A',
+        latitude: location.latitude ?? 'N/A',
+        longitude: location.longitude ?? 'N/A',
         asn: asn.asn === undefined ? 'N/A' : 'AS' + asn.asn,
         org: asn.org || 'N/A',
         ...(extended && { extended }),

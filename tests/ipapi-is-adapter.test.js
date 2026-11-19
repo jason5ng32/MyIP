@@ -93,7 +93,14 @@ describe('ipapi-is adapter — base fields', () => {
         const out = modifyJsonForIPAPI({ ip: '203.0.113.40', location: null });
         assert.equal(out.asn, 'N/A');
         assert.equal(out.city, 'N/A');
+        assert.equal(out.latitude, 'N/A');
         assert.equal('extended' in out, false);
+    });
+
+    it('keeps a coordinate of 0', () => {
+        const out = modifyJsonForIPAPI({ ...full, location: { ...full.location, latitude: 0, longitude: 0 } });
+        assert.equal(out.latitude, 0);
+        assert.equal(out.longitude, 0);
     });
 });
 

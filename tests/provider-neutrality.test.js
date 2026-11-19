@@ -201,7 +201,6 @@ const RULES = [
         name: 'no reads of the IPCheck.ing API env variables',
         test: (code) => new RegExp(`\\b(${ENV_WORDS.join('|')})\\b`).test(code),
         permanent: {
-            'api/configs.js': 'the configs route, which derives the ipChecking flag',
             'server/ipcheck-ing-api.js': 'the adapter that sends requests to the IPCheck.ing API',
         },
     },

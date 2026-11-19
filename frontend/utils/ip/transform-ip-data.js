@@ -13,13 +13,17 @@ function mapCoord(value) {
     return Number(value).toFixed(1);
 }
 
+// A usable coordinate: a finite number or numeric string, 0 included; 'N/A', '' and null are not.
+const isCoord = (value) => (typeof value === 'number' || (typeof value === 'string' && value.trim() !== ''))
+    && Number.isFinite(Number(value));
+
 // Parse IP data
 function transformDataFromIPapi(data, t, mapLanguage) {
     if (data.error) {
         throw new Error(data.reason);
     }
 
-    const hasCoords = data.latitude && data.longitude;
+    const hasCoords = isCoord(data.latitude) && isCoord(data.longitude);
     const mapLat = hasCoords ? mapCoord(data.latitude) : "";
     const mapLon = hasCoords ? mapCoord(data.longitude) : "";
 
@@ -32,8 +36,8 @@ function transformDataFromIPapi(data, t, mapLanguage) {
         country_code: data.country === 'N/A' ? '' : data.country,
         region: data.region || "",
         city: data.city || "",
-        latitude: data.latitude || "",
-        longitude: data.longitude || "",
+        latitude: data.latitude ?? "",
+        longitude: data.longitude ?? "",
         timezone: data.timezone || "",
         isp: data.org || "",
         asn: data.asn || "",

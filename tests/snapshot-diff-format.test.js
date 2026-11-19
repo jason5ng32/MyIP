@@ -231,9 +231,9 @@ describe('snapshot diff format — the answering geo source', () => {
         snap({ ipinfo: { testedAt: T0, cards: [card('A', '1.1.1.1', { ipType: 'residential', geoSource, ...fields })] } });
 
     it('opens a compared card with one context line naming both sources', () => {
-        const [hunk] = hunksOf('ipinfo', sideOf(0), sideOf(3, { ipType: 'hosting' }));
+        const [hunk] = hunksOf('ipinfo', sideOf(0), sideOf(1, { ipType: 'hosting' }));
         assert.deepEqual(marks(hunk).slice(0, 4), [' geoSource', ' ip', ' countryCode', ' asn']);
-        assert.deepEqual(hunk.lines[0].value, [0, 3], '[compared, viewed]');
+        assert.deepEqual(hunk.lines[0].value, [0, 1], '[compared, viewed]');
         assert.equal(hunk.changedCount, 1, 'only the line type counts as changed');
         assert.equal(formatFieldValue('geoSource', hunk.lines[0].value, opts), 'IPCheck.ing → IPAPI.is');
         assert.equal(fieldLabelKey('geoSource'), 'ipInfos.sourceFields.source');
@@ -257,10 +257,10 @@ describe('snapshot diff format — the answering geo source', () => {
     });
 
     it('splits into the compared source on the left, the viewed one on the right', () => {
-        const [hunk] = hunksOf('ipinfo', sideOf(0), sideOf(4));
+        const [hunk] = hunksOf('ipinfo', sideOf(0), sideOf(2));
         const [row] = splitRows(hunk);
         assert.deepEqual([row.field, row.left.mark, row.left.value, row.right.mark, row.right.value],
-            ['geoSource', ' ', 0, ' ', 4]);
+            ['geoSource', ' ', 0, ' ', 2]);
         assert.equal(formatFieldValue('geoSource', row.left.value, opts), 'IPCheck.ing');
         assert.equal(formatFieldValue('geoSource', row.right.value, opts), 'IP2Location.io');
     });

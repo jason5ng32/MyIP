@@ -43,7 +43,7 @@ import serviceStatusHandler, {
 import createReportHandler, { getReport as getReportHandler, normalizeTtlDays } from '../api/share-report.js';
 import { modifyJsonForIPAPI } from '../api/ipapi-is.js';
 import { modifyJsonForIPSB } from '../api/ip-sb.js';
-import { modifyJson as modifyJsonForIpinfo } from '../api/ipinfo-io.js';
+import { modifyJson as modifyJsonForIpinfoio } from '../api/ipinfo-io.js';
 import { REPORT_VERSION } from '../common/report-schema.js';
 import logger from '../server/logger.js';
 
@@ -146,7 +146,7 @@ describe('configs handler', () => {
         const res = createResponse();
         configsHandler(createRequest(), res);
         assert.equal(res.statusCode, 200);
-        const flags = ['map', 'ipInfo', 'ipChecking', 'ip2location', 'cloudFlare', 'ipapiis', 'reportSharing'];
+        const flags = ['map', 'ipinfoio', 'ipChecking', 'ip2locationio', 'cloudFlare', 'ipapiis', 'reportSharing'];
         for (const key of flags) {
             assert.equal(typeof res.body[key], 'boolean');
         }
@@ -179,7 +179,7 @@ describe('configs handler', () => {
         process.env.CLOUDFLARE_API = 'legacy-key';
         const res = createResponse();
         configsHandler(createRequest(), res);
-        assert.equal(res.body.ipInfo, true);
+        assert.equal(res.body.ipinfoio, true);
         assert.equal(res.body.cloudFlare, true);
     });
 });
@@ -1444,7 +1444,7 @@ describe('ipinfo-io normalize', () => {
     ];
 
     it('maps a fully populated upstream payload', () => {
-        const out = modifyJsonForIpinfo({
+        const out = modifyJsonForIpinfoio({
             ip: '8.8.8.8',
             city: 'Mountain View',
             region: 'California',
@@ -1462,7 +1462,7 @@ describe('ipinfo-io normalize', () => {
 
     it('degrades coordinates to null when the upstream omits loc', () => {
         // Anycast ranges answer 200 without loc.
-        const out = modifyJsonForIpinfo({
+        const out = modifyJsonForIpinfoio({
             ip: '104.28.212.153', city: 'Los Angeles', country: 'US', org: 'AS13335 Cloudflare, Inc.',
         });
         assert.equal(out.latitude, null);
@@ -1471,34 +1471,34 @@ describe('ipinfo-io normalize', () => {
     });
 
     it('degrades a partial or non-numeric loc to null', () => {
-        assert.equal(modifyJsonForIpinfo({ loc: '37.4056' }).longitude, null);
-        assert.equal(modifyJsonForIpinfo({ loc: '' }).latitude, null);
-        assert.equal(modifyJsonForIpinfo({ loc: 'unknown,unknown' }).latitude, null);
-        assert.equal(modifyJsonForIpinfo({ loc: ',-122.0775' }).latitude, null);
+        assert.equal(modifyJsonForIpinfoio({ loc: '37.4056' }).longitude, null);
+        assert.equal(modifyJsonForIpinfoio({ loc: '' }).latitude, null);
+        assert.equal(modifyJsonForIpinfoio({ loc: 'unknown,unknown' }).latitude, null);
+        assert.equal(modifyJsonForIpinfoio({ loc: ',-122.0775' }).latitude, null);
         // 0 is a real coordinate, not a blank one.
-        assert.equal(modifyJsonForIpinfo({ loc: '0,0' }).latitude, 0);
+        assert.equal(modifyJsonForIpinfoio({ loc: '0,0' }).latitude, 0);
     });
 
     it('empties asn / org when the upstream omits org', () => {
-        const out = modifyJsonForIpinfo({ ip: '8.8.8.8', country: 'US', loc: '37.4,-122.0' });
+        const out = modifyJsonForIpinfoio({ ip: '8.8.8.8', country: 'US', loc: '37.4,-122.0' });
         assert.equal(out.asn, '');
         assert.equal(out.org, '');
     });
 
     it('uses ICU country names and accepts lowercase upstream codes', () => {
-        assert.equal(modifyJsonForIpinfo({ country: 'TR' }).country_name, 'Türkiye');
-        assert.equal(modifyJsonForIpinfo({ country: 'us' }).country_name, 'United States');
+        assert.equal(modifyJsonForIpinfoio({ country: 'TR' }).country_name, 'Türkiye');
+        assert.equal(modifyJsonForIpinfoio({ country: 'us' }).country_name, 'United States');
     });
 
     it('falls back to Unknown Country for absent, unknown or malformed codes', () => {
         for (const country of [undefined, null, '', 'XX', 'ZZ', 'T1', 'USA', 123, {}]) {
-            assert.equal(modifyJsonForIpinfo({ country }).country_name, 'Unknown Country');
+            assert.equal(modifyJsonForIpinfoio({ country }).country_name, 'Unknown Country');
         }
     });
 
     it('survives a bogon payload and still emits the canonical shape', () => {
         // ipinfo.io answers {"ip":…,"bogon":true} — no loc, org or country.
-        const out = modifyJsonForIpinfo({ ip: '192.0.2.1', bogon: true });
+        const out = modifyJsonForIpinfoio({ ip: '192.0.2.1', bogon: true });
         assert.equal(out.ip, '192.0.2.1');
         for (const key of CANONICAL_KEYS) {
             assert.ok(key in out, `${key} must stay present in the response`);
@@ -1507,7 +1507,7 @@ describe('ipinfo-io normalize', () => {
 
     it('survives an empty or null upstream body', () => {
         for (const payload of [{}, null, undefined]) {
-            const out = modifyJsonForIpinfo(payload);
+            const out = modifyJsonForIpinfoio(payload);
             for (const key of CANONICAL_KEYS) {
                 assert.ok(key in out, `${key} must stay present in the response`);
             }

@@ -20,7 +20,8 @@ handlers share is split by who imports it:
 
 Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /
-`maxmind`), tool backends (`get-whois` / `dns-resolver` / `mac-checker` /
+`maxmind`; their routes are mounted from `api/ip-sources.js`), tool backends
+(`get-whois` / `dns-resolver` / `mac-checker` /
 `cf-radar` / `asn-history` / `asn-connectivity` / `asn-profile` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona` /
@@ -107,8 +108,12 @@ resolver list behind `dns-resolver` (gated by
   fixed vocabulary (contract and validator: `common/ip-extended.js`);
   `ipcheck-ing` builds its block in `server/ipcheck-ing-extended.js`.
 - **Adding an IP source.** One handler over `makeGeoHandler`
-  (`server/geo-handler.js`) that normalizes to that shape; its route adds
-  `withTimeZone()`. The `extended` block goes through
+  (`server/geo-handler.js`) that normalizes to that shape, one row in
+  `api/ip-sources.js` (`key`, `handler`, edge TTL, readiness `gates`, and an
+  `isConfigured` exported by the adapter when it needs a key) — the route,
+  its daily-limit key and its `/api/configs` flag derive from it — and its
+  row in `frontend/data/ip-databases.js` (`tests/ip-sources.test.js` checks
+  the two match). The `extended` block goes through
   `server/source-extended.js`, whose `buildExtended` drops a block that does
   not validate, so the base answer never depends on it. The adapter sends
   only what the card's grid shows, computed from what the upstream states:
@@ -164,6 +169,15 @@ resolver list behind `dns-resolver` (gated by
   picker and `resolveDns` also read; otherwise the DoH branch would forward any
   string to four third-party endpoints.
 - `requireValidReportId()` — `/api/report/:id` route param (22-char base64url).
+- `sourceDailyLimit('<key>')` (`server/source-daily-limits.js`, not a guard
+  here) — the geo routes' daily ceiling from `IP_SOURCE_DAILY_LIMITS`
+  (`<key>=<n>`, key = the route's last segment, as listed by
+  `initSourceDailyLimits(IP_SOURCE_KEYS)`; 0 / unset = unlimited). After
+  the route's guards and readiness gate, before `withTimeZone()`: a slot is
+  held on admission and given back on a status ≥ 400 or an aborted
+  connection; a used-up day answers 429 `{ error, code: 'source_daily_limit' }`
+  (never cached). Counts reset on the server-local day, persist to
+  `common/source-limits-db/` every few seconds, and are per process.
 
 New param shape → new guard there, attached in `backend-server.js`.
 Rewrites go through `setQueryParam()` there: Express 5's `req.query` re-parses
@@ -171,12 +185,12 @@ on every read, so a direct write is lost.
 
 ### Response enrichment lives in middleware too
 
-`withTimeZone()` (`server/ip-timezone.js`), on all seven geo routes, derives
+`withTimeZone()` (`server/ip-timezone.js`), on every geo route, derives
 `timezone` (IANA name) from the `latitude` / `longitude` the handler returned
 (2xx only, the `cacheable` hook); no handler computes or forwards one. Own
 coordinates keep the zone consistent with the city beside it; only the name
 ships — the frontend renders the offset, as a 24h-cached offset breaks at every
-DST switch. A new geo source adds the middleware.
+DST switch. `backend-server.js` adds it to every `api/ip-sources.js` row.
 
 ### Offline data gates boot, not the listener
 
@@ -221,8 +235,8 @@ guards, caching or per-request logs.
 
 Every `/api/*` response defaults to `Cache-Control: no-store`; slowly-changing
 public routes opt in via `cacheable(maxAge)` (`server/cache-control.js`) in
-`backend-server.js`, e.g. `cacheable(24 * 60 * 60)` (TTLs written that way, not
-raw seconds). `maxAge` may be a `(req) => seconds` resolver (cfradar: its view's
+`backend-server.js` (geo routes: their row's `cacheSeconds`), e.g.
+`cacheable(24 * 60 * 60)` (TTLs written that way, not raw seconds). `maxAge` may be a `(req) => seconds` resolver (cfradar: its view's
 TTL; falsy = no-store). `{ cacheIf }` vetoes the full TTL for a 2xx body,
 `{ degradedMaxAge }` gives a vetoed one a shorter TTL instead of no-store:
 `/api/asn-profile` caches a complete answer (no section `error` / `incomplete`;

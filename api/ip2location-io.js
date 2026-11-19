@@ -1,4 +1,4 @@
-// /api/ip2location — geolocation source handler backed by api.ip2location.io.
+// /api/ip2locationio — geolocation source handler backed by api.ip2location.io.
 // Picks a random API key and normalizes the response into the canonical
 // geo shape (plus an `extended` block) via the shared makeGeoHandler factory.
 // Fields outside the key's plan are absent, and "-" stands for no value.
@@ -7,6 +7,9 @@ import { makeGeoHandler } from '../server/geo-handler.js';
 import {
     anyOf, buildExtended, buildMetric, cleanText, detectedCode,
 } from '../server/source-extended.js';
+
+// Whether a key is set; /api/configs reports it as the `ip2locationio` flag.
+export const isConfigured = () => Boolean(process.env.IP2LOCATION_API_KEY);
 
 function buildUrl(req) {
     const ipAddress = req.query.ip;
@@ -78,7 +81,7 @@ const asnOf = (value) => {
     return digits !== undefined && /^\d+$/.test(digits) ? 'AS' + digits : 'N/A';
 };
 
-export const modifyJsonForIp2Location = (json) => {
+export const modifyJsonForIp2Locationio = (json) => {
     const { ip, country_code, country_name, region_name, city_name, latitude, longitude, as } = json;
     const extended = extendedOf(json);
 
@@ -89,12 +92,12 @@ export const modifyJsonForIp2Location = (json) => {
         country: country_code || 'N/A',
         country_name: country_name || 'N/A',
         country_code: country_code || 'N/A',
-        latitude: latitude || 'N/A',
-        longitude: longitude || 'N/A',
+        latitude: latitude ?? 'N/A',
+        longitude: longitude ?? 'N/A',
         asn: asnOf(json.asn),
         org: as || 'N/A',
         ...(extended && { extended }),
     };
 };
 
-export default makeGeoHandler({ name: 'ip2location-io', buildUrl, normalize: modifyJsonForIp2Location });
+export default makeGeoHandler({ name: 'ip2location-io', buildUrl, normalize: modifyJsonForIp2Locationio });

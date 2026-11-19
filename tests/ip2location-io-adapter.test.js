@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { isValidExtended } from '../common/ip-extended.js';
-import { modifyJsonForIp2Location } from '../api/ip2location-io.js';
+import { modifyJsonForIp2Locationio } from '../api/ip2location-io.js';
 
 const BASE = {
     ip: '203.0.113.10',
@@ -78,7 +78,7 @@ const mobile = {
 
 describe('ip2location-io adapter — base fields', () => {
     it('keeps the base fields', () => {
-        const { extended, ...base } = modifyJsonForIp2Location(full);
+        const { extended, ...base } = modifyJsonForIp2Locationio(full);
         assert.deepEqual(base, {
             ip: '203.0.113.10', city: 'Sampleton', region: 'North Example', country: 'XE',
             country_name: 'Exampleland', country_code: 'XE', latitude: 12.5, longitude: 34.25,
@@ -89,25 +89,32 @@ describe('ip2location-io adapter — base fields', () => {
 
     it('never prints AS[object Object] for a missing or odd asn', () => {
         for (const asn of [undefined, null, '', '-', {}, 'AS64500x']) {
-            assert.equal(modifyJsonForIp2Location({ ...BASE, asn }).asn, 'N/A', `asn ${JSON.stringify(asn)}`);
+            assert.equal(modifyJsonForIp2Locationio({ ...BASE, asn }).asn, 'N/A', `asn ${JSON.stringify(asn)}`);
         }
-        assert.equal(modifyJsonForIp2Location({ ...BASE, asn: 64501 }).asn, 'AS64501');
-        assert.equal(modifyJsonForIp2Location({ ...BASE, asn: ' 64502 ' }).asn, 'AS64502');
+        assert.equal(modifyJsonForIp2Locationio({ ...BASE, asn: 64501 }).asn, 'AS64501');
+        assert.equal(modifyJsonForIp2Locationio({ ...BASE, asn: ' 64502 ' }).asn, 'AS64502');
     });
 
     it('answers the lowest-plan payload with the base fields and only the anonymizer answer', () => {
-        const out = modifyJsonForIp2Location(BASE);
+        const out = modifyJsonForIp2Locationio(BASE);
         assert.equal(out.asn, 'AS64500');
         assert.deepEqual(out.extended, { anonymity: { code: 'none' } });
-        const bare = modifyJsonForIp2Location({ ip: '203.0.113.40' });
+        const bare = modifyJsonForIp2Locationio({ ip: '203.0.113.40' });
         assert.equal(bare.asn, 'N/A');
+        assert.equal(bare.latitude, 'N/A');
         assert.equal('extended' in bare, false);
+    });
+
+    it('keeps a coordinate of 0', () => {
+        const out = modifyJsonForIp2Locationio({ ...BASE, latitude: 0, longitude: 0 });
+        assert.equal(out.latitude, 0);
+        assert.equal(out.longitude, 0);
     });
 });
 
 describe('ip2location-io adapter — extended', () => {
     it('maps a full data-centre answer to what the card shows', () => {
-        const { extended } = modifyJsonForIp2Location(full);
+        const { extended } = modifyJsonForIp2Locationio(full);
         assert.deepEqual(extended, {
             lineType: 'hosting',
             anonymity: { code: 'none' },
@@ -118,7 +125,7 @@ describe('ip2location-io adapter — extended', () => {
     });
 
     it('maps a VPN answer to a plain anonymizer yes, without the provider', () => {
-        const { extended } = modifyJsonForIp2Location(vpn);
+        const { extended } = modifyJsonForIp2Locationio(vpn);
         assert.deepEqual(extended, {
             lineType: 'hosting',
             anonymity: { code: 'detected' },
@@ -129,7 +136,7 @@ describe('ip2location-io adapter — extended', () => {
     });
 
     it('maps a mobile answer to wireless', () => {
-        const { extended } = modifyJsonForIp2Location(mobile);
+        const { extended } = modifyJsonForIp2Locationio(mobile);
         assert.deepEqual(extended, {
             lineType: 'wireless',
             anonymity: { code: 'none' },
@@ -140,7 +147,7 @@ describe('ip2location-io adapter — extended', () => {
     });
 
     it('reads usage_type for the line type, combined codes included', () => {
-        const typed = (usage_type) => modifyJsonForIp2Location({ ...BASE, usage_type }).extended?.lineType;
+        const typed = (usage_type) => modifyJsonForIp2Locationio({ ...BASE, usage_type }).extended?.lineType;
         assert.equal(typed('ISP'), 'residential');
         assert.equal(typed('ISP/MOB'), 'wireless');
         assert.equal(typed('CDN'), 'hosting');
@@ -153,34 +160,34 @@ describe('ip2location-io adapter — extended', () => {
     it('answers yes for the top-level is_proxy or any anonymizer bit, never for proxy_type', () => {
         const bits = ['is_vpn', 'is_tor', 'is_public_proxy', 'is_web_proxy', 'is_residential_proxy', 'is_consumer_privacy_network'];
         for (const bit of bits) {
-            const { extended } = modifyJsonForIp2Location({ ...full, proxy: proxy({ [bit]: true }) });
+            const { extended } = modifyJsonForIp2Locationio({ ...full, proxy: proxy({ [bit]: true }) });
             assert.equal(extended.anonymity.code, 'detected', bit);
             assert.ok(isValidExtended(extended));
         }
-        const top = modifyJsonForIp2Location({ ...full, is_proxy: true }).extended;
+        const top = modifyJsonForIp2Locationio({ ...full, is_proxy: true }).extended;
         assert.equal(top.anonymity.code, 'detected');
-        const typed = modifyJsonForIp2Location({ ...full, proxy: proxy({ proxy_type: 'VPN' }) }).extended;
+        const typed = modifyJsonForIp2Locationio({ ...full, proxy: proxy({ proxy_type: 'VPN' }) }).extended;
         assert.equal(typed.anonymity.code, 'none');
     });
 
     it('reads abuse as a yes / no from spammer, scanner and botnet', () => {
         for (const bit of ['is_spammer', 'is_scanner', 'is_botnet']) {
-            const { extended } = modifyJsonForIp2Location({ ...full, proxy: proxy({ [bit]: true }) });
+            const { extended } = modifyJsonForIp2Locationio({ ...full, proxy: proxy({ [bit]: true }) });
             assert.equal(extended.abuse, 'detected', bit);
             assert.ok(isValidExtended(extended));
         }
-        assert.equal(modifyJsonForIp2Location(full).extended.abuse, 'none');
+        assert.equal(modifyJsonForIp2Locationio(full).extended.abuse, 'none');
     });
 
     it('emits no anonymizer or abuse answer without the inputs, keeping the base answer', () => {
-        const out = modifyJsonForIp2Location({ ...full, is_proxy: undefined, proxy: undefined });
+        const out = modifyJsonForIp2Locationio({ ...full, is_proxy: undefined, proxy: undefined });
         assert.equal(out.city, 'Sampleton');
         assert.deepEqual(out.extended, { lineType: 'hosting', metrics: [{ id: 'fraudScore', value: 3, max: 100 }] });
         assert.ok(isValidExtended(out.extended));
     });
 
     it('takes fraud_score as a number out of 100, and drops it when missing or malformed', () => {
-        const scored = (fraud_score) => modifyJsonForIp2Location({ ...full, fraud_score }).extended.metrics;
+        const scored = (fraud_score) => modifyJsonForIp2Locationio({ ...full, fraud_score }).extended.metrics;
         assert.deepEqual(scored(42), [{ id: 'fraudScore', value: 42, max: 100 }]);
         for (const value of [undefined, null, '42', -1, 101, Number.NaN, '-']) {
             assert.equal(scored(value), undefined, String(value));
@@ -188,7 +195,7 @@ describe('ip2location-io adapter — extended', () => {
     });
 
     it('skips placeholders, empty strings and empty objects everywhere', () => {
-        const out = modifyJsonForIp2Location({
+        const out = modifyJsonForIp2Locationio({
             ip: '203.0.113.50',
             asn: '-', as: '',
             as_info: {}, isp: '-', domain: '', net_speed: '-', usage_type: '-', address_type: '',

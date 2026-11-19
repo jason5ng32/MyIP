@@ -1,4 +1,4 @@
-// /api/ipapi — geolocation source handler backed by ip-api.com.
+// /api/ipapicom — geolocation source handler backed by ip-api.com.
 // Forwards the optional ?lang and normalizes the response into the
 // canonical geo shape (plus an `extended` block) via the shared makeGeoHandler factory.
 

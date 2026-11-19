@@ -22,18 +22,18 @@ describe('IP_DATABASES', () => {
     const idByName = Object.fromEntries(IP_DATABASES.map((d) => [d.text, d.id]));
     assert.deepEqual(idByName, {
       'IPCheck.ing': 0,
-      'IPinfo.io': 1,
-      'IP-API.com': 2,
-      'IPAPI.is': 3,
-      'IP2Location.io': 4,
-      'IP.sb': 5,
+      'IPAPI.is': 1,
+      'IP2Location.io': 2,
+      'IP-API.com': 3,
+      'IP.sb': 4,
+      'IPinfo.io': 5,
       MaxMind: 6,
     });
   });
 
   it('marks the sources whose answer carries the extended block', () => {
     const extended = IP_DATABASES.filter((d) => d.extended === true).map((d) => d.id);
-    assert.deepEqual([...extended].sort((a, b) => a - b), [0, 2, 3, 4]);
+    assert.deepEqual([...extended].sort((a, b) => a - b), [0, 1, 2, 3]);
     for (const db of IP_DATABASES) assert.ok(db.extended === undefined || db.extended === true, db.text);
   });
 
@@ -97,15 +97,15 @@ describe('buildDbUrl()', () => {
 
 describe('applyConfigAvailability()', () => {
   // Shape of a real /api/configs payload (booleans only).
-  const configs = { ipChecking: true, ipInfo: false, ipapiis: false, ip2location: true };
+  const configs = { ipChecking: true, ipinfoio: false, ipapiis: false, ip2locationio: true };
 
   it('follows the configKey flag for keyed sources', () => {
     const out = applyConfigAvailability(createInitialIpDBs(), configs);
     const byId = Object.fromEntries(out.map((db) => [db.id, db.enabled]));
     assert.equal(byId[0], true);   // ipChecking: true
-    assert.equal(byId[1], false);  // ipInfo: false
-    assert.equal(byId[3], false);  // ipapiis: false
-    assert.equal(byId[4], true);   // ip2location: true
+    assert.equal(byId[1], false);  // ipapiis: false
+    assert.equal(byId[2], true);   // ip2locationio: true
+    assert.equal(byId[5], false);  // ipinfoio: false
   });
 
   it('drops IPCheck.ing (id 0) when ipChecking is false', () => {
@@ -115,8 +115,8 @@ describe('applyConfigAvailability()', () => {
 
   it('keeps key-free sources always enabled', () => {
     const allOff = applyConfigAvailability(createInitialIpDBs(),
-      { ipChecking: false, ipInfo: false, ipapiis: false, ip2location: false });
-    for (const id of [2, 5, 6]) {
+      { ipChecking: false, ipinfoio: false, ipapiis: false, ip2locationio: false });
+    for (const id of [3, 4, 6]) {
       assert.equal(allOff.find((db) => db.id === id).enabled, true, `id ${id} must stay enabled`);
     }
   });
@@ -135,23 +135,23 @@ describe('nearestEnabledId()', () => {
     createInitialIpDBs().map((db) => ({ ...db, enabled: enabledIds.includes(db.id) }));
 
   it('keeps the preference when it is still available', () => {
-    assert.equal(nearestEnabledId(3, dbs([0, 3, 6])), 3);
+    assert.equal(nearestEnabledId(1, dbs([0, 1, 6])), 1);
   });
 
   it('walks forward to the next available source', () => {
-    assert.equal(nearestEnabledId(1, dbs([0, 4, 5])), 4);
+    assert.equal(nearestEnabledId(1, dbs([0, 3, 4])), 3);
   });
 
   it('wraps around past the end of the list', () => {
-    assert.equal(nearestEnabledId(6, dbs([1])), 1);
+    assert.equal(nearestEnabledId(6, dbs([5])), 5);
   });
 
   it('starts from the head for unknown ids', () => {
-    assert.equal(nearestEnabledId(42, dbs([2, 5])), 2);
+    assert.equal(nearestEnabledId(42, dbs([3, 4])), 3);
   });
 
   it('leaves the preference unchanged when nothing is enabled', () => {
-    assert.equal(nearestEnabledId(3, dbs([])), 3);
+    assert.equal(nearestEnabledId(1, dbs([])), 1);
     assert.equal(nearestEnabledId(0, []), 0);
   });
 });
