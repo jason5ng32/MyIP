@@ -594,6 +594,7 @@ describe('watchDatasets', () => {
         });
         const stop = watchDatasets([row], fast);
         try {
+            await sleep(150); // the poll's first reading: a write before it raises no event
             for (const file of row.files) fs.writeFileSync(path.join(row.dir, file), `${file}\n`);
             await waitFor(() => log.reloads.length >= 1);
             await sleep(150); // and no retry without a change
