@@ -203,6 +203,7 @@ MyIP 免費且開源，但它的運作離不開真實的伺服器、資料來源
 | <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>全球網路，提供 CDN、安全防護、DNS 與 Serverless 應用程式。</sub> |
 | <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>應用程式監控，提供錯誤追蹤、分散式追蹤與工作階段重播。</sub> |
 | <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>IP 情資 API 與資料庫，涵蓋地理位置、ASN、VPN 與濫用偵測。</sub> |
+| <a href="https://www.ip2location.io"><img src="https://res.ipcheck.ing/img/ip2location_logo.png" alt="IP2Location.io" height="24" /></a> | <sub>IP 地理位置 API，提供代理、VPN 與主機代管偵測，並支援網域 WHOIS 查詢。</sub> |
 | <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>能理解整個程式碼庫的 AI 程式碼審查。</sub> |
 | <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>為技術團隊打造的文件平台。</sub> |
 | <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>為個人與團隊打造的密碼與機密管理工具。</sub> |
