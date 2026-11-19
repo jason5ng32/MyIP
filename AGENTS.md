@@ -22,8 +22,8 @@ and may not appear in the agent's automatically supplied skill list.
 **MyIP** (IPCheck.ing) is an open-source IP toolbox: IP lookup, connectivity
 tests, WebRTC / DNS-leak detection, speed test, MTR, Whois, ASN profile,
 security checklist, browser fingerprint, anonymity checks, persona check, IP
-calculator, and more. Single repo, two halves: a Vue 3 SPA front-end and an
-Express 5 back-end API.
+calculator, snapshot history, and more. Single repo, two halves: a Vue 3 SPA
+front-end and an Express 5 back-end API.
 
 Licensed under AGPL-3.0-only (`LICENSE`).
 
@@ -95,6 +95,25 @@ use npm / yarn — they'd produce a competing lockfile.
   aren't hoisted — declare before use. Applies to new / rewritten code only;
   don't mass-convert existing declarations.
 
+### Dependency direction
+
+Imports point one way; `tests/dependency-direction.test.js` enforces it (its
+allowlist names each known exception, and fails once one is gone):
+
+- `common/` imports only `common/`; `common/codes/` imports nothing;
+  `server/` never imports `api/` or `frontend/`.
+- In `frontend/`, only `utils/` imports `common/` — through thin re-export
+  bridges (`utils/ip/valid-ip.js`). `utils/` imports no app layer
+  (composables, components, store, router, entry points); `data/` only `data/`.
+- Inside `utils/`: `codes/` ← `ip/` ← `features/` · `report/`. `codes/`
+  imports only `common/codes/` and itself; `ip/` never imports `features/`
+  or `report/`; `report/` never imports `features/`.
+- A locale-free code list the report validator checks is written once, in
+  `common/codes/<domain>.js`, bridged by `utils/codes/<domain>.js`; the
+  recording module, `report-schema.js` and the report builders only import
+  it. Its code → i18n-key map lives once in `utils/codes/<domain>-labels.js`,
+  used by every view (live card, report page, Snapshots diff).
+
 ### Comments
 
 - **Every new file opens with a header comment** stating its purpose —
@@ -124,7 +143,7 @@ use npm / yarn — they'd produce a competing lockfile.
   `LOG_HTTP=true` to mount `pino-http` on `/api` (off by default; handlers
   never log "received request" lines themselves). No `NODE_ENV` anywhere.
 - Startup-only lines lead with an emoji (🚀 listening · 📦 ready ·
-  📥 downloading · 🛡️ security · 🐢 throttling · 🗓️ schedule · ⚠️ recoverable
+  📥 downloading · 🛡️ security · 🗓️ schedule · ⚠️ recoverable
   · ❌ failure); per-request logs stay plain.
 
 ## Testing

@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 一个开源的一站式 IP 工具箱：多来源 IP 查询、连通性测试、WebRTC 与 DNS 泄露检测、网速测试、MTR、封锁检测、Whois 等等 —— 一条 Docker 命令即可自行部署。
 
@@ -40,7 +40,7 @@
 
 * 🛜 **IP 卡片**：从多个相互独立的来源并列检测你的 IPv4 和 IPv6 —— 国家、地区、城市、ASN、组织，以及该 IP 所在地的时区。
 * 🔍 **IP 查询**：查询任意一个你感兴趣的 IP 地址的同样详细的信息。
-* 🧾 **IP 历史记录**：在本地记录你使用过的 IP，可按类型和国家筛选 —— 数据只存在你的浏览器里。
+* 📸 **快照记录**：每次打开首页时，把首页各项测试的结果（IP 信息、网络连通性、WebRTC、DNS 泄露测试、网速测试）保存为一份快照。任选两份对比，像代码 diff 一样逐行查看差异；重要的快照可以命名或固定 —— 数据只存在你的浏览器里。
 * 🖥️ **浏览器指纹**：用多种方式计算你的浏览器指纹，并展示是什么让你变得可被识别。
 
 ### 🕵️ 泄露与隐私
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-其余全部是可选配置 —— 第三方 API Key、安全与限流、日志、Sentry、curl API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/environment-variables)。
+其余全部是可选配置 —— 第三方 API Key、安全、日志、Sentry、curl API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/environment-variables)。
 
 ## 📖 官方文档
 

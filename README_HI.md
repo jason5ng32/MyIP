@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 एक ओपन-सोर्स, ऑल-इन-वन IP टूलबॉक्स: कई स्रोतों से IP की जानकारी, कनेक्टिविटी जांच, WebRTC और DNS लीक की पहचान, स्पीड टेस्ट, MTR, सेंसरशिप जांच, Whois और बहुत कुछ — Docker की एक कमांड से अपने सर्वर पर चलाएं.
 
@@ -40,7 +40,7 @@
 
 * 🛜 **IP कार्ड**: कई अलग-अलग स्रोतों से आपका IPv4 और IPv6 एक साथ पता करता है — देश, क्षेत्र, शहर, ASN, संगठन और उस IP का स्थानीय समय क्षेत्र.
 * 🔍 **IP खोजें**: किसी भी IP पते की यही पूरी जानकारी देखें.
-* 🧾 **IP इतिहास**: आपके इस्तेमाल किए गए IP का लोकल रिकॉर्ड रखता है, जिसे प्रकार और देश के हिसाब से फ़िल्टर किया जा सकता है — यह सिर्फ़ आपके ब्राउज़र में सेव रहता है.
+* 📸 **स्नैपशॉट इतिहास**: जब भी होमपेज खुलता है, तो उसकी जांचों के नतीजे — IP जानकारी, कनेक्टिविटी, WebRTC, DNS लीक जांच, स्पीड टेस्ट — एक स्नैपशॉट के रूप में सेव करता है. किन्हीं भी दो की तुलना करें और कोड diff की तरह लाइन-दर-लाइन अंतर देखें; ज़रूरी स्नैपशॉट को नाम दें या पिन करें — यह सिर्फ़ आपके ब्राउज़र में सेव रहता है.
 * 🖥️ **ब्राउज़र फ़िंगरप्रिंट**: कई तरीकों से आपके ब्राउज़र का फ़िंगरप्रिंट निकालता है और दिखाता है कि किन चीज़ों से आपकी पहचान हो सकती है.
 
 ### 🕵️ लीक और निजता
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-बाकी सब कुछ — वैकल्पिक API कुंजियां, सुरक्षा और रेट लिमिटिंग, लॉगिंग, Sentry, curl API के डोमेन — [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables) में लिखा है.
+बाकी सब कुछ — वैकल्पिक API कुंजियां, सुरक्षा, लॉगिंग, Sentry, curl API के डोमेन — [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables) में लिखा है.
 
 ## 📖 दस्तावेज़
 

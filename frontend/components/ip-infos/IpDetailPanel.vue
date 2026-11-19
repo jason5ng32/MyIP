@@ -101,13 +101,13 @@
         :asn-connectivity-infos="asnConnectivityInfos" :configs="configs" :is-dark-mode="isDarkMode"
         :collapsed="collapsed" @open-tool="emit('open-tool')" />
 
-    <!-- Dialog-mode shells for the same two panels (IPCard). -->
-    <CountryTraffic v-if="countryTrafficMode === 'dialog'" :open="isTrafficDialogOpen"
+    <!-- Dialog-mode shells for the same two panels (IPCard), mounted lazily on first open. -->
+    <CountryTraffic v-if="countryTrafficMode === 'dialog' && hasOpenedTrafficDialog" :open="isTrafficDialogOpen"
         @update:open="isTrafficDialogOpen = $event" :country-code="data.country_code || ''"
         :country-name="data.country_name" :timezone="data.timezone" :isDarkMode="isDarkMode" />
 
-    <LocationMap v-if="mapMode === 'dialog'" :open="isMapDialogOpen" @update:open="isMapDialogOpen = $event"
-        :data="data" :isDarkMode="isDarkMode" />
+    <LocationMap v-if="mapMode === 'dialog' && hasOpenedMapDialog" :open="isMapDialogOpen"
+        @update:open="isMapDialogOpen = $event" :data="data" :isDarkMode="isDarkMode" />
 </template>
 
 <script setup>
@@ -116,14 +116,10 @@
 // via mapMode / countryTrafficMode). Used by IPCard (homepage card grid) and QueryIP (manual IP
 // lookup dialog). Hero IP is NOT part of this panel — consumers render their own hero row since
 // affordances (copy button, etc.) differ.
-import { ref, computed } from 'vue';
+import { ref, computed, onDeactivated, defineAsyncComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { getZoneUtcOffset, getZoneLocalTime } from '@/utils/time-utils.js';
-import CountryTraffic from './CountryTraffic.vue';
-import CountryTrafficPanel from './CountryTrafficPanel.vue';
-import LocationMap from './LocationMap.vue';
-import LocationMapPanel from './LocationMapPanel.vue';
 import IpAdvancedBlock from './IpAdvancedBlock.vue';
 import IpAsnBlock from './IpAsnBlock.vue';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -138,6 +134,11 @@ import {
     MapPin,
     Clock,
 } from '@lucide/vue';
+
+const CountryTraffic = defineAsyncComponent(() => import('./CountryTraffic.vue'));
+const CountryTrafficPanel = defineAsyncComponent(() => import('./CountryTrafficPanel.vue'));
+const LocationMap = defineAsyncComponent(() => import('./LocationMap.vue'));
+const LocationMapPanel = defineAsyncComponent(() => import('./LocationMapPanel.vue'));
 
 const { t, locale } = useI18n();
 
@@ -167,8 +168,14 @@ const props = defineProps({
 // dialog stacks on it (`view-usage`) or a tool link (ASN Profile, Blocklist Check, Persona Check) changes page (`open-tool`).
 const emit = defineEmits(['view-usage', 'open-tool']);
 
+const hasOpenedMapDialog = ref(false);
+const hasOpenedTrafficDialog = ref(false);
 const isMapDialogOpen = ref(false);
 const isTrafficDialogOpen = ref(false);
+onDeactivated(() => {
+    isMapDialogOpen.value = false;
+    isTrafficDialogOpen.value = false;
+});
 
 // The backend sends the zone name only; the offset follows DST, so it is
 // resolved here rather than travelling through the routes' 24h edge cache.
@@ -211,13 +218,21 @@ const onMetaPanelOpenChange = (open) => {
 
 const onMapClick = () => {
     trackEvent('IPCheck', 'ViewOnMapClick', props.data.source || 'unknown');
-    if (props.mapMode === 'inline') toggleMetaPanel('map');
-    else isMapDialogOpen.value = true;
+    if (props.mapMode === 'inline') {
+        toggleMetaPanel('map');
+    } else {
+        hasOpenedMapDialog.value = true;
+        isMapDialogOpen.value = true;
+    }
 };
 
 const onTrafficClick = () => {
     trackEvent('IPCheck', 'CountryTrafficClick', props.data.country_code || 'unknown');
-    if (props.countryTrafficMode === 'inline') toggleMetaPanel('traffic');
-    else isTrafficDialogOpen.value = true;
+    if (props.countryTrafficMode === 'inline') {
+        toggleMetaPanel('traffic');
+    } else {
+        hasOpenedTrafficDialog.value = true;
+        isTrafficDialogOpen.value = true;
+    }
 };
 </script>

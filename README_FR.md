@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 Une boîte à outils IP tout-en-un et open source : recherche d'IP depuis plusieurs sources, tests de connectivité, détection WebRTC et de fuites DNS, test de vitesse, MTR, vérification de la censure, Whois et plus encore — auto-hébergeable en une seule commande Docker.
 
@@ -40,7 +40,7 @@ N'hésitez pas à mettre la démo en favori ou à déployer votre propre instanc
 
 * 🛜 **Cartes IP** : Détecte vos adresses IPv4 et IPv6 depuis plusieurs sources indépendantes, présentées côte à côte — pays, région, ville, ASN, organisation et fuseau horaire local de l'IP.
 * 🔍 **Recherche d'IP** : Affiche les mêmes informations détaillées pour n'importe quelle adresse IP qui vous intrigue.
-* 🧾 **Historique des IP** : Conserve un enregistrement local des IP sous lesquelles vous avez été vu, filtrable par type et par pays — stocké uniquement dans votre navigateur.
+* 📸 **Historique des instantanés** : Chaque fois que la page d'accueil s'ouvre, enregistre les résultats de ses tests — informations IP, connectivité, WebRTC, test de fuite DNS, test de vitesse — sous forme d'instantané. Comparez-en deux au choix et lisez les différences ligne par ligne, comme un diff de code ; nommez ou épinglez ceux qui comptent — stocké uniquement dans votre navigateur.
 * 🖥️ **Empreinte du navigateur** : Calcule l'empreinte de votre navigateur de plusieurs manières et montre ce qui vous rend identifiable.
 
 ### 🕵️ Fuites et vie privée
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Tout le reste — clés API optionnelles, sécurité et limitation de débit, journalisation, Sentry, domaines de l'API curl — est documenté dans la [référence des variables d'environnement](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Tout le reste — clés API optionnelles, sécurité, journalisation, Sentry, domaines de l'API curl — est documenté dans la [référence des variables d'environnement](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Documentation
 

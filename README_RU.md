@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 Универсальный набор IP-инструментов с открытым исходным кодом: определение IP по нескольким источникам, проверка доступности сайтов, обнаружение утечек WebRTC и DNS, тест скорости, MTR, проверка цензуры, Whois и многое другое — разворачивается на своём сервере одной командой Docker.
 
@@ -40,7 +40,7 @@
 
 * 🛜 **Карточки IP**: определяют ваши IPv4 и IPv6 по нескольким независимым источникам одновременно — страна, регион, город, ASN, организация и местный часовой пояс IP-адреса.
 * 🔍 **Проверка IP**: показывает те же подробные сведения о любом интересующем вас IP-адресе.
-* 🧾 **История IP**: ведёт локальный журнал IP-адресов, с которых вас видели в сети, с фильтрами по типу и стране — данные хранятся только в вашем браузере.
+* 📸 **История снимков**: каждый раз, когда открывается главная страница, сохраняет результаты её тестов — сведения об IP, доступность, WebRTC, тест утечки DNS, тест скорости — в виде снимка. Сравнивайте любые два и читайте различия построчно, как diff кода; важные снимки можно переименовать или закрепить — данные хранятся только в вашем браузере.
 * 🖥️ **Цифровой отпечаток браузера**: рассчитывает отпечаток браузера несколькими способами и показывает, что именно делает вас узнаваемым.
 
 ### 🕵️ Утечки и приватность
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Всё остальное — необязательные ключи API, безопасность и ограничение частоты запросов, логирование, Sentry, домены curl API — описано в [справочнике переменных окружения](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Всё остальное — необязательные ключи API, безопасность, логирование, Sentry, домены curl API — описано в [справочнике переменных окружения](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Документация
 

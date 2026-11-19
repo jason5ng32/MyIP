@@ -41,7 +41,14 @@
                                     {{ t(card.noteKey) }}
                                 </p>
                                 <!-- Top right emoji -->
-                                <span class="jn-emoji" aria-hidden="true">{{ card.emoji }}</span>
+                                <EmojiMotion
+                                    :emoji="card.emoji"
+                                    :motion="card.motion"
+                                    :fx="card.fx"
+                                    :tone="card.tone"
+                                    :angle="card.angle"
+                                    trigger=".jn-adv-card"
+                                    class="pointer-events-none absolute top-[0.3rem] right-[0.55rem] size-8 text-[1.6rem]" />
                             </CardContent>
                         </a>
                     </Card>
@@ -64,6 +71,7 @@ import { ADVANCED_TOOLS, groupToolsByCategory } from '@/data/tools.js';
 import { listedTools } from '@/utils/tool-availability.js';
 import { isPlainClick } from '@/utils/nav-target.js';
 import { Card, CardContent } from '@/components/ui/card';
+import EmojiMotion from '@/components/widgets/EmojiMotion.vue';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { ArrowRight } from '@lucide/vue';
 
@@ -105,22 +113,17 @@ defineExpose({
 </script>
 
 <style scoped>
-.jn-emoji {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.75rem;
-    font-size: 1.6rem;
-    line-height: 1;
-    transition: transform 0.4s ease, text-shadow 0.4s ease;
-    pointer-events: none;
+/* Keep acting / hovered / focused cards above upper neighbors while their emoji motion plays */
+.jn-adv-card:hover,
+.jn-adv-card:focus-within,
+.jn-adv-card:has([data-acting='true']) {
+    z-index: 10;
 }
 
-.jn-adv-card:hover .jn-emoji {
-    transform: translateY(-10pt) scale(1.8);
-    text-shadow: 0 0 10pt rgb(0 0 0 / 0.38);
-}
-
-:global(.dark) .jn-adv-card:hover .jn-emoji {
-    text-shadow: 0 0 10pt rgb(255 255 255 / 0.15);
+@media (prefers-reduced-motion: no-preference) {
+    .jn-adv-card:is(:hover, :focus-within, [data-keyboard-hover='true']) :deep(.jn-emoji-motion) {
+        translate: -2px -4px;
+        scale: 1.32;
+    }
 }
 </style>

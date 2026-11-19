@@ -116,7 +116,7 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { normalizeMacQuery } from '@/utils/features/mac-input.js';
 import { ChevronRight, CircleCheck, CircleX, Factory, ListChecks, Search } from '@lucide/vue';
 import { Input } from '@/components/ui/input';

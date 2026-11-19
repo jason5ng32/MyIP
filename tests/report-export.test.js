@@ -7,11 +7,12 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
-    SECTION_TITLE_KEYS,
     buildShareReport,
+    buildDocsResults,
     reportToMarkdown,
     reportFileName,
 } from '../frontend/utils/report/report-export.js';
+import { SECTION_TITLE_KEYS } from '../frontend/utils/report/report-sections.js';
 import { REPORT_SECTION_IDS, REPORT_VERSION, validateReport } from '../common/report-schema.js';
 
 // t() stub: returns the key, with params appended so interpolation is visible.
@@ -118,6 +119,37 @@ describe('buildShareReport', () => {
     });
 });
 
+describe('buildDocsResults', () => {
+    const withLocalOnly = () => {
+        const sections = makeSections();
+        sections.ipinfo.cards[0] = {
+            ...sections.ipinfo.cards[0], abuseLevel: 'low', scenarios: { signup: 'high', email: 'low' },
+        };
+        return sections;
+    };
+
+    it('drops local-only fields and keeps the rest', () => {
+        const { results } = buildDocsResults(withLocalOnly(), (id) => `name:${id}`);
+        const card = results.ipinfo.cards[0];
+        assert.equal('scenarios' in card, false);
+        assert.equal(card.abuseLevel, 'low');
+        assert.equal(card.ip, '1.2.3.4');
+        assert.equal(results.ipinfo.name, 'name:ipinfo');
+        assert.deepEqual(results.speedtest.qualities, makeSections().speedtest.qualities);
+    });
+
+    it('lists uncollected sections and never mutates the collected ones', () => {
+        const sections = withLocalOnly();
+        const { results, missingSections } = buildDocsResults(sections, (id) => `name:${id}`);
+        assert.deepEqual(missingSections.map((s) => s.id),
+            REPORT_SECTION_IDS.filter((id) => !(id in sections)));
+        assert.deepEqual(missingSections[0], { id: missingSections[0].id, name: `name:${missingSections[0].id}` });
+        assert.ok(sections.ipinfo.cards[0].scenarios);
+        results.speedtest.qualities.gaming = 'bad';
+        assert.equal(sections.speedtest.qualities.gaming, 'good');
+    });
+});
+
 describe('SECTION_TITLE_KEYS', () => {
     it('covers every schema section id', () => {
         assert.deepEqual(Object.keys(SECTION_TITLE_KEYS).sort(), [...REPORT_SECTION_IDS].sort());
@@ -146,6 +178,26 @@ describe('reportToMarkdown', () => {
         assert.ok(md.includes('| gps-location | leak | leak |'));
         assert.ok(md.includes('grade: C'));
         assert.ok(md.includes('score: 72/100'));
+    });
+
+    it('renders ipinfo abuse as a column and never carries scenario friction', () => {
+        const sections = makeSections();
+        sections.ipinfo.cards = [
+            { ...sections.ipinfo.cards[0], abuseLevel: 'low', scenarios: { signup: 'low', email: 'high' } },
+            { source: 'Cloudflare IPv4', ip: '1.2.3.4', countryCode: 'US' },
+        ];
+        for (const maskTail of [false, true]) {
+            const report = buildShareReport({ sections, selectedIds: ['ipinfo'], maskTail, locale: 'en', origin: 'ipcheck.ing' });
+            assert.deepEqual(validateReport(report), { ok: true, errors: [] }, 'passes the share validator');
+            assert.ok(report.sections.ipinfo.cards.every((card) => !('scenarios' in card)), 'link / JSON payload');
+            const md = reportToMarkdown(report, t);
+            assert.ok(md.includes('| source | ip | countryCode | region | city | timezone | asn | isp | abuseLevel |'));
+            assert.ok(!/scenario|signup/i.test(md), 'AI copy');
+        }
+        assert.deepEqual(sections.ipinfo.cards[0].scenarios, { signup: 'low', email: 'high' }, 'collector data untouched');
+
+        const plain = reportToMarkdown(makeReport(), t);
+        assert.ok(!plain.includes('abuseLevel'));
     });
 
     it('renders the adblocktest section as its per-category table', () => {

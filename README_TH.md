@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 กล่องเครื่องมือ IP แบบโอเพนซอร์สที่รวมทุกอย่างไว้ในที่เดียว: ตรวจ IP จากหลายแหล่ง, ทดสอบการเชื่อมต่อ, ตรวจจับ WebRTC และ DNS รั่ว, ทดสอบความเร็ว, MTR, ตรวจการเซ็นเซอร์, Whois และอีกมากมาย ติดตั้งบนเซิร์ฟเวอร์ของคุณเองได้ด้วยคำสั่ง Docker เพียงคำสั่งเดียว
 
@@ -40,7 +40,7 @@
 
 * 🛜 **IP Cards**: ตรวจ IPv4 และ IPv6 ของคุณจากหลายแหล่งที่เป็นอิสระต่อกันแล้วแสดงเทียบกัน พร้อมประเทศ ภูมิภาค เมือง ASN องค์กร และเขตเวลาท้องถิ่นของ IP นั้น
 * 🔍 **ค้นหา IP**: ดูข้อมูลละเอียดแบบเดียวกันของ IP ใดก็ได้ที่คุณอยากรู้
-* 🧾 **ประวัติ IP**: บันทึก IP ที่คุณเคยใช้ไว้ในเครื่อง กรองตามประเภทและประเทศได้ ข้อมูลเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น
+* 📸 **ประวัติ Snapshot**: ทุกครั้งที่เปิดหน้าแรก จะบันทึกผลการทดสอบของหน้าแรก (ข้อมูล IP การเชื่อมต่อ WebRTC ทดสอบ DNS รั่ว ทดสอบความเร็ว) เป็น snapshot เลือกสองชุดใดก็ได้มาเทียบ แล้วอ่านความต่างทีละบรรทัดเหมือน diff ของโค้ด ตั้งชื่อหรือปักหมุดชุดที่สำคัญได้ ข้อมูลเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น
 * 🖥️ **Browser Fingerprint**: คำนวณลายนิ้วมือเบราว์เซอร์ของคุณด้วยหลายวิธี และแสดงว่าอะไรบ้างที่ทำให้คุณถูกระบุตัวตนได้
 
 ### 🕵️ การรั่วไหลและความเป็นส่วนตัว
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-การตั้งค่าอื่นทั้งหมด เช่น API key เสริม ความปลอดภัยและการจำกัดอัตราคำขอ การเก็บ log, Sentry และโดเมนสำหรับ curl API มีอธิบายไว้ใน[เอกสารอ้างอิงตัวแปรสภาพแวดล้อม](https://docs.ipcheck.ing/developer/reference/environment-variables)
+การตั้งค่าอื่นทั้งหมด เช่น API key เสริม ความปลอดภัย การเก็บ log, Sentry และโดเมนสำหรับ curl API มีอธิบายไว้ใน[เอกสารอ้างอิงตัวแปรสภาพแวดล้อม](https://docs.ipcheck.ing/developer/reference/environment-variables)
 
 ## 📖 เอกสาร
 

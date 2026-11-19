@@ -19,7 +19,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 > 🌐 Bu, topluluk tarafından hazırlanan bir çeviridir; esas metin İngilizce [README.md](README.md) dosyasıdır.
 
@@ -39,7 +39,7 @@ Demoyu yer imlerinize ekleyebilir veya kendiniz kurabilirsiniz.
 
 * 🛜 **IP Kartları**: IPv4 ve IPv6 adresinizi birbirinden bağımsız birden fazla kaynaktan yan yana algılar: ülke, bölge, şehir, ASN, kuruluş ve IP'nin yerel saat dilimi.
 * 🔍 **IP Sorgula**: Merak ettiğiniz herhangi bir IP adresi için aynı ayrıntılı bilgiyi getirir.
-* 🧾 **IP Geçmişi**: Hangi IP'lerle görüldüğünüzün yerel bir kaydını tutar; türe ve ülkeye göre filtrelenebilir. Yalnızca tarayıcınızda saklanır.
+* 📸 **Anlık Görüntü Geçmişi**: Ana sayfa her açıldığında, testlerinin sonuçlarını (IP bilgileri, bağlantı, WebRTC, DNS sızıntı testi, hız testi) bir anlık görüntü olarak kaydeder. İstediğiniz ikisini karşılaştırıp farkları bir kod diff'i gibi satır satır okuyun; önemli olanları adlandırın veya sabitleyin. Yalnızca tarayıcınızda saklanır.
 * 🖥️ **Tarayıcı Parmak İzi**: Tarayıcı parmak izinizi birden fazla yöntemle hesaplar ve sizi tanınabilir kılan öğeleri gösterir.
 
 ### 🕵️ Sızıntılar ve Gizlilik
@@ -132,7 +132,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Geri kalan her şey (isteğe bağlı API anahtarları, güvenlik ve istek sınırlama, günlükleme, Sentry, curl API alan adları) [Ortam Değişkenleri başvurusunda](https://docs.ipcheck.ing/developer/reference/environment-variables) belgelenmiştir.
+Geri kalan her şey (isteğe bağlı API anahtarları, güvenlik, günlükleme, Sentry, curl API alan adları) [Ortam Değişkenleri başvurusunda](https://docs.ipcheck.ing/developer/reference/environment-variables) belgelenmiştir.
 
 ## 📖 Belgeler
 

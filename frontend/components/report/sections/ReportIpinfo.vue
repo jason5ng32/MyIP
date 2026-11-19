@@ -13,6 +13,7 @@
                     <th v-if="has.ipType" scope="col" :class="TH_LEFT">{{ t('ipInfos.type') }}</th>
                     <th v-if="has.nativeIP" scope="col" :class="TH_LEFT">{{ t('ipInfos.advancedData.Nativeness') }}</th>
                     <th v-if="has.qualityScore" scope="col" :class="TH_RIGHT">{{ t('ipInfos.qualityScore') }}</th>
+                    <th v-if="has.abuseLevel" scope="col" :class="TH_LEFT">{{ t('ipInfos.abuseLevel.label') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y">
@@ -39,7 +40,7 @@
                         <span v-else class="text-muted-foreground">—</span>
                     </td>
                     <td v-if="has.ipType" class="px-3 py-2 whitespace-nowrap">
-                        {{ card.ipType ? t(TYPE_KEYS[card.ipType]) : '—' }}
+                        {{ card.ipType ? t(IP_TYPE_I18N_KEYS[card.ipType]) : '—' }}
                     </td>
                     <td v-if="has.nativeIP" class="px-3 py-2 whitespace-nowrap">
                         <span v-if="card.nativeIP === undefined" class="text-muted-foreground">—</span>
@@ -50,6 +51,9 @@
                     <td v-if="has.qualityScore" :class="TD_NUM">
                         {{ card.qualityScore != null ? `${card.qualityScore}/100` : '—' }}
                     </td>
+                    <td v-if="has.abuseLevel" class="px-3 py-2 whitespace-nowrap">
+                        {{ card.abuseLevel ? t(ABUSE_LEVEL_I18N_KEYS[card.abuseLevel]) : '—' }}
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -59,24 +63,18 @@
 <script setup>
 // Read-only renderer for the ipinfo report section: one row per IP source.
 // The IPCheck.ing-source enrichment columns (anonymity verdict, line type,
-// ASN-geo match, quality score) appear only when at least one card carries
-// them — enums map back to the IP card's own labels in the viewer's locale.
+// ASN-geo match, quality score, abuse activity) appear only when at least
+// one card carries them — enums map back to the IP card's own labels in the
+// viewer's locale.
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import GeoCell from './GeoCell.vue';
 import { TH_LEFT, TH_RIGHT, TD_NUM } from './table-classes.js';
-// Anonymity verdict code → the IP card's own label.
-import { ANONYMITY_I18N_KEYS } from '@/utils/ip/transform-ip-data.js';
+// Anonymity / line type codes → the IP card's own labels.
+import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS, ABUSE_LEVEL_I18N_KEYS } from '@/utils/codes/ip-labels.js';
 
 const props = defineProps({ section: { type: Object, required: true } });
 const { t } = useI18n();
-
-const TYPE_KEYS = {
-    business: 'ipInfos.advancedData.type.Business',
-    residential: 'ipInfos.advancedData.type.Residential',
-    wireless: 'ipInfos.advancedData.type.Wireless',
-    hosting: 'ipInfos.advancedData.type.Hosting',
-};
 
 const has = computed(() => ({
     timezone: props.section.cards.some((card) => card.timezone !== undefined),
@@ -84,5 +82,6 @@ const has = computed(() => ({
     ipType: props.section.cards.some((card) => card.ipType !== undefined),
     nativeIP: props.section.cards.some((card) => card.nativeIP !== undefined),
     qualityScore: props.section.cards.some((card) => card.qualityScore !== undefined),
+    abuseLevel: props.section.cards.some((card) => card.abuseLevel !== undefined),
 }));
 </script>

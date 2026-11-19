@@ -4,6 +4,7 @@ import { describe, it } from 'node:test';
 import {
   transformDataFromIPapi,
   extractAdvancedData,
+  ADVANCED_CARD_FIELDS,
 } from '../frontend/utils/ip/transform-ip-data.js';
 
 // simple i18n translation stub: return key with prefix for assertions, to verify template references rather than hardcoded translation text
@@ -234,8 +235,8 @@ describe('extractAdvancedData()', () => {
     });
 
     it('every code has a label in the en pack and is a report code', async () => {
-      const { ANONYMITY_I18N_KEYS } = await import('../frontend/utils/ip/transform-ip-data.js');
-      const { ANONYMITY_CODES } = await import('../common/report-schema.js');
+      const { ANONYMITY_I18N_KEYS } = await import('../frontend/utils/codes/ip-labels.js');
+      const { ANONYMITY_CODES } = await import('../common/codes/ip.js');
       const fs = await import('node:fs');
       const en = JSON.parse(fs.readFileSync(new URL('../frontend/locales/en.json', import.meta.url), 'utf8'));
       const resolve = (path) => path.split('.').reduce((node, part) => node?.[part], en);
@@ -286,5 +287,27 @@ describe('extractAdvancedData()', () => {
     assert.equal(gated.frictionScenarios, null);
     const malformed = extractAdvancedData({ tags: { ...cleanTags }, operatorType: 'Residential', score: 90, scenarios: { version: '1', items: [{ id: 'email', level: 'high' }] } }, t);
     assert.equal(malformed.frictionScenarios, null);
+  });
+});
+
+describe('ADVANCED_CARD_FIELDS', () => {
+  // The card reset clears exactly these keys, so they must be every key an
+  // advanced answer can add — full or gated.
+  it('lists every key extractAdvancedData returns', () => {
+    const full = extractAdvancedData({
+      tags: { ...cleanTags }, operatorType: 'Hosting', score: 70, scoreVersion: 3,
+      anonymityProvider: 'Acme', anonymityProtocol: 'socks5',
+      dimensions: { reputation: { level: 'low' }, anonymity: { class: 'vpn', sources: 'multi' } },
+      scenarios: { version: 1, items: [{ id: 'email', level: 'high' }] },
+    }, t);
+    const gated = extractAdvancedData({ tags: 'sign_in_required', score: 'sign_in_required', operatorType: 'sign_in_required' }, t);
+    assert.deepEqual(Object.keys(full).sort(), [...ADVANCED_CARD_FIELDS].sort());
+    assert.deepEqual(Object.keys(gated).sort(), [...ADVANCED_CARD_FIELDS].sort());
+  });
+
+  it('is exactly what a source-0 card adds over the base fields', () => {
+    const base = Object.keys(transformDataFromIPapi(basicRaw, 1, t, 'en'));
+    const advanced = Object.keys(transformDataFromIPapi({ ...basicRaw, advancedData: { tags: { ...cleanTags } } }, 0, t, 'en'));
+    assert.deepEqual(advanced.filter((key) => !base.includes(key)).sort(), [...ADVANCED_CARD_FIELDS].sort());
   });
 });

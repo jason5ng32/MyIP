@@ -4,7 +4,7 @@ import { useMainStore } from './store';
 import App from './App.vue'
 import i18n, { loadActiveLocaleMessages } from './locales/i18n';
 import router from './router';
-import { analytics } from './utils/analytics';
+import { analytics, startAnalytics } from './utils/analytics';
 import { getTimezoneInfo } from './utils/time-utils';
 import { isRunningAsPwa } from './utils/pwa';
 import { readAuthHint } from './utils/auth-hint';
@@ -157,6 +157,13 @@ Promise.all([
 }).finally(() => {
     loadFlagIcons(); // deferred boot-bandwidth work, app is on screen now
     loadSentry();
+    // Inject gtag.js after the first mounted frame paints (or immediately in a
+    // background tab where rAF is throttled) and flush queued boot events.
+    if (document.visibilityState === 'hidden') {
+        setTimeout(startAnalytics, 0);
+    } else {
+        requestAnimationFrame(() => startAnalytics());
+    }
     // Unknown hint (first visit since the flag shipped, or storage cleared):
     // probe auth once in the background so an already-signed-in user is
     // recognized and the next boot takes the exact path.

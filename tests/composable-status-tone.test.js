@@ -71,6 +71,7 @@ describe('useStatusTone() (existing contract still holds)', () => {
   it('dotClass maps tones to bg-* classes', () => {
     const { dotClass } = useStatusTone();
     assert.equal(dotClass('wait'), 'bg-info');
+    assert.equal(dotClass('active'), 'bg-info');
     assert.equal(dotClass('ok-fast'), 'bg-success');
     assert.equal(dotClass('ok-mild'), 'bg-warning/50');
     assert.equal(dotClass('ok-slow'), 'bg-warning');
@@ -79,9 +80,20 @@ describe('useStatusTone() (existing contract still holds)', () => {
     assert.equal(dotClass('bogus'), 'bg-info');
   });
 
-  it('textClass maps ok-mild to a lighter text-warning', () => {
+  it('textClass distinguishes muted wait placeholders from live active readouts', () => {
     const { textClass } = useStatusTone();
+    assert.equal(textClass('wait'), 'text-muted-foreground');
+    assert.equal(textClass('active'), 'text-info');
     assert.equal(textClass('ok-mild'), 'text-warning/75');
     assert.equal(textClass('ok-slow'), 'text-warning');
+  });
+
+  it('toneVar maps tones to semantic CSS custom properties', () => {
+    const { toneVar } = useStatusTone();
+    assert.equal(toneVar('active'), 'var(--info)');
+    assert.equal(toneVar('ok-fast'), 'var(--success)');
+    assert.equal(toneVar('ok-slow'), 'var(--warning)');
+    assert.equal(toneVar('fail'), 'var(--destructive)');
+    assert.equal(toneVar('bogus'), 'var(--info)');
   });
 });

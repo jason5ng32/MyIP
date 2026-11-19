@@ -10,7 +10,7 @@ import {
     MINE_LIST_ID,
     DEFAULT_LIST_MEMBERS,
     faviconPath,
-} from '../../data/connectivity-import-lists.js';
+} from '../../data/connectivity-defaults.js';
 
 export const CONNECTIVITY_LISTS_SCHEMA_VERSION = 1;
 

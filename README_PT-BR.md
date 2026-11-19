@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 Uma caixa de ferramentas de IP completa e de código aberto: consulta de IP a partir de múltiplas fontes, testes de conectividade, detecção de WebRTC e de vazamento de DNS, teste de velocidade, MTR, verificação de censura, Whois e muito mais — auto-hospedável com um único comando Docker.
 
@@ -40,7 +40,7 @@ Adicione a demonstração aos favoritos ou faça sua própria implantação.
 
 * 🛜 **Cartões de IP**: Detecta seus IPv4 e IPv6 a partir de várias fontes independentes, lado a lado — país, região, cidade, ASN, organização e o fuso horário local do IP.
 * 🔍 **Verificação de IP**: Consulta as mesmas informações detalhadas de qualquer endereço IP que despertar sua curiosidade.
-* 🧾 **Histórico de IP**: Mantém um registro local dos IPs com os quais você já foi visto, filtrável por tipo e país — armazenado apenas no seu navegador.
+* 📸 **Histórico de instantâneos**: Sempre que a página inicial abre, salva os resultados dos seus testes — informações de IP, conectividade, WebRTC, teste de vazamento de DNS, teste de velocidade — como um instantâneo. Compare quaisquer dois e leia as diferenças linha a linha, como um diff de código; dê nome ou fixe os que importam — armazenado apenas no seu navegador.
 * 🖥️ **Impressão digital do navegador**: Calcula a impressão digital do seu navegador de várias formas e mostra o que torna você identificável.
 
 ### 🕵️ Vazamentos e privacidade
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Todo o restante — chaves de API opcionais, segurança e limitação de taxa, registros, Sentry e os domínios da API curl — está documentado na [referência de variáveis de ambiente](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Todo o restante — chaves de API opcionais, segurança, registros, Sentry e os domínios da API curl — está documentado na [referência de variáveis de ambiente](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Documentação
 

@@ -2,8 +2,6 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { slowDown } from 'express-slow-down'
-import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './server/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
@@ -67,20 +65,9 @@ initUpstreamUserAgent();
 
 const app = express();
 const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);
-// Local rate-limit ledger file — opt-in: empty means no file is written.
-// The logger.warn in the limiter handler always fires regardless (and flows
-// to Sentry Logs when a backend DSN is configured), so the file only adds a
-// permanent on-disk record for deployments that want one (e.g. Sentry-less
-// self-hosts, or feeding a firewall script).
-const blackListIPLogFilePath = process.env.SECURITY_BLACKLIST_LOG_FILE_PATH || '';
-const rateLimitSet = parseInt(process.env.SECURITY_RATE_LIMIT || 0, 10);
-const speedLimitSet = parseInt(process.env.SECURITY_DELAY_AFTER || 0, 10);
-
-app.set('trust proxy', 1);
 
 // HTTP request logging on /api/* — off by default to keep pm2 logs lean.
-// Set LOG_HTTP=true in .env to enable. Mounted before the rate limiter
-// so 429s are also logged when enabled.
+// Set LOG_HTTP=true in .env to enable.
 if (process.env.LOG_HTTP === 'true') {
     app.use('/api', pinoHttp({
         logger,
@@ -97,118 +84,6 @@ if (process.env.LOG_HTTP === 'true') {
         },
     }));
     logger.info('📝 HTTP request logging enabled (LOG_HTTP=true)');
-}
-
-function getClientIp(req) {
-    const cfIp = req.headers['cf-connecting-ip'];
-    const forwardedIps = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0] : null;
-    const cfIpV6 = req.headers['cf-connecting-ipv6'];
-    return cfIp || forwardedIps || cfIpV6 || req.ip;
-}
-
-// Host-local time with an explicit UTC offset ("2026-07-14 10:23:45 +0800"),
-// matching the pretty-log timestamp style — ledger entries stay unambiguous
-// whatever timezone the deployment runs in.
-const formatDate = (timestamp) => {
-    const d = new Date(timestamp);
-    const pad = (n) => String(n).padStart(2, '0');
-    const offsetMin = -d.getTimezoneOffset();
-    const sign = offsetMin >= 0 ? '+' : '-';
-    const abs = Math.abs(offsetMin);
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} `
-        + `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} `
-        + `${sign}${pad(Math.floor(abs / 60))}${pad(abs % 60)}`;
-};
-
-// Append-or-update one line in the rate-limit log, keeping the original
-// timestamp on repeat offenders so we can see when an IP *first* showed up.
-function logLimitedIP(ip) {
-    const logPath = path.join(__dirname, blackListIPLogFilePath);
-
-    const logDir = path.dirname(logPath);
-    if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true });
-        logger.info({ logDir }, 'Created log directory');
-    }
-
-    fs.readFile(logPath, 'utf8', (err, data) => {
-        if (err && err.code !== 'ENOENT') {
-            logger.error({ err }, 'Error reading the log file');
-            return;
-        }
-
-        const now = Date.now();
-        let newCount = 1;
-        let logExists = false;
-        let updatedData = '';
-
-        if (data) {
-            const lines = data.split('\n');
-            updatedData = lines.map(line => {
-                const [currentIp, count, timestamp] = line.split(',');
-                if (currentIp === ip) {
-                    newCount = parseInt(count, 10) + 1;
-                    logExists = true;
-                    return `${ip},${newCount},${timestamp}`;
-                }
-                return line;
-            }).join('\n');
-        }
-
-        if (!logExists) {
-            const newLine = `${ip},${newCount},${formatDate(now)}`;
-            updatedData += (updatedData ? '\n' : '') + newLine;
-        }
-
-        fs.writeFile(logPath, updatedData, 'utf8', err => {
-            if (err) {
-                logger.error({ err }, 'Failed to write to log file');
-            }
-        });
-    });
-}
-
-const rateLimiter = rateLimit({
-    windowMs: 20 * 60 * 1000,
-    max: rateLimitSet,
-    message: 'Too Many Requests',
-    // The Sentry tunnel is exempted — it has its own limiter at the route.
-    // Telemetry sharing the app quota is how reporting silently dies: one
-    // 429 and the browser SDK drops every event for the next minute.
-    skip: (req) => req.path === '/monitoring',
-    handler: (req, res, next) => {
-        const ip = getClientIp(req);
-        // Log on the exact transition into rate-limited state — not every
-        // blocked request — to avoid log flooding when an abusive client
-        // keeps hammering after being limited. The warn line is the primary
-        // record (mirrored to Sentry Logs when configured); the on-disk
-        // ledger is the opt-in extra.
-        if (req.rateLimit.current === req.rateLimit.limit + 1) {
-            logger.warn({ ip }, 'IP rate-limited');
-            if (blackListIPLogFilePath) {
-                logLimitedIP(ip);
-            }
-        }
-        res.status(429).json({ message: 'Too Many Requests' });
-    }
-});
-
-const speedLimiter = slowDown({
-    windowMs: 60 * 60 * 1000,
-    delayAfter: speedLimitSet,
-    delayMs: (used, req) => (used - req.slowDown.limit) * 400,
-    maxDelayMs: 5000,
-    skip: (req) => req.path === '/monitoring' || req.path === '/maxmind',
-})
-
-if (rateLimitSet !== 0) {
-    app.use('/api', rateLimiter);
-    logger.info(`🛡️  Rate limiter enabled — ${rateLimitSet} requests per 20 minutes`);
-}
-
-if (speedLimitSet !== 0) {
-    app.use('/api', speedLimiter);
-    logger.info(`🐢 Speed limiter enabled — slow down after ${speedLimitSet} requests`);
 }
 
 // 500kb instead of the 100kb default: shared diagnostic reports (POST
@@ -242,6 +117,15 @@ if (allowlist.domains.length) {
 }
 for (const { entry, reason } of allowlist.problems) {
     logger.warn(`⚠️  ALLOWED_DOMAINS entry "${entry}" can never match: ${reason}`);
+}
+
+const removedSecurityVars = [
+    'SECURITY_RATE_LIMIT',
+    'SECURITY_DELAY_AFTER',
+    'SECURITY_BLACKLIST_LOG_FILE_PATH',
+].filter((key) => process.env[key] && process.env[key] !== '0');
+if (removedSecurityVars.length) {
+    logger.warn(`⚠️  These variables no longer have any effect (built-in rate limiting was removed; enforce limits at your reverse proxy or WAF): ${removedSecurityVars.join(', ')}`);
 }
 
 // Readiness gates for routes reading local data (server/offline-data.js):
@@ -335,13 +219,7 @@ app.post('/api/bulk-lookup', needsMaxMind, bulkLookupHandler);
 // header at all — a '*/*' string matcher skips such requests and req.body
 // would never be populated.
 if (process.env.VITE_SENTRY_DSN_FRONTEND) {
-    // Dedicated, more generous per-IP limiter
-    const monitoringLimiter = rateLimit({
-        windowMs: 20 * 60 * 1000,
-        max: 600,
-        message: 'Too Many Requests',
-    });
-    app.post('/api/monitoring', monitoringLimiter, express.raw({ type: () => true, limit: '10mb' }), sentryTunnelHandler);
+    app.post('/api/monitoring', express.raw({ type: () => true, limit: '10mb' }), sentryTunnelHandler);
 }
 
 // Set static file server

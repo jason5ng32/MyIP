@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 Një kuti mjetesh IP gjithëpërfshirëse dhe me burim të hapur: kërkim IP nga shumë burime, teste lidhshmërie, zbulim i rrjedhjeve WebRTC dhe DNS, test shpejtësie, MTR, kontrolle censure, Whois e shumë të tjera — e vetë-strehueshme me një komandë të vetme Docker.
 
@@ -40,7 +40,7 @@ Mund ta ruani demon te faqeshënuesit ose të vendosni instancën tuaj.
 
 * 🛜 **Kartat e IP-së**: Zbulojnë IPv4 dhe IPv6 tuaj nga disa burime të pavarura krah për krah — shtetin, rajonin, qytetin, ASN-në, organizatën dhe zonën kohore lokale të IP-së.
 * 🔍 **Kërkimi i IP-së**: Kërkon të njëjtin informacion të detajuar për çdo adresë IP për të cilën jeni kureshtarë.
-* 🧾 **Historiku i IP-ve**: Mban një regjistër lokal të IP-ve me të cilat jeni parë, të filtrueshëm sipas llojit dhe shtetit — i ruajtur vetëm në shfletuesin tuaj.
+* 📸 **Historiku i fotografive të çastit**: Sa herë që faqja kryesore hapet, ruan rezultatet e testeve të saj — informacionin e IP-së, lidhshmërinë, WebRTC, testin e rrjedhjes DNS, testin e shpejtësisë — si një fotografi të çastit. Krahasoni çdo dy prej tyre dhe lexoni ndryshimet rresht pas rreshti, si një diff kodi; emërtoni ose fiksoni ato që kanë rëndësi — të ruajtura vetëm në shfletuesin tuaj.
 * 🖥️ **Gjurma e shfletuesit**: Llogarit gjurmën e shfletuesit tuaj në disa mënyra dhe tregon çfarë ju bën të identifikueshëm.
 
 ### 🕵️ Rrjedhjet dhe privatësia
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Gjithçka tjetër — çelësat opsionalë API, siguria dhe kufizimi i shpejtësisë, regjistrimi, Sentry, domenet e API-së curl — është dokumentuar te [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Gjithçka tjetër — çelësat opsionalë API, siguria, regjistrimi, Sentry, domenet e API-së curl — është dokumentuar te [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Dokumentacioni
 

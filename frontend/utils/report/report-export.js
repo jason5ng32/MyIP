@@ -1,35 +1,22 @@
 // Turns collected section snapshots into the share outputs: the versioned
-// report envelope (POSTed for the /r/:id link and offered as JSON download)
-// and the self-describing Markdown handed to AI assistants. Pure functions —
+// report envelope (POSTed for the /r/:id link and offered as JSON download),
+// the self-describing Markdown handed to AI assistants and the Docs
+// Assistant's results payload. Pure functions —
 // the share dialog owns all interaction state. Markdown prose is localized
 // via the caller's t(); data tables keep the schema's English field names on
 // purpose (stable identifiers for AI consumption).
 
-import { REPORT_VERSION, REPORT_SECTION_IDS, maskReportIps } from './report-schema.js';
-
-// Section id → the site's existing i18n title key (dialog checklist and
-// Markdown headings reuse the same titles the homepage sections show).
-export const SECTION_TITLE_KEYS = {
-    ipinfo: 'ipInfos.Title',
-    connectivity: 'connectivity.Title',
-    webrtc: 'webrtc.Title',
-    dnsleak: 'dnsleaktest.Title',
-    speedtest: 'speedtest.Title',
-    pingtest: 'pingtest.Title',
-    mtrtest: 'mtrtest.Title',
-    ruletest: 'ruletest.Title',
-    browserinfo: 'browserinfo.Title',
-    adblocktest: 'adblocktest.Title',
-    invisibility: 'invisibilitytest.Title',
-    enhanceddnsleak: 'enhanceddnsleaktest.Title',
-    persona: 'personacheck.Title',
-};
+import {
+    REPORT_VERSION, REPORT_SECTION_IDS, maskReportIps, stripLocalOnly,
+} from './report-schema.js';
+import { SECTION_TITLE_KEYS } from './report-sections.js';
 
 // Assemble the envelope from collected snapshots. Sections keep homepage
 // order regardless of selection order; snapshots are deep-copied (they're
 // JSON-safe by construction) so later test re-runs can't mutate an already
-// exported report; masking applies at this boundary so all outputs share
-// the exact same data.
+// exported report; local-only fields (Snapshots' scenario friction) are
+// dropped and masking applies at this boundary, so all outputs share the
+// exact same data.
 export const buildShareReport = ({ sections, selectedIds, maskTail, locale, origin }) => {
     const picked = {};
     for (const id of REPORT_SECTION_IDS) {
@@ -37,14 +24,28 @@ export const buildShareReport = ({ sections, selectedIds, maskTail, locale, orig
             picked[id] = JSON.parse(JSON.stringify(sections[id]));
         }
     }
-    const report = {
+    const report = stripLocalOnly({
         v: REPORT_VERSION,
         generatedAt: new Date().toISOString(),
         origin,
         locale,
         sections: picked,
-    };
+    });
     return maskTail ? maskReportIps(report) : report;
+};
+
+// The Docs Assistant's results payload: each collected section deep-copied
+// without its local-only fields and tagged with its localized name
+// (`sectionName(id)`), plus the sections not collected yet.
+export const buildDocsResults = (sections, sectionName) => {
+    const available = Object.keys(sections);
+    const copied = Object.fromEntries(available.map((id) => [id, JSON.parse(JSON.stringify(sections[id]))]));
+    const shared = stripLocalOnly({ sections: copied }).sections;
+    return {
+        results: Object.fromEntries(available.map((id) => [id, { name: sectionName(id), ...shared[id] }])),
+        missingSections: REPORT_SECTION_IDS.filter((id) => !available.includes(id))
+            .map((id) => ({ id, name: sectionName(id) })),
+    };
 };
 
 // --- Markdown rendering -------------------------------------------------------
@@ -73,7 +74,7 @@ const MTR_HOP_STATS = ['lossPct', 'sntCount', 'drop', 'rcv', 'lastMs', 'avgMs', 
 
 // ipinfo's IPCheck.ing enrichment columns only render when some card
 // carries them (other sources / signed-out runs never do).
-const IPINFO_EXTRA_COLS = ['anonymity', 'ipType', 'nativeIP', 'qualityScore', 'anonymityProtocol', 'anonymityProvider'];
+const IPINFO_EXTRA_COLS = ['anonymity', 'ipType', 'nativeIP', 'qualityScore', 'anonymityProtocol', 'anonymityProvider', 'abuseLevel'];
 
 const SECTION_RENDERERS = {
     ipinfo: (section) => {

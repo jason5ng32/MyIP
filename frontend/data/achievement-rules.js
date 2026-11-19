@@ -59,9 +59,6 @@ export const ACHIEVEMENT_RULES = [
     { event: 'ipinfo:finished', slug: 'SqueakyClean', when: (p) => (p.cards || []).some((c) => Number(c.qualityScore) === 100) },
     { event: 'ipinfo:finished', slug: 'WalkWithPenguins', when: (p) => (p.cards || []).some((c) => (c.country_code || '').toUpperCase() === 'AQ') },
 
-    // Local IP history snapshot — payload { countryCount } (distinct countries).
-    { event: 'iphistory:updated', slug: 'GlobeTrotter', when: (p) => p.countryCount >= 10 },
-
     // Earth Online status posted (backend confirmed the write).
     { event: 'pulse:status-sent', slug: 'HelloWorld' },
 

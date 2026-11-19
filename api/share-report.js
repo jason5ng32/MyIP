@@ -9,10 +9,8 @@
 //
 // Abuse layering (write side): schema whitelist (no free-form text can be
 // stored), a size cap (REPORT_MAX_BYTES), 128-bit unguessable ids, KV TTL.
-// Rate limiting is
-// deliberately NOT done here — it's a deployment concern: edge rules cover
-// the hosted site, and the env-gated global /api limiter in
-// backend-server.js (SECURITY_RATE_LIMIT) covers self-hosts.
+// Rate limiting is deliberately NOT done in the app — it's a deployment
+// concern, left to the edge / reverse proxy in front of it.
 
 import crypto from 'node:crypto';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
