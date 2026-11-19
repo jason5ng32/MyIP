@@ -203,6 +203,7 @@ MyIP бесплатный и с открытым исходным кодом, н
 | <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>Глобальная сеть для CDN, защиты, DNS и serverless-приложений.</sub> |
 | <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>Мониторинг приложений: отслеживание ошибок, трассировка и запись сессий.</sub> |
 | <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>API и базы данных IP-аналитики: геолокация, ASN, VPN и выявление злоупотреблений.</sub> |
+| <a href="https://www.ip2location.io"><img src="https://res.ipcheck.ing/img/ip2location_logo.png" alt="IP2Location.io" height="24" /></a> | <sub>API геолокации IP с выявлением прокси, VPN и хостинга, а также WHOIS-поиск по доменам.</sub> |
 | <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>ИИ-ревью кода, которое понимает всю кодовую базу.</sub> |
 | <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>Платформа документации для технических команд.</sub> |
 | <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>Менеджер паролей и секретов для людей и команд.</sub> |
