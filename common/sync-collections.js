@@ -3,9 +3,12 @@
 import {
     PREFERENCES_VERSION, SYNCED_PREFERENCE_KEYS, isSyncedPreferenceKey, isValidPreferenceValue,
     isValidConnectivityList, isValidConnectivityListOrder, isValidConnectivityListId, CONNECTIVITY_LIST_LIMIT,
+    isValidSpeedtestSize,
 } from './preferences-schema.js';
 
 export const CONNECTIVITY_SYNC_VERSION = 2;
+export const CHECKLIST_SYNC_VERSION = 1;
+export const SPEEDTEST_SYNC_VERSION = 1;
 
 // `code` of an item request for a collection the account has not enabled (409).
 export const SYNC_OFF_CODE = 'sync_off';
@@ -54,6 +57,19 @@ const isConnectivityValue = (id, value) => {
 // Live items at most: every list, its order and the default list id.
 const CONNECTIVITY_MAX_ITEMS = CONNECTIVITY_LIST_LIMIT + CONNECTIVITY_SYNC_ITEM_IDS.length;
 
+// Security Checklist progress: item slugs (lowercase words joined by hyphens, up to ~80 chars today) and their two
+// marks; an unset item is a delete. The slug list lives in the locale datasets, so ids are checked by shape.
+export const CHECKLIST_MARKS = Object.freeze(['checked', 'ignored']);
+const CHECKLIST_SLUG_PATTERN = /^[a-z0-9][a-z0-9-]{0,127}$/;
+export const isChecklistSlug = (id) => typeof id === 'string' && CHECKLIST_SLUG_PATTERN.test(id);
+export const isChecklistMark = (value) => CHECKLIST_MARKS.includes(value);
+// Well above the checklist's item count (258).
+const CHECKLIST_MAX_ITEMS = 1000;
+
+// The speed test's two sizes.
+const SPEEDTEST_ITEM_IDS = Object.freeze(['downloadBytes', 'uploadBytes']);
+const isSpeedtestItemId = (id) => SPEEDTEST_ITEM_IDS.includes(id);
+
 const row = (fields) => Object.freeze(fields);
 
 export const SYNC_COLLECTIONS = Object.freeze({
@@ -79,6 +95,28 @@ export const SYNC_COLLECTIONS = Object.freeze({
         maxItemBytes: 32 * KB,
         allowDelete: true,
         pageSize: CONNECTIVITY_MAX_ITEMS,
+    }),
+    // One item per checked or ignored Security Checklist item, by slug.
+    checklist: row({
+        id: 'checklist',
+        version: CHECKLIST_SYNC_VERSION,
+        isValidItemId: isChecklistSlug,
+        isValidValue: (id, value) => isChecklistSlug(id) && isChecklistMark(value),
+        maxItems: CHECKLIST_MAX_ITEMS,
+        maxItemBytes: 16,
+        allowDelete: true,
+        pageSize: CHECKLIST_MAX_ITEMS,
+    }),
+    // The speed test's download and upload sizes.
+    speedtest: row({
+        id: 'speedtest',
+        version: SPEEDTEST_SYNC_VERSION,
+        isValidItemId: isSpeedtestItemId,
+        isValidValue: (id, value) => isSpeedtestItemId(id) && isValidSpeedtestSize(value),
+        maxItems: SPEEDTEST_ITEM_IDS.length,
+        maxItemBytes: 32,
+        allowDelete: false,
+        pageSize: SPEEDTEST_ITEM_IDS.length,
     }),
 });
 

@@ -1,10 +1,10 @@
 // Exercise SpeedTest startup orchestration, boot-draw ceremony, and post-run diagnostics.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { effectScope, nextTick } from 'vue';
+import { effectScope, nextTick, reactive } from 'vue';
 import { useSpeedTest } from '../frontend/composables/use-speedtest.js';
 import {
-  formatLoadedDelta, loadedLatencyDelta, qualityLevel,
+  formatLoadedDelta, loadedLatencyDelta, qualityLevel, speedTestSizesOf,
 } from '../frontend/utils/features/speedtest-session.js';
 
 const deferred = () => {
@@ -14,7 +14,7 @@ const deferred = () => {
   return { promise, resolve, reject };
 };
 
-const fixture = () => {
+const fixture = ({ sizes } = {}) => {
   const chartLoad = deferred();
   const connectionLoads = [];
   const engines = [];
@@ -31,6 +31,7 @@ const fixture = () => {
   const runner = scope.run(() => useSpeedTest({
     t: (key, params) => (params ? `${key}: ${params.phase}` : key),
     lang: 'en',
+    sizes,
     updateAllIPs: (value) => ips.push(value),
     initStartingPoints: () => { chartLoads += 1; return chartLoad.promise; },
     updateCharts: () => {},
@@ -432,4 +433,34 @@ test('getIPFromSpeedTest warns on blocked trace requests without triggering cons
   assert.equal(errors.length, 1);
 
   scope.stop();
+});
+
+test('the chosen sizes: stored ones taken, others fall back to the defaults', () => {
+  assert.deepEqual(speedTestSizesOf({ speedtestDownloadBytes: 100e6, speedtestUploadBytes: 1e6 }), { download: 100e6, upload: 1e6 });
+  assert.deepEqual(speedTestSizesOf({ speedtestDownloadBytes: 3e6, speedtestUploadBytes: '1e6' }), { download: 50e6, upload: 15e6 });
+  assert.deepEqual(speedTestSizesOf(undefined), { download: 50e6, upload: 15e6 });
+});
+
+test('the chosen sizes reach the package when idle; one arriving mid-run waits and the run keeps its own', async () => {
+  const prefs = reactive({ speedtestDownloadBytes: 10e6, speedtestUploadBytes: 1e6 });
+  const run = fixture({ sizes: () => speedTestSizesOf(prefs) });
+  assert.equal(run.state.config.package.download.bytes, 10e6);
+  assert.equal(run.state.config.package.upload.bytes, 1e6);
+  prefs.speedtestUploadBytes = 50e6;
+  await nextTick();
+  assert.equal(run.state.config.package.upload.bytes, 50e6);
+
+  await run.speedTestController();
+  assert.equal(run.state.speedTest.status, 'running');
+  prefs.speedtestDownloadBytes = 100e6;
+  await nextTick();
+  assert.equal(run.state.config.package.download.bytes, 10e6, 'the run is not disturbed');
+  await run.speedTestController();
+  assert.equal(run.state.speedTest.status, 'paused');
+  await nextTick();
+  assert.equal(run.state.config.package.download.bytes, 10e6, 'nor while paused');
+  run.state.speedTest.status = 'finished';
+  await nextTick();
+  assert.equal(run.state.config.package.download.bytes, 100e6, 'taken once the run ends');
+  run.unmount();
 });

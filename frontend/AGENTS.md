@@ -194,14 +194,19 @@ separate from Share Report and `Report*.vue`.
 
 ### Account sync
 
-Two collections sync, `preferences` (`SYNCED_PREFERENCE_KEYS`) and
-`connectivity` (one item per list, the lists' order, the default list id);
-IPs, snapshots, test results and the checklist never do. The account chooses which:
+Four collections sync, `preferences` (`SYNCED_PREFERENCE_KEYS`),
+`connectivity` (one item per list, the lists' order, the default list id),
+`checklist` (Security Checklist progress: one item per marked slug, unset =
+tombstone; `store.checklistProgress` over `utils/features/checklist-progress.js`)
+and `speedtest` (the two size preferences, outside `SYNCED_PREFERENCE_KEYS`; no
+Preferences control, the homepage selects save them); IPs, snapshots and test
+results never do. The account chooses which:
 `GET / PUT /api/sync` (`store.syncSettings`, cached per user so a load starts
 before the fetch; nothing until decided; turning one off deletes its rows
 there). `use-account-sync.js` (App.vue) runs one engine
-(`utils/features/account-sync.js`) over two store adapters
-(`utils/features/preferences-sync.js`; the store stays the only writer).
+(`utils/features/account-sync.js`) over four store adapters
+(`utils/features/preferences-sync.js` and the checklist's; the store stays the
+only writer).
 Per enabled collection: signed out, the data is the device's (no record);
 signed in, the account's — the first pull adopts (an empty account takes the
 device's data, else the account replaces it), then edits stamp by hash and
@@ -213,9 +218,11 @@ too. `widgets/SyncChoiceDialog.vue` asks once (`use-sync-dialog.js`,
 `shouldShowSyncDialog`): every exit saves a choice; Preferences edits it at
 once. Both use `widgets/SyncChoiceControls.vue` (`applySyncToggle`).
 Every preference edit goes through `store.editPreferences`
-(`updatePreference`; list ops through `editConnectivityLists`): it lands on
-what localStorage holds at that moment, so another tab's save survives; no
-tab ever reacts to another (no `storage` listener).
+(`updatePreference`; list ops through `editConnectivityLists`), every
+checklist mark through `store.editChecklist` (`setChecklistMark`,
+`resetChecklist`): each lands on what localStorage holds at that moment, so
+another tab's save survives; no tab ever reacts to another (no `storage`
+listener). A size arriving mid-run waits for the speed test to end.
 
 ### Overlays take no keyboard shortcuts
 

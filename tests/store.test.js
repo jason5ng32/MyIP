@@ -448,6 +448,79 @@ describe('store — an edit lands on the freshest stored preferences', () => {
   });
 });
 
+describe('store — Security Checklist progress', () => {
+  const KEY = 'securityChecklistSlugs';
+  const stored = () => JSON.parse(globalThis.localStorage.getItem(KEY));
+  const tab = () => {
+    setActivePinia(createPinia());
+    return useMainStore();
+  };
+
+  it('two tabs each marking a different item keep both; an idle tab is never rewritten', () => {
+    const one = tab();
+    const two = tab();
+    one.setChecklistMark('a-b', 'checked');
+    two.setChecklistMark('c-d', 'ignored');
+    assert.deepEqual(stored(), { 'a-b': 'checked', 'c-d': 'ignored' });
+    assert.deepEqual(two.checklistProgress, { 'a-b': 'checked', 'c-d': 'ignored' });
+    assert.deepEqual(one.checklistProgress, { 'a-b': 'checked' });
+    assert.equal(two.checklistEdits, 1);
+  });
+
+  it('unset and Reset are edits; Reset clears what another tab marked too', () => {
+    const one = tab();
+    const two = tab();
+    one.setChecklistMark('a-b', 'checked');
+    two.setChecklistMark('c-d', 'checked');
+    one.setChecklistMark('c-d', '');
+    assert.deepEqual(stored(), { 'a-b': 'checked' });
+    two.resetChecklist();
+    assert.deepEqual(stored(), {});
+    assert.deepEqual(two.checklistProgress, {});
+    assert.equal(two.checklistEdits, 2);
+  });
+
+  it('reads the stored copy as it is kept: \'\' entries and junk drop, an unreadable copy changes nothing', () => {
+    const s = tab();
+    globalThis.localStorage.setItem(KEY, JSON.stringify({ 'a-b': 'checked', 'c-d': '', 'E F': 'checked', 'g-h': 'maybe' }));
+    s.adoptStoredChecklist();
+    assert.deepEqual(s.checklistProgress, { 'a-b': 'checked' });
+    globalThis.localStorage.setItem(KEY, '{x');
+    s.adoptStoredChecklist();
+    assert.deepEqual(s.checklistProgress, { 'a-b': 'checked' });
+    s.setChecklistMark('i-j', 'ignored');
+    assert.deepEqual(stored(), { 'a-b': 'checked', 'i-j': 'ignored' });
+  });
+
+  it('account sync\'s changes and clearing are not edits', () => {
+    const s = tab();
+    s.setChecklistMark('a-b', 'checked');
+    s.applySyncedChecklist({ upserts: { 'c-d': 'ignored' }, deletes: ['a-b'] });
+    assert.deepEqual(stored(), { 'c-d': 'ignored' });
+    s.clearChecklist();
+    assert.deepEqual(stored(), {});
+    assert.deepEqual(s.checklistProgress, {});
+    assert.equal(s.checklistEdits, 1);
+  });
+});
+
+describe('store — speed test sizes', () => {
+  it('are preferences with today\'s defaults; only a size option is taken from sync or storage', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    assert.equal(s.userPreferences.speedtestDownloadBytes, 50e6);
+    assert.equal(s.userPreferences.speedtestUploadBytes, 15e6);
+    s.applySyncedPreferences({ speedtestDownloadBytes: 100e6, speedtestUploadBytes: 2e6 });
+    assert.equal(s.userPreferences.speedtestDownloadBytes, 100e6);
+    assert.equal(s.userPreferences.speedtestUploadBytes, 15e6);
+    globalThis.localStorage.setItem('userPreferences_v7', JSON.stringify({ ...s.userPreferences, speedtestUploadBytes: 'x' }));
+    s.updatePreference('speedtestDownloadBytes', 10e6);
+    assert.equal(s.userPreferences.speedtestUploadBytes, 15e6);
+    s.resetSyncedPreferences('speedtest');
+    assert.equal(s.userPreferences.speedtestDownloadBytes, 50e6);
+  });
+});
+
 describe('store — getters', () => {
   it('allHasLoaded is false when any loading flag is false', () => {
     const s = useMainStore();

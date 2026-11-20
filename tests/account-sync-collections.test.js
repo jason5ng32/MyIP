@@ -13,13 +13,17 @@ import {
 import {
     SYNC_SETTINGS_CACHE_KEY, createSyncSettings, readSyncSettingsAnswer, readCachedSyncSettings,
     writeCachedSyncSettings, clearCachedSyncSettings, collectionSyncState, chosenCollections, shouldShowSyncDialog,
-    applySyncToggle,
+    applySyncToggle, defaultSyncChoice, syncChoiceOf,
 } from '../frontend/utils/features/sync-settings.js';
 import {
     BEFORE_RELOAD_COMMAND, SIGN_OUT_COMMAND, SET_SYNC_COLLECTIONS_COMMAND, SIGN_IN_SYNC_TIMEOUT_MS,
     SIGN_OUT_FLUSH_MS, SIGN_OUT_TIMEOUT_MS, syncBeforeReload, clearAccountDataBeforeSignOut, saveSyncCollections,
 } from '../frontend/utils/features/account-sync-auth.js';
 import { registerAppCommand } from '../frontend/utils/app-commands.js';
+import {
+    CHECKLIST_STORAGE_KEY, cleanChecklistProgress, readStoredChecklist, writeStoredChecklist, applyChecklistMarks,
+    applyChecklistItems, unsetAllMarks,
+} from '../frontend/utils/features/checklist-progress.js';
 import { syncRecordKey, readSyncRecord, writeSyncRecord, hashSyncValue } from '../frontend/utils/features/account-sync.js';
 import { SYNC_COLLECTIONS, SYNC_COLLECTION_IDS } from '../frontend/utils/sync-collections.js';
 import { SYNCED_PREFERENCE_KEYS } from '../frontend/utils/preferences-schema.js';
@@ -33,6 +37,7 @@ const memoryStorage = (initial = {}) => ({
     removeItem(key) { delete this.data[key]; },
 });
 
+const ALL = ['preferences', 'connectivity', 'checklist', 'speedtest'];
 const prefs = (over = {}) => ({ ...DEFAULT_PREFERENCES, connectivityLists: sanitizeLists(null, null, []), ...over });
 const site = (id) => ({ id, name: `Site ${id}`, url: `https://${id}.example.com/favicon.ico` });
 const withWork = () => {
@@ -41,9 +46,23 @@ const withWork = () => {
 };
 
 describe('account sync — the collections', () => {
-    it('exactly the two registry collections, each read from userPreferences', () => {
-        assert.deepEqual([...SYNC_COLLECTION_IDS], ['preferences', 'connectivity']);
-        assert.deepEqual(Object.keys(SYNC_ITEM_READERS), [...SYNC_COLLECTION_IDS]);
+    it('the four registry collections; all but the checklist read from userPreferences', () => {
+        assert.deepEqual([...SYNC_COLLECTION_IDS], ['preferences', 'connectivity', 'checklist', 'speedtest']);
+        assert.deepEqual(Object.keys(SYNC_ITEM_READERS), ['preferences', 'connectivity', 'speedtest']);
+    });
+
+    it('speedtest: the two sizes, a stored size outside the options read as its default; never preferences', () => {
+        assert.deepEqual(SYNC_ITEM_READERS.speedtest(prefs({ speedtestDownloadBytes: 100e6 })), { downloadBytes: 100e6, uploadBytes: 15e6 });
+        assert.deepEqual(SYNC_ITEM_READERS.speedtest(prefs({ speedtestDownloadBytes: 7, speedtestUploadBytes: '1e6' })),
+            { downloadBytes: DEFAULT_PREFERENCES.speedtestDownloadBytes, uploadBytes: DEFAULT_PREFERENCES.speedtestUploadBytes });
+        for (const [id, value] of Object.entries(SYNC_ITEM_READERS.speedtest(prefs()))) {
+            assert.ok(SYNC_COLLECTIONS.speedtest.isValidValue(id, value), id);
+        }
+        assert.deepEqual(SYNC_ITEM_WRITERS.speedtest(prefs(), { upserts: { uploadBytes: 1e6 }, deletes: ['downloadBytes'] }),
+            { speedtestDownloadBytes: DEFAULT_PREFERENCES.speedtestDownloadBytes, speedtestUploadBytes: 1e6 });
+        assert.deepEqual(syncDefaultPreferences('speedtest'), { speedtestDownloadBytes: 50e6, speedtestUploadBytes: 15e6 });
+        const items = SYNC_ITEM_READERS.preferences(prefs());
+        for (const key of ['speedtestDownloadBytes', 'speedtestUploadBytes']) assert.equal(key in items, false, key);
     });
 
     it('preferences: every synced key, normalised as the server checks it; the Connectivity keys stay out', () => {
@@ -67,8 +86,10 @@ describe('account sync — the collections', () => {
     });
 
     it('writers: the collection\'s own items give back the very same preferences', () => {
-        for (const id of SYNC_COLLECTION_IDS) {
-            const current = prefs({ theme: 'dark', connectivityLists: withWork(), connectivityDefaultListId: 'work' });
+        for (const id of Object.keys(SYNC_ITEM_READERS)) {
+            const current = prefs({
+                theme: 'dark', connectivityLists: withWork(), connectivityDefaultListId: 'work', speedtestUploadBytes: 100e6,
+            });
             const values = applySyncItems(id, prefs(), { upserts: SYNC_ITEM_READERS[id](current), deletes: [] });
             assert.deepEqual(SYNC_ITEM_READERS[id]({ ...prefs(), ...values }), SYNC_ITEM_READERS[id](current), id);
         }
@@ -163,32 +184,43 @@ describe('account sync — the account\'s settings', () => {
     });
 
     it('the switches become the list: nothing while the master is off', () => {
-        assert.deepEqual(chosenCollections({ master: true, preferences: true, connectivity: true }), ['preferences', 'connectivity']);
-        assert.deepEqual(chosenCollections({ master: true, preferences: false, connectivity: true }), ['connectivity']);
-        assert.deepEqual(chosenCollections({ master: false, preferences: true, connectivity: true }), []);
+        assert.deepEqual(chosenCollections(syncChoiceOf(ALL)), ALL);
+        assert.deepEqual(chosenCollections({ master: true, preferences: false, connectivity: true, checklist: true }), ['connectivity', 'checklist']);
+        assert.deepEqual(chosenCollections({ ...defaultSyncChoice(), master: false }), []);
+    });
+
+    it('the controls\' state: every collection on by default; the account\'s list shown as it is', () => {
+        assert.deepEqual(defaultSyncChoice(), { master: false, preferences: true, connectivity: true, checklist: true, speedtest: true });
+        assert.deepEqual(syncChoiceOf([]), defaultSyncChoice());
+        assert.deepEqual(syncChoiceOf(['preferences', 'connectivity']),
+            { master: true, preferences: true, connectivity: true, checklist: false, speedtest: false });
     });
 });
 
 describe('account sync — the sync controls', () => {
-    const off = { master: false, preferences: true, connectivity: true };
-    const on = { master: true, preferences: true, connectivity: true };
+    const off = defaultSyncChoice();
+    const on = { ...defaultSyncChoice(), master: true };
     const sends = (choice) => chosenCollections(choice);
 
-    it('Enable turns both collections on; off sends nothing', () => {
-        const enabled = applySyncToggle({ master: false, preferences: false, connectivity: false }, 'master', true);
+    it('Enable turns every collection on; off sends nothing', () => {
+        const none = Object.fromEntries(Object.keys(on).map((key) => [key, false]));
+        const enabled = applySyncToggle(none, 'master', true);
         assert.deepEqual(enabled, on);
-        assert.deepEqual(sends(enabled), ['preferences', 'connectivity']);
+        assert.deepEqual(sends(enabled), ALL);
         assert.deepEqual(sends(applySyncToggle(on, 'master', false)), []);
     });
 
-    it('unchecking one leaves the other; unchecking the last turns Enable off', () => {
+    it('unchecking one leaves the others; unchecking the last turns Enable off', () => {
         const one = applySyncToggle(on, 'connectivity', false);
-        assert.deepEqual(one, { master: true, preferences: true, connectivity: false });
-        assert.deepEqual(sends(one), ['preferences']);
-        const none = applySyncToggle(one, 'preferences', false);
+        assert.deepEqual(one, { ...on, connectivity: false });
+        assert.deepEqual(sends(one), ['preferences', 'checklist', 'speedtest']);
+        let rest = one;
+        for (const id of ['preferences', 'checklist']) rest = applySyncToggle(rest, id, false);
+        assert.equal(rest.master, true);
+        const none = applySyncToggle(rest, 'speedtest', false);
         assert.equal(none.master, false);
         assert.deepEqual(sends(none), []);
-        assert.deepEqual(sends(applySyncToggle(one, 'connectivity', true)), ['preferences', 'connectivity']);
+        assert.deepEqual(sends(applySyncToggle(one, 'connectivity', true)), ALL);
         assert.deepEqual(applySyncToggle(off, 'preferences', true), off, 'a checkbox never turns Enable on by itself');
     });
 });
@@ -258,5 +290,24 @@ describe('account sync — the commands app code awaits', () => {
         });
         assert.equal(await saveSyncCollections(['preferences']), true);
         assert.deepEqual(calls, [{ collections: ['preferences'] }]);
+    });
+});
+
+describe('account sync — the checklist progress', () => {
+    it('keeps marked, well-formed slugs only; an unreadable copy reads as none', () => {
+        assert.deepEqual(cleanChecklistProgress({ 'a-b': 'checked', 'c-d': '', 'E': 'checked', 'e-f': 'ignored', 'g-h': 1 }),
+            { 'a-b': 'checked', 'e-f': 'ignored' });
+        assert.equal(cleanChecklistProgress([]), null);
+        const storage = memoryStorage({ [CHECKLIST_STORAGE_KEY]: '{x' });
+        assert.equal(readStoredChecklist(storage), null);
+        writeStoredChecklist(storage, { 'a-b': 'checked' });
+        assert.deepEqual(readStoredChecklist(storage), { 'a-b': 'checked' });
+    });
+
+    it('marks and a pull\'s changes: \'\' and a delete unset, junk is skipped', () => {
+        assert.deepEqual(applyChecklistMarks({ 'a-b': 'checked' }, { 'a-b': '', 'c-d': 'ignored', 'X Y': 'checked' }), { 'c-d': 'ignored' });
+        assert.deepEqual(applyChecklistItems({ 'a-b': 'checked', 'c-d': 'ignored' }, { upserts: { 'e-f': 'checked' }, deletes: ['a-b'] }),
+            { 'c-d': 'ignored', 'e-f': 'checked' });
+        assert.deepEqual(unsetAllMarks({ 'a-b': 'checked' }), { 'a-b': '' });
     });
 });

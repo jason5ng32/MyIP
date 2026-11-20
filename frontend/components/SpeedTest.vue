@@ -34,7 +34,7 @@
                 <CloudDownload class="size-4 text-muted-foreground" />
               </span>
               <Select :model-value="String(state.config.package.download.bytes)"
-                @update:model-value="(v) => v && (state.config.package.download.bytes = Number(v))"
+                @update:model-value="(v) => v && store.updatePreference('speedtestDownloadBytes', Number(v))"
                 :disabled="isRunning || isPaused">
                 <SelectTrigger aria-label="Download size"
                   class="rounded-none border-l-0 shadow-none gap-1.5 flex-1 min-w-0 md:flex-none md:w-auto md:min-w-[100px]">
@@ -50,7 +50,7 @@
                 <CloudUpload class="size-4 text-muted-foreground" />
               </span>
               <Select :model-value="String(state.config.package.upload.bytes)"
-                @update:model-value="(v) => v && (state.config.package.upload.bytes = Number(v))"
+                @update:model-value="(v) => v && store.updatePreference('speedtestUploadBytes', Number(v))"
                 :disabled="isRunning || isPaused">
                 <SelectTrigger aria-label="Upload size"
                   class="rounded-none border-l-0 shadow-none gap-1.5 flex-1 min-w-0 md:flex-none md:w-auto md:min-w-[100px]">
@@ -174,6 +174,7 @@ import { useMainStore } from '@/store';
 import { useAppCommand } from '@/composables/use-app-command.js';
 import useSpeedTest from '@/composables/use-speedtest.js';
 import useSpeedTestCharts from '@/composables/use-speedtest-charts.js';
+import { speedTestSizesOf } from '@/utils/features/speedtest-session.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -203,6 +204,8 @@ const {
 } = useSpeedTest({
   t,
   lang,
+  // The selects save the chosen sizes as preferences; the test starts from them.
+  sizes: () => speedTestSizesOf(store.userPreferences),
   updateAllIPs: (items) => store.updateAllIPs(items),
   initStartingPoints,
   updateCharts,

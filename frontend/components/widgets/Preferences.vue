@@ -277,7 +277,7 @@ import {
 import { clampLabelCard } from '@/utils/features/snapshot-entry.js';
 import { LOCALES } from '@/utils/locale-registry.js';
 import { syncStatusOf, syncStatusBadge } from '@/utils/features/account-sync.js';
-import { chosenCollections } from '@/utils/features/sync-settings.js';
+import { chosenCollections, defaultSyncChoice, syncChoiceOf } from '@/utils/features/sync-settings.js';
 import { saveSyncCollections } from '@/utils/features/account-sync-auth.js';
 import { useAccountSyncState } from '@/composables/use-account-sync.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
@@ -390,18 +390,15 @@ const isSignedIn = computed(() => store.isSignedIn);
 const syncState = useAccountSyncState();
 const { textClass } = useStatusTone();
 const SYNC_BADGE_ICONS = { 'ok-fast': CircleCheck, 'ok-mild': CircleAlert, 'ok-slow': CirclePause, fail: CircleAlert };
-const syncDraft = ref({ master: false, preferences: true, connectivity: true });
+const syncDraft = ref(defaultSyncChoice());
 const syncSaving = ref(false);
 const syncSaveFailed = ref(false);
 const syncKnown = computed(() => store.syncSettings?.user === store.user?.uid && store.syncSettings?.status !== 'unknown');
 const syncEditable = computed(() => syncKnown.value && !syncSaving.value);
-// The draft follows the account; turned off, the collections are shown both on for the next Enable.
+// The draft follows the account; turned off, the collections are shown all on for the next Enable.
 watch(() => store.syncSettings, (settings) => {
   if (syncSaving.value) return;
-  const on = settings?.collections ?? [];
-  syncDraft.value = on.length
-    ? { master: true, preferences: on.includes('preferences'), connectivity: on.includes('connectivity') }
-    : { master: false, preferences: true, connectivity: true };
+  syncDraft.value = syncChoiceOf(settings?.collections ?? []);
 }, { immediate: true });
 const setSync = async (next) => {
   const previous = syncDraft.value;

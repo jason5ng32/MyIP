@@ -1,6 +1,7 @@
-// Account sync: keeps preferences and Connectivity lists in step with the signed-in account through
-// GET / PUT /api/sync (the account's settings: which collections sync) and GET / PUT /api/sync/:collection, one
-// engine (utils/features/account-sync.js) over two store-backed adapters (utils/features/preferences-sync.js).
+// Account sync: keeps preferences, Connectivity lists, Security Checklist progress and the speed test's sizes in step
+// with the signed-in account through GET / PUT /api/sync (the account's settings: which collections sync) and
+// GET / PUT /api/sync/:collection, one engine (utils/features/account-sync.js) over four store-backed adapters
+// (utils/features/preferences-sync.js, utils/features/checklist-progress.js).
 // Mounted once in App.vue. The settings come from this device's cache at once, then from the server; they live in
 // `store.syncSettings`. Per collection the account has enabled, two regimes: signed out, the device's data is its
 // own (no record, no stamps); signed in, it is the account's — the device holds a copy plus this session's edits not
@@ -13,7 +14,7 @@
 
 import { computed, reactive, readonly, watch, onScopeDispose } from 'vue';
 import { authenticatedFetch } from '../utils/authenticated-fetch.js';
-import { SYNC_COLLECTIONS, SYNC_OFF_CODE } from '../utils/sync-collections.js';
+import { SYNC_COLLECTIONS, SYNC_COLLECTION_IDS, SYNC_OFF_CODE } from '../utils/sync-collections.js';
 import {
     readSyncRecord, writeSyncRecord, removeSyncRecord, isOwnRecord, detectLocalChanges, preparePull, readSyncPage,
     mergePull, settleApplied, buildUploadBatches, markRefused, readSyncSave, mergeSave, hashItems, changedSince,
@@ -35,7 +36,7 @@ export const SYNC_PUSH_DELAY_MS = 2000;
 // This page load's state per collection, read by the Preferences panel: 'idle' | 'synced' | 'partial' (synced but for
 // items the account refused) | 'failed' (the last pull or push did not go through; retried silently) | 'reload' |
 // 'stopped'.
-const syncState = reactive({ preferences: 'idle', connectivity: 'idle' });
+const syncState = reactive(Object.fromEntries(SYNC_COLLECTION_IDS.map((id) => [id, 'idle'])));
 export const useAccountSyncState = () => readonly(syncState);
 
 // console.warn only: console.error is captured by error monitoring, and a failed sync retries later.
@@ -51,22 +52,34 @@ const defaultStorage = () => {
 };
 
 /**
- * The two adapters, both over the store (the only writer of userPreferences). `readLocal()` → `{ <id>: value }`, of
- * what localStorage holds now (another tab's save is not taken for this tab's delete);
- * `applyRemote({ upserts, deletes })` writes unstamped what those changes make of the current preferences (a deleted
- * preference goes back to its default, a deleted list leaves the lists); `clearLocal()` resets the collection to a
- * fresh visitor's; `signal()` changes on a local edit.
+ * The adapters, all over the store (the only writer of userPreferences and the checklist progress). `readLocal()` →
+ * `{ <id>: value }`, of what localStorage holds now (another tab's save is not taken for this tab's delete);
+ * `applyRemote({ upserts, deletes })` writes unstamped what those changes make of the current data (a deleted
+ * preference goes back to its default, a deleted list leaves the lists, a deleted checklist item is unset);
+ * `clearLocal()` resets the collection to a fresh visitor's; `signal()` changes on a local edit.
  */
-export const createSyncAdapters = (store) => Object.keys(SYNC_ITEM_READERS).map((id) => ({
-    id,
-    readLocal: () => {
-        store.adoptStoredPreferences();
-        return SYNC_ITEM_READERS[id](store.userPreferences);
+export const createSyncAdapters = (store) => [
+    ...Object.keys(SYNC_ITEM_READERS).map((id) => ({
+        id,
+        readLocal: () => {
+            store.adoptStoredPreferences();
+            return SYNC_ITEM_READERS[id](store.userPreferences);
+        },
+        applyRemote: (changes) => store.applySyncedPreferences(applySyncItems(id, store.userPreferences, changes)),
+        clearLocal: () => store.resetSyncedPreferences(id),
+        signal: () => store.preferenceEdits,
+    })),
+    {
+        id: 'checklist',
+        readLocal: () => {
+            store.adoptStoredChecklist();
+            return { ...store.checklistProgress };
+        },
+        applyRemote: (changes) => store.applySyncedChecklist(changes),
+        clearLocal: () => store.clearChecklist(),
+        signal: () => store.checklistEdits,
     },
-    applyRemote: (changes) => store.applySyncedPreferences(applySyncItems(id, store.userPreferences, changes)),
-    clearLocal: () => store.resetSyncedPreferences(id),
-    signal: () => store.preferenceEdits,
-}));
+];
 
 // One collection's pulls and pushes; `active()` / `userId()` come from the composable.
 const createRunner = ({ adapter, storage, request, now, delayMs, active, userId, onForbidden, onSyncOff }) => {

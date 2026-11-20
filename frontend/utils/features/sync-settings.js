@@ -48,17 +48,25 @@ export const collectionSyncState = (settings, userId, id) => {
     return settings.collections.includes(id) ? 'on' : 'off';
 };
 
+// The sync controls' state: `{ master, <collection id>: boolean }`. Every collection starts on, for the next Enable.
+export const defaultSyncChoice = () => ({ master: false, ...Object.fromEntries(SYNC_COLLECTION_IDS.map((id) => [id, true])) });
+
+// The account's enabled collections → the controls' state; none enabled shows the default.
+export const syncChoiceOf = (collections) => (collections?.length
+    ? { master: true, ...Object.fromEntries(SYNC_COLLECTION_IDS.map((id) => [id, collections.includes(id)])) }
+    : defaultSyncChoice());
+
 // The dialog's and the panel's switches → the list PUT /api/sync takes: nothing while the master is off.
-export const chosenCollections = ({ master, preferences, connectivity }) => (master
-    ? SYNC_COLLECTION_IDS.filter((id) => ({ preferences, connectivity })[id])
+export const chosenCollections = (choice) => (choice?.master
+    ? SYNC_COLLECTION_IDS.filter((id) => choice[id])
     : []);
 
-// One switch or checkbox of the sync controls → the next `{ master, preferences, connectivity }`: the master on
-// turns both collections on; unchecking the last one turns the master off.
+// One switch or checkbox of the sync controls → the next choice: the master on turns every collection on;
+// unchecking the last one turns the master off.
 export const applySyncToggle = (choice, field, value) => {
-    if (field === 'master') return value ? { master: true, preferences: true, connectivity: true } : { ...choice, master: false };
+    if (field === 'master') return value ? { ...defaultSyncChoice(), master: true } : { ...choice, master: false };
     const next = { ...choice, [field]: Boolean(value) };
-    return next.preferences || next.connectivity ? next : { ...next, master: false };
+    return SYNC_COLLECTION_IDS.some((id) => next[id]) ? next : { ...next, master: false };
 };
 
 /**

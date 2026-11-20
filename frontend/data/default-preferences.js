@@ -44,6 +44,10 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   connectivityDefaultListId: 'mine',
   // On: card titles open the site in a new tab; off: plain text.
   connectivityCardTitleOpensSite: false,
+  // The speed test's download / upload sizes in bytes (options: SPEEDTEST_SIZE_OPTIONS in
+  // common/preferences-schema.js); synced as their own collection.
+  speedtestDownloadBytes: 50e6,
+  speedtestUploadBytes: 15e6,
   // Legacy pre-connectivityLists keys, oldest last. Read once by the
   // migration; kept for rollback, never written.
   connectivityTargets: null,

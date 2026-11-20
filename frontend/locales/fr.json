@@ -365,6 +365,8 @@
       "syncEnable": "Activer",
       "syncPreferences": "Préférences",
       "syncConnectivity": "Listes du test de connectivité",
+      "syncChecklist": "Progression de la liste de vérification de sécurité",
+      "syncSpeedtest": "Options du test de vitesse",
       "syncNever": "Les IP, les instantanés et les résultats des tests ne sont jamais synchronisés. Ils restent uniquement dans ce navigateur.",
       "syncTips": "Ce qui est activé suit votre compte sur chaque appareil. La déconnexion le retire de cet appareil jusqu'à votre prochaine connexion. Désactiver un élément le supprime de votre compte et le garde sur cet appareil.",
       "syncSignedOut": "Connectez-vous pour synchroniser avec votre compte.",

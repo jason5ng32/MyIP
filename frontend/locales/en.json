@@ -365,6 +365,8 @@
       "syncEnable": "Enable",
       "syncPreferences": "Preferences",
       "syncConnectivity": "Connectivity test lists",
+      "syncChecklist": "Security Checklist progress",
+      "syncSpeedtest": "Speed test options",
       "syncNever": "IPs, snapshots and test results are never synced. They stay in this browser only.",
       "syncTips": "What is on follows your account on every device. Signing out removes it from this device until you sign in again. Turning an item off deletes it from your account and keeps it on this device.",
       "syncSignedOut": "Sign in to sync with your account.",

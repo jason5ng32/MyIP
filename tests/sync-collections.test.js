@@ -5,21 +5,24 @@ import { describe, it } from 'node:test';
 import {
     SYNC_COLLECTIONS, SYNC_COLLECTION_IDS, syncCollectionOf, syncValueBytes,
     CONNECTIVITY_SYNC_VERSION, CONNECTIVITY_SYNC_ITEM_IDS, SYNC_OFF_CODE, connectivityListItemId, connectivityListIdOf,
+    CHECKLIST_SYNC_VERSION, SPEEDTEST_SYNC_VERSION, CHECKLIST_MARKS, isChecklistSlug, isChecklistMark,
     SYNC_MAX_ITEMS_PER_REQUEST, SYNC_TOMBSTONE_TTL_MS, SYNC_MAX_BODY_BYTES,
 } from '../common/sync-collections.js';
 import * as syncBridge from '../frontend/utils/sync-collections.js';
 import {
     PREFERENCES_VERSION, SYNCED_PREFERENCE_KEYS, CONNECTIVITY_LIST_LIMIT, CONNECTIVITY_TARGET_LIMIT, CONNECTIVITY_ORDER_LIMIT,
+    SPEEDTEST_SIZE_OPTIONS,
 } from '../common/preferences-schema.js';
 import { DEFAULT_PREFERENCES } from '../frontend/data/default-preferences.js';
 import { sanitizeLists } from '../frontend/utils/features/connectivity-lists.js';
+import { readFileSync, readdirSync } from 'node:fs';
 
-const { preferences, connectivity } = SYNC_COLLECTIONS;
+const { preferences, connectivity, checklist, speedtest } = SYNC_COLLECTIONS;
 const KB = 1024;
 
 describe('sync collections registry', () => {
-    it('has the two collections, frozen, each with the full row shape', () => {
-        assert.deepEqual([...SYNC_COLLECTION_IDS], ['preferences', 'connectivity']);
+    it('has the four collections, frozen, each with the full row shape', () => {
+        assert.deepEqual([...SYNC_COLLECTION_IDS], ['preferences', 'connectivity', 'checklist', 'speedtest']);
         assert.ok(Object.isFrozen(SYNC_COLLECTIONS));
         for (const id of SYNC_COLLECTION_IDS) {
             const row = SYNC_COLLECTIONS[id];
@@ -40,12 +43,15 @@ describe('sync collections registry', () => {
     it('the item body limit holds a collection at its largest', () => {
         assert.ok(SYNC_MAX_BODY_BYTES >= preferences.maxItems * preferences.maxItemBytes + 16 * KB);
         assert.ok(SYNC_MAX_BODY_BYTES >= connectivity.maxItemBytes + 16 * KB);
+        const fullChecklistBatch = Array.from({ length: SYNC_MAX_ITEMS_PER_REQUEST }, (_, i) => (
+            { id: `${'x'.repeat(124)}${String(i).padStart(4, '0')}`, updatedAt: Date.now(), value: 'checked' }));
+        assert.ok(syncValueBytes({ version: 1, items: fullChecklistBatch }) < SYNC_MAX_BODY_BYTES, 'a full checklist request');
         assert.ok(SYNC_MAX_BODY_BYTES <= 512 * KB);
     });
 
     it('looks rows up by own id only', () => {
         assert.equal(syncCollectionOf('connectivity'), connectivity);
-        for (const id of ['', 'nope', 'snapshots', 'checklist', 'constructor', '__proto__', 'toString', undefined, null, 3]) {
+        for (const id of ['', 'nope', 'snapshots', 'ipHistory', 'constructor', '__proto__', 'toString', undefined, null, 3]) {
             assert.equal(syncCollectionOf(id), null, String(id));
         }
         const stub = Object.freeze({ other: Object.freeze({ id: 'other' }) });
@@ -149,5 +155,64 @@ describe('connectivity collection', () => {
         t.diagnostic(`busy list ${bytes} B, cap ${connectivity.maxItemBytes} B`);
         assert.ok(bytes < connectivity.maxItemBytes, `${bytes} B`);
         assert.ok(SYNC_MAX_BODY_BYTES >= connectivity.maxItemBytes + 16 * KB);
+        const fullChecklistBatch = Array.from({ length: SYNC_MAX_ITEMS_PER_REQUEST }, (_, i) => (
+            { id: `${'x'.repeat(124)}${String(i).padStart(4, '0')}`, updatedAt: Date.now(), value: 'checked' }));
+        assert.ok(syncValueBytes({ version: 1, items: fullChecklistBatch }) < SYNC_MAX_BODY_BYTES, 'a full checklist request');
+    });
+});
+
+describe('checklist collection', () => {
+    const DATASET_DIR = new URL('../frontend/locales/security-checklist/', import.meta.url);
+    const slugsOf = (file) => JSON.parse(readFileSync(new URL(file, DATASET_DIR), 'utf8'))
+        .flatMap((category) => category.checklist.map((item) => item.slug));
+
+    it('is version 1: one item per marked slug, two marks, deletes for unset', () => {
+        assert.equal(checklist.version, CHECKLIST_SYNC_VERSION);
+        assert.equal(checklist.version, 1);
+        assert.deepEqual([...CHECKLIST_MARKS], ['checked', 'ignored']);
+        assert.equal(checklist.allowDelete, true);
+        assert.equal(checklist.maxItems, 1000);
+        assert.equal(checklist.maxItemBytes, 16);
+        for (const mark of CHECKLIST_MARKS) assert.ok(syncValueBytes(mark) <= checklist.maxItemBytes, mark);
+    });
+
+    it('every slug of every locale\'s dataset is a valid id, the same set everywhere, well under the cap', (t) => {
+        const files = readdirSync(DATASET_DIR).filter((file) => file.endsWith('.json'));
+        const [first, ...rest] = files.map((file) => new Set(slugsOf(file)));
+        t.diagnostic(`${first.size} checklist items`);
+        for (const slugs of rest) assert.deepEqual([...slugs].sort(), [...first].sort());
+        for (const slug of first) assert.equal(checklist.isValidItemId(slug), true, slug);
+        assert.ok(first.size * 2 < checklist.maxItems);
+    });
+
+    it('ids by shape, values by mark', () => {
+        assert.equal(isChecklistSlug('email-use-aliasing--anonymous-forwarding'), true);
+        for (const id of ['', '-a', 'Email', 'a b', 'a_b', 'x'.repeat(129), 'constructor!', null, 3]) {
+            assert.equal(checklist.isValidItemId(id), false, String(id));
+        }
+        assert.equal(checklist.isValidValue('a-b', 'checked'), true);
+        assert.equal(checklist.isValidValue('a-b', 'ignored'), true);
+        for (const value of ['', 'unchecked', true, null]) assert.equal(isChecklistMark(value), false, String(value));
+        assert.equal(checklist.isValidValue('A', 'checked'), false);
+    });
+});
+
+describe('speedtest collection', () => {
+    it('is version 1: exactly the two sizes, no deletes', () => {
+        assert.equal(speedtest.version, SPEEDTEST_SYNC_VERSION);
+        assert.equal(speedtest.version, 1);
+        assert.equal(speedtest.maxItems, 2);
+        assert.equal(speedtest.allowDelete, false);
+        for (const id of ['downloadBytes', 'uploadBytes']) assert.equal(speedtest.isValidItemId(id), true, id);
+        for (const id of ['speedtestDownloadBytes', 'latency', '', 'constructor', null]) assert.equal(speedtest.isValidItemId(id), false, String(id));
+    });
+
+    it('values are the size options only; the defaults pass within the item cap', () => {
+        for (const size of SPEEDTEST_SIZE_OPTIONS) assert.equal(speedtest.isValidValue('uploadBytes', size), true, String(size));
+        for (const bad of [2e6, '50000000', null]) assert.equal(speedtest.isValidValue('downloadBytes', bad), false, String(bad));
+        assert.equal(speedtest.isValidValue('nope', 50e6), false);
+        assert.equal(speedtest.isValidValue('downloadBytes', DEFAULT_PREFERENCES.speedtestDownloadBytes), true);
+        assert.equal(speedtest.isValidValue('uploadBytes', DEFAULT_PREFERENCES.speedtestUploadBytes), true);
+        assert.ok(syncValueBytes(100e6) <= speedtest.maxItemBytes);
     });
 });

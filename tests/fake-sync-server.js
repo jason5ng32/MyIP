@@ -1,5 +1,5 @@
 // An in-memory stand-in for the account sync endpoints (GET / PUT /api/sync and /api/sync/:collection), for specs.
-import { SYNC_COLLECTIONS, SYNC_OFF_CODE } from '../frontend/utils/sync-collections.js';
+import { SYNC_COLLECTIONS, SYNC_COLLECTION_IDS, SYNC_OFF_CODE } from '../frontend/utils/sync-collections.js';
 
 // The composable's SYNC_ENDPOINT (frontend/composables/use-account-sync.js).
 const SYNC_ENDPOINT = '/api/sync';
@@ -11,7 +11,7 @@ export const BOTH = ['preferences', 'connectivity'];
 // The settings and item endpoints over memory: per collection a seq-ordered item map, the newer `updatedAt` winning;
 // an item route of a collection that is off answers 409 sync_off; turning one off deletes its rows.
 export const fakeServer = ({ settings = { decided: true, collections: BOTH }, pageSize } = {}) => {
-    const rows = { preferences: new Map(), connectivity: new Map() };
+    const rows = Object.fromEntries(SYNC_COLLECTION_IDS.map((id) => [id, new Map()]));
     let seq = 0;
     const server = {
         calls: [],

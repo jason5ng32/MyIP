@@ -1209,11 +1209,11 @@ describe('sync handlers', () => {
         assert.equal(res2.statusCode, 405);
     });
 
-    it('an unknown collection → 404 before sign-in or storage; snapshots and checklist are not collections', async () => {
+    it('an unknown collection → 404 before sign-in or storage; snapshots and IP history are not collections', async () => {
         const { db, storage, handlers } = setup();
         let verified = false;
         const verify = async () => { verified = true; return { id: USER_ID }; };
-        for (const name of ['nope', 'snapshots', 'checklist', 'constructor', '__proto__', '']) {
+        for (const name of ['nope', 'snapshots', 'ipHistory', 'constructor', '__proto__', '']) {
             for (const req of [get(name, { v: '1' }), put(name, { version: 1, items: [] })]) {
                 const res = await route(req.method === 'PUT' ? handlers.write : handlers.read, req, { verify, storage, collections: SYNC_COLLECTIONS });
                 assert.equal(res.statusCode, 404, name);
@@ -1501,7 +1501,7 @@ describe('sync settings handlers', () => {
         const { db, storage, handlers } = setup();
         for (const body of [
             undefined, null, [], 'x', {}, { collections: 'preferences' }, { collections: {} }, { collections: null },
-            { collections: ['nope'] }, { collections: ['snapshots'] }, { collections: ['checklist'] },
+            { collections: ['nope'] }, { collections: ['snapshots'] }, { collections: ['ipHistory'] },
             { collections: ['preferences', 'preferences'] }, { collections: [1] }, { collections: [null] },
             { collections: ['constructor'] }, { collections: ['__proto__'] },
         ]) {
@@ -1541,7 +1541,7 @@ describe('sync settings handlers', () => {
 
     it('GET leaves out stored ids the registry no longer has', async () => {
         const { db, storage, handlers } = setup();
-        db.syncSettings.set(USER_ID, { collections: ['snapshots', 'preferences', 'checklist'], updated_at: new Date() });
+        db.syncSettings.set(USER_ID, { collections: ['snapshots', 'preferences', 'ipHistory'], updated_at: new Date() });
         assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { decided: true, collections: ['preferences'] });
     });
 

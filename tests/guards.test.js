@@ -299,7 +299,7 @@ describe('requireValidSyncCollection', () => {
     };
 
     it('passes a registry id and puts its row on res.locals', () => {
-        for (const id of ['preferences', 'connectivity']) {
+        for (const id of ['preferences', 'connectivity', 'checklist', 'speedtest']) {
             const { res, nextCalled } = run(requireValidSyncCollection(), id);
             assert.equal(nextCalled, true, id);
             assert.equal(res.locals.syncCollection, SYNC_COLLECTIONS[id]);
@@ -307,7 +307,7 @@ describe('requireValidSyncCollection', () => {
     });
 
     it('404s anything else, inherited names included', () => {
-        for (const bad of [undefined, '', 'nope', 'checklist', 'snapshots', 'Connectivity', 'constructor', '__proto__', 'toString']) {
+        for (const bad of [undefined, '', 'nope', 'ipHistory', 'snapshots', 'Connectivity', 'constructor', '__proto__', 'toString']) {
             const { res, nextCalled } = run(requireValidSyncCollection(), bad);
             assert.equal(res.statusCode, 404, String(bad));
             assert.deepEqual(res.body, { error: 'Unknown collection' });
@@ -318,7 +318,7 @@ describe('requireValidSyncCollection', () => {
     it('reads the registry it is given', () => {
         const stub = Object.freeze({ other: Object.freeze({ id: 'other' }) });
         assert.equal(run(requireValidSyncCollection('collection', stub), 'other').nextCalled, true);
-        assert.equal(run(requireValidSyncCollection('collection', stub), 'checklist').res.statusCode, 404);
+        assert.equal(run(requireValidSyncCollection('collection', stub), 'ipHistory').res.statusCode, 404);
     });
 });
 

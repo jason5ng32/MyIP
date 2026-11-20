@@ -284,8 +284,8 @@ edge-cached), not ready. Specs drive the runner and repositories with fakes;
 `DATABASE_URL_TEST` runs the optional real-database spec. Data minimisation:
 store only what a feature needs keyed by the opaque user id — no e-mail,
 name, IP, user agent, last-seen time or test result. Synced content is
-preferences and Connectivity lists only (the lists hold the sites a user
-added themselves).
+preferences, Connectivity lists (the lists hold the sites a user added
+themselves), Security Checklist marks and the speed test's two sizes only.
 
 Tables: `users` (id, created), `achievements` (user, name, unlock time; one
 row per unlocked name), `feature_uses` (user, feature, lifetime count) —
@@ -320,13 +320,16 @@ user decided, an empty list = sync nothing). `seq` comes from
   `requireUser()` + `requireUserStorage()`, no-store, users row ensured, own
   `SYNC_MAX_BODY_BYTES` (320 KB) PUT body limit, mounted before the settings'
   1 KB one). Collections: `common/sync-collections.js`, one frozen registry
-  (`preferences` · `connectivity`), each with its schema `version`, item id
+  (`preferences` · `connectivity` · `checklist` · `speedtest`), each with its schema `version`, item id
   and value checks, `maxItems` (live rows per user and version),
   `maxItemBytes`, `allowDelete` and `pageSize`; `connectivity` (v2, deletes
   on) holds one `list:<list id>` item per list (`{ name, members }`,
   `isValidConnectivityList`), the lists' `order` and `defaultListId`, checked
   in `common/preferences-schema.js`; its `maxItems` is the list cap plus those
-  two. A collection the user has not enabled
+  two. `checklist` (deletes on) holds one item per marked slug, `'checked'` /
+  `'ignored'`; slugs live in the locale datasets, so ids are checked by shape
+  and `maxItems` is a fixed 1000. `speedtest` holds `downloadBytes` /
+  `uploadBytes` from `SPEEDTEST_SIZE_OPTIONS`. A collection the user has not enabled
   in `sync_settings` → 409 `{ error, code: 'sync_off' }` (`SYNC_OFF_CODE`),
   nothing read or written; for a PUT the check runs inside the write
   transaction, after the lock, so a write racing a disable leaves nothing.

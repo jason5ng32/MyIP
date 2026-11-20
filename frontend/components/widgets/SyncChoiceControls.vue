@@ -1,5 +1,5 @@
 <template>
-  <!-- The sync choice: an "Enable" switch with the two collections as checkboxes nested under it, shown while it is
+  <!-- The sync choice: an "Enable" switch with the collections as checkboxes nested under it, shown while it is
        on, or always with `expanded` (dimmed while off: what enabling covers). Emits the next choice
        (applySyncToggle); the caller decides when it is saved. -->
   <div class="rounded-lg border bg-card">
@@ -27,7 +27,7 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 
 const props = defineProps({
-  // `{ master, preferences, connectivity }`
+  // `{ master, <collection id>: boolean }` (utils/features/sync-settings.js)
   modelValue: { type: Object, required: true },
   idPrefix: { type: String, default: 'sync' },
   disabled: { type: Boolean, default: false },
@@ -41,6 +41,8 @@ const { t } = useI18n();
 const SYNC_OPTIONS = [
   { id: 'preferences', label: 'nav.preferences.syncPreferences' },
   { id: 'connectivity', label: 'nav.preferences.syncConnectivity' },
+  { id: 'checklist', label: 'nav.preferences.syncChecklist' },
+  { id: 'speedtest', label: 'nav.preferences.syncSpeedtest' },
 ];
 
 const toggle = (field, value) => emit('update:modelValue', applySyncToggle(props.modelValue, field, value));

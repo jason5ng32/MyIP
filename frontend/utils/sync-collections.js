@@ -2,5 +2,6 @@
 export {
     SYNC_COLLECTIONS, SYNC_COLLECTION_IDS, syncCollectionOf, syncValueBytes,
     CONNECTIVITY_SYNC_VERSION, CONNECTIVITY_SYNC_ITEM_IDS, connectivityListItemId, connectivityListIdOf, SYNC_OFF_CODE,
+    CHECKLIST_SYNC_VERSION, SPEEDTEST_SYNC_VERSION, CHECKLIST_MARKS, isChecklistSlug, isChecklistMark,
     SYNC_MAX_ITEMS_PER_REQUEST, SYNC_TOMBSTONE_TTL_MS, SYNC_MAX_BODY_BYTES,
 } from '../../common/sync-collections.js';

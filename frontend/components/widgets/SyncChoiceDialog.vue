@@ -25,11 +25,12 @@ import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from '@lucide/vue';
 import SyncChoiceControls from './SyncChoiceControls.vue';
+import { defaultSyncChoice } from '@/utils/features/sync-settings.js';
 
 defineProps({ open: { type: Boolean, default: false } });
 const emit = defineEmits(['save', 'dismiss']);
 
 const { t } = useI18n();
 
-const choice = ref({ master: false, preferences: true, connectivity: true });
+const choice = ref(defaultSyncChoice());
 </script>

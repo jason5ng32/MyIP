@@ -1,4 +1,4 @@
-// The synced preferences contract both halves read: the schema version, the synced keys and each key's value check, plus the checks of one Connectivity list, the lists' order and the default list id.
+// The synced preferences contract both halves read: the schema version, the synced keys and each key's value check, plus the checks of one Connectivity list, the lists' order and the default list id, and the speed test's size options.
 
 // The preferences schema version; the front end's storage key carries it as its suffix.
 export const PREFERENCES_VERSION = 7;
@@ -8,6 +8,10 @@ export const IP_CARDS_OPTIONS = Object.freeze([2, 4, 6]);
 export const SNAPSHOTS_KEEP_LAST_OPTIONS = Object.freeze([10, 50, 100]);
 export const SNAPSHOTS_AUTO_MODES = Object.freeze(['smart', 'every', 'off']);
 export const THEME_OPTIONS = Object.freeze(['auto', 'light', 'dark']);
+
+// The speed test's download / upload sizes in bytes (the homepage selects); synced as their own collection.
+export const SPEEDTEST_SIZE_OPTIONS = Object.freeze([1e6, 10e6, 15e6, 50e6, 100e6]);
+export const isValidSpeedtestSize = (value) => SPEEDTEST_SIZE_OPTIONS.includes(value);
 
 // The `connectivityLists` model: its version and caps (mirrored in frontend/data/connectivity-defaults.js).
 export const CONNECTIVITY_LISTS_SCHEMA_VERSION = 1;

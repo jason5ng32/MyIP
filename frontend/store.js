@@ -10,14 +10,19 @@ import { ACHIEVEMENT_NAMES } from './utils/codes/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
 import { createDefaultPreferences, PREFS_STORAGE_KEY } from './data/default-preferences.js';
 import { sanitizeLists } from './utils/features/connectivity-lists.js';
-import { refreshSyncRecords, syncDefaultPreferences } from './utils/features/preferences-sync.js';
+import { refreshSyncRecords, syncDefaultPreferences, SPEEDTEST_ITEM_KEYS } from './utils/features/preferences-sync.js';
+import {
+  readStoredChecklist, writeStoredChecklist, applyChecklistMarks, applyChecklistItems, unsetAllMarks,
+} from './utils/features/checklist-progress.js';
 import { syncBeforeReload, clearAccountDataBeforeSignOut } from './utils/features/account-sync-auth.js';
 import { createSyncSettings } from './utils/features/sync-settings.js';
-import { isValidPreferenceValue, isValidConnectivityListId } from './utils/preferences-schema.js';
+import { isValidPreferenceValue, isValidConnectivityListId, isValidSpeedtestSize } from './utils/preferences-schema.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
 import { PROBE_CAPABILITIES } from './utils/probe-endpoints.js';
 const { t } = i18n.global;
+
+const SPEEDTEST_PREFERENCE_KEYS = Object.values(SPEEDTEST_ITEM_KEYS);
 
 // `{ <key>: value }` from account sync or localStorage → the entries the store takes, as at boot: Connectivity lists
 // sanitized, the IP source an available one, unknown keys and invalid values left out.
@@ -25,7 +30,8 @@ const acceptedPreferenceEntries = (values, ipDBs) => Object.entries(values ?? {}
   .filter(([key, value]) => (
     key === 'connectivityLists' ? Array.isArray(value?.lists)
       : key === 'connectivityDefaultListId' ? isValidConnectivityListId(value)
-        : isValidPreferenceValue(key, value)))
+        : SPEEDTEST_PREFERENCE_KEYS.includes(key) ? isValidSpeedtestSize(value)
+          : isValidPreferenceValue(key, value)))
   .map(([key, value]) => [key,
     key === 'connectivityLists' ? sanitizeLists(value, null, [])
       : key === 'ipGeoSource' ? nearestEnabledId(value, ipDBs)
@@ -114,6 +120,11 @@ export const useMainStore = defineStore('main', {
     userPreferences: {},
     // Counts preference edits; account sync (use-account-sync.js) checks them for changes.
     preferenceEdits: 0,
+    // Security Checklist progress (utils/features/checklist-progress.js): slug → 'checked' | 'ignored'; read from
+    // localStorage by adoptStoredChecklist, which the tool page and account sync call.
+    checklistProgress: {},
+    // Counts checklist edits, as preferenceEdits does for preferences.
+    checklistEdits: 0,
     // A sign-in or sign-out waiting on account sync before the reload.
     authPending: false,
     // The signed-in account's choice of what syncs (utils/features/sync-settings.js); account sync writes it.
@@ -299,10 +310,45 @@ export const useMainStore = defineStore('main', {
       for (const [key, value] of entries) this.userPreferences[key] = value;
       this.persistPreferences();
     },
-    // Sign-out: one synced collection's keys ('preferences' / 'connectivity') back
+    // Sign-out: one store-backed collection's keys ('preferences' / 'connectivity' / 'speedtest') back
     // to a fresh visitor's values, not counted as an edit.
     resetSyncedPreferences(collectionId) {
       this.applySyncedPreferences(syncDefaultPreferences(collectionId));
+    },
+    // The checklist progress brought up to what localStorage holds now; not an edit. A missing or unreadable copy
+    // changes nothing.
+    adoptStoredChecklist() {
+      const stored = readStoredChecklist(localStorage);
+      if (stored) this.checklistProgress = stored;
+    },
+    // A checklist edit on the freshest progress: `change(progress)` → `{ <slug>: 'checked' | 'ignored' | '' }`, or
+    // null for none.
+    editChecklist(change) {
+      this.adoptStoredChecklist();
+      const marks = change(this.checklistProgress);
+      if (!marks) return;
+      this.checklistProgress = applyChecklistMarks(this.checklistProgress, marks);
+      writeStoredChecklist(localStorage, this.checklistProgress);
+      this.checklistEdits += 1;
+    },
+    // One item checked, ignored or unset ('') (an edit).
+    setChecklistMark(slug, mark) {
+      this.editChecklist(() => ({ [slug]: mark }));
+    },
+    // Reset: every item unset (an edit).
+    resetChecklist() {
+      this.editChecklist(unsetAllMarks);
+    },
+    // A pull's `{ upserts, deletes }` from account sync, on the freshest progress; not an edit.
+    applySyncedChecklist(changes) {
+      this.adoptStoredChecklist();
+      this.checklistProgress = applyChecklistItems(this.checklistProgress, changes);
+      writeStoredChecklist(localStorage, this.checklistProgress);
+    },
+    // Sign-out: the progress leaves this device; not an edit.
+    clearChecklist() {
+      this.checklistProgress = {};
+      writeStoredChecklist(localStorage, {});
     },
     // Written by account sync only.
     setSyncSettings(settings) {

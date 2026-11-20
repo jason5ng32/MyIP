@@ -6,6 +6,7 @@ import { describe, it } from 'node:test';
 import {
     PREFERENCES_VERSION, SYNCED_PREFERENCE_KEYS, isSyncedPreferenceKey, isValidPreferenceValue,
     isValidConnectivityList, isValidConnectivityListOrder, isValidConnectivityListId, CONNECTIVITY_ORDER_LIMIT,
+    SPEEDTEST_SIZE_OPTIONS, isValidSpeedtestSize,
     IP_CARDS_OPTIONS, SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_AUTO_MODES,
     CONNECTIVITY_LISTS_SCHEMA_VERSION, CONNECTIVITY_TARGET_LIMIT, CONNECTIVITY_LIST_LIMIT, CONNECTIVITY_LIST_NAME_LIMIT,
 } from '../common/preferences-schema.js';
@@ -18,16 +19,17 @@ import * as snapshots from '../frontend/utils/features/snapshots.js';
 const LEGACY_KEYS = ['connectivityTargets', 'customConnectivityTargets'];
 // Synced as their own collection (common/sync-collections.js), not as preferences.
 const CONNECTIVITY_KEYS = ['connectivityLists', 'connectivityDefaultListId'];
+const SPEEDTEST_KEYS = ['speedtestDownloadBytes', 'speedtestUploadBytes'];
 
 const member = (over = {}) => ({ id: 'custom-1', name: 'Example', url: 'https://example.com/favicon.ico', ...over });
 
 describe('synced preference keys', () => {
-    it('are every default preference but the legacy and Connectivity list ones, frozen', () => {
+    it('are every default preference but the legacy, Connectivity list and speed test ones, frozen', () => {
         assert.ok(Object.isFrozen(SYNCED_PREFERENCE_KEYS));
         const expected = Object.keys(DEFAULT_PREFERENCES)
-            .filter((key) => ![...LEGACY_KEYS, ...CONNECTIVITY_KEYS].includes(key));
+            .filter((key) => ![...LEGACY_KEYS, ...CONNECTIVITY_KEYS, ...SPEEDTEST_KEYS].includes(key));
         assert.deepEqual([...SYNCED_PREFERENCE_KEYS].sort(), expected.sort());
-        for (const key of [...LEGACY_KEYS, ...CONNECTIVITY_KEYS, 'constructor', '__proto__', 'toString']) {
+        for (const key of [...LEGACY_KEYS, ...CONNECTIVITY_KEYS, ...SPEEDTEST_KEYS, 'constructor', '__proto__', 'toString']) {
             assert.equal(isSyncedPreferenceKey(key), false, key);
             assert.equal(isValidPreferenceValue(key, true), false, key);
         }
@@ -37,6 +39,15 @@ describe('synced preference keys', () => {
         for (const key of SYNCED_PREFERENCE_KEYS) assert.ok(isValidPreferenceValue(key, DEFAULT_PREFERENCES[key]), key);
         for (const { id, name, members } of sanitizeLists(null, null, []).lists) assert.ok(isValidConnectivityList(id, { name, members }), id);
         assert.ok(isValidConnectivityListId(DEFAULT_PREFERENCES.connectivityDefaultListId));
+        for (const key of SPEEDTEST_KEYS) assert.ok(isValidSpeedtestSize(DEFAULT_PREFERENCES[key]), key);
+    });
+
+    it('speed test sizes: one of the size options, nothing else', () => {
+        assert.deepEqual([...SPEEDTEST_SIZE_OPTIONS], [1e6, 10e6, 15e6, 50e6, 100e6]);
+        assert.ok(Object.isFrozen(SPEEDTEST_SIZE_OPTIONS));
+        for (const value of SPEEDTEST_SIZE_OPTIONS) assert.equal(isValidSpeedtestSize(value), true, String(value));
+        for (const value of [0, 2e6, 1e9, '50000000', null, -1e6, 50e6 + 0.5]) assert.equal(isValidSpeedtestSize(value), false, String(value));
+        assert.equal(bridge.SPEEDTEST_SIZE_OPTIONS, SPEEDTEST_SIZE_OPTIONS);
     });
 });
 

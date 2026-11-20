@@ -43,7 +43,7 @@ describe('sync settings repository', () => {
 
     it('a stored id the registry no longer has is left out of the answer', async () => {
         const { db } = await setup();
-        db.syncSettings.set('u', { collections: ['snapshots', 'connectivity', 'checklist'], updated_at: new Date() });
+        db.syncSettings.set('u', { collections: ['snapshots', 'connectivity', 'ipHistory'], updated_at: new Date() });
         assert.deepEqual(await readSyncSettings(db.query, 'u'), { decided: true, collections: ['connectivity'] });
     });
 
@@ -56,7 +56,7 @@ describe('sync settings repository', () => {
             putRow(db, user, 'connectivity', 1, 'lists');
             putRow(db, user, 'connectivity', 1, 'defaultListId');
             putRow(db, user, 'snapshots', 1, 'old-snapshot');
-            putRow(db, user, 'checklist', 1, 'old-tick', { deleted: true });
+            putRow(db, user, 'ipHistory', 1, 'old-tick', { deleted: true });
         }
         await save('u', ['connectivity']);
         assert.deepEqual(rowsOf(db, 'u'), ['connectivity/1/defaultListId', 'connectivity/1/lists']);

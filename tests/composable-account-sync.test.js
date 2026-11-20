@@ -30,6 +30,7 @@ const { SYNC_COLLECTIONS } = await import('../frontend/utils/sync-collections.js
 const { SYNCED_PREFERENCE_KEYS } = await import('../frontend/utils/preferences-schema.js');
 const { sanitizeLists } = await import('../frontend/utils/features/connectivity-lists.js');
 const { DEFAULT_PREFERENCES } = await import('../frontend/data/default-preferences.js');
+const { applyChecklistItems, applyChecklistMarks } = await import('../frontend/utils/features/checklist-progress.js');
 const { CONNECTIVITY_TARGET_LIMIT } = await import('../frontend/data/connectivity-defaults.js');
 const {
     BEFORE_RELOAD_COMMAND, SIGN_OUT_COMMAND, syncBeforeReload, clearAccountDataBeforeSignOut, saveSyncCollections,
@@ -59,7 +60,7 @@ let clock = 1_000_000;
 const freshPrefs = (over = {}) => ({ ...DEFAULT_PREFERENCES, connectivityLists: sanitizeLists(null, null, []), ...over });
 
 const startSync = ({
-    prefs = {}, signedIn = true, uid = 'u1', available = true, server = fakeServer(), storage = memoryStorage(),
+    prefs = {}, checklist = {}, signedIn = true, uid = 'u1', available = true, server = fakeServer(), storage = memoryStorage(),
     authResolved = signedIn, flushMs = 200, request = server.request,
 } = {}) => {
     const store = reactive({
@@ -78,6 +79,15 @@ const startSync = ({
         resetSyncedPreferences(id) {
             this.applySyncedPreferences(syncDefaultPreferences(id));
         },
+        checklistProgress: { ...checklist },
+        checklistEdits: 0,
+        adoptStoredChecklist() {},
+        applySyncedChecklist(changes) {
+            this.checklistProgress = applyChecklistItems(this.checklistProgress, changes);
+        },
+        clearChecklist() {
+            this.checklistProgress = {};
+        },
         setSyncSettings(settings) {
             this.syncSettings = settings;
         },
@@ -85,6 +95,10 @@ const startSync = ({
     const edit = (key, value) => {
         store.userPreferences[key] = value;
         store.preferenceEdits += 1;
+    };
+    const mark = (slug, value) => {
+        store.checklistProgress = applyChecklistMarks(store.checklistProgress, { [slug]: value });
+        store.checklistEdits += 1;
     };
     scope = effectScope();
     scopes.push(scope);
@@ -96,7 +110,7 @@ const startSync = ({
     } finally {
         console.warn = realWarn;
     }
-    return { store, server, storage, edit };
+    return { store, server, storage, edit, mark };
 };
 
 const record = (storage, id) => readSyncRecord(storage, SYNC_COLLECTIONS[id]);
@@ -400,6 +414,81 @@ describe('account sync — items the account refuses', () => {
         await settle();
         assert.equal(state.connectivity, 'synced');
         assert.deepEqual(server.live('connectivity')['list:mine'].members, members.slice(0, 3));
+    });
+});
+
+describe('account sync — Security Checklist progress and the speed test sizes', () => {
+    const ALL = [...BOTH, 'checklist', 'speedtest'];
+
+    it('off unless the account enabled them: nothing recorded or sent for an account with the other two only', async () => {
+        const server = fakeServer();
+        const { storage, edit, mark } = startSync({ server, checklist: { 'a-b': 'checked' } });
+        await settle();
+        mark('c-d', 'ignored');
+        edit('speedtestDownloadBytes', 100e6);
+        await settle();
+        for (const id of ['checklist', 'speedtest']) {
+            assert.equal(record(storage, id), null, id);
+            assert.equal(calls(server, id).length, 0, id);
+        }
+        assert.equal('speedtestDownloadBytes' in server.live('preferences'), false, 'never a preference');
+    });
+
+    it('checklist: an empty account takes the device\'s marks; a mark and an unset push only that item', async () => {
+        const server = fakeServer({ settings: { decided: true, collections: ALL } });
+        const { mark } = startSync({ server, checklist: { 'a-b': 'checked', 'c-d': 'ignored' } });
+        await settle();
+        assert.deepEqual(server.live('checklist'), { 'a-b': 'checked', 'c-d': 'ignored' });
+        const before = calls(server, 'checklist', 'PUT').length;
+        mark('e-f', 'checked');
+        mark('a-b', '');
+        await settle();
+        const later = calls(server, 'checklist', 'PUT').slice(before).flatMap((put) => put.body.items);
+        assert.deepEqual(later.map(({ id, deleted, value }) => [id, deleted ? 'deleted' : value]).sort(), [['a-b', 'deleted'], ['e-f', 'checked']]);
+        assert.deepEqual(server.live('checklist'), { 'c-d': 'ignored', 'e-f': 'checked' });
+        assert.equal(state.checklist, 'synced');
+    });
+
+    it('checklist: an account with marks replaces the device\'s; sign-out clears them off the device', async () => {
+        const server = fakeServer({ settings: { decided: true, collections: ['checklist'] } });
+        server.seed('checklist', { id: 'x-y', updatedAt: 5, value: 'ignored' });
+        const { store } = startSync({ server, checklist: { 'a-b': 'checked' } });
+        await settle();
+        assert.deepEqual(store.checklistProgress, { 'x-y': 'ignored' });
+        assert.equal(calls(server, 'checklist', 'PUT').length, 0);
+        assert.equal(await clearAccountDataBeforeSignOut('u1'), 1);
+        assert.deepEqual(store.checklistProgress, {});
+        assert.deepEqual(server.live('checklist'), { 'x-y': 'ignored' }, 'the account keeps them');
+    });
+
+    it('checklist: a session found ended clears it; turned off, the record goes and the marks stay', async () => {
+        const storage = memoryStorage();
+        writeSyncRecord(storage, SYNC_COLLECTIONS.checklist, { user: 'u1', cursor: 3, lastSyncAt: 1, items: {} });
+        const ended = startSync({ storage, signedIn: false, authResolved: true, checklist: { 'a-b': 'checked' } });
+        await settle();
+        assert.deepEqual(ended.store.checklistProgress, {});
+        scope.stop();
+        const server = fakeServer({ settings: { decided: true, collections: ['checklist'] } });
+        const on = startSync({ server, checklist: { 'a-b': 'checked' } });
+        await settle();
+        await saveSyncCollections(['preferences']);
+        await settle();
+        assert.equal(record(on.storage, 'checklist'), null);
+        assert.deepEqual(on.store.checklistProgress, { 'a-b': 'checked' });
+        assert.deepEqual(server.live('checklist'), {});
+    });
+
+    it('speedtest: its own collection; an edit pushes the size, the account\'s sizes reach the device', async () => {
+        const server = fakeServer({ settings: { decided: true, collections: ['speedtest'] } });
+        server.seed('speedtest', { id: 'uploadBytes', updatedAt: 5, value: 1e6 });
+        const { store, edit } = startSync({ server });
+        await settle();
+        assert.equal(store.userPreferences.speedtestUploadBytes, 1e6);
+        edit('speedtestDownloadBytes', 10e6);
+        await settle();
+        assert.deepEqual(server.live('speedtest'), { uploadBytes: 1e6, downloadBytes: 10e6 });
+        assert.equal(calls(server, 'preferences').length, 0);
+        assert.equal(state.speedtest, 'synced');
     });
 });
 

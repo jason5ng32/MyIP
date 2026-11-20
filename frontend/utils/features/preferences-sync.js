@@ -1,8 +1,9 @@
-// The two store-backed collections of account sync: `preferences` (the synced keys, normalised as the server checks
-// them) and `connectivity` (one item per list, the lists' order and the default list id) — their items from
+// The three store-backed collections of account sync: `preferences` (the synced keys, normalised as the server checks
+// them), `connectivity` (one item per list, the lists' order and the default list id) and `speedtest` (the two
+// sizes) — their items from
 // userPreferences, the userPreferences values a pull's changes become, a fresh visitor's values, and the hash refresh
 // for writes that are not user edits.
-import { SYNCED_PREFERENCE_KEYS } from '../preferences-schema.js';
+import { SYNCED_PREFERENCE_KEYS, isValidSpeedtestSize } from '../preferences-schema.js';
 import { SYNC_COLLECTIONS, connectivityListItemId, connectivityListIdOf } from '../sync-collections.js';
 import { DEFAULT_PREFERENCES } from '../../data/default-preferences.js';
 import { MINE_LIST_ID } from '../../data/connectivity-defaults.js';
@@ -12,6 +13,12 @@ import { readSyncRecord, writeSyncRecord, refreshSyncHashes } from './account-sy
 
 // Stored forms the server would refuse in their legacy shape.
 const NORMALIZERS = { snapshotsAuto: snapshotsAutoMode };
+
+// The speedtest collection's item ids → userPreferences keys.
+export const SPEEDTEST_ITEM_KEYS = Object.freeze({
+    downloadBytes: 'speedtestDownloadBytes',
+    uploadBytes: 'speedtestUploadBytes',
+});
 
 const freshVisitor = () => ({ ...DEFAULT_PREFERENCES, connectivityLists: sanitizeLists(null, null, []) });
 
@@ -29,6 +36,9 @@ export const SYNC_ITEM_READERS = Object.freeze({
             ...Object.fromEntries(lists.map(({ id, name, members }) => [connectivityListItemId(id), { name, members }])),
         };
     },
+    // A stored size outside the options reads as its default.
+    speedtest: (prefs) => Object.fromEntries(Object.entries(SPEEDTEST_ITEM_KEYS)
+        .map(([id, key]) => [id, isValidSpeedtestSize(prefs?.[key]) ? prefs[key] : DEFAULT_PREFERENCES[key]])),
 });
 
 // Lists in `order` (ids without a list skipped), then the lists it lacks by id: the same on every device.
@@ -68,6 +78,9 @@ export const SYNC_ITEM_WRITERS = Object.freeze({
         else if (deletes.includes('defaultListId')) values.connectivityDefaultListId = DEFAULT_PREFERENCES.connectivityDefaultListId;
         return values;
     },
+    speedtest: (prefs, { upserts = {}, deletes = [] }) => Object.fromEntries(Object.entries(SPEEDTEST_ITEM_KEYS)
+        .filter(([id]) => Object.hasOwn(upserts, id) || deletes.includes(id))
+        .map(([id, key]) => [key, Object.hasOwn(upserts, id) ? upserts[id] : DEFAULT_PREFERENCES[key]])),
 });
 
 // A collection's userPreferences values for a pull's changes.

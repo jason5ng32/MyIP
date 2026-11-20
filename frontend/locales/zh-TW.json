@@ -365,6 +365,8 @@
       "syncEnable": "開啟",
       "syncPreferences": "偏好設定",
       "syncConnectivity": "連通性測試清單",
+      "syncChecklist": "安全檢查清單進度",
+      "syncSpeedtest": "測速偏好",
       "syncNever": "IP、快照和測試結果永遠不會同步，只儲存在本瀏覽器中。",
       "syncTips": "開啟的內容會在你登入的每台裝置上跟隨帳號。登出會把它們從本裝置移除，再次登入後恢復。關閉某一項會從帳號中刪除它，本裝置上的仍然保留。",
       "syncSignedOut": "登入後即可與帳號同步。",

@@ -1,6 +1,14 @@
 // Orchestrate Cloudflare speed test preview + formal runs and derive receipt telemetry.
 
 import { SPEEDTEST_QUALITIES } from '../codes/speedtest.js';
+import { isValidSpeedtestSize } from '../preferences-schema.js';
+import { DEFAULT_PREFERENCES } from '../../data/default-preferences.js';
+
+// The chosen download / upload sizes from userPreferences; one outside the options is its default.
+export const speedTestSizesOf = (prefs) => {
+  const pick = (key) => (isValidSpeedtestSize(prefs?.[key]) ? prefs[key] : DEFAULT_PREFERENCES[key]);
+  return { download: pick('speedtestDownloadBytes'), upload: pick('speedtestUploadBytes') };
+};
 
 const scaleThreshold = (domain, range) => (value) => {
   let i = 0;
