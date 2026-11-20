@@ -1,22 +1,22 @@
-// The account's sync settings (which collections sync, and whether the user has decided): their state, this device's
-// cache of them, the choice the dialog and Preferences send, and the one-time dialog's show rule.
+// The account's sync settings (which collections sync; all of them until the user turns one off): their state, this
+// device's cache of them, and the choice Preferences sends.
 import { SYNC_COLLECTION_IDS } from '../sync-collections.js';
 
-// `{ user, decided, collections }` of the last answer, so a later load can start before the fetch returns.
+// `{ user, collections }` of the last answer, so a later load can start before the fetch returns.
 export const SYNC_SETTINGS_CACHE_KEY = 'accountSyncSettings';
 
 const isPlainObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value);
 
 // status: 'unknown' (nothing yet) | 'cached' (this device's copy) | 'fresh' (the server's answer this page load).
-export const createSyncSettings = () => ({ user: null, status: 'unknown', decided: false, collections: [] });
+export const createSyncSettings = () => ({ user: null, status: 'unknown', collections: [] });
 
 // Registry ids only, in registry order.
 const cleanCollections = (ids) => SYNC_COLLECTION_IDS.filter((id) => Array.isArray(ids) && ids.includes(id));
 
-// A GET / PUT /api/sync answer → `{ decided, collections }`, or null when its shape is off.
+// A GET / PUT /api/sync answer → `{ collections }`, or null when its shape is off.
 export const readSyncSettingsAnswer = (answer) => {
-    if (!isPlainObject(answer) || typeof answer.decided !== 'boolean' || !Array.isArray(answer.collections)) return null;
-    return { decided: answer.decided, collections: cleanCollections(answer.collections) };
+    if (!isPlainObject(answer) || !Array.isArray(answer.collections)) return null;
+    return { collections: cleanCollections(answer.collections) };
 };
 
 export const readCachedSyncSettings = (storage, userId) => {
@@ -30,9 +30,9 @@ export const readCachedSyncSettings = (storage, userId) => {
     }
 };
 
-export const writeCachedSyncSettings = (storage, { user, decided, collections }) => {
+export const writeCachedSyncSettings = (storage, { user, collections }) => {
     try {
-        storage?.setItem(SYNC_SETTINGS_CACHE_KEY, JSON.stringify({ user, decided, collections }));
+        storage?.setItem(SYNC_SETTINGS_CACHE_KEY, JSON.stringify({ user, collections }));
     } catch { /* storage full or blocked: the next load fetches first */ }
 };
 
@@ -56,7 +56,7 @@ export const syncChoiceOf = (collections) => (collections?.length
     ? { master: true, ...Object.fromEntries(SYNC_COLLECTION_IDS.map((id) => [id, collections.includes(id)])) }
     : defaultSyncChoice());
 
-// The dialog's and the panel's switches → the list PUT /api/sync takes: nothing while the master is off.
+// The panel's switches → the list PUT /api/sync takes: nothing while the master is off.
 export const chosenCollections = (choice) => (choice?.master
     ? SYNC_COLLECTION_IDS.filter((id) => choice[id])
     : []);
@@ -68,13 +68,3 @@ export const applySyncToggle = (choice, field, value) => {
     const next = { ...choice, [field]: Boolean(value) };
     return SYNC_COLLECTION_IDS.some((id) => next[id]) ? next : { ...next, master: false };
 };
-
-/**
- * The one-time dialog: signed in with sync available, the settings fetched from the server this page load and still
- * undecided, Home's tests done or off Home, nothing else on screen (no other overlay, no sign-in or sign-out under
- * way), and not shown yet this page load.
- */
-export const shouldShowSyncDialog = ({
-    available, userId, settings, allHasLoaded, offHome, overlayOpen, authPending, shown,
-}) => Boolean(available && userId && settings?.user === userId && settings.status === 'fresh'
-    && settings.decided === false && (allHasLoaded || offHome) && !overlayOpen && !authPending && !shown);

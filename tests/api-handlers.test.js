@@ -32,7 +32,7 @@ import { isCompleteProfile } from '../server/asn-profile.js';
 import { createAchievementHandlers } from '../api/achievements.js';
 import { createSyncHandlers } from '../api/sync.js';
 import { createSyncSettingsHandlers } from '../api/sync-settings.js';
-import { SYNC_COLLECTIONS, SYNC_OFF_CODE } from '../common/sync-collections.js';
+import { SYNC_COLLECTIONS, SYNC_COLLECTION_IDS, SYNC_OFF_CODE } from '../common/sync-collections.js';
 import { sanitizeLists } from '../frontend/utils/features/connectivity-lists.js';
 import { requireUser, requireUserStorage, requireValidSyncCollection } from '../server/guards.js';
 import { AUTH_REASON } from '../common/codes/service-errors.js';
@@ -1218,7 +1218,7 @@ describe('sync handlers', () => {
         assert.equal(db.calls.length, 0);
     });
 
-    it('a collection the account has not enabled → 409 sync_off, nothing read or written', async () => {
+    it('a collection the account turned off → 409 sync_off, nothing read or written', async () => {
         const { db, storage, handlers } = setup({ enabled: false });
         const attempt = async () => {
             db.calls.length = 0;
@@ -1228,8 +1228,8 @@ describe('sync handlers', () => {
             }), { storage });
             return [read, write];
         };
-        for (const ids of [null, [], ['connectivity']]) {
-            if (ids) enable(db, USER_ID, ids);
+        for (const ids of [[], ['connectivity']]) {
+            enable(db, USER_ID, ids);
             for (const res of await attempt()) {
                 assert.equal(res.statusCode, 409, JSON.stringify(ids));
                 assert.deepEqual(res.body, SYNC_OFF);
@@ -1241,6 +1241,17 @@ describe('sync handlers', () => {
         const [read, write] = await attempt();
         assert.equal(read.statusCode, 200);
         assert.deepEqual(write.body, { base: 0, cursor: 1, conflicts: [], refused: [] });
+    });
+
+    it('no settings row: a registry collection syncs', async () => {
+        const { db, storage, handlers } = setup({ enabled: false });
+        const read = await route(handlers.read, get('preferences', { v: String(preferences.version) }), { storage });
+        assert.equal(read.statusCode, 200);
+        const write = await route(handlers.write, put('preferences', {
+            version: preferences.version, items: [{ id: 'theme', updatedAt: 1, value: 'dark' }],
+        }), { storage });
+        assert.deepEqual(write.body, { base: 0, cursor: 1, conflicts: [], refused: [] });
+        assert.equal(db.syncSettings.has(USER_ID), false, 'no row written');
     });
 
     it('GET with a bad v or since → 400, storage untouched', async () => {
@@ -1468,11 +1479,11 @@ describe('sync settings handlers', () => {
         assert.equal(db.calls.length, 0);
     });
 
-    it('GET for a user who never decided → undecided, nothing enabled, and a users row', async () => {
+    it('GET for a user without a row → every registry collection, and a users row', async () => {
         const { db, storage, handlers } = setup();
         const res = await route(handlers.read, createRequest(), { storage });
         assert.equal(res.statusCode, 200);
-        assert.deepEqual(res.body, { decided: false, collections: [] });
+        assert.deepEqual(res.body, { collections: [...SYNC_COLLECTION_IDS] });
         assert.ok(db.users.has(USER_ID));
     });
 
@@ -1491,14 +1502,14 @@ describe('sync settings handlers', () => {
         assert.equal(db.calls.length, 0);
     });
 
-    it('PUT decides: nothing, then both, in registry order; GET reads it back', async () => {
+    it('PUT stores nothing, then both, in registry order; GET reads it back', async () => {
         const { db, storage, handlers } = setup();
         const none = await route(handlers.write, put({ collections: [] }), { storage });
         assert.equal(none.statusCode, 200);
-        assert.deepEqual(none.body, { decided: true, collections: [] });
-        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { decided: true, collections: [] });
+        assert.deepEqual(none.body, { collections: [] });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { collections: [] });
         const both = await route(handlers.write, put({ collections: ['connectivity', 'preferences'] }), { storage });
-        assert.deepEqual(both.body, { decided: true, collections: ['preferences', 'connectivity'] });
+        assert.deepEqual(both.body, { collections: ['preferences', 'connectivity'] });
         assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, both.body);
         assert.ok(db.users.has(USER_ID));
     });
@@ -1521,7 +1532,7 @@ describe('sync settings handlers', () => {
     it('GET leaves out stored ids the registry no longer has', async () => {
         const { db, storage, handlers } = setup();
         db.syncSettings.set(USER_ID, { collections: ['snapshots', 'preferences', 'ipHistory'], updated_at: new Date() });
-        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { decided: true, collections: ['preferences'] });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { collections: ['preferences'] });
     });
 
     it('a storage failure answers 500 without its details', async () => {

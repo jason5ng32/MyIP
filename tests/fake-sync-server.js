@@ -9,14 +9,16 @@ export const httpError = (status, code) => Object.assign(new Error(`HTTP ${statu
 export const BOTH = ['preferences', 'connectivity'];
 
 // The settings and item endpoints over memory: per collection a seq-ordered item map, the newer `updatedAt` winning;
-// an item route of a collection that is off answers 409 sync_off; turning one off deletes its rows.
-export const fakeServer = ({ settings = { decided: true, collections: BOTH }, pageSize } = {}) => {
+// an item route of a collection that is off answers 409 sync_off; turning one off deletes its rows. `settings: null`
+// is an account with no stored choice: every collection on.
+export const fakeServer = ({ settings = { collections: BOTH }, pageSize } = {}) => {
     const rows = Object.fromEntries(SYNC_COLLECTION_IDS.map((id) => [id, new Map()]));
     let seq = 0;
+    const enabled = () => server.settings?.collections ?? SYNC_COLLECTION_IDS;
     const server = {
         calls: [],
         rows,
-        settings: { ...settings },
+        settings: settings && { ...settings },
         fail: null, // (collection, method) → an error to throw, or null
         hold: null, // a promise every item request waits on
         holdSettings: null, // a promise the settings GET waits on
@@ -36,15 +38,15 @@ export const fakeServer = ({ settings = { decided: true, collections: BOTH }, pa
                 const error = server.fail?.('settings', method);
                 if (error) throw error;
                 if (method === 'PUT') {
-                    server.settings = { decided: true, collections: body.collections };
+                    server.settings = { collections: body.collections };
                     for (const id of Object.keys(rows)) if (!body.collections.includes(id)) rows[id].clear();
                 }
-                return { ...server.settings, collections: [...server.settings.collections] };
+                return { collections: [...enabled()] };
             }
             if (server.hold) await server.hold;
             const error = server.fail?.(collection, method);
             if (error) throw error;
-            if (!server.settings.collections.includes(collection)) throw httpError(409, SYNC_OFF_CODE);
+            if (!enabled().includes(collection)) throw httpError(409, SYNC_OFF_CODE);
             const registry = SYNC_COLLECTIONS[collection];
             if (method === 'GET') {
                 const since = Number(searchParams.get('since'));

@@ -420,7 +420,7 @@ export const useAccountSync = ({
         return (await Promise.all(pulls)).every(Boolean);
     });
 
-    // The dialog and Preferences: PUT /api/sync `{ collections }` → true once the account holds the choice (the
+    // Preferences: PUT /api/sync `{ collections }` → true once the account holds the choice (the
     // watchers then adopt what was turned on and drop what was turned off), false when it failed.
     useAppCommand(SET_SYNC_COLLECTIONS_COMMAND, async ({ collections } = {}) => {
         const uid = userId.value;

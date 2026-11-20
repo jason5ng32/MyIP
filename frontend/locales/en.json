@@ -2500,11 +2500,5 @@
   "pwa": {
     "appDescription": "All in one IP Toolbox",
     "installDescription": "You've already used IPCheck.ing {count} times — install it as an app for a smoother experience and quicker access."
-  },
-  "syncDialog": {
-    "Title": "Sync your settings",
-    "Note": "You can sync your non-sensitive data across your devices.",
-    "Save": "Save",
-    "Later": "Not now"
   }
 }

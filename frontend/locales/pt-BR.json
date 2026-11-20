@@ -2500,11 +2500,5 @@
   "pwa": {
     "appDescription": "Caixa de ferramentas de IP tudo em um",
     "installDescription": "Você já usou o IPCheck.ing {count} vezes — instale-o como app para uma experiência mais fluida e acesso mais rápido."
-  },
-  "syncDialog": {
-    "Title": "Sincronize suas configurações",
-    "Note": "Você pode sincronizar seus dados não sensíveis entre seus dispositivos.",
-    "Save": "Salvar",
-    "Later": "Agora não"
   }
 }

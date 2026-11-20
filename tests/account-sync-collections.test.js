@@ -12,7 +12,7 @@ import {
 } from '../frontend/utils/features/preferences-sync.js';
 import {
     SYNC_SETTINGS_CACHE_KEY, createSyncSettings, readSyncSettingsAnswer, readCachedSyncSettings,
-    writeCachedSyncSettings, clearCachedSyncSettings, collectionSyncState, chosenCollections, shouldShowSyncDialog,
+    writeCachedSyncSettings, clearCachedSyncSettings, collectionSyncState, chosenCollections,
     applySyncToggle, defaultSyncChoice, syncChoiceOf,
 } from '../frontend/utils/features/sync-settings.js';
 import {
@@ -155,9 +155,9 @@ describe('account sync — the collections', () => {
 
 describe('account sync — the account\'s settings', () => {
     it('reads an answer into registry ids, in registry order', () => {
-        assert.deepEqual(readSyncSettingsAnswer({ decided: true, collections: ['connectivity', 'snapshots', 'preferences'] }),
-            { decided: true, collections: ['preferences', 'connectivity'] });
-        for (const bad of [null, { decided: 'yes', collections: [] }, { decided: false }]) {
+        assert.deepEqual(readSyncSettingsAnswer({ collections: ['connectivity', 'snapshots', 'preferences'] }),
+            { collections: ['preferences', 'connectivity'] });
+        for (const bad of [null, [], { collections: 'preferences' }, { decided: true }]) {
             assert.equal(readSyncSettingsAnswer(bad), null);
         }
     });
@@ -165,8 +165,8 @@ describe('account sync — the account\'s settings', () => {
     it('caches per user: another user, junk or nothing reads as no cache', () => {
         const storage = memoryStorage();
         assert.equal(readCachedSyncSettings(storage, 'u1'), null);
-        writeCachedSyncSettings(storage, { user: 'u1', status: 'fresh', decided: true, collections: ['preferences'] });
-        assert.deepEqual(readCachedSyncSettings(storage, 'u1'), { user: 'u1', status: 'cached', decided: true, collections: ['preferences'] });
+        writeCachedSyncSettings(storage, { user: 'u1', status: 'fresh', collections: ['preferences'] });
+        assert.deepEqual(readCachedSyncSettings(storage, 'u1'), { user: 'u1', status: 'cached', collections: ['preferences'] });
         assert.equal(readCachedSyncSettings(storage, 'u2'), null);
         clearCachedSyncSettings(storage);
         assert.equal(storage.data[SYNC_SETTINGS_CACHE_KEY], undefined);
@@ -175,7 +175,7 @@ describe('account sync — the account\'s settings', () => {
     });
 
     it('a collection is on or off only for the user the settings belong to, once known', () => {
-        const settings = { user: 'u1', status: 'cached', decided: true, collections: ['connectivity'] };
+        const settings = { user: 'u1', status: 'cached', collections: ['connectivity'] };
         assert.equal(collectionSyncState(settings, 'u1', 'connectivity'), 'on');
         assert.equal(collectionSyncState(settings, 'u1', 'preferences'), 'off');
         assert.equal(collectionSyncState(settings, 'u2', 'connectivity'), 'unknown');
@@ -223,30 +223,6 @@ describe('account sync — the sync controls', () => {
         assert.deepEqual(sends(applySyncToggle(one, 'connectivity', true)), ALL);
         assert.deepEqual(applySyncToggle(off, 'preferences', true), off, 'a checkbox never turns Enable on by itself');
     });
-});
-
-describe('account sync — when the one-time dialog shows', () => {
-    const base = {
-        available: true, userId: 'u1', settings: { user: 'u1', status: 'fresh', decided: false, collections: [] },
-        allHasLoaded: true, offHome: false, overlayOpen: false, authPending: false, shown: false,
-    };
-    const cases = [
-        ['undecided, fresh, tests done', {}, true],
-        ['off Home before the tests finish', { allHasLoaded: false, offHome: true }, true],
-        ['decided', { settings: { ...base.settings, decided: true } }, false],
-        ['from the cache only', { settings: { ...base.settings, status: 'cached' } }, false],
-        ['settings unknown', { settings: { ...base.settings, status: 'unknown' } }, false],
-        ['another user\'s settings', { settings: { ...base.settings, user: 'u2' } }, false],
-        ['not signed in', { userId: null }, false],
-        ['sync not available', { available: false }, false],
-        ['Home\'s tests still running', { allHasLoaded: false }, false],
-        ['another overlay open', { overlayOpen: true }, false],
-        ['a sign-in or sign-out under way', { authPending: true }, false],
-        ['already shown this page load', { shown: true }, false],
-    ];
-    for (const [name, over, expected] of cases) {
-        it(name, () => assert.equal(shouldShowSyncDialog({ ...base, ...over }), expected));
-    }
 });
 
 describe('account sync — the commands app code awaits', () => {

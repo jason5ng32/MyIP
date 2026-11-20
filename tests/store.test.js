@@ -302,7 +302,7 @@ describe('store — preference edits and account sync', () => {
   it('setSyncSettings holds the account\'s settings, unknown at first', () => {
     const s = useMainStore();
     assert.equal(s.syncSettings.status, 'unknown');
-    s.setSyncSettings({ user: 'u1', status: 'fresh', decided: true, collections: ['preferences'] });
+    s.setSyncSettings({ user: 'u1', status: 'fresh', collections: ['preferences'] });
     assert.deepEqual(s.syncSettings.collections, ['preferences']);
   });
 

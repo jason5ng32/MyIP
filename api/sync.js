@@ -1,4 +1,4 @@
-// GET /api/sync/:collection (a page of the signed-in user's synced items changed after a cursor) and PUT /api/sync/:collection (merge a device's items in), from user storage; 409 for a collection the account has not enabled.
+// GET /api/sync/:collection (a page of the signed-in user's synced items changed after a cursor) and PUT /api/sync/:collection (merge a device's items in), from user storage; 409 for a collection the account turned off.
 import logger from '../server/logger.js';
 import { userStorage } from '../server/db/user-storage.js';
 import { ensureUser } from '../server/db/users.js';

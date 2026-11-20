@@ -2500,11 +2500,5 @@
   "pwa": {
     "appDescription": "一站式 IP 工具箱",
     "installDescription": "这已经是你第 {count} 次使用 IPCheck.ing 了，把它安装为应用，可以获得更好的使用体验，打开也更方便。"
-  },
-  "syncDialog": {
-    "Title": "同步你的设置",
-    "Note": "你可以在多设备上同步你的非敏感信息。",
-    "Save": "保存",
-    "Later": "暂不"
   }
 }

@@ -73,7 +73,7 @@
           "An account identifier, which is a random string rather than your e-mail or name, and the time it was first stored.",
           "The achievements you have unlocked and when you unlocked them.",
           "How many times you have used each counted feature, as a number only: no target, IP address or time of use.",
-          "Only if you turn sync on: your preferences, your Connectivity test lists (including the sites you added to them), your Security Checklist progress and your speed test options. Turning a sync item off deletes it from your account.",
+          "Unless you turn sync off: your preferences, your Connectivity test lists (including the sites you added to them), your Security Checklist progress and your speed test options. Turning a sync item off deletes it from your account.",
           "No IP address, test result, snapshot, e-mail address, name or user agent is stored there."
         ]
       },

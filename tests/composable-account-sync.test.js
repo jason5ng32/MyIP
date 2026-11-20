@@ -1,6 +1,6 @@
 // Tests for frontend/composables/use-account-sync.js over a fake sync server (tests/fake-sync-server.js) and storage:
-// the account's settings (fetched once signed in, cached per user, the cache starting pulls early and the answer
-// correcting it), gating on them, enabling (an empty account takes the device's data, a non-empty one replaces it),
+// the account's settings (fetched once signed in, every collection on with no stored choice, cached per user, the
+// cache starting pulls early and the answer correcting it), gating on them, enabling (an empty account takes the device's data, a non-empty one replaces it),
 // disabling (record dropped, data kept), a 409 `sync_off`, no stamps while signed out, the debounced push, paging,
 // another user's record, the 400 / 403 / 5xx handling, one item per Connectivity list (two devices' lists, deletes,
 // order, Mine kept, an oversized list held back), the sign-out flush-then-clear of enabled collections only, the
@@ -26,7 +26,7 @@ const {
 const {
     createSyncSettings, writeCachedSyncSettings, readCachedSyncSettings, SYNC_SETTINGS_CACHE_KEY,
 } = await import('../frontend/utils/features/sync-settings.js');
-const { SYNC_COLLECTIONS } = await import('../frontend/utils/sync-collections.js');
+const { SYNC_COLLECTIONS, SYNC_COLLECTION_IDS } = await import('../frontend/utils/sync-collections.js');
 const { SYNCED_PREFERENCE_KEYS } = await import('../frontend/utils/preferences-schema.js');
 const { sanitizeLists } = await import('../frontend/utils/features/connectivity-lists.js');
 const { DEFAULT_PREFERENCES } = await import('../frontend/data/default-preferences.js');
@@ -150,7 +150,7 @@ afterEach(() => {
 
 describe('account sync — the account\'s settings', () => {
     it('are fetched once signed in with sync available, cached, and gate the pulls', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: ['connectivity'] } });
+        const server = fakeServer({ settings: { collections: ['connectivity'] } });
         const { store, storage } = startSync({ server });
         await settle();
         assert.deepEqual(calls(server, 'settings').map((c) => c.method), ['GET']);
@@ -160,9 +160,24 @@ describe('account sync — the account\'s settings', () => {
         assert.equal(calls(server, 'preferences').length, 0, 'off in the account: device-only, no request');
     });
 
-    it('undecided: nothing syncs, nothing is recorded', async () => {
-        const server = fakeServer({ settings: { decided: false, collections: [] } });
-        const { storage } = startSync({ server });
+    it('no stored choice: nothing before the first answer, then every collection syncs', async () => {
+        const server = fakeServer({ settings: null });
+        let release;
+        server.holdSettings = new Promise((resolve) => { release = resolve; });
+        const { store, storage } = startSync({ server, prefs: { theme: 'dark' } });
+        await settle();
+        assert.deepEqual(server.calls.map((c) => c.collection), ['settings'], 'no cache: waits for the answer');
+        assert.equal(record(storage, 'preferences'), null);
+        release();
+        await settle();
+        assert.deepEqual(store.syncSettings.collections, SYNC_COLLECTION_IDS);
+        for (const id of SYNC_COLLECTION_IDS) assert.equal(calls(server, id, 'GET').length >= 1, true, id);
+        assert.equal(server.live('preferences').theme, 'dark', 'an empty account adopts this device');
+    });
+
+    it('everything turned off on another device: a new device sends nothing', async () => {
+        const server = fakeServer({ settings: { collections: [] } });
+        const { storage } = startSync({ server, prefs: { theme: 'dark' } });
         await settle();
         assert.deepEqual(server.calls.map((c) => c.collection), ['settings']);
         assert.equal(record(storage, 'preferences'), null);
@@ -178,18 +193,18 @@ describe('account sync — the account\'s settings', () => {
     });
 
     it('this user\'s cache starts the pulls before the answer, which then corrects it', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: ['preferences'] } });
+        const server = fakeServer({ settings: { collections: ['preferences'] } });
         let release;
         server.holdSettings = new Promise((resolve) => { release = resolve; });
         const storage = memoryStorage();
-        writeCachedSyncSettings(storage, { user: 'u1', decided: true, collections: BOTH });
-        server.settings = { decided: true, collections: BOTH };
+        writeCachedSyncSettings(storage, { user: 'u1', collections: BOTH });
+        server.settings = { collections: BOTH };
         const { store } = startSync({ server, storage });
         await settle();
         assert.equal(store.syncSettings.status, 'cached');
         assert.ok(calls(server, 'connectivity', 'GET').length >= 1, 'pulled from the cache');
         assert.ok(record(storage, 'connectivity'));
-        server.settings = { decided: true, collections: ['preferences'] };
+        server.settings = { collections: ['preferences'] };
         release();
         await settle();
         assert.equal(store.syncSettings.status, 'fresh');
@@ -197,16 +212,16 @@ describe('account sync — the account\'s settings', () => {
     });
 
     it('a read answered after a save does not undo it', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: [] } });
+        const server = fakeServer({ settings: { collections: [] } });
         let answerRead;
         let held = false;
         const request = (url, method = 'GET', body = null) => {
             if (url !== SYNC_ENDPOINT || method !== 'GET' || held) return server.request(url, method, body);
             held = true;
-            return new Promise((resolve) => { answerRead = () => resolve({ decided: true, collections: [] }); });
+            return new Promise((resolve) => { answerRead = () => resolve({ collections: [] }); });
         };
         const storage = memoryStorage();
-        writeCachedSyncSettings(storage, { user: 'u1', decided: true, collections: [] });
+        writeCachedSyncSettings(storage, { user: 'u1', collections: [] });
         const { store } = startSync({ server, storage, request });
         await settle();
         assert.equal(await saveSyncCollections(BOTH), true);
@@ -217,16 +232,16 @@ describe('account sync — the account\'s settings', () => {
     });
 
     it('a save that fails over a pending read: the settings are read again', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: BOTH } });
+        const server = fakeServer({ settings: { collections: BOTH } });
         let answerRead;
         let held = false;
         const request = (url, method = 'GET', body = null) => {
             if (url !== SYNC_ENDPOINT || method !== 'GET' || held) return server.request(url, method, body);
             held = true;
-            return new Promise((resolve) => { answerRead = () => resolve({ decided: true, collections: BOTH }); });
+            return new Promise((resolve) => { answerRead = () => resolve({ collections: BOTH }); });
         };
         const storage = memoryStorage();
-        writeCachedSyncSettings(storage, { user: 'u1', decided: true, collections: [] });
+        writeCachedSyncSettings(storage, { user: 'u1', collections: [] });
         const { store } = startSync({ server, storage, request });
         await settle();
         server.fail = (collection, method) => (collection === 'settings' && method === 'PUT' ? httpError(500) : null);
@@ -244,7 +259,7 @@ describe('account sync — the account\'s settings', () => {
 
     it('another user\'s cache is ignored', async () => {
         const storage = memoryStorage();
-        writeCachedSyncSettings(storage, { user: 'u2', decided: true, collections: BOTH });
+        writeCachedSyncSettings(storage, { user: 'u2', collections: BOTH });
         const server = fakeServer();
         let release;
         server.holdSettings = new Promise((resolve) => { release = resolve; });
@@ -258,7 +273,7 @@ describe('account sync — the account\'s settings', () => {
 
 describe('account sync — enabling and disabling', () => {
     it('enabling into an empty account: this device\'s data becomes the account\'s', async () => {
-        const server = fakeServer({ settings: { decided: false, collections: [] } });
+        const server = fakeServer({ settings: { collections: [] } });
         const lists = otherLists();
         const { storage } = startSync({ server, prefs: { theme: 'dark', connectivityLists: lists } });
         await settle();
@@ -274,7 +289,7 @@ describe('account sync — enabling and disabling', () => {
     });
 
     it('enabling when another device already filled the account: the account replaces this device', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: [] } });
+        const server = fakeServer({ settings: { collections: [] } });
         const { store } = startSync({ server, prefs: { connectivityDefaultListId: 'mine' } });
         await settle();
         seedLists(server, otherLists(), 5, 'work');
@@ -302,20 +317,20 @@ describe('account sync — enabling and disabling', () => {
     });
 
     it('a failed settings save changes nothing and says so', async () => {
-        const server = fakeServer({ settings: { decided: false, collections: [] } });
+        const server = fakeServer({ settings: { collections: [] } });
         server.fail = (collection, method) => (collection === 'settings' && method === 'PUT' ? httpError(500) : null);
         const { store } = startSync({ server });
         await settle();
         const { result } = await quiet(() => saveSyncCollections(BOTH));
         assert.equal(result, false);
-        assert.equal(store.syncSettings.decided, false);
+        assert.deepEqual(store.syncSettings.collections, []);
     });
 
     it('another device turned it off (409 sync_off): settings re-fetched, record dropped, data kept, no warning', async () => {
         const server = fakeServer();
         const { store, storage, edit } = startSync({ server, prefs: { theme: 'dark' } });
         await settle();
-        server.settings = { decided: true, collections: ['connectivity'] };
+        server.settings = { collections: ['connectivity'] };
         const { warnings } = await quiet(async () => {
             edit('theme', 'light');
             await settle();
@@ -435,7 +450,7 @@ describe('account sync — Security Checklist progress and the speed test sizes'
     });
 
     it('checklist: an empty account takes the device\'s marks; a mark and an unset push only that item', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: ALL } });
+        const server = fakeServer({ settings: { collections: ALL } });
         const { mark } = startSync({ server, checklist: { 'a-b': 'checked', 'c-d': 'ignored' } });
         await settle();
         assert.deepEqual(server.live('checklist'), { 'a-b': 'checked', 'c-d': 'ignored' });
@@ -450,7 +465,7 @@ describe('account sync — Security Checklist progress and the speed test sizes'
     });
 
     it('checklist: an account with marks replaces the device\'s; sign-out clears them off the device', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: ['checklist'] } });
+        const server = fakeServer({ settings: { collections: ['checklist'] } });
         server.seed('checklist', { id: 'x-y', updatedAt: 5, value: 'ignored' });
         const { store } = startSync({ server, checklist: { 'a-b': 'checked' } });
         await settle();
@@ -468,7 +483,7 @@ describe('account sync — Security Checklist progress and the speed test sizes'
         await settle();
         assert.deepEqual(ended.store.checklistProgress, {});
         scope.stop();
-        const server = fakeServer({ settings: { decided: true, collections: ['checklist'] } });
+        const server = fakeServer({ settings: { collections: ['checklist'] } });
         const on = startSync({ server, checklist: { 'a-b': 'checked' } });
         await settle();
         await saveSyncCollections(['preferences']);
@@ -479,7 +494,7 @@ describe('account sync — Security Checklist progress and the speed test sizes'
     });
 
     it('speedtest: its own collection; an edit pushes the size, the account\'s sizes reach the device', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: ['speedtest'] } });
+        const server = fakeServer({ settings: { collections: ['speedtest'] } });
         server.seed('speedtest', { id: 'uploadBytes', updatedAt: 5, value: 1e6 });
         const { store, edit } = startSync({ server });
         await settle();
@@ -594,7 +609,7 @@ describe('account sync — failures', () => {
     });
 
     it('a 5xx or network failure marks the collection failed for the panel', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: ['preferences'] } });
+        const server = fakeServer({ settings: { collections: ['preferences'] } });
         server.fail = (collection) => (collection === 'preferences' ? httpError(503) : null);
         await quiet(async () => {
             startSync({ server });
@@ -604,7 +619,7 @@ describe('account sync — failures', () => {
     });
 
     it('a 5xx or network failure warns and retries on the next change', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: ['preferences'] } });
+        const server = fakeServer({ settings: { collections: ['preferences'] } });
         server.fail = (collection) => (collection === 'preferences' ? httpError(503) : null);
         const { warnings } = await quiet(async () => {
             const { edit } = startSync({ server });
@@ -648,7 +663,7 @@ describe('account sync — sign-out', () => {
     });
 
     it('a collection the account does not sync is device-only and stays', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: ['preferences'] } });
+        const server = fakeServer({ settings: { collections: ['preferences'] } });
         const { store } = await signedInDevice({ server, prefs: { connectivityDefaultListId: 'mine-too' } });
         assert.equal(await clearAccountDataBeforeSignOut('u1'), 1);
         assert.equal(store.userPreferences.connectivityDefaultListId, 'mine-too');
@@ -682,7 +697,7 @@ describe('account sync — boot after the session ended', () => {
     it('Firebase says nobody is signed in: records naming a user clear their collections, without a request', async () => {
         const storage = memoryStorage();
         writeSyncRecord(storage, SYNC_COLLECTIONS.connectivity, { user: 'u1', cursor: 3, lastSyncAt: 1, items: {} });
-        writeCachedSyncSettings(storage, { user: 'u1', decided: true, collections: ['connectivity'] });
+        writeCachedSyncSettings(storage, { user: 'u1', collections: ['connectivity'] });
         const { store, server } = startSync({
             storage, signedIn: false, authResolved: true, prefs: { theme: 'dark', connectivityDefaultListId: 'work' },
         });
@@ -706,7 +721,7 @@ describe('account sync — boot after the session ended', () => {
 
 describe('account sync — the popup sign-in\'s step before the reload', () => {
     it('fetches the settings and pulls every enabled collection for the new user; nothing is pushed', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: ['connectivity'] } });
+        const server = fakeServer({ settings: { collections: ['connectivity'] } });
         server.seed('connectivity', { id: 'defaultListId', updatedAt: 5, value: 'work' });
         const { store, storage } = startSync({ server, signedIn: false, authResolved: true });
         store.user = { uid: 'u9' };
@@ -719,8 +734,20 @@ describe('account sync — the popup sign-in\'s step before the reload', () => {
         assert.equal(calls(server, 'connectivity', 'PUT').length, 0);
     });
 
+    it('no stored choice: every collection is pulled for the new user', async () => {
+        const server = fakeServer({ settings: null });
+        server.seed('connectivity', { id: 'defaultListId', updatedAt: 5, value: 'work' });
+        const { store, storage } = startSync({ server, signedIn: false, authResolved: true });
+        store.user = { uid: 'u9' };
+        await settle();
+        assert.equal(await syncBeforeReload('u9'), true);
+        assert.equal(store.userPreferences.connectivityDefaultListId, 'work');
+        for (const id of SYNC_COLLECTION_IDS) assert.equal(record(storage, id).user, 'u9', id);
+        assert.deepEqual(readCachedSyncSettings(storage, 'u9').collections, SYNC_COLLECTION_IDS);
+    });
+
     it('an empty enabled account: every item waits as pending for after the reload', async () => {
-        const server = fakeServer({ settings: { decided: true, collections: ['preferences'] } });
+        const server = fakeServer({ settings: { collections: ['preferences'] } });
         const { store, storage } = startSync({ server, signedIn: false });
         store.user = { uid: 'u9' };
         assert.equal(await syncBeforeReload('u9'), true);

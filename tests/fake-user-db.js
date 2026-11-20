@@ -28,7 +28,6 @@ const SQL = {
         + 'SET updated_at = EXCLUDED.updated_at, deleted = EXCLUDED.deleted, data = EXCLUDED.data, seq = EXCLUDED.seq '
         + 'RETURNING seq',
     readSettings: 'SELECT collections FROM sync_settings WHERE user_id = $1',
-    syncEnabled: 'SELECT 1 AS enabled FROM sync_settings WHERE user_id = $1 AND $2 = ANY(collections)',
     upsertSettings: 'INSERT INTO sync_settings (user_id, collections) VALUES ($1, $2::text[]) '
         + 'ON CONFLICT (user_id) DO UPDATE SET collections = EXCLUDED.collections, updated_at = now()',
     deleteDisabled: 'DELETE FROM synced_items WHERE user_id = $1 AND collection <> ALL($2::text[])',
@@ -127,8 +126,6 @@ export const fakeUserDb = ({ now = () => new Date() } = {}) => {
             }
             case SQL.readSettings:
                 return { rows: syncSettings.has(id) ? [{ collections: [...syncSettings.get(id).collections] }] : [] };
-            case SQL.syncEnabled:
-                return { rows: syncSettings.get(id)?.collections.includes(value) ? [{ enabled: 1 }] : [] };
             case SQL.upsertSettings:
                 needUser(id);
                 syncSettings.set(id, { collections: [...value], updated_at: now() });

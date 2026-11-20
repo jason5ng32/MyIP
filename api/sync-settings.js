@@ -1,4 +1,4 @@
-// GET /api/sync (which collections the signed-in user syncs, and whether they decided) and PUT /api/sync (set them, deleting the items of every collection left out), from user storage.
+// GET /api/sync (which collections the signed-in user syncs; all of them until the user turns one off) and PUT /api/sync (set them, deleting the items of every collection left out), from user storage.
 import logger from '../server/logger.js';
 import { userStorage } from '../server/db/user-storage.js';
 import { ensureUser } from '../server/db/users.js';

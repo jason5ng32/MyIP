@@ -1,7 +1,6 @@
 <template>
   <!-- The sync choice: an "Enable" switch with the collections as checkboxes nested under it, shown while it is
-       on, or always with `expanded` (dimmed while off: what enabling covers). Emits the next choice
-       (applySyncToggle); the caller decides when it is saved. -->
+       on. Emits the next choice (applySyncToggle); the caller decides when it is saved. -->
   <div class="rounded-lg border bg-card">
     <div class="flex items-center justify-between gap-3 p-3">
       <label :for="`${idPrefix}Master`" class="min-w-0 flex-1 text-sm font-medium select-none"
@@ -9,11 +8,11 @@
       <Switch :id="`${idPrefix}Master`" class="shrink-0" :model-value="modelValue.master" :disabled="disabled"
         @update:model-value="(value) => toggle('master', value)" />
     </div>
-    <div v-if="modelValue.master || expanded" class="space-y-2 border-t px-3 py-3 pl-6">
+    <div v-if="modelValue.master" class="space-y-2 border-t px-3 py-3 pl-6">
       <label v-for="option in SYNC_OPTIONS" :key="option.id" class="flex items-center gap-2 text-sm select-none"
-        :class="disabled || !modelValue.master ? 'opacity-50' : 'cursor-pointer'">
-        <Checkbox :model-value="!modelValue.master || modelValue[option.id]" :disabled="disabled || !modelValue.master"
-          @update:model-value="(value) => toggle(option.id, value === true)" :class="disabled || !modelValue.master ? '' : 'cursor-pointer'" />
+        :class="disabled ? 'opacity-50' : 'cursor-pointer'">
+        <Checkbox :model-value="modelValue[option.id]" :disabled="disabled"
+          @update:model-value="(value) => toggle(option.id, value === true)" :class="disabled ? '' : 'cursor-pointer'" />
         {{ t(option.label) }}
       </label>
     </div>
@@ -31,8 +30,6 @@ const props = defineProps({
   modelValue: { type: Object, required: true },
   idPrefix: { type: String, default: 'sync' },
   disabled: { type: Boolean, default: false },
-  // Keep the collections visible while the switch is off.
-  expanded: { type: Boolean, default: false },
 });
 const emit = defineEmits(['update:modelValue']);
 

@@ -200,10 +200,10 @@ Four collections sync, `preferences` (`SYNCED_PREFERENCE_KEYS`),
 tombstone; `store.checklistProgress` over `utils/features/checklist-progress.js`)
 and `speedtest` (the two size preferences, outside `SYNCED_PREFERENCE_KEYS`; no
 Preferences control, the homepage selects save them); IPs, snapshots and test
-results never do. The account chooses which:
-`GET / PUT /api/sync` (`store.syncSettings`, cached per user so a load starts
-before the fetch; nothing until decided; turning one off deletes its rows
-there). `use-account-sync.js` (App.vue) runs one engine
+results never do. The account chooses which, all of them until the user turns
+one off in Preferences: `GET / PUT /api/sync` (`store.syncSettings`, cached per
+user so a load starts before the fetch; with no cache nothing runs until the
+answer; turning one off deletes its rows there). `use-account-sync.js` (App.vue) runs one engine
 (`utils/features/account-sync.js`) over four store adapters
 (`utils/features/preferences-sync.js` and the checklist's; the store stays the
 only writer).
@@ -214,9 +214,8 @@ merge per item: a list deleted syncs as a tombstone (never Mine), lists the
 `order` item lacks follow it by id. Turned off (here, or a 409 `sync_off`) → record dropped, data
 kept. The popup sign-in awaits `syncBeforeReload`; sign-out flushes, clears
 enabled collections and reloads; a boot that finds the session ended clears
-too. `widgets/SyncChoiceDialog.vue` asks once (`use-sync-dialog.js`,
-`shouldShowSyncDialog`): every exit saves a choice; Preferences edits it at
-once. Both use `widgets/SyncChoiceControls.vue` (`applySyncToggle`).
+too. Preferences edits the choice at once through
+`widgets/SyncChoiceControls.vue` (`applySyncToggle`).
 Every preference edit goes through `store.editPreferences`
 (`updatePreference`; list ops through `editConnectivityLists`), every
 checklist mark through `store.editChecklist` (`setChecklistMark`,

@@ -92,8 +92,8 @@ export const listSyncedItems = async (query, { userId, collection, version, sinc
  * Merges a write into one collection and version under the user's row lock
  * (so that user's `seq` values commit in order and a racing settings change
  * waits), after removing the user's expired tombstones of that collection.
- * The users row must exist. Resolves with null when the user has not enabled
- * the collection (nothing written), else `{ base, cursor, conflicts, refused }`:
+ * The users row must exist. Resolves with null when the user turned the
+ * collection off (nothing written), else `{ base, cursor, conflicts, refused }`:
  * the highest `seq` before and after the write.
  */
 export const saveSyncedItems = (transaction, { userId, collection, version, items, now }) => transaction(async (query) => {

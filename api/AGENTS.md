@@ -291,8 +291,8 @@ nothing about a use but the count: no target, IP or time — and
 `synced_items` (user, collection, schema version, item id, the device's edit
 time `updated_at` in epoch ms, `deleted`, `data` jsonb, `seq`; one row per
 item, a delete kept as a tombstone with `data` NULL) and `sync_settings`
-(user, the enabled collection ids as `text[]`, updated time; a row means the
-user decided, an empty list = sync nothing). `seq` comes from
+(user, the enabled collection ids as `text[]`, updated time; no row = every
+registry collection on, an empty list = sync nothing). `seq` comes from
 `synced_items_seq`, a new value on every insert or update.
 
 - **Achievements** (`api/achievements.js`, behind `requireUser()` +
@@ -306,10 +306,10 @@ user decided, an empty list = sync nothing). `seq` comes from
 - **Sync settings** (`api/sync-settings.js`, `server/db/sync-settings.js`,
   behind `requireUser()` + `requireUserStorage()`, no-store, users row
   ensured, own 1 KB body limit): the account, not the device, chooses what
-  syncs. `GET /api/sync` → `{ decided, collections }` (no row → `{ decided:
-  false, collections: [] }`; ids the registry no longer has are left out).
-  `PUT /api/sync` `{ collections }` (an array of distinct registry ids, else
-  400) → `{ decided: true, collections }` in registry order. One transaction
+  syncs. `GET /api/sync` → `{ collections }` (no row → the whole registry;
+  ids the registry no longer has are left out). `PUT /api/sync`
+  `{ collections }` (an array of distinct registry ids, else 400) →
+  `{ collections }` in registry order. One transaction
   under the user's `users` row lock: the row upserted, then every
   `synced_items` row of the user whose collection is left out deleted — all
   versions, tombstones too — in one `DELETE … WHERE user_id = $1 AND
@@ -328,8 +328,8 @@ user decided, an empty list = sync nothing). `seq` comes from
   two. `checklist` (deletes on) holds one item per marked slug, `'checked'` /
   `'ignored'`; slugs live in the locale datasets, so ids are checked by shape
   and `maxItems` is a fixed 1000. `speedtest` holds `downloadBytes` /
-  `uploadBytes` from `SPEEDTEST_SIZE_OPTIONS`. A collection the user has not enabled
-  in `sync_settings` → 409 `{ error, code: 'sync_off' }` (`SYNC_OFF_CODE`),
+  `uploadBytes` from `SPEEDTEST_SIZE_OPTIONS`. A collection the user's `sync_settings`
+  row leaves out → 409 `{ error, code: 'sync_off' }` (`SYNC_OFF_CODE`),
   nothing read or written; for a PUT the check runs inside the write
   transaction, after the lock, so a write racing a disable leaves nothing.
   `GET /api/sync/:collection?v=&since=` →

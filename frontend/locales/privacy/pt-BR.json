@@ -73,7 +73,7 @@
           "Um identificador de conta, uma sequência aleatória que não é o seu e-mail nem o seu nome, e a data em que foi armazenado pela primeira vez.",
           "As conquistas que você desbloqueou e quando as desbloqueou.",
           "Quantas vezes você usou cada recurso contabilizado, apenas como um número: sem alvo, endereço IP ou horário de uso.",
-          "Somente se você ativar a sincronização: suas preferências, suas listas do teste de conectividade (incluindo os sites que você adicionou a elas), seu progresso no checklist de segurança e suas opções do teste de velocidade. Desativar um item sincronizado o exclui da sua conta.",
+          "A menos que você desative a sincronização: suas preferências, suas listas do teste de conectividade (incluindo os sites que você adicionou a elas), seu progresso no checklist de segurança e suas opções do teste de velocidade. Desativar um item sincronizado o exclui da sua conta.",
           "Nenhum endereço IP, resultado de teste, instantâneo, e-mail, nome ou user agent é armazenado ali."
         ]
       },

@@ -237,23 +237,31 @@ describe('synced items repository', () => {
         await save(userId, items);
         const texts = db.calls.map(({ text }) => text);
         assert.equal(texts[0], 'SELECT id FROM users WHERE id = $1 FOR UPDATE');
-        assert.equal(texts[1], 'SELECT 1 AS enabled FROM sync_settings WHERE user_id = $1 AND $2 = ANY(collections)');
+        assert.equal(texts[1], 'SELECT collections FROM sync_settings WHERE user_id = $1');
         assert.equal(texts.length, 6);
         assert.equal(texts.filter((text) => text.startsWith('INSERT INTO synced_items')).length, 1);
         assert.ok(texts.every((text) => !text.includes('DROP') && !text.includes('slug-') && !text.includes('checked')));
     });
 
-    it('a collection the user has not enabled → null after the lock and the check, nothing written', async () => {
+    it('a collection the user turned off → null after the lock and the check, nothing written', async () => {
         const { db, save } = await setup();
         await ensureUser(db.query, 'w');
-        for (const settings of [undefined, { collections: [] }, { collections: [preferences.id] }]) {
-            if (settings) db.syncSettings.set('w', { ...settings, updated_at: new Date() });
+        for (const settings of [{ collections: [] }, { collections: [preferences.id] }]) {
+            db.syncSettings.set('w', { ...settings, updated_at: new Date() });
             db.calls.length = 0;
             assert.equal(await save('w', [tick('a', 1)]), null);
             assert.deepEqual(db.calls.map(({ text }) => text.split(' ').slice(0, 4).join(' ')),
-                ['SELECT id FROM users', 'SELECT 1 AS enabled']);
+                ['SELECT id FROM users', 'SELECT collections FROM sync_settings']);
         }
         assert.equal([...db.syncedItems.values()].filter((row) => row.user_id === 'w').length, 0);
+    });
+
+    it('no settings row: every registry collection is on', async () => {
+        const { db, save } = await setup();
+        await ensureUser(db.query, 'w');
+        const saved = await save('w', [{ id: 'theme', updatedAt: 1, deleted: false, value: 'dark' }], { collection: preferences });
+        assert.equal(saved.cursor > saved.base, true);
+        assert.equal(await save('w', [tick('a', 1)]), null, 'an id outside the registry never syncs');
     });
 
     it('needs the users row', async () => {

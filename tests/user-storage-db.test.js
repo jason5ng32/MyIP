@@ -9,7 +9,7 @@ import { listAchievements, unlockAchievement } from '../server/db/achievements.j
 import { FEATURE_USES, recordFeatureUse, sumFeatureUses } from '../server/db/feature-uses.js';
 import { listSyncedItems, saveSyncedItems } from '../server/db/synced-items.js';
 import { readSyncSettings, isSyncEnabled, saveSyncSettings } from '../server/db/sync-settings.js';
-import { SYNC_COLLECTIONS } from '../common/sync-collections.js';
+import { SYNC_COLLECTIONS, SYNC_COLLECTION_IDS } from '../common/sync-collections.js';
 
 const url = process.env.DATABASE_URL_TEST;
 // Rows this file creates carry this prefix; only they are ever deleted.
@@ -179,12 +179,12 @@ describe('user storage on Postgres', { skip: url ? false : 'DATABASE_URL_TEST is
         assert.deepEqual((await list()).items[0], pref('theme', 1, 'dark'));
     });
 
-    it('sync settings: undecided, decided, and a write to a collection not enabled stores nothing', async () => {
+    it('sync settings: no row enables all, a stored choice holds, and a write to a collection turned off stores nothing', async () => {
         const { id, query, transaction, save } = await userWith('h', null);
-        assert.deepEqual(await readSyncSettings(query, id), { decided: false, collections: [] });
-        assert.equal(await save([pref('theme', 1, 'dark')]), null);
-        assert.deepEqual(await saveSyncSettings(transaction, { userId: id, collections: ['connectivity'] }), { decided: true, collections: ['connectivity'] });
-        assert.deepEqual(await readSyncSettings(query, id), { decided: true, collections: ['connectivity'] });
+        assert.deepEqual(await readSyncSettings(query, id), { collections: [...SYNC_COLLECTION_IDS] });
+        assert.notEqual(await save([pref('theme', 1, 'dark')]), null);
+        assert.deepEqual(await saveSyncSettings(transaction, { userId: id, collections: ['connectivity'] }), { collections: ['connectivity'] });
+        assert.deepEqual(await readSyncSettings(query, id), { collections: ['connectivity'] });
         assert.equal(await isSyncEnabled(query, id, 'connectivity'), true);
         assert.equal(await isSyncEnabled(query, id, 'preferences'), false);
         assert.equal(await save([pref('theme', 1, 'dark')]), null);

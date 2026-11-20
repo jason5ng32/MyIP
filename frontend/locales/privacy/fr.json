@@ -73,7 +73,7 @@
           "Un identifiant de compte, une chaîne aléatoire qui n'est ni votre adresse e-mail ni votre nom, et la date de son premier enregistrement.",
           "Les succès que vous avez débloqués et la date de leur déblocage.",
           "Le nombre de fois où vous avez utilisé chaque fonctionnalité comptabilisée, sous forme de simple nombre : ni cible, ni adresse IP, ni date d'utilisation.",
-          "Uniquement si vous activez la synchronisation : vos préférences, vos listes du test de connectivité (y compris les sites que vous y avez ajoutés), votre progression dans la liste de vérification de sécurité et vos options du test de vitesse. Désactiver un élément synchronisé le supprime de votre compte.",
+          "Sauf si vous désactivez la synchronisation : vos préférences, vos listes du test de connectivité (y compris les sites que vous y avez ajoutés), votre progression dans la liste de vérification de sécurité et vos options du test de vitesse. Désactiver un élément synchronisé le supprime de votre compte.",
           "Aucune adresse IP, aucun résultat de test, aucun instantané, aucune adresse e-mail, aucun nom ni user agent n'y est stocké."
         ]
       },

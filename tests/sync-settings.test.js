@@ -5,6 +5,7 @@ import { describe, it } from 'node:test';
 import { readSyncSettings, isSyncEnabled, saveSyncSettings } from '../server/db/sync-settings.js';
 import { ensureUser } from '../server/db/users.js';
 import { fakeUserDb } from './fake-user-db.js';
+import { SYNC_COLLECTION_IDS } from '../common/sync-collections.js';
 
 const transactionOf = (db) => (fn) => fn(db.query);
 
@@ -24,27 +25,28 @@ describe('sync settings repository', () => {
         return { db, save };
     };
 
-    it('no row → undecided, nothing enabled', async () => {
+    it('no row → every registry collection enabled', async () => {
         const { db } = await setup();
-        assert.deepEqual(await readSyncSettings(db.query, 'u'), { decided: false, collections: [] });
-        assert.equal(await isSyncEnabled(db.query, 'u', 'preferences'), false);
+        assert.deepEqual(await readSyncSettings(db.query, 'u'), { collections: [...SYNC_COLLECTION_IDS] });
+        for (const id of SYNC_COLLECTION_IDS) assert.equal(await isSyncEnabled(db.query, 'u', id), true);
+        assert.equal(await isSyncEnabled(db.query, 'u', 'snapshots'), false);
     });
 
-    it('deciding on nothing is a decision; enabling stores the ids in registry order', async () => {
+    it('a stored empty list syncs nothing; enabling stores the ids in registry order', async () => {
         const { db, save } = await setup();
-        assert.deepEqual(await save('u', []), { decided: true, collections: [] });
-        assert.deepEqual(await readSyncSettings(db.query, 'u'), { decided: true, collections: [] });
+        assert.deepEqual(await save('u', []), { collections: [] });
+        assert.deepEqual(await readSyncSettings(db.query, 'u'), { collections: [] });
         assert.equal(await isSyncEnabled(db.query, 'u', 'preferences'), false);
-        assert.deepEqual(await save('u', ['connectivity', 'preferences']), { decided: true, collections: ['preferences', 'connectivity'] });
-        assert.deepEqual(await readSyncSettings(db.query, 'u'), { decided: true, collections: ['preferences', 'connectivity'] });
+        assert.deepEqual(await save('u', ['connectivity', 'preferences']), { collections: ['preferences', 'connectivity'] });
+        assert.deepEqual(await readSyncSettings(db.query, 'u'), { collections: ['preferences', 'connectivity'] });
         assert.equal(await isSyncEnabled(db.query, 'u', 'connectivity'), true);
-        assert.deepEqual(await readSyncSettings(db.query, 'v'), { decided: false, collections: [] });
+        assert.deepEqual(await readSyncSettings(db.query, 'v'), { collections: [...SYNC_COLLECTION_IDS] });
     });
 
     it('a stored id the registry no longer has is left out of the answer', async () => {
         const { db } = await setup();
         db.syncSettings.set('u', { collections: ['snapshots', 'connectivity', 'ipHistory'], updated_at: new Date() });
-        assert.deepEqual(await readSyncSettings(db.query, 'u'), { decided: true, collections: ['connectivity'] });
+        assert.deepEqual(await readSyncSettings(db.query, 'u'), { collections: ['connectivity'] });
     });
 
     it('turning a collection off deletes its rows in every version, tombstones too; others and other users stay', async () => {
