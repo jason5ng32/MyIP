@@ -29,7 +29,11 @@ import asnProfileHandler, { peeringdbReadiness, connectivityReadiness } from '..
 import { isAsRelLoaded } from '../server/datasets/as-rel-db.js';
 import { describeMac } from '../server/datasets/oui-db.js';
 import { isCompleteProfile } from '../server/asn-profile.js';
-import updateAchievementHandler from '../api/update-user-achievement.js';
+import { createAchievementHandlers } from '../api/achievements.js';
+import { requireUser, requireUserStorage } from '../server/guards.js';
+import { AUTH_REASON } from '../common/codes/service-errors.js';
+import { FEATURE_USES, recordFeatureUse } from '../server/db/feature-uses.js';
+import { fakeUserDb, fakeStorage } from './fake-user-db.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { createBulkLookup } from '../api/bulk-lookup.js';
 import { BULK_LOOKUP_MAX_IPS } from '../common/bulk-lookup-limits.js';
@@ -1041,41 +1045,113 @@ describe('bulk-lookup handler', () => {
     });
 });
 
-// -- update-user-achievement handler --------------------------------------
+// -- achievements handlers ------------------------------------------------
 
-describe('update-user-achievement handler', () => {
-    it('rejects non-PUT methods with 405', async () => {
+describe('achievements handlers', () => {
+    // The route's chain: requireUser(), requireUserStorage(), then the handler.
+    const route = async (handler, req, { verify = async () => ({ id: USER_ID }), storage }) => {
         const res = createResponse();
-        await updateAchievementHandler(createRequest({ method: 'POST', body: { name: 'X' } }), res);
-        assert.equal(res.statusCode, 405);
-        assert.deepEqual(res.body, { error: 'Method not allowed' });
-    });
+        for (const step of [requireUser(verify), requireUserStorage(storage), handler]) {
+            let advanced = false;
+            await step(req, res, () => { advanced = true; });
+            if (step !== handler && !advanced) break;
+        }
+        return res;
+    };
+    const setup = (times = [1000, 2000, 3000]) => {
+        const stamps = times.map((ms) => new Date(ms));
+        const db = fakeUserDb({ now: () => stamps.shift() ?? new Date(9999) });
+        return { db, storage: fakeStorage(db), handlers: createAchievementHandlers(fakeStorage(db)) };
+    };
+    const put = (body) => createRequest({ method: 'PUT', body });
 
-    it('reports missing API key before forwarding', async () => {
-        delete process.env.IPCHECKING_API_KEY;
-        const res = createResponse();
-        await updateAchievementHandler(createRequest({ method: 'PUT', body: { name: 'X' } }), res);
-        assert.equal(res.statusCode, 500);
-        assert.deepEqual(res.body, { error: 'API key is missing' });
-    });
-
-    it('PUTs the re-serialized body as JSON with the listed caller headers', async () => {
-        process.env.IPCHECKING_API_KEY = 'test-key';
-        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
-        let called;
-        globalThis.fetch = async (url, init) => {
-            called = { url: new URL(String(url)), init };
-            return new Response(JSON.stringify({ ok: true }), { status: 200 });
-        };
+    it('rejects the wrong method with 405', async () => {
+        const { handlers } = setup();
         const res = signedIn(createResponse());
-        await updateAchievementHandler(withVisitorHeaders(createRequest({ method: 'PUT', body: { name: 'X' } })), res);
+        await handlers.list(createRequest({ method: 'POST' }), res);
+        assert.equal(res.statusCode, 405);
+        const res2 = signedIn(createResponse());
+        await handlers.unlock(createRequest({ method: 'GET' }), res2);
+        assert.equal(res2.statusCode, 405);
+    });
+
+    it('signed out → 403 auth, before storage is touched', async () => {
+        const { db, storage, handlers } = setup();
+        const verify = async () => ({ reason: AUTH_REASON.SIGN_IN_REQUIRED });
+        for (const [handler, req] of [[handlers.list, createRequest()], [handlers.unlock, put({ name: 'IAmHuman' })]]) {
+            const res = await route(handler, req, { verify, storage });
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('storage off or not ready → 503', async () => {
+        const { db, handlers } = setup();
+        for (const options of [{ configured: false }, { ready: false }]) {
+            const storage = fakeStorage(db, options);
+            for (const [handler, req] of [[handlers.list, createRequest()], [handlers.unlock, put({ name: 'IAmHuman' })]]) {
+                const res = await route(handler, req, { storage });
+                assert.equal(res.statusCode, 503);
+                assert.deepEqual(res.body, { error: 'User storage unavailable' });
+            }
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('PUT with an unknown, missing or non-string name → 400, nothing stored', async () => {
+        const { db, storage, handlers } = setup();
+        for (const body of [{ name: 'NoSuchBadge' }, {}, undefined, { name: 42 }, { name: 'constructor' }, { achievement: 'IAmHuman' }]) {
+            const res = await route(handlers.unlock, put(body), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(body));
+            assert.deepEqual(res.body, { error: 'Unknown achievement' });
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('a new user lists nothing, with zero uses, and gets a users row', async () => {
+        const { db, storage, handlers } = setup();
+        const res = await route(handlers.list, createRequest(), { storage });
         assert.equal(res.statusCode, 200);
-        assert.deepEqual(res.body, { ok: true });
-        assert.equal(called.url.pathname, '/updateuserachievements');
-        assert.equal(called.url.searchParams.get('key'), 'test-key');
-        assert.equal(called.init.method, 'PUT');
-        assert.equal(called.init.body, JSON.stringify({ name: 'X' }));
-        assertForwardedHeaders(called.init.headers, { 'content-type': 'application/json', ...END_USER });
+        assert.deepEqual(res.body, { achievements: {}, totalUses: 0 });
+        assert.ok(db.users.has(USER_ID));
+    });
+
+    it('PUT unlocks once; a repeat keeps the first time; GET lists it with the summed uses', async () => {
+        const { db, storage, handlers } = setup([1000, 2000, 3000, 4000]);
+        const first = await route(handlers.unlock, put({ name: 'IAmHuman' }), { storage });
+        assert.equal(first.statusCode, 200);
+        assert.equal(first.body.name, 'IAmHuman');
+        const again = await route(handlers.unlock, put({ name: 'IAmHuman' }), { storage });
+        assert.deepEqual(again.body, first.body);
+        await route(handlers.unlock, put({ name: 'CuriousCat' }), { storage });
+        await recordFeatureUse(db.query, USER_ID, FEATURE_USES.persona);
+        await recordFeatureUse(db.query, USER_ID, FEATURE_USES.persona);
+        await recordFeatureUse(db.query, USER_ID, FEATURE_USES.ipchecking);
+        await recordFeatureUse(db.query, 'someone-else', FEATURE_USES.ipchecking);
+
+        const res = await route(handlers.list, createRequest(), { storage });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, {
+            achievements: {
+                IAmHuman: { achieved: true, achievedTime: first.body.achievedTime },
+                CuriousCat: { achieved: true, achievedTime: res.body.achievements.CuriousCat.achievedTime },
+            },
+            totalUses: 3,
+        });
+        assert.equal(typeof first.body.achievedTime, 'number');
+        assert.ok(res.body.achievements.CuriousCat.achievedTime > first.body.achievedTime);
+    });
+
+    it('a storage failure answers 500 without its details', async () => {
+        const storage = fakeStorage({ query: async () => { throw new Error('relation "x" does not exist'); } });
+        const handlers = createAchievementHandlers(storage);
+        const listRes = await route(handlers.list, createRequest(), { storage });
+        assert.equal(listRes.statusCode, 500);
+        assert.deepEqual(listRes.body, { error: 'Achievements unavailable' });
+        const putRes = await route(handlers.unlock, put({ name: 'IAmHuman' }), { storage });
+        assert.equal(putRes.statusCode, 500);
+        assert.deepEqual(putRes.body, { error: 'Achievement not saved' });
     });
 });
 
@@ -1100,18 +1176,26 @@ describe('get-user-info handler', () => {
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
 
-    it('asks /userinfo with the system key and the listed caller headers', async () => {
+    // Fields beyond { userLevel, quota } (an older upstream's) are not relayed.
+    const upstreamSummary = {
+        userLevel: 'Standard',
+        quota: { month: '2026-11', isSponsor: false, features: {} },
+        functionUses: { total: 9 },
+        achievements: { IAmHuman: { achieved: true, achievedTime: 1 } },
+    };
+
+    it('asks /userinfo with the system key and the listed caller headers, relaying { userLevel, quota }', async () => {
         process.env.IPCHECKING_API_KEY = 'test-key';
         process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
         let called;
         globalThis.fetch = async (url, init) => {
             called = { url: new URL(String(url)), init };
-            return new Response(JSON.stringify({ uid: 'u1' }), { status: 200 });
+            return new Response(JSON.stringify(upstreamSummary), { status: 200 });
         };
         const res = signedIn(createResponse());
         await getUserInfoHandler(withVisitorHeaders(createRequest()), res);
         assert.equal(res.statusCode, 200);
-        assert.deepEqual(res.body, { uid: 'u1' });
+        assert.deepEqual(res.body, { userLevel: 'Standard', quota: upstreamSummary.quota });
         assert.equal(called.url.pathname, '/userinfo');
         assert.equal(called.url.searchParams.get('key'), 'test-key');
         assertForwardedHeaders(called.init.headers, END_USER);

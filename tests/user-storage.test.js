@@ -1,5 +1,6 @@
-// Specs for the optional user storage (server/db/): env gate, lazy loading, migrations, readiness and the users repository, over fakes.
+// Specs for the optional user storage (server/db/): env gate, lazy loading, migrations, readiness, the repositories and the feature-use counter, over fakes.
 import assert from 'node:assert/strict';
+import { EventEmitter } from 'node:events';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
@@ -7,6 +8,10 @@ import { describe, it } from 'node:test';
 import { isUserStorageConfigured, accountSetupGap, createUserStorage, isConnectionLoss } from '../server/db/user-storage.js';
 import { MIGRATIONS_DIR, MIGRATION_LOCK_KEY, orderMigrations, readMigrationFiles, runMigrations } from '../server/db/migrate.js';
 import { ensureUser } from '../server/db/users.js';
+import { listAchievements, unlockAchievement } from '../server/db/achievements.js';
+import { FEATURE_USES, recordFeatureUse, sumFeatureUses } from '../server/db/feature-uses.js';
+import { countFeatureUse } from '../server/count-feature-use.js';
+import { fakeUserDb, fakeStorage } from './fake-user-db.js';
 import configsHandler from '../api/configs.js';
 
 const CONFIGURED = { DATABASE_URL: 'postgres://fake' };
@@ -408,5 +413,126 @@ describe('/api/configs userStorage', () => {
             if (saved === undefined) delete process.env.DATABASE_URL;
             else process.env.DATABASE_URL = saved;
         }
+    });
+});
+
+describe('achievement and feature-use migrations', () => {
+    // Pinned: the shapes other tooling (data migrations) is written against.
+    const tableOf = (sql) => sql.split('\n').filter((line) => !line.startsWith('--')).join(' ').replace(/\s+/g, ' ').trim();
+
+    it('0002 creates achievements and 0003 feature_uses, exactly', async () => {
+        const byName = Object.fromEntries((await readMigrationFiles()).map(({ name, sql }) => [name, sql]));
+        assert.equal(tableOf(byName['0002_achievements']), 'CREATE TABLE achievements ( user_id text NOT NULL REFERENCES users(id), '
+            + 'name text NOT NULL, achieved_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY (user_id, name) );');
+        assert.equal(tableOf(byName['0003_feature_uses']), 'CREATE TABLE feature_uses ( user_id text NOT NULL REFERENCES users(id), '
+            + 'feature text NOT NULL, times integer NOT NULL DEFAULT 0, PRIMARY KEY (user_id, feature) );');
+    });
+});
+
+describe('achievements repository', () => {
+    it('unlocks once, keeps the first time on a repeat, and lists in unlock order', async () => {
+        const stamps = [new Date(1000), new Date(2000), new Date(3000)];
+        const db = fakeUserDb({ now: () => stamps.shift() });
+        await ensureUser(db.query, 'u');
+        const first = await unlockAchievement(db.query, 'u', 'CuriousCat');
+        const repeat = await unlockAchievement(db.query, 'u', 'CuriousCat');
+        await unlockAchievement(db.query, 'u', 'IAmHuman');
+        assert.deepEqual(first, { name: 'CuriousCat', achievedAt: new Date(2000) });
+        assert.deepEqual(repeat, first);
+        assert.deepEqual(await listAchievements(db.query, 'u'), [
+            { name: 'CuriousCat', achievedAt: new Date(2000) },
+            { name: 'IAmHuman', achievedAt: new Date(3000) },
+        ]);
+        assert.deepEqual(await listAchievements(db.query, 'other'), []);
+    });
+
+    it('passes values only as parameters', async () => {
+        const db = fakeUserDb();
+        const id = "x'); DROP TABLE achievements; --";
+        await ensureUser(db.query, id);
+        await unlockAchievement(db.query, id, 'IAmHuman');
+        await listAchievements(db.query, id);
+        assert.ok(db.calls.every(({ text }) => !text.includes(id)));
+    });
+});
+
+describe('feature-uses repository', () => {
+    it('names the five counted features', () => {
+        assert.deepEqual(Object.values(FEATURE_USES).sort(), ['ipdb:ipchecking', 'tool:dnsleaktest', 'tool:invisibility', 'tool:ipblocklist', 'tool:persona']);
+        assert.ok(Object.isFrozen(FEATURE_USES));
+    });
+
+    it('counts per user and feature, creating the users row, and sums over features', async () => {
+        const db = fakeUserDb();
+        assert.equal(await sumFeatureUses(db.query, 'u'), 0);
+        await recordFeatureUse(db.query, 'u', FEATURE_USES.persona);
+        await recordFeatureUse(db.query, 'u', FEATURE_USES.persona);
+        await recordFeatureUse(db.query, 'u', FEATURE_USES.ipblocklist);
+        await recordFeatureUse(db.query, 'v', FEATURE_USES.persona);
+        assert.ok(db.users.has('u') && db.users.has('v'));
+        assert.equal(await sumFeatureUses(db.query, 'u'), 3);
+        assert.equal(await sumFeatureUses(db.query, 'v'), 1);
+        assert.ok(db.calls.every(({ text }) => !text.includes("'u'")));
+    });
+
+    it('rejects a feature outside the list before touching the db', async () => {
+        const db = fakeUserDb();
+        await assert.rejects(recordFeatureUse(db.query, 'u', 'invisibility_' + 'test'), TypeError);
+        assert.equal(db.calls.length, 0);
+    });
+});
+
+describe('countFeatureUse middleware', () => {
+    // Runs the middleware, then "answers" with `status` and emits finish.
+    const answer = (middleware, { status = 200, userId = 'u' } = {}) => {
+        const res = new EventEmitter();
+        res.locals = userId ? { userId } : {};
+        let advanced = false;
+        middleware({}, res, () => { advanced = true; });
+        assert.equal(advanced, true, 'next() runs at once');
+        res.statusCode = status;
+        res.emit('finish');
+    };
+    const settle = () => new Promise((resolve) => setImmediate(resolve));
+
+    it('counts a signed-in answer below 400, once per answer', async () => {
+        const db = fakeUserDb();
+        const middleware = countFeatureUse(FEATURE_USES.invisibility, { storage: fakeStorage(db) });
+        answer(middleware);
+        answer(middleware, { status: 304 });
+        await settle();
+        assert.equal(db.uses.get(`u\u0000${FEATURE_USES.invisibility}`), 2);
+    });
+
+    it('never counts a guest, a failed answer, or without ready storage', async () => {
+        const db = fakeUserDb();
+        answer(countFeatureUse(FEATURE_USES.persona, { storage: fakeStorage(db) }), { userId: null });
+        for (const status of [400, 403, 429, 500, 502]) {
+            answer(countFeatureUse(FEATURE_USES.persona, { storage: fakeStorage(db) }), { status });
+        }
+        answer(countFeatureUse(FEATURE_USES.persona, { storage: fakeStorage(db, { configured: false }) }));
+        answer(countFeatureUse(FEATURE_USES.persona, { storage: fakeStorage(db, { ready: false }) }));
+        await settle();
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('a failing write never throws; it is only logged', async () => {
+        const failing = { query: async () => { throw new Error('connection reset'); } };
+        const middleware = countFeatureUse(FEATURE_USES.ipblocklist, { storage: fakeStorage(failing) });
+        const rejections = [];
+        const onRejection = (err) => rejections.push(err);
+        process.on('unhandledRejection', onRejection);
+        try {
+            answer(middleware);
+            await settle();
+            await settle();
+        } finally {
+            process.off('unhandledRejection', onRejection);
+        }
+        assert.deepEqual(rejections, []);
+    });
+
+    it('refuses an unknown feature when the route is built', () => {
+        assert.throws(() => countFeatureUse('ipinfo'), TypeError);
     });
 });

@@ -48,7 +48,7 @@
                   {{ t('user.Level.' + remoteUserInfo.userLevel) }}
                 </Badge>
               </span>
-              <span v-else-if="!remoteUserInfoFetched" class="text-xs text-muted-foreground">{{
+              <span v-else-if="usageAvailable && !remoteUserInfoFetched" class="text-xs text-muted-foreground">{{
                 t('user.Fields.Fetching') }}</span>
             </div>
           </div>
@@ -71,11 +71,13 @@
             </div>
           </dl>
         </div>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem class="cursor-pointer" @select="openAchievements">
-          <Award />
-          <span>{{ t('user.MyAchievements') }}</span>
-        </DropdownMenuItem>
+        <template v-if="achievementsAvailable">
+          <DropdownMenuSeparator />
+          <DropdownMenuItem class="cursor-pointer" @select="openAchievements">
+            <Award />
+            <span>{{ t('user.MyAchievements') }}</span>
+          </DropdownMenuItem>
+        </template>
       </template>
 
       <!-- Not signed in: sign-in providers -->
@@ -90,13 +92,13 @@
         </DropdownMenuItem>
       </template>
 
-      <!-- Every state: preferences + benefits & usage -->
+      <!-- Every state: preferences + benefits & usage (where the usage summary exists) -->
       <DropdownMenuSeparator />
       <DropdownMenuItem class="cursor-pointer" @select="openPreferences">
         <Cog />
         <span>{{ t('nav.preferences.title') }}</span>
       </DropdownMenuItem>
-      <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
+      <DropdownMenuItem v-if="usageAvailable" class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
         <HeartHandshake />
         <span>{{ t('user.Benefits.Title') }}</span>
       </DropdownMenuItem>
@@ -147,6 +149,9 @@ const userPhotoURL = computed(() => store.user?.photoURL);
 const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata?.createdAt, locale.value));
 const remoteUserInfo = computed(() => store.remoteUserInfo);
 const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
+// The level badge and usage need the IPCheck.ing API; achievements need user storage.
+const usageAvailable = computed(() => store.usageAvailable);
+const achievementsAvailable = computed(() => store.achievementsAvailable);
 // Sign-in methods attached to this account.
 const linkedProviders = computed(() => store.linkedProviders);
 
@@ -163,9 +168,12 @@ const levelBadgeClass = computed(() => {
   }
 });
 
+// Opening the menu asks User.vue for whatever account data is still missing.
 const getUserInfo = async () => {
-  if (remoteUserInfoFetched.value || !isSignedIn.value) return;
-  store.setTriggerRemoteUserInfo(true);
+  if (!isSignedIn.value) return;
+  const usageMissing = usageAvailable.value && !remoteUserInfoFetched.value;
+  const achievementsMissing = achievementsAvailable.value && !store.userAchievementsSynced;
+  if (usageMissing || achievementsMissing) store.setTriggerRemoteUserInfo(true);
 };
 
 const openPreferences = () => {

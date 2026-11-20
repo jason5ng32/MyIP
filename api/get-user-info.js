@@ -1,3 +1,4 @@
+// GET /api/getuserinfo: the signed-in user's level and quota from the IPCheck.ing API, relayed as `{ userLevel, quota }`.
 import logger from '../server/logger.js';
 import { isIpCheckingApiConfigured, requestIpCheckingApi } from '../server/ipcheck-ing-api.js';
 
@@ -13,8 +14,8 @@ export default async (req, res) => {
             throw new Error(`API responded with status: ${apiResponse.status}`);
         }
 
-        const data = await apiResponse.json();
-        res.json(data);
+        const { userLevel, quota } = await apiResponse.json();
+        res.json({ userLevel, quota });
     } catch (error) {
         logger.error({ err: error }, 'get-user-info upstream request failed');
         res.status(500).json({ error: error.message });

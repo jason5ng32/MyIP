@@ -1,7 +1,9 @@
 <template>
     <!-- User account dialog: Benefits + Usage merged behind Tabs. Signed-in
          visitors land on the Usage tab (their own numbers are what they came
-         for); signed-out visitors land on Benefits. -->
+         for); signed-out visitors land on Benefits. Opens only where the
+         usage summary exists (store.usageAvailable). This component also
+         loads and saves the account's achievements. -->
     <Dialog :open="isOpen" @update:open="isOpen = $event">
         <DialogContent :title="t('user.Benefits.Title')" class="max-w-2xl">
             <DialogHeader :icon="HeartHandshake" :title="t('user.Benefits.Title')" />
@@ -69,7 +71,9 @@
                         <span>{{ t('user.SignInToUse') }}</span>
                     </div>
 
-                    <template v-else-if="usageRows.length">
+                    <section v-else-if="usageRows.length" class="space-y-4">
+                        <!-- Every quota row comes from one service: one group, titled with its name. -->
+                        <h3 class="text-base font-semibold m-0">{{ QUOTA_SERVICE_NAME }}</h3>
                         <!-- 24-hour limit: one row; once it is used up, when the
                              next lookup becomes possible (the oldest target in the
                              window ages out — a rolling window never resets as a whole). -->
@@ -115,7 +119,7 @@
                                 class="underline underline-offset-2 hover:text-foreground">{{ t('user.QuotaSponsorCta')
                                 }}</a>
                         </p>
-                    </template>
+                    </section>
 
                     <div v-else class="text-sm text-muted-foreground flex items-center justify-center gap-2 py-10">
                         <Spinner /> {{ t('user.Fields.Fetching') }}
@@ -156,6 +160,8 @@ const { dotClass } = useStatusTone();
 const isOffHome = computed(() => route.matched.length > 0 && route.name !== 'home');
 
 const isSignedIn = computed(() => store.isSignedIn);
+const usageAvailable = computed(() => store.usageAvailable);
+const achievementsAvailable = computed(() => store.achievementsAvailable);
 const remoteUserInfo = computed(() => store.remoteUserInfo);
 const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
 
@@ -180,10 +186,11 @@ const benefitTiers = computed(() => [
 ]);
 
 const openUserBenefits = () => {
+    store.triggerUserBenefits = false;
+    if (!usageAvailable.value) return;
     // Signed-in visitors open straight onto their usage numbers.
     activeTab.value = isSignedIn.value ? 'usage' : 'benefits';
     isOpen.value = true;
-    store.triggerUserBenefits = false;
     if (isSignedIn.value) refreshUserInfo();
     trackEvent('Nav', 'NavClick', 'UserBenefits');
 };
@@ -196,8 +203,11 @@ const USAGE_LABEL_KEYS = Object.fromEntries([
     ...ADVANCED_TOOLS.filter((tool) => tool.quotaKey).map((tool) => [tool.quotaKey, tool.titleKey]),
 ]);
 
-// The feature carrying the 24-hour limit: the IP data source's quotaKey.
-const DAILY_QUOTA_KEY = IP_DATABASES.find((db) => db.quotaKey)?.quotaKey;
+// The metered IP data source: its quotaKey carries the 24-hour limit, and
+// its display name titles the quota group (every row is that service's).
+const QUOTA_SOURCE = IP_DATABASES.find((db) => db.quotaKey);
+const DAILY_QUOTA_KEY = QUOTA_SOURCE?.quotaKey;
+const QUOTA_SERVICE_NAME = QUOTA_SOURCE?.text ?? '';
 
 // Rows for the usage dialog. Empty until the (re)fetched user info lands or
 // when the backend predates the quota field — the template then shows the
@@ -230,7 +240,7 @@ const dailyRow = computed(() => {
 // Refetch on every open (bypassing the one-shot page-load guard) so the
 // numbers reflect what the visitor just consumed in this session.
 const refreshUserInfo = async () => {
-    if (!isSignedIn.value) return;
+    if (!isSignedIn.value || !usageAvailable.value) return;
     try {
         store.remoteUserInfo = await authenticatedFetch(`/api/getuserinfo`);
     } catch (error) {
@@ -238,38 +248,44 @@ const refreshUserInfo = async () => {
     }
 };
 
-// Fetch user info. `remoteUserInfoFetched` flips only on success, so a failed
-// round stays refetchable from Nav / Achievements on their next open.
+// Fetch the usage summary ({ userLevel, quota }). `remoteUserInfoFetched`
+// flips only on success, so a failed round stays refetchable from the menu.
 const getUserInfo = async () => {
-    if (remoteUserInfoFetched.value || !isSignedIn.value) return;
+    if (remoteUserInfoFetched.value || !isSignedIn.value || !usageAvailable.value) return;
     try {
         store.remoteUserInfo = await authenticatedFetch(`/api/getuserinfo`);
         store.remoteUserInfoFetched = true;
-        initUserAchievements();
     } catch (error) {
         console.error('Error fetching user info:', error);
     }
 };
 
-// Initialize user achievements
-const initUserAchievements = () => {
-    if (!remoteUserInfo.value) return;
-
-    // A brand-new account may come back with no achievements payload yet.
-    const { achievements, functionUses } = remoteUserInfo.value;
+// Apply the achievements snapshot, then release the achievement engine's
+// evaluation gate before emitting, so the event already sees synced state.
+const applyAchievements = ({ achievements, totalUses }) => {
     Object.entries(achievements ?? {}).forEach(([key, value]) => {
         if (store.userAchievements[key]) {
             store.userAchievements[key].achieved = value.achieved;
             store.userAchievements[key].achievedTime = value.achievedTime;
         }
     });
-
-    // Snapshot applied — release the achievement engine's evaluation gate
-    // before emitting anything, so the event below already sees synced state.
     store.userAchievementsSynced = true;
-
     // Unlock rules (IAmHuman / MakingBigNews) live in data/achievement-rules.js.
-    emitAppEvent('user:info-loaded', { totalFunctionUses: functionUses?.total ?? 0 });
+    emitAppEvent('user:info-loaded', { totalFunctionUses: totalUses ?? 0 });
+};
+
+// Fetch the achievements snapshot once; a failed round stays refetchable.
+let achievementsLoading = null;
+const getAchievements = async () => {
+    if (store.userAchievementsSynced || achievementsLoading || !isSignedIn.value || !achievementsAvailable.value) return;
+    achievementsLoading = authenticatedFetch(`/api/achievements`);
+    try {
+        applyAchievements(await achievementsLoading);
+    } catch (error) {
+        console.error('Error fetching achievements:', error);
+    } finally {
+        achievementsLoading = null;
+    }
 };
 
 // Update local achievement status
@@ -278,7 +294,7 @@ const updateLocalAchievementStatus = (achievementName) => {
     store.userAchievements[achievementName].achievedTime = Date.now();
 };
 
-// Update user achievement
+// Unlock: shown at once, then saved; the stored time replaces the local one.
 const updateUserAchievement = async (achievementName) => {
     isUpdateAchievementsSuccess.value = false;
     updateLocalAchievementStatus(achievementName);
@@ -287,17 +303,23 @@ const updateUserAchievement = async (achievementName) => {
     store.setAlert(true, 'text-success', message, t('user.Achievements.Congrats'), 5000);
 
     try {
-        await authenticatedFetch(`/api/updateuserachievement`, 'PUT', { achievement: achievementName });
+        const saved = await authenticatedFetch(`/api/achievements`, 'PUT', { name: achievementName });
+        if (Number.isFinite(saved?.achievedTime)) store.userAchievements[achievementName].achievedTime = saved.achievedTime;
         isUpdateAchievementsSuccess.value = true;
     } catch (error) {
         console.error('Error updating user achievement', error);
     }
 };
 
-// User info loads once signed in and, on Home, after its tests (allHasLoaded);
-// other pages never run them. getUserInfo self-guards against double fetches.
-watch(() => isSignedIn.value && (store.allHasLoaded || isOffHome.value), (ready) => {
+// Account data loads once signed in and, on Home, after its tests
+// (allHasLoaded); other pages never run them. Usage and achievements load
+// independently, each once its capability is known; both self-guard.
+const accountDataReady = computed(() => isSignedIn.value && (store.allHasLoaded || isOffHome.value));
+watch(() => accountDataReady.value && usageAvailable.value, (ready) => {
     if (ready) getUserInfo();
+}, { immediate: true });
+watch(() => accountDataReady.value && achievementsAvailable.value, (ready) => {
+    if (ready) getAchievements();
 }, { immediate: true });
 
 watch(() => triggerUserBenefits.value, (newVal) => {
@@ -315,6 +337,7 @@ watch(() => triggerRemoteUserInfo.value, (newVal) => {
     if (!newVal) return;
     store.triggerRemoteUserInfo = false;
     getUserInfo();
+    getAchievements();
 });
 
 watch(() => triggerUpdateAchievements.value, (newVal) => {

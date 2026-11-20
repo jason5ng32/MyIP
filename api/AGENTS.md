@@ -25,8 +25,8 @@ Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `cf-radar` / `asn-history` / `asn-connectivity` / `asn-profile` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona` /
-`ip-blocklist` / `bulk-lookup`), user
-proxies (`get-user-info` / `update-user-achievement`), platform (`configs` /
+`ip-blocklist` / `bulk-lookup`), account data (`get-user-info`, a proxy;
+`achievements`, from user storage), platform (`configs` /
 `sentry-tunnel` / `share-report`). Each file's header comment states its route
 and purpose — read those for specifics.
 
@@ -224,7 +224,7 @@ on demand.
 ### IPCheck.ing API requests go through one helper with a header list
 
 Handlers proxying the IPCheck.ing API (`ipcheck-ing`,
-`invisibility-test`, `update-user-achievement`, `get-user-info`,
+`invisibility-test`, `get-user-info`,
 `dns-leak-test`, `persona`, `ip-blocklist`, and `asn-profile`'s reputation via
 `server/asn-reputation.js`) send their requests through
 `server/ipcheck-ing-api.js`. It forwards a fixed list of the caller's headers
@@ -240,10 +240,11 @@ so no feature is marked used up. Third-party upstreams get only what's
 explicitly needed.
 
 Usage reaches MyIP two ways: that `quota`-coded answer (the front end marks the
-feature used up) and the `/api/getuserinfo` summary, held in memory only
-(`store.remoteUserInfo`; MyIP reads its `quota.features` and `functionUses.total`).
-Each feature has exactly one meter — the IPCheck.ing API; MyIP stores none of its
-counts. Pinned by `tests/usage-contract.test.js`.
+feature used up) and the `/api/getuserinfo` summary, relayed as `{ userLevel,
+quota }` and held in memory only (`store.remoteUserInfo`; MyIP reads its
+`quota.features`). Each quota has exactly one meter — the IPCheck.ing API; the
+lifetime counts in user storage (`feature_uses`) feed achievements only, never
+a quota. Pinned by `tests/usage-contract.test.js`.
 
 ### Firebase Auth handler proxy
 
@@ -280,6 +281,27 @@ edge-cached), not ready. Specs drive the runner and repositories with fakes;
 `DATABASE_URL_TEST` runs the optional real-database spec. Data minimisation:
 store only what a feature needs keyed by the opaque user id — no e-mail,
 name, IP, user agent or last-seen time.
+
+Tables: `users` (id, created), `achievements` (user, name, unlock time; one
+row per unlocked name) and `feature_uses` (user, feature, lifetime count) —
+nothing about a use but the count: no target, IP or time.
+
+- **Achievements** (`api/achievements.js`, behind `requireUser()` +
+  `requireUserStorage()`, no-store, the users row ensured on first contact):
+  `GET /api/achievements` → `{ achievements: { <Name>: { achieved: true,
+  achievedTime } }, totalUses }` (epoch ms; unlocked names only; `totalUses` =
+  the user's summed `feature_uses`); `PUT /api/achievements` `{ name }` (own
+  1 KB body limit) → `{ name, achievedTime }`, 400 for a name outside
+  `common/codes/achievements.js` — the one name list, which the front end
+  reads too. A repeat unlock keeps the first time.
+- **Use counting** (`server/count-feature-use.js`): `countFeatureUse(<id>)`,
+  attached in `backend-server.js` to the five IPCheck.ing-API-backed routes
+  (`/api/ipchecking` via its `api/ip-sources.js` row's `featureUse`), adds
+  one for a signed-in caller once the route answered below 400. It watches
+  the response's `finish`, never delays or fails it, skips guests and a
+  storage that is off or not ready, and a failed write only warns. The ids
+  (`FEATURE_USES`, `server/db/feature-uses.js`) are MyIP's own `<kind>:<name>`
+  (`ipdb:ipchecking`, `tool:persona`), never the upstream's metered names.
 
 ## Edge caching
 

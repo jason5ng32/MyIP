@@ -5,7 +5,9 @@ import { fileURLToPath } from 'url';
 import pinoHttp from 'pino-http';
 import logger from './server/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
-    requireValidRecordType, requireValidReportId, normalizeAsnQuery, requireUser, optionalUser } from './server/guards.js';
+    requireValidRecordType, requireValidReportId, normalizeAsnQuery, requireUser, optionalUser, requireUserStorage } from './server/guards.js';
+import { countFeatureUse } from './server/count-feature-use.js';
+import { FEATURE_USES } from './server/db/feature-uses.js';
 import { withTimeZone } from './server/ip-timezone.js';
 import { initSourceDailyLimits, sourceDailyLimit } from './server/source-daily-limits.js';
 import { inspectAllowedDomains } from './server/referer-check.js';
@@ -41,7 +43,7 @@ import validateConfigs from './api/configs.js';
 import bulkLookupHandler from './api/bulk-lookup.js';
 import { bulkLookupSource } from './server/bulk-lookup-sources.js';
 import getUserinfo from './api/get-user-info.js';
-import updateUserAchievement from './api/update-user-achievement.js';
+import listAchievementsHandler, { unlockAchievement as unlockAchievementHandler } from './api/achievements.js';
 import { reloadMaxMindDatabases, isMaxMindReady, getMaxMindDbPaths } from './server/datasets/maxmind-service.js';
 import { bootstrapDatasets, startDatasetScheduler, watchDatasets } from './server/datasets/dataset-updater.js';
 import { datasets } from './server/datasets/datasets.js';
@@ -91,6 +93,8 @@ if (process.env.LOG_HTTP === 'true') {
 // its own tight parser runs first, and the global one skips a body that is
 // already parsed.
 app.use('/api/bulk-lookup', express.json({ limit: '16kb' }));
+// An achievement unlock is one short name.
+app.use('/api/achievements', express.json({ limit: '1kb' }));
 app.use(express.json({ limit: '500kb' }));
 
 // Default every /api/* response to no-store. Routes that want edge caching
@@ -155,6 +159,7 @@ for (const source of IP_SOURCES) {
         requirePublicIP(),
         ...(source.gates ?? []),
         sourceDailyLimit(source.key),
+        ...(source.featureUse ? [countFeatureUse(source.featureUse)] : []),
         withTimeZone(),
         ...(source.cacheSeconds ? [cacheable(source.cacheSeconds)] : []),
         source.handler);
@@ -203,17 +208,21 @@ app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 app.get('/api/dnsresolver', requireValidDomain('hostname'), requireValidRecordType(), dnsResolver);
 // Sign-in is verified here (server/guards.js): requireUser() refuses a
 // signed-out or invalid caller, optionalUser() lets a signed-out one through.
-app.get('/api/dnsleaktest/session/:token', requireUser(), dnsLeakGetResult);
-app.get('/api/invisibility', requireUser(), invisibilitytestHandler);
-app.get('/api/ipblocklist', requirePublicIP(), optionalUser(), ipBlocklistHandler);
+// countFeatureUse() adds one to a signed-in caller's lifetime count after an
+// answer below 400 (user storage, for achievements; never a quota).
+app.get('/api/dnsleaktest/session/:token', requireUser(), countFeatureUse(FEATURE_USES.dnsleaktest), dnsLeakGetResult);
+app.get('/api/invisibility', requireUser(), countFeatureUse(FEATURE_USES.invisibility), invisibilitytestHandler);
+app.get('/api/ipblocklist', requirePublicIP(), optionalUser(), countFeatureUse(FEATURE_USES.ipblocklist), ipBlocklistHandler);
 app.get('/api/getuserinfo', requireUser(), getUserinfo);
-app.put('/api/updateuserachievement', requireUser(), updateUserAchievement);
+// Achievements live in user storage: 503 without it.
+app.get('/api/achievements', requireUser(), requireUserStorage(), listAchievementsHandler);
+app.put('/api/achievements', requireUser(), requireUserStorage(), unlockAchievementHandler);
 // Shared reports stay no-store: an edge cache could serve a report past its
 // KV expiry, and private diagnostic data doesn't belong in a public cache.
 app.get('/api/report/:id', requireValidReportId(), getReportHandler);
 app.post('/api/report', createReportHandler);
 // One observation in, one graded report out — per-visitor by definition.
-app.post('/api/persona/evaluate', requireUser(), personaEvaluateHandler);
+app.post('/api/persona/evaluate', requireUser(), countFeatureUse(FEATURE_USES.persona), personaEvaluateHandler);
 // Bulk IP Lookup: local data only. Resolved here so a bad BULK_LOOKUP_SOURCE
 // warns at boot rather than on the first request.
 bulkLookupSource();

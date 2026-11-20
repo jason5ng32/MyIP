@@ -245,6 +245,24 @@ describe('store — getters', () => {
     assert.equal(s.capabilities.userStorage, true);
   });
 
+  it('achievements need sign-in + user storage, usage sign-in + the IPCheck.ing API, independently', () => {
+    const s = useMainStore();
+    const combos = [
+      // [accounts, configs, achievements, usage]
+      [false, { userStorage: true, ipChecking: true }, false, false],
+      [true, {}, false, false],
+      [true, { userStorage: true }, true, false],
+      [true, { ipChecking: true }, false, true],
+      [true, { userStorage: true, ipChecking: true }, true, true],
+    ];
+    for (const [accounts, configs, achievements, usage] of combos) {
+      s.isFireBaseSet = accounts;
+      s.configs = configs;
+      assert.equal(s.achievementsAvailable, achievements, JSON.stringify({ accounts, configs }));
+      assert.equal(s.usageAvailable, usage, JSON.stringify({ accounts, configs }));
+    }
+  });
+
   it('capabilities carries the build-time probe facts, never configs values', () => {
     const s = useMainStore();
     s.configs = { invisibilityProbe: true, dnsLeakProbe: true };

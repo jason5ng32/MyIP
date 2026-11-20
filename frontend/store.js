@@ -6,6 +6,7 @@ import { markPendingRedirectSignIn, shouldFallBackToRedirect, takePendingRedirec
 import { isRunningAsPwa } from './utils/pwa.js';
 import i18n from './locales/i18n.js';
 import { createInitialAchievementsState } from './data/achievements.js';
+import { ACHIEVEMENT_NAMES } from './utils/codes/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
 import { createDefaultPreferences, PREFS_STORAGE_KEY } from './data/default-preferences.js';
 import { sanitizeLists } from './utils/features/connectivity-lists.js';
@@ -52,10 +53,10 @@ export const useMainStore = defineStore('main', {
     triggerRemoteUserInfo: false,
     triggerUpdateAchievements: false,
     achievementToUpdate: '',
-    // achievements defined in data/achievements.js; state is created by factory to avoid shared references between instances
-    userAchievements: createInitialAchievementsState(),
-    // True once the remote achievements snapshot has been applied to
-    // userAchievements (User.vue initUserAchievements). The achievement
+    // One entry per achievement name (utils/codes/achievements.js), fresh per store instance.
+    userAchievements: createInitialAchievementsState(ACHIEVEMENT_NAMES),
+    // True once the /api/achievements snapshot has been applied to
+    // userAchievements (User.vue applyAchievements). The achievement
     // engine holds rule evaluation until then — the all-false initial state
     // must never be mistaken for "nothing achieved yet".
     userAchievementsSynced: false,
@@ -111,6 +112,14 @@ export const useMainStore = defineStore('main', {
       ...state.configs, ...state.probeCapabilities,
       accounts: state.isFireBaseSet, userStorage: Boolean(state.configs.userStorage),
     }),
+    // Achievements need sign-in and user storage; the user level and the
+    // usage dialog need sign-in and the IPCheck.ing API. Each works without the other.
+    achievementsAvailable() {
+      return this.capabilities.accounts && this.capabilities.userStorage;
+    },
+    usageAvailable() {
+      return this.capabilities.accounts && Boolean(this.capabilities.ipChecking);
+    },
     curlDomainsHadSet: (state) => {
       return state.curl.ipv4Domain && state.curl.ipv6Domain && state.curl.ipv64Domain;
     },

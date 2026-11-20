@@ -148,11 +148,11 @@ describe('requestIpCheckingApi', () => {
         configure();
         const calls = stubFetch();
         const body = { name: 'X', nested: { a: 1 } };
-        await requestIpCheckingApi('/updateuserachievements', {
-            method: 'PUT', body, forwardFrom: { headers: VISITOR_HEADERS },
+        await requestIpCheckingApi('/persona/evaluate', {
+            method: 'POST', body, forwardFrom: { headers: VISITOR_HEADERS },
         });
         const { init } = calls[0];
-        assert.equal(init.method, 'PUT');
+        assert.equal(init.method, 'POST');
         assert.equal(init.body, JSON.stringify(body));
         assert.equal(init.headers['content-type'], 'application/json');
         assert.equal(Object.keys(init.headers).filter((name) => name.toLowerCase() === 'content-type').length, 1);

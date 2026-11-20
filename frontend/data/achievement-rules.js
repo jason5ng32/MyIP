@@ -4,13 +4,13 @@
 //
 // Each rule: { event, slug, when? }
 //   event — app-event name emitted by a component (see utils/app-events.js)
-//   slug  — achievement key from data/achievements.js
+//   slug  — achievement name from utils/codes/achievements.js
 //   when  — optional pure predicate over the event payload; omitted = always
 //
 // Rules are evaluated by composables/use-achievement-engine.js, which owns
 // the cross-cutting guards (signed-in check, already-achieved check, trigger
 // spacing). Keep predicates pure — tests/achievement-rules.test.js unit-tests
-// them and asserts every slug exists in data/achievements.js.
+// them and asserts every slug is a known achievement name.
 
 export const ACHIEVEMENT_RULES = [
     // Speed test finished — payload { downloadSpeed, uploadSpeed } in Mbps.
@@ -21,7 +21,8 @@ export const ACHIEVEMENT_RULES = [
     { event: 'speedtest:finished', slug: 'TooFastTooSimple', when: (p) => p.uploadSpeed >= 200 },
     { event: 'speedtest:finished', slug: 'SwiftAscent', when: (p) => p.uploadSpeed >= 1000 },
 
-    // Remote user info loaded after sign-in — payload { totalFunctionUses }.
+    // Achievements snapshot loaded after sign-in — payload { totalFunctionUses }:
+    // the account's lifetime uses of the counted features (/api/achievements totalUses).
     { event: 'user:info-loaded', slug: 'IAmHuman' },
     { event: 'user:info-loaded', slug: 'MakingBigNews', when: (p) => p.totalFunctionUses > 1000 },
 

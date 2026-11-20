@@ -73,10 +73,9 @@ const hitsOf = (pattern, files = [...SOURCES.keys()]) => files.flatMap((path) =>
 
 // --- fixture ----------------------------------------------------------------
 
-// The /api/getuserinfo summary in the shape the front end reads (invented values).
+// The /api/getuserinfo summary, `{ userLevel, quota }`, as the front end reads it (invented values).
 const summaryFixture = () => ({
-  userLevel: 2,
-  functionUses: { total: 1234 },
+  userLevel: 'Standard',
   quota: {
     month: '2026-11',
     isSponsor: false,
@@ -88,7 +87,6 @@ const summaryFixture = () => ({
       ip_hitlist: { percent: 10, exhausted: false },
     },
   },
-  achievements: { IAmHuman: { achieved: true, achievedTime: 1763600000000 } },
 });
 
 // The registries' quotaKey values: the only home of the metered feature names.
@@ -161,7 +159,7 @@ describe('usage contract — the usage summary', () => {
 
   it('reads absent data as not exceeded and leaves it absent', () => {
     const s = useMainStore();
-    for (const info of [{}, null, { quota: {} }, { quota: { features: {} } }, { functionUses: { total: 3 } }]) {
+    for (const info of [{}, null, { quota: {} }, { quota: { features: {} } }, { userLevel: 'Standard' }]) {
       s.remoteUserInfo = info;
       assert.equal(s.quotaExceeded('ipinfo'), false);
       s.markQuotaExhausted('ipinfo');
@@ -169,11 +167,9 @@ describe('usage contract — the usage summary', () => {
     }
   });
 
-  it('reads functionUses only for its total', () => {
+  it('no code reads use counts from it: those live in user storage', () => {
     const readers = [...SOURCES.keys()].filter((path) => SOURCES.get(path).includes('functionUses'));
-    assert.deepEqual(readers, ['frontend/components/User.vue']);
-    const accesses = SOURCES.get('frontend/components/User.vue').match(/functionUses(\?\.|\.|\[)\w*/g);
-    assert.deepEqual([...new Set(accesses)], ['functionUses?.total']);
+    assert.deepEqual(readers, []);
   });
 });
 

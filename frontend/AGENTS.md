@@ -59,8 +59,15 @@ Every file opens with a header comment stating its purpose — read those.
 Components never touch achievements — they emit domain events unconditionally
 (`emitAppEvent('speedtest:finished', {…})`); `data/achievement-rules.js` maps
 events → slugs, `composables/use-achievement-engine.js` owns all guards (rules
-wait for the remote snapshot; pre-sync hits parked). New achievement = entry +
-rule + (only if no suitable event exists) a new event. The shareable report
+wait for the remote snapshot; pre-sync hits parked). The snapshot comes from
+user storage (`GET /api/achievements`, loaded and unlocked through
+`PUT /api/achievements` by `User.vue`); its `totalUses` feeds
+`user:info-loaded`. Achievements need `store.achievementsAvailable` (sign-in +
+`userStorage`); the user level and the usage dialog need `store.usageAvailable`
+(sign-in + `ipChecking`, `/api/getuserinfo`) — each works, or is absent,
+without the other. New achievement = a name in `common/codes/achievements.js`
++ its `public/achievements/<lowercased name>.webp` + rule + (only if no
+suitable event exists) a new event. The shareable report
 rides the same bus: `<domain>:finished` → `use-report-collector.js` →
 `utils/report/report-builders.js` → sections whitelisted by `common/report-schema.js`.
 New reportable test = event + builder + schema entry in one change; new result
