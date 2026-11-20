@@ -368,7 +368,7 @@
       "syncChecklist": "Security Checklist progress",
       "syncSpeedtest": "Speed test options",
       "syncNever": "IPs, lookup history, snapshots, test results and the like are never synced. They stay in this browser only.",
-      "syncTips": "What is on follows your account on every device. Signing out removes it from this device until you sign in again.",
+      "syncTips": "With sync on, you choose what to sync, and it appears on every device you sign in to. Signing out removes it from this device until you sign in again.",
       "syncSignedOut": "Sign in to sync with your account.",
       "syncSynced": "Synced with your account.",
       "syncReload": "Sync is paused on this page. Reload the page to continue.",

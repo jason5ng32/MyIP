@@ -1,21 +1,27 @@
 <template>
-  <!-- The sync choice: an "Enable" switch with the collections as checkboxes nested under it, shown while it is
-       on. Emits the next choice (applySyncToggle); the caller decides when it is saved. -->
-  <div class="rounded-lg border bg-card">
-    <div class="flex items-center justify-between gap-3 p-3">
-      <label :for="`${idPrefix}Master`" class="min-w-0 flex-1 text-sm font-medium select-none"
-        :class="disabled ? 'opacity-50' : 'cursor-pointer'">{{ t('nav.preferences.syncEnable') }}</label>
-      <Switch :id="`${idPrefix}Master`" class="shrink-0" :model-value="modelValue.master" :disabled="disabled"
-        @update:model-value="(value) => toggle('master', value)" />
+  <!-- The sync choice, in the Preferences switch-row style: an "Enable" row with its tip, and while it is on one
+       indented switch row per collection. Emits the next choice (applySyncToggle); the caller decides when it is
+       saved. -->
+  <div class="rounded-lg border bg-card divide-y overflow-hidden">
+    <div class="p-3 pb-2">
+      <div class="flex items-center justify-between gap-3">
+        <label :for="`${idPrefix}Master`" class="min-w-0 flex-1 text-sm font-medium select-none"
+          :class="disabled ? 'opacity-50' : 'cursor-pointer'">{{ t('nav.preferences.syncEnable') }}</label>
+        <Switch :id="`${idPrefix}Master`" class="shrink-0" :model-value="modelValue.master" :disabled="disabled"
+          @update:model-value="(value) => toggle('master', value)" />
+      </div>
+      <p class="mt-1 text-xs text-muted-foreground leading-relaxed">{{ t('nav.preferences.syncTips') }}</p>
     </div>
-    <div v-if="modelValue.master" class="space-y-2 border-t px-3 py-3 pl-6">
-      <label v-for="option in SYNC_OPTIONS" :key="option.id" class="flex items-center gap-2 text-sm select-none"
-        :class="disabled ? 'opacity-50' : 'cursor-pointer'">
-        <Checkbox :model-value="modelValue[option.id]" :disabled="disabled"
-          @update:model-value="(value) => toggle(option.id, value === true)" :class="disabled ? '' : 'cursor-pointer'" />
-        {{ t(option.label) }}
-      </label>
-    </div>
+    <template v-if="modelValue.master">
+      <!-- Collections: indented and tinted, so they read as parts of the row above. -->
+      <div v-for="option in SYNC_OPTIONS" :key="option.id"
+        class="flex items-center justify-between gap-3 bg-muted/40 py-2.5 pr-3 pl-7">
+        <label :for="`${idPrefix}_${option.id}`" class="min-w-0 flex-1 text-sm select-none"
+          :class="disabled ? 'opacity-50' : 'cursor-pointer'">{{ t(option.label) }}</label>
+        <Switch :id="`${idPrefix}_${option.id}`" class="shrink-0" :model-value="modelValue[option.id]"
+          :disabled="disabled" @update:model-value="(value) => toggle(option.id, value)" />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -23,7 +29,6 @@
 import { useI18n } from 'vue-i18n';
 import { applySyncToggle } from '@/utils/features/sync-settings.js';
 import { Switch } from '@/components/ui/switch';
-import { Checkbox } from '@/components/ui/checkbox';
 
 const props = defineProps({
   // `{ master, <collection id>: boolean }` (utils/features/sync-settings.js)

@@ -368,7 +368,7 @@
       "syncChecklist": "Progression de la liste de vérification de sécurité",
       "syncSpeedtest": "Options du test de vitesse",
       "syncNever": "Les IP, l'historique des recherches, les instantanés, les résultats des tests et autres données de ce type ne sont jamais synchronisés. Ils restent uniquement dans ce navigateur.",
-      "syncTips": "Ce qui est activé suit votre compte sur chaque appareil. La déconnexion le retire de cet appareil jusqu'à votre prochaine connexion.",
+      "syncTips": "Une fois la synchronisation activée, vous choisissez ce qui est synchronisé ; ces éléments apparaissent sur chaque appareil où vous êtes connecté. La déconnexion les retire de cet appareil jusqu'à votre prochaine connexion.",
       "syncSignedOut": "Connectez-vous pour synchroniser avec votre compte.",
       "syncSynced": "Synchronisé avec votre compte.",
       "syncReload": "La synchronisation est en pause sur cette page. Rechargez la page pour continuer.",

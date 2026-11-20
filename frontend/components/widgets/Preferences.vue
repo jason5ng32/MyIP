@@ -66,9 +66,9 @@
           </div>
         </section>
 
-        <!-- Sync settings: the title row carries the status badge; the shared controls (an Enable switch, the two
-             collections nested under it while on) apply at once; then what is synced and what never is. Only where
-             sync is possible; signed out, one sentence. -->
+        <!-- Sync settings: the title row carries the status badge; the controls (an Enable switch with its tip, the
+             collections' switches under it while on) apply at once; then what never syncs. Only where sync is
+             possible; signed out, one sentence. -->
         <section v-if="accountSyncAvailable" id="Pref_sync">
           <div class="mb-2 flex items-center justify-between gap-2">
             <h3 class="m-0 flex min-w-0 items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -80,9 +80,8 @@
             </span>
           </div>
           <template v-if="isSignedIn">
-            <SyncChoiceControls :model-value="syncDraft" id-prefix="prefSync" :disabled="!syncEditable"
+            <SyncChoiceControls :model-value="syncDraft" id-prefix="prefSync" :disabled="!syncKnown"
               @update:model-value="setSync" />
-            <!-- <SectionTip>{{ t('nav.preferences.syncTips') }}</SectionTip> -->
             <SectionTip>{{ t('nav.preferences.syncNever') }}</SectionTip>
           </template>
           <SectionTip v-else>{{ t('nav.preferences.syncSignedOut') }}</SectionTip>
@@ -394,13 +393,14 @@ const syncDraft = ref(defaultSyncChoice());
 const syncSaving = ref(false);
 const syncSaveFailed = ref(false);
 const syncKnown = computed(() => store.syncSettings?.user === store.user?.uid && store.syncSettings?.status !== 'unknown');
-const syncEditable = computed(() => syncKnown.value && !syncSaving.value);
 // The draft follows the account; turned off, the collections are shown all on for the next Enable.
 watch(() => store.syncSettings, (settings) => {
   if (syncSaving.value) return;
   syncDraft.value = syncChoiceOf(settings?.collections ?? []);
 }, { immediate: true });
+// One save at a time: a toggle during a save is ignored, the controls stay as they are (no dimming).
 const setSync = async (next) => {
+  if (syncSaving.value) return;
   const previous = syncDraft.value;
   if (chosenCollections(next).join() === chosenCollections(previous).join()) {
     syncDraft.value = next;

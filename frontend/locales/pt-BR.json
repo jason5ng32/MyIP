@@ -368,7 +368,7 @@
       "syncChecklist": "Progresso do checklist de segurança",
       "syncSpeedtest": "Opções do teste de velocidade",
       "syncNever": "IPs, histórico de consultas, instantâneos, resultados de testes e dados semelhantes nunca são sincronizados. Ficam apenas neste navegador.",
-      "syncTips": "O que estiver ativado acompanha sua conta em todos os dispositivos. Sair remove esses dados deste dispositivo até você entrar novamente.",
+      "syncTips": "Com a sincronização ativada, você escolhe o que sincronizar, e esses itens aparecem em todos os dispositivos em que você entrar. Sair remove esses dados deste dispositivo até você entrar novamente.",
       "syncSignedOut": "Entre na sua conta para sincronizar.",
       "syncSynced": "Sincronizado com sua conta.",
       "syncReload": "A sincronização está pausada nesta página. Recarregue a página para continuar.",
