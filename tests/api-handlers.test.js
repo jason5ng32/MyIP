@@ -105,7 +105,6 @@ const signedIn = (res) => {
 const UPSTREAM_SIGN_IN_REQUIRED = { error: 'Sign in required', message: 'Authorization header is missing.', code: 'sign_in_required' };
 const UPSTREAM_INVALID_TOKEN = { error: 'Invalid token', message: 'Firebase ID token has expired.', code: 'invalid_token' };
 const UPSTREAM_QUOTA = { error: 'Monthly quota exceeded', code: 'quota_exceeded' };
-const UPSTREAM_SERVICE_LIMIT = { error: 'Service limit reached', code: 'service_limit' };
 const CODED_SIGN_IN_REQUIRED = { error: 'Sign in required', code: 'auth', reason: 'sign_in_required' };
 const CODED_INVALID_TOKEN = { error: 'Invalid token', code: 'auth', reason: 'invalid_token' };
 const CODED_QUOTA = { error: 'Monthly quota exceeded', code: 'quota' };
@@ -533,7 +532,6 @@ describe('persona handler', () => {
             [403, UPSTREAM_SIGN_IN_REQUIRED, CODED_SIGN_IN_REQUIRED],
             [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
             [429, UPSTREAM_QUOTA, CODED_QUOTA],
-            [429, UPSTREAM_SERVICE_LIMIT, { error: 'Service limit reached' }],
             [400, { error: 'Invalid country' }, { error: 'Invalid country' }],
         ]) {
             globalThis.fetch = upstreamAnswer(status, upstream);
@@ -776,16 +774,6 @@ describe('invisibility-test handler', () => {
         assert.equal(called.url.searchParams.get('apikey'), 'test-key');
         assertForwardedHeaders(called.init.headers, END_USER);
     });
-
-    it('answers a service limit with its status and no quota code', async () => {
-        process.env.IPCHECKING_API_KEY = 'test-key';
-        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
-        globalThis.fetch = upstreamAnswer(429, UPSTREAM_SERVICE_LIMIT);
-        const res = createResponse();
-        await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
-        assert.equal(res.statusCode, 429);
-        assert.deepEqual(res.body, { error: 'Service limit reached' });
-    });
 });
 
 // -- ip-blocklist handler -------------------------------------------------
@@ -847,15 +835,6 @@ describe('ip-blocklist handler', () => {
         await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
         assert.equal(res.statusCode, 429);
         assert.deepEqual(res.body, CODED_QUOTA);
-    });
-
-    it('passes a service limit through as 429 without the quota code', async () => {
-        configure();
-        globalThis.fetch = upstreamAnswer(429, UPSTREAM_SERVICE_LIMIT);
-        const res = createResponse();
-        await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
-        assert.equal(res.statusCode, 429);
-        assert.deepEqual(res.body, { error: 'Service limit reached' });
     });
 
     it('turns any other upstream failure into a 500', async () => {
@@ -1669,7 +1648,6 @@ describe('dns-leak-test getSessionResult', () => {
         for (const [status, upstream, coded] of [
             [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
             [429, UPSTREAM_QUOTA, CODED_QUOTA],
-            [429, UPSTREAM_SERVICE_LIMIT, { error: 'Service limit reached' }],
         ]) {
             globalThis.fetch = upstreamAnswer(status, upstream);
             const res = createResponse();
@@ -1790,7 +1768,7 @@ describe('ipcheck-ing handler', () => {
         const failing = await silenced(() => callWith(async () => new Response('busy', { status: 503 })));
         assert.equal(failing.statusCode, 500);
         assert.deepEqual(failing.body, { error: 'API responded with status: 503' });
-        const limited = await silenced(() => callWith(upstreamAnswer(429, UPSTREAM_SERVICE_LIMIT)));
+        const limited = await silenced(() => callWith(upstreamAnswer(429, UPSTREAM_QUOTA)));
         assert.equal(limited.statusCode, 500);
         assert.equal('code' in limited.body, false);
         const down = await silenced(() => callWith(async () => { throw new Error('network down'); }));

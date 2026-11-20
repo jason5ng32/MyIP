@@ -238,14 +238,6 @@ describe('ipCheckingApiErrorBody', () => {
         );
     });
 
-    it('gives a 429 service limit no code: it is not the user quota', async () => {
-        assert.deepEqual(
-            await ipCheckingApiErrorBody(answer(429, { error: 'Service limit reached', code: 'service_limit' })),
-            { error: 'Service limit reached' },
-        );
-        assert.deepEqual(await ipCheckingApiErrorBody(answer(429, { code: 'service_limit' })), { error: 'Upstream status 429' });
-    });
-
     it('gives other statuses no code, and drops the upstream code field', async () => {
         assert.deepEqual(await ipCheckingApiErrorBody(answer(400, { error: 'Invalid country', code: 'x' })), { error: 'Invalid country' });
         assert.deepEqual(await ipCheckingApiErrorBody(answer(500, {})), { error: 'Upstream status 500' });

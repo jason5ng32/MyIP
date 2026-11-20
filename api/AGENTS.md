@@ -237,9 +237,7 @@ Handlers proxying the IPCheck.ing API (`ipcheck-ing`,
 identifier to the API, absent for a guest) and sets `content-type` itself for
 JSON bodies; handlers never pass headers of their own. The ASN reputation
 request carries no caller headers. `ipCheckingApiErrorBody` codes 401 / 403
-as `auth` and a 429 as `quota`, except a 429 whose upstream `code` is
-`service_limit` (the deployment's key at its limit): that one carries no code,
-so no feature is marked used up. Third-party upstreams get only what's
+as `auth` and a 429 as `quota`. Third-party upstreams get only what's
 explicitly needed.
 
 Usage reaches MyIP two ways: that `quota`-coded answer (the front end marks the

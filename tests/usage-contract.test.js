@@ -112,14 +112,6 @@ describe('usage contract — the over-quota answer', () => {
     assert.equal(error.code, SERVICE_ERROR_CODE.QUOTA);
   });
 
-  it('leaves the service-limit 429 uncoded all the way to the caller', async () => {
-    const body = await ipCheckingApiErrorBody(upstream(429, { error: 'Service limit reached', code: 'service_limit' }));
-    assert.equal('code' in body, false);
-    const error = await throughBrowser(body);
-    assert.equal(error.status, 429);
-    assert.equal(error.code, undefined);
-  });
-
   it('flips quotaExceeded only through markQuotaExhausted', () => {
     const s = useMainStore();
     s.remoteUserInfo = summaryFixture();

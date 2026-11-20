@@ -69,19 +69,12 @@ const DEFAULT_ERROR_TEXT = { 401: 'Sign in required', 403: 'Sign in required', 4
 
 const AUTH_REASONS = new Set(Object.values(AUTH_REASON));
 
-// A 429 with this code is the deployment's key at its limit, not the user's quota.
-const UPSTREAM_SERVICE_LIMIT = 'service_limit';
-
 // The uniform body { error, code?, reason? } for a failed upstream Response:
 // 401 / 403 → auth, its reason the upstream `code` when it is a known auth
-// reason, else sign_in_required; 429 → quota, unless it is the service
-// limit; any other status → no code.
+// reason, else sign_in_required; 429 → quota; any other status → no code.
 export const ipCheckingApiErrorBody = async (response) => {
     const data = await response.json().catch(() => null);
     const upstreamText = typeof data?.error === 'string' && data.error ? data.error : undefined;
-    if (response.status === 429 && data?.code === UPSTREAM_SERVICE_LIMIT) {
-        return { error: upstreamText ?? `Upstream status ${response.status}` };
-    }
     const error = upstreamText ?? DEFAULT_ERROR_TEXT[response.status] ?? `Upstream status ${response.status}`;
     if (response.status === 401 || response.status === 403) {
         const reason = AUTH_REASONS.has(data?.code) ? data.code : AUTH_REASON.SIGN_IN_REQUIRED;
