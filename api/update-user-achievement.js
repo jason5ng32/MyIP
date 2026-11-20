@@ -21,6 +21,7 @@ export default async (req, res) => {
             method: 'PUT',
             body: req.body,
             forwardFrom: req,
+            endUserId: res.locals.userId,
         });
 
         if (!apiResponse.ok) {

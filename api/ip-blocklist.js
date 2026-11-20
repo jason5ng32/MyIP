@@ -1,7 +1,7 @@
 // GET /api/ipblocklist?ip= — which blocklists an IP is on, from the
 // IPCheck.ing API (`/iphitlist`: live DNSBL lookups plus static threat lists).
-// `?ip` is validated by requirePublicIP(). Sign-in is enforced upstream, so
-// the listed caller headers (auth token included) are forwarded.
+// `?ip` is validated by requirePublicIP(); optionalUser() supplies the
+// signed-in user id, and the upstream decides what a guest may see.
 
 import logger from '../server/logger.js';
 import { ipCheckingApiErrorBody, isIpCheckingApiConfigured, requestIpCheckingApi } from '../server/ipcheck-ing-api.js';
@@ -19,6 +19,7 @@ export default async (req, res) => {
         const apiResponse = await requestIpCheckingApi('/iphitlist', {
             query: { ip: req.query.ip },
             forwardFrom: req,
+            endUserId: res.locals.userId,
             timeoutMs: IP_BLOCKLIST_TIMEOUT_MS,
         });
 

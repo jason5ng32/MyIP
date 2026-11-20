@@ -3,7 +3,8 @@ import { describe, it } from 'node:test';
 import express from 'express';
 import logger from '../server/logger.js';
 
-import { requireReferer, resetRefererRejectionLog, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery } from '../server/guards.js';
+import { requireReferer, resetRefererRejectionLog, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery, optionalUser, requireUser } from '../server/guards.js';
+import { AUTH_REASON } from '../common/codes/service-errors.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -491,5 +492,87 @@ describe('guard rewrites on a real Express request', () => {
         assert.equal(calls, 2);
         assert.deepEqual({ ...req.query }, { type: 'CAA', hostname: 'example.com' });
         assert.equal(req.query, req.query);
+    });
+});
+
+describe('optionalUser / requireUser', () => {
+    const SIGNED_OUT = { reason: AUTH_REASON.SIGN_IN_REQUIRED };
+    const INVALID = { reason: AUTH_REASON.INVALID_TOKEN };
+
+    // Runs `guard` over a request carrying `authorization`; `seen` is what
+    // the verifier was handed.
+    const run = async (guard, authorization) => {
+        const req = { headers: authorization === undefined ? {} : { authorization }, query: {} };
+        const res = { ...makeRes(), locals: {} };
+        let nextCalled = false;
+        await guard(req, res, () => { nextCalled = true; });
+        return { res, nextCalled };
+    };
+    const verifier = (answer) => {
+        const seen = [];
+        const verify = async (header) => {
+            seen.push(header);
+            if (answer instanceof Error) throw answer;
+            return answer;
+        };
+        return { verify, seen };
+    };
+
+    it('both put a verified id on res.locals.userId and pass', async () => {
+        for (const factory of [optionalUser, requireUser]) {
+            const { verify, seen } = verifier({ id: 'user-1' });
+            const { res, nextCalled } = await run(factory(verify), 'Bearer t');
+            assert.equal(nextCalled, true);
+            assert.equal(res.locals.userId, 'user-1');
+            assert.deepEqual(seen, ['Bearer t']);
+        }
+    });
+
+    it('optionalUser lets a signed-out request through without an id', async () => {
+        const { res, nextCalled } = await run(optionalUser(verifier(SIGNED_OUT).verify));
+        assert.equal(nextCalled, true);
+        assert.equal(res.locals.userId, undefined);
+        assert.equal(res.statusCode, null);
+    });
+
+    it('requireUser refuses a signed-out request with 403 sign_in_required', async () => {
+        const { res, nextCalled } = await run(requireUser(verifier(SIGNED_OUT).verify));
+        assert.equal(nextCalled, false);
+        assert.equal(res.statusCode, 403);
+        assert.deepEqual(res.body, { error: 'Sign in required', code: 'auth', reason: AUTH_REASON.SIGN_IN_REQUIRED });
+    });
+
+    it('both refuse a token that fails verification with 403 invalid_token', async () => {
+        for (const factory of [optionalUser, requireUser]) {
+            const { res, nextCalled } = await run(factory(verifier(INVALID).verify), 'Bearer bad');
+            assert.equal(nextCalled, false);
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, { error: 'Invalid token', code: 'auth', reason: AUTH_REASON.INVALID_TOKEN });
+            assert.equal(res.locals.userId, undefined);
+        }
+    });
+
+    it('both answer 503 without a code when the check cannot run', async () => {
+        for (const factory of [optionalUser, requireUser]) {
+            const { res, nextCalled } = await run(factory(verifier(new Error('certificates down')).verify), 'Bearer t');
+            assert.equal(nextCalled, false);
+            assert.equal(res.statusCode, 503);
+            assert.deepEqual(res.body, { error: 'Sign-in check unavailable' });
+        }
+    });
+
+    it('treat every request as signed out when sign-in is not configured', async () => {
+        const saved = process.env.VITE_FIREBASE_PROJECT_ID;
+        delete process.env.VITE_FIREBASE_PROJECT_ID;
+        try {
+            const optional = await run(optionalUser(), 'Bearer anything');
+            assert.equal(optional.nextCalled, true);
+            assert.equal(optional.res.locals.userId, undefined);
+            const required = await run(requireUser(), 'Bearer anything');
+            assert.equal(required.nextCalled, false);
+            assert.equal(required.res.body.reason, AUTH_REASON.SIGN_IN_REQUIRED);
+        } finally {
+            if (saved !== undefined) process.env.VITE_FIREBASE_PROJECT_ID = saved;
+        }
     });
 });

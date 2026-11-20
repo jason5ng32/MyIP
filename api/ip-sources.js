@@ -3,6 +3,7 @@
 import { requireOfflineData } from '../server/offline-data.js';
 import { isMaxMindReady } from '../server/datasets/maxmind-service.js';
 import { isIpCheckingApiConfigured } from '../server/ipcheck-ing-api.js';
+import { optionalUser } from '../server/guards.js';
 import ipinfoioHandler, { isConfigured as isIpinfoioConfigured } from './ipinfo-io.js';
 import ipapicomHandler from './ipapi-com.js';
 import ipsbHandler from './ip-sb.js';
@@ -25,7 +26,10 @@ export const IP_SOURCES = Object.freeze([
     { key: 'ip2locationio', handler: ip2locationioHandler, isConfigured: isIp2locationioConfigured, cacheSeconds: ONE_DAY },
     { key: 'maxmind', handler: maxmindHandler, gates: [requireOfflineData([isMaxMindReady])], cacheSeconds: ONE_DAY },
     // No cacheSeconds: it answers per signed-in user, so it stays no-store.
-    { key: 'ipchecking', handler: ipCheckingHandler, isConfigured: isIpCheckingApiConfigured, configFlag: 'ipChecking' },
+    {
+        key: 'ipchecking', handler: ipCheckingHandler, isConfigured: isIpCheckingApiConfigured, configFlag: 'ipChecking',
+        gates: [optionalUser()],
+    },
 ].map((source) => Object.freeze(source)));
 
 export const IP_SOURCE_KEYS = Object.freeze(IP_SOURCES.map((s) => s.key));

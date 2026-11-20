@@ -17,6 +17,7 @@ export default async (req, res) => {
         const apiResponse = await requestIpCheckingApi('/ipinfo', {
             query: { ip: ipAddress, lang },
             forwardFrom: req,
+            endUserId: res.locals.userId,
         });
 
         if (!apiResponse.ok) {

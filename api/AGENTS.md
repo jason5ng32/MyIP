@@ -169,6 +169,17 @@ resolver list behind `dns-resolver` (gated by
   picker and `resolveDns` also read; otherwise the DoH branch would forward any
   string to four third-party endpoints.
 - `requireValidReportId()` — `/api/report/:id` route param (22-char base64url).
+- `optionalUser()` / `requireUser()` — sign-in, verified here
+  (`server/sign-in-token.js`: the `authorization` Bearer token checked
+  against Google's public certificates, RS256 only, the project from
+  `VITE_FIREBASE_PROJECT_ID`; without it every request is signed out).
+  A verified user id lands on `res.locals.userId`. `requireUser()` refuses
+  a signed-out caller and both refuse a token that fails: 403 `{ error,
+  code: 'auth', reason }` (`common/codes/service-errors.js`); a certificate
+  outage is 503, uncoded. Verdicts are cached per token for 5 minutes,
+  never past its `exp`. Optional on `/api/ipchecking` (its
+  `api/ip-sources.js` row's `gates`) and `/api/ipblocklist`; required on
+  the other IPCheck.ing API routes, so an invalid token never goes upstream.
 - `sourceDailyLimit('<key>')` (`server/source-daily-limits.js`, not a guard
   here) — the geo routes' daily ceiling from `IP_SOURCE_DAILY_LIMITS`
   (`<key>=<n>`, key = the route's last segment, as listed by
@@ -214,11 +225,22 @@ Handlers proxying the IPCheck.ing API (`ipcheck-ing`,
 `dns-leak-test`, `persona`, `ip-blocklist`, and `asn-profile`'s reputation via
 `server/asn-reputation.js`) send their requests through
 `server/ipcheck-ing-api.js`. It forwards a fixed list of the caller's headers
-(`authorization`, `accept-language`, `user-agent`, `cf-connecting-ip`,
-`x-forwarded-for`; `FORWARDED_HEADERS`) and sets `content-type` itself for
+(`accept-language`, `user-agent`, `cf-connecting-ip`, `x-forwarded-for`;
+`FORWARDED_HEADERS` — never `authorization`), sends `res.locals.userId` as
+`x-end-user-id` when the handler passes it (`endUserId`; an opaque end-user
+identifier to the API, absent for a guest) and sets `content-type` itself for
 JSON bodies; handlers never pass headers of their own. The ASN reputation
-request carries no caller headers. Third-party upstreams get only what's
+request carries no caller headers. `ipCheckingApiErrorBody` codes 401 / 403
+as `auth` and a 429 as `quota`, except a 429 whose upstream `code` is
+`service_limit` (the deployment's key at its limit): that one carries no code,
+so no feature is marked used up. Third-party upstreams get only what's
 explicitly needed.
+
+Usage reaches MyIP two ways: that `quota`-coded answer (the front end marks the
+feature used up) and the `/api/getuserinfo` summary, held in memory only
+(`store.remoteUserInfo`; MyIP reads its `quota.features` and `functionUses.total`).
+Each feature has exactly one meter — the IPCheck.ing API; MyIP stores none of its
+counts. Pinned by `tests/usage-contract.test.js`.
 
 ### Firebase Auth handler proxy
 

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import pinoHttp from 'pino-http';
 import logger from './server/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
-    requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './server/guards.js';
+    requireValidRecordType, requireValidReportId, normalizeAsnQuery, requireUser, optionalUser } from './server/guards.js';
 import { withTimeZone } from './server/ip-timezone.js';
 import { initSourceDailyLimits, sourceDailyLimit } from './server/source-daily-limits.js';
 import { inspectAllowedDomains } from './server/referer-check.js';
@@ -200,17 +200,19 @@ app.get('/api/macchecker', needsOui, cacheable(THIRTY_DAYS_CACHE), macChecker);
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
 app.get('/api/dnsresolver', requireValidDomain('hostname'), requireValidRecordType(), dnsResolver);
-app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
-app.get('/api/invisibility', invisibilitytestHandler);
-app.get('/api/ipblocklist', requirePublicIP(), ipBlocklistHandler);
-app.get('/api/getuserinfo', getUserinfo);
-app.put('/api/updateuserachievement', updateUserAchievement);
+// Sign-in is verified here (server/guards.js): requireUser() refuses a
+// signed-out or invalid caller, optionalUser() lets a signed-out one through.
+app.get('/api/dnsleaktest/session/:token', requireUser(), dnsLeakGetResult);
+app.get('/api/invisibility', requireUser(), invisibilitytestHandler);
+app.get('/api/ipblocklist', requirePublicIP(), optionalUser(), ipBlocklistHandler);
+app.get('/api/getuserinfo', requireUser(), getUserinfo);
+app.put('/api/updateuserachievement', requireUser(), updateUserAchievement);
 // Shared reports stay no-store: an edge cache could serve a report past its
 // KV expiry, and private diagnostic data doesn't belong in a public cache.
 app.get('/api/report/:id', requireValidReportId(), getReportHandler);
 app.post('/api/report', createReportHandler);
 // One observation in, one graded report out — per-visitor by definition.
-app.post('/api/persona/evaluate', personaEvaluateHandler);
+app.post('/api/persona/evaluate', requireUser(), personaEvaluateHandler);
 // Bulk IP Lookup: local data only. Resolved here so a bad BULK_LOOKUP_SOURCE
 // warns at boot rather than on the first request.
 bulkLookupSource();

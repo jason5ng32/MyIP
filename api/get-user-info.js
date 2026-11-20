@@ -7,7 +7,7 @@ export default async (req, res) => {
     }
 
     try {
-        const apiResponse = await requestIpCheckingApi('/userinfo', { forwardFrom: req });
+        const apiResponse = await requestIpCheckingApi('/userinfo', { forwardFrom: req, endUserId: res.locals.userId });
 
         if (!apiResponse.ok) {
             throw new Error(`API responded with status: ${apiResponse.status}`);

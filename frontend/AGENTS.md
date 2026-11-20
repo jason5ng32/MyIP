@@ -101,7 +101,8 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
   `utils/probe-endpoints.js`; card grid, Nav, shortcuts); a `/tools/:slug`
   link is never gated. `quotaKey` on a tool or an IP source names its metered
   feature in the quota snapshot (`store.quotaExceeded(key)`, the usage
-  dialog). Features gate on capabilities; `isUpstreamSite()` is the only
+  dialog); the metered feature names live only there, never as literals.
+  Features gate on capabilities; `isUpstreamSite()` is the only
   identity check (the footer credit line, the IP probes' JSON endpoint).
 - `App.vue` keeps Home and `ToolPage` alive (`KeepAlive`); `ToolPage` keeps up
   to 8 tools alive per slug, dropped on sign-out / account switch

@@ -62,13 +62,13 @@ function createRequest(options = {}) {
 // Visitor headers: the listed ones reach the IPCheck.ing API, the rest
 // (plus createRequest's referer) never do.
 const FORWARDED_VISITOR_HEADERS = {
-    authorization: 'Bearer t',
     'accept-language': 'de-DE',
     'user-agent': 'VisitorBrowser/1.0',
     'cf-connecting-ip': '203.0.113.7',
     'x-forwarded-for': '203.0.113.7',
 };
 const DROPPED_VISITOR_HEADERS = {
+    authorization: 'Bearer t',
     host: 'myip.example', cookie: 'session=1', origin: 'https://myip.example',
     'content-length': '999', 'content-type': 'application/json',
 };
@@ -81,7 +81,15 @@ const withVisitorHeaders = (req) => {
 // The exact header set sent upstream: the listed visitor headers plus `extra`.
 const assertForwardedHeaders = (headers, extra = {}) => {
     assert.deepEqual(headers, { ...FORWARDED_VISITOR_HEADERS, ...extra });
-    for (const name of ['host', 'cookie', 'referer', 'content-length']) assert.equal(name in headers, false, name);
+    for (const name of ['host', 'cookie', 'referer', 'content-length', 'authorization']) assert.equal(name in headers, false, name);
+};
+
+// The user id the sign-in guards put on res.locals, and the header carrying it.
+const USER_ID = 'user-123';
+const END_USER = { 'x-end-user-id': USER_ID };
+const signedIn = (res) => {
+    res.locals.userId = USER_ID;
+    return res;
 };
 
 // IPCheck.ing API failure bodies as it sends them, and the coded bodies the
@@ -89,6 +97,7 @@ const assertForwardedHeaders = (headers, extra = {}) => {
 const UPSTREAM_SIGN_IN_REQUIRED = { error: 'Sign in required', message: 'Authorization header is missing.', code: 'sign_in_required' };
 const UPSTREAM_INVALID_TOKEN = { error: 'Invalid token', message: 'Firebase ID token has expired.', code: 'invalid_token' };
 const UPSTREAM_QUOTA = { error: 'Monthly quota exceeded', code: 'quota_exceeded' };
+const UPSTREAM_SERVICE_LIMIT = { error: 'Service limit reached', code: 'service_limit' };
 const CODED_SIGN_IN_REQUIRED = { error: 'Sign in required', code: 'auth', reason: 'sign_in_required' };
 const CODED_INVALID_TOKEN = { error: 'Invalid token', code: 'auth', reason: 'invalid_token' };
 const CODED_QUOTA = { error: 'Monthly quota exceeded', code: 'quota' };
@@ -98,6 +107,7 @@ function createResponse() {
     return {
         statusCode: 200,
         body: undefined,
+        locals: {},
         status(code) { this.statusCode = code; return this; },
         json(payload) { this.body = payload; return this; },
         send(payload) { this.body = payload; return this; },
@@ -493,7 +503,7 @@ describe('persona handler', () => {
         };
 
         const req = withVisitorHeaders(createRequest({ method: 'POST', body: { persona: { country: 'JP' } } }));
-        const res = createResponse();
+        const res = signedIn(createResponse());
         await personaEvaluateHandler(req, res);
 
         assert.equal(res.statusCode, 200);
@@ -503,7 +513,7 @@ describe('persona handler', () => {
         // here: exactly one content-type goes along (two would arrive as
         // "application/json, application/json" and be refused with 415), and
         // no content-length.
-        assertForwardedHeaders(requested.options.headers, { 'content-type': 'application/json' });
+        assertForwardedHeaders(requested.options.headers, { 'content-type': 'application/json', ...END_USER });
         assert.equal(requested.options.body, JSON.stringify({ persona: { country: 'JP' } }));
         assert.match(requested.url, /\/persona\/evaluate\?key=test-key$/);
     });
@@ -515,6 +525,7 @@ describe('persona handler', () => {
             [403, UPSTREAM_SIGN_IN_REQUIRED, CODED_SIGN_IN_REQUIRED],
             [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
             [429, UPSTREAM_QUOTA, CODED_QUOTA],
+            [429, UPSTREAM_SERVICE_LIMIT, { error: 'Service limit reached' }],
             [400, { error: 'Invalid country' }, { error: 'Invalid country' }],
         ]) {
             globalThis.fetch = upstreamAnswer(status, upstream);
@@ -749,13 +760,23 @@ describe('invisibility-test handler', () => {
             called = { url: new URL(String(url)), init };
             return new Response(JSON.stringify({ status: 'pending' }), { status: 202 });
         };
-        const res = createResponse();
+        const res = signedIn(createResponse());
         await invisibilityHandler(withVisitorHeaders(createRequest({ query: { id: 'a'.repeat(28) } })), res);
         assert.equal(res.statusCode, 200);
         assert.deepEqual(res.body, { status: 'pending' });
         assert.equal(called.url.pathname, `/getpdresult/${'a'.repeat(28)}`);
         assert.equal(called.url.searchParams.get('apikey'), 'test-key');
-        assertForwardedHeaders(called.init.headers);
+        assertForwardedHeaders(called.init.headers, END_USER);
+    });
+
+    it('answers a service limit with its status and no quota code', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        globalThis.fetch = upstreamAnswer(429, UPSTREAM_SERVICE_LIMIT);
+        const res = createResponse();
+        await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
+        assert.equal(res.statusCode, 429);
+        assert.deepEqual(res.body, { error: 'Service limit reached' });
     });
 });
 
@@ -784,13 +805,16 @@ describe('ip-blocklist handler', () => {
             return { status: 200, ok: true, json: async () => ({ ip: '1.1.1.1', summary: { listed: 0 } }) };
         };
         const req = withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1' } }));
-        const res = createResponse();
+        const res = signedIn(createResponse());
         await ipBlocklistHandler(req, res);
         assert.equal(res.statusCode, 200);
         assert.deepEqual(res.body, { ip: '1.1.1.1', summary: { listed: 0 } });
         assert.equal(called.url.pathname, '/iphitlist');
         assert.equal(called.url.searchParams.get('ip'), '1.1.1.1');
         assert.equal(called.url.searchParams.get('key'), 'test-key');
+        assertForwardedHeaders(called.init.headers, END_USER);
+
+        await ipBlocklistHandler(withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1' } })), createResponse());
         assertForwardedHeaders(called.init.headers);
     });
 
@@ -815,6 +839,15 @@ describe('ip-blocklist handler', () => {
         await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
         assert.equal(res.statusCode, 429);
         assert.deepEqual(res.body, CODED_QUOTA);
+    });
+
+    it('passes a service limit through as 429 without the quota code', async () => {
+        configure();
+        globalThis.fetch = upstreamAnswer(429, UPSTREAM_SERVICE_LIMIT);
+        const res = createResponse();
+        await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        assert.equal(res.statusCode, 429);
+        assert.deepEqual(res.body, { error: 'Service limit reached' });
     });
 
     it('turns any other upstream failure into a 500', async () => {
@@ -1034,7 +1067,7 @@ describe('update-user-achievement handler', () => {
             called = { url: new URL(String(url)), init };
             return new Response(JSON.stringify({ ok: true }), { status: 200 });
         };
-        const res = createResponse();
+        const res = signedIn(createResponse());
         await updateAchievementHandler(withVisitorHeaders(createRequest({ method: 'PUT', body: { name: 'X' } })), res);
         assert.equal(res.statusCode, 200);
         assert.deepEqual(res.body, { ok: true });
@@ -1042,7 +1075,7 @@ describe('update-user-achievement handler', () => {
         assert.equal(called.url.searchParams.get('key'), 'test-key');
         assert.equal(called.init.method, 'PUT');
         assert.equal(called.init.body, JSON.stringify({ name: 'X' }));
-        assertForwardedHeaders(called.init.headers, { 'content-type': 'application/json' });
+        assertForwardedHeaders(called.init.headers, { 'content-type': 'application/json', ...END_USER });
     });
 });
 
@@ -1075,13 +1108,13 @@ describe('get-user-info handler', () => {
             called = { url: new URL(String(url)), init };
             return new Response(JSON.stringify({ uid: 'u1' }), { status: 200 });
         };
-        const res = createResponse();
+        const res = signedIn(createResponse());
         await getUserInfoHandler(withVisitorHeaders(createRequest()), res);
         assert.equal(res.statusCode, 200);
         assert.deepEqual(res.body, { uid: 'u1' });
         assert.equal(called.url.pathname, '/userinfo');
         assert.equal(called.url.searchParams.get('key'), 'test-key');
-        assertForwardedHeaders(called.init.headers);
+        assertForwardedHeaders(called.init.headers, END_USER);
     });
 });
 
@@ -1135,13 +1168,13 @@ describe('dns-leak-test getSessionResult', () => {
             called = { url: new URL(String(url)), init };
             return new Response(JSON.stringify(UPSTREAM_SIGN_IN_REQUIRED), { status: 403 });
         };
-        const res = createResponse();
+        const res = signedIn(createResponse());
         const req = withVisitorHeaders({ method: 'GET', headers: { referer: 'http://localhost/' }, query: {}, params: { token: 'a'.repeat(32) } });
         await dnsLeakGetResult(req, res);
         assert.equal(res.statusCode, 403);
         assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
         assert.equal(called.url.pathname, `/dnsleaktest/session/${'a'.repeat(32)}`);
-        assertForwardedHeaders(called.init.headers);
+        assertForwardedHeaders(called.init.headers, END_USER);
     });
 
     it('answers invalid-token and quota rejections with their status and code', async () => {
@@ -1150,6 +1183,7 @@ describe('dns-leak-test getSessionResult', () => {
         for (const [status, upstream, coded] of [
             [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
             [429, UPSTREAM_QUOTA, CODED_QUOTA],
+            [429, UPSTREAM_SERVICE_LIMIT, { error: 'Service limit reached' }],
         ]) {
             globalThis.fetch = upstreamAnswer(status, upstream);
             const res = createResponse();
@@ -1270,6 +1304,9 @@ describe('ipcheck-ing handler', () => {
         const failing = await silenced(() => callWith(async () => new Response('busy', { status: 503 })));
         assert.equal(failing.statusCode, 500);
         assert.deepEqual(failing.body, { error: 'API responded with status: 503' });
+        const limited = await silenced(() => callWith(upstreamAnswer(429, UPSTREAM_SERVICE_LIMIT)));
+        assert.equal(limited.statusCode, 500);
+        assert.equal('code' in limited.body, false);
         const down = await silenced(() => callWith(async () => { throw new Error('network down'); }));
         assert.equal(down.statusCode, 500);
         assert.match(down.body.error, /network down/);
@@ -1293,13 +1330,16 @@ describe('ipcheck-ing handler', () => {
             called = { url: new URL(String(url)), init };
             return new Response(JSON.stringify(geo), { status: 200 });
         };
-        const res = createResponse();
+        const res = signedIn(createResponse());
         await ipcheckIngHandler(withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1', lang: 'en&ip=10.0.0.1' } })), res);
         assert.equal(res.statusCode, 200);
         assert.equal(called.url.pathname, '/ipinfo');
         assert.equal(called.url.searchParams.get('key'), 'test-key');
         assert.deepEqual(called.url.searchParams.getAll('ip'), ['1.1.1.1']);
         assert.equal(called.url.searchParams.get('lang'), 'en&ip=10.0.0.1');
+        assertForwardedHeaders(called.init.headers, END_USER);
+
+        await ipcheckIngHandler(withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1' } })), createResponse());
         assertForwardedHeaders(called.init.headers);
     });
 });
