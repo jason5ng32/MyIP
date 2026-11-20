@@ -1,12 +1,12 @@
 // Tests for the achievement rule table (frontend/data/achievement-rules.js):
-// structural validity (every slug exists in data/achievements.js) and the
+// structural validity (every slug is a known achievement name) and the
 // behavior of each `when` predicate.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { ACHIEVEMENT_RULES } from '../frontend/data/achievement-rules.js';
-import { createInitialAchievementsState } from '../frontend/data/achievements.js';
+import { ACHIEVEMENT_NAMES } from '../common/codes/achievements.js';
 
 // Collect the rules for one event as { slug: rule } for easy lookup.
 const rulesFor = (event) =>
@@ -17,10 +17,10 @@ const fires = (rule, payload) => (rule.when ? !!rule.when(payload) : true);
 
 describe('ACHIEVEMENT_RULES structure', () => {
   it('every rule has a non-empty event name and a known achievement slug', () => {
-    const known = createInitialAchievementsState();
+    const known = new Set(ACHIEVEMENT_NAMES);
     for (const rule of ACHIEVEMENT_RULES) {
       assert.ok(typeof rule.event === 'string' && rule.event.length > 0, 'event name required');
-      assert.ok(known[rule.slug], `unknown achievement slug: ${rule.slug}`);
+      assert.ok(known.has(rule.slug), `unknown achievement slug: ${rule.slug}`);
       if (rule.when) assert.equal(typeof rule.when, 'function');
     }
   });
@@ -116,10 +116,11 @@ describe('whois:lookup', () => {
 });
 
 describe('ruletest:finished', () => {
-  it('CrossingTheWall needs exactly 8 unique IPs', () => {
+  it('CrossingTheWall needs at least 8 unique IPs', () => {
     const rule = rulesFor('ruletest:finished').CrossingTheWall;
     assert.equal(fires(rule, { uniqueIPCount: 7 }), false);
     assert.equal(fires(rule, { uniqueIPCount: 8 }), true);
+    assert.equal(fires(rule, { uniqueIPCount: 12 }), true);
   });
 });
 

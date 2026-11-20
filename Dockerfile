@@ -29,6 +29,8 @@ COPY --from=build-stage /app/frontend-server.js ./
 # npm start boots the backend with `--import ./sentry-instrument.js`
 COPY --from=build-stage /app/sentry-instrument.js ./
 COPY --from=build-stage /app/api ./api
+# server/ carries the optional user storage's SQL migrations (server/db/migrations/),
+# applied by the backend at start.
 COPY --from=build-stage /app/server ./server
 COPY --from=build-stage /app/common ./common
 

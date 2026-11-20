@@ -355,7 +355,8 @@ const isDarkMode = computed(() => store.isDarkMode);
 
 const categories = ref([]);
 const currentList = ref('authentication');
-const slugs = ref({});
+// Progress lives in the store (shared with account sync); '' is unset.
+const markOf = (slug) => store.checklistProgress[slug] ?? '';
 
 const priorities = ['Basic', 'Optional', 'Essential', 'Advanced'];
 
@@ -384,26 +385,8 @@ const priorityDenom = (priority) =>
     countItems({ action: 'total', category: 'all', priority }) -
     countItems({ action: 'ignored', category: 'all', priority });
 
-// Local persistence
-const setLocalSlugs = () => {
-    localStorage.setItem('securityChecklistSlugs', JSON.stringify(slugs.value));
-};
-
-const loadLocalSlugs = () => {
-    const storedSlugs = localStorage.getItem('securityChecklistSlugs');
-    if (storedSlugs) {
-        const parsedSlugs = JSON.parse(storedSlugs);
-        Object.keys(parsedSlugs).forEach(key => { slugs.value[key] = parsedSlugs[key]; });
-    }
-};
-
-const updateSlugs = (slug, value) => {
-    slugs.value[slug] = value;
-    setLocalSlugs();
-};
-
 const initSecurityList = (securityChecklist) => {
-    loadLocalSlugs();
+    store.adoptStoredChecklist();
     const transformedObject = {};
     securityChecklist.forEach(item => {
         if (!categories.value.includes(item.slug)) categories.value.push(item.slug);
@@ -413,26 +396,33 @@ const initSecurityList = (securityChecklist) => {
             intro: item.intro,
             checklist: item.checklist.map(checkItem => {
                 const checkItemSlug = checkItem.slug;
-                if (slugs.value[checkItemSlug] === undefined) slugs.value[checkItemSlug] = '';
                 return {
                     ...checkItem,
-                    checked: slugs.value[checkItemSlug] === 'checked',
-                    ignored: slugs.value[checkItemSlug] === 'ignored',
+                    checked: markOf(checkItemSlug) === 'checked',
+                    ignored: markOf(checkItemSlug) === 'ignored',
                     slug: checkItemSlug,
                 };
             }),
         };
     });
-    setLocalSlugs();
     return transformedObject;
 };
 
 const fullList = ref(null);
 
+// The store's progress changed (another tab's save taken in by an edit, or account sync): the items follow it.
+watch(() => store.checklistProgress, () => {
+    for (const category of Object.values(fullList.value ?? {})) {
+        for (const item of category.checklist) {
+            item.checked = markOf(item.slug) === 'checked';
+            item.ignored = markOf(item.slug) === 'ignored';
+        }
+    }
+});
+
 const resetAllslugs = () => {
     trackEvent('SecurityChecklist', 'SecurityChecklist', 'Reset');
-    for (const slug in slugs.value) slugs.value[slug] = '';
-    setLocalSlugs();
+    store.resetChecklist();
     fullList.value = initSecurityList(securityChecklist.value);
     listToShow.value = fullList.value[currentList.value];
     filterList.value = listToShow.value.checklist;
@@ -485,14 +475,14 @@ const filterChecklist = (filter) => {
 const ignoreItem = (item) => {
     item.ignored = !item.ignored;
     item.checked = false;
-    updateSlugs(item.slug, item.ignored ? 'ignored' : '');
+    store.setChecklistMark(item.slug, item.ignored ? 'ignored' : '');
     if (item.ignored) trackEvent('SecurityChecklist', 'SecurityChecklist', 'Ignore');
 };
 
 const checkItem = (item) => {
     if (item.ignored) return;
     item.checked = !item.checked;
-    updateSlugs(item.slug, item.checked ? 'checked' : '');
+    store.setChecklistMark(item.slug, item.checked ? 'checked' : '');
     if (item.checked) trackEvent('SecurityChecklist', 'SecurityChecklist', 'Check');
     // Achievement rules (SurfaceCheck / HalfwayThere / FullySecured) live in
     // data/achievement-rules.js.

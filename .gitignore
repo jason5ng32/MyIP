@@ -25,7 +25,9 @@ dist-ssr
 *.sln
 *.sw?
 .env
-.env.forker
+.env.forker*
+.env.dev
+.env.prod
 .vscode/extensions.json
 
 package-lock.json

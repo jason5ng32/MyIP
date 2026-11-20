@@ -49,9 +49,9 @@ Every file opens with a header comment stating its purpose — read those.
 - **Data-source sentence:** `IpSourceBlock.vue`, inline after the IP section's
   notes (`IpInfos.vue`; hidden with them in simple mode): the source that
   answered a card, else the one selected in Preferences (`answeringSource` →
-  its `data/ip-databases.js` row, the name linking `attribution.url`) and a
-  "Preferences" link that opens Preferences at the picker, as
-  `ipInfos.sourceFields.sentence` slots. Cards carry no geo-source row;
+  its `data/ip-databases.js` row, the name linking `attribution.url`), the
+  `{source}` slot of `ipInfos.sourceFields.sentence`; the sentence names the
+  picker by its Preferences label (`nav.preferences.ipDB`). Cards carry no geo-source row;
   `geoSourceId` stays for the sentence, the cache and Snapshots.
 
 ### Achievements are event-driven
@@ -59,8 +59,19 @@ Every file opens with a header comment stating its purpose — read those.
 Components never touch achievements — they emit domain events unconditionally
 (`emitAppEvent('speedtest:finished', {…})`); `data/achievement-rules.js` maps
 events → slugs, `composables/use-achievement-engine.js` owns all guards (rules
-wait for the remote snapshot; pre-sync hits parked). New achievement = entry +
-rule + (only if no suitable event exists) a new event. The shareable report
+wait for the remote snapshot; pre-sync hits parked). The snapshot comes from
+user storage (`GET /api/achievements`, loaded and unlocked through
+`PUT /api/achievements` by `User.vue`); its `totalUses` feeds
+`user:info-loaded`. Achievements need `store.achievementsAvailable` (sign-in +
+`userStorage`); the user level and the usage dialog need `store.usageAvailable`
+(sign-in + `ipChecking`, `/api/usage`) — each works, or is absent,
+without the other. The account dialog's Benefits list is a registry
+(`data/user-benefits.js`: groups → tiers → items, each with its own gate),
+resolved by `utils/features/user-benefits.js`; the dialog and its menu entry
+exist when sign-in adds something (achievements, account sync or usage), the
+IPCheck.ing usage tab only with `usageAvailable`. New achievement = a name in `common/codes/achievements.js`
++ its `public/achievements/<lowercased name>.webp` + rule + (only if no
+suitable event exists) a new event. The shareable report
 rides the same bus: `<domain>:finished` → `use-report-collector.js` →
 `utils/report/report-builders.js` → sections whitelisted by `common/report-schema.js`.
 New reportable test = event + builder + schema entry in one change; new result
@@ -101,7 +112,8 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
   `utils/probe-endpoints.js`; card grid, Nav, shortcuts); a `/tools/:slug`
   link is never gated. `quotaKey` on a tool or an IP source names its metered
   feature in the quota snapshot (`store.quotaExceeded(key)`, the usage
-  dialog). Features gate on capabilities; `isUpstreamSite()` is the only
+  dialog); the metered feature names live only there, never as literals.
+  Features gate on capabilities; `isUpstreamSite()` is the only
   identity check (the footer credit line, the IP probes' JSON endpoint).
 - `App.vue` keeps Home and `ToolPage` alive (`KeepAlive`); `ToolPage` keeps up
   to 8 tools alive per slug, dropped on sign-out / account switch
@@ -148,9 +160,10 @@ links to the Blocklist tool — no bulk path to the IPCheck.ing API.
 
 ### Snapshots
 
-Browser-local, per-visit homepage records: `use-snapshot-recorder.js` consumes
-`<domain>:finished` through the report builders; `utils/features/snapshots.js`
-owns storage, retention and schema validation. Read `snapshotsAuto` through
+Browser-local, per-visit homepage records (never synced):
+`use-snapshot-recorder.js` consumes `<domain>:finished` through the report
+builders; `utils/features/snapshots.js` owns storage, retention and schema
+validation. Read `snapshotsAuto` through
 `snapshotsAutoMode()`; smart-mode rules live in `snapshot-trigger.js`.
 Later results update only this visit's automatic snapshot; visits never
 merge. Manual saves (`use-snapshot-save.js`) are frozen copies; pinned
@@ -178,6 +191,38 @@ renders factual −/+ differences, never leak / safe / better / worse verdicts
 or summary chips. Use `--diff-removed` / `--diff-added` and their `-strong`
 variants only here; measurement drift folds while hidden. Keep this pipeline
 separate from Share Report and `Report*.vue`.
+
+### Account sync
+
+Four collections sync, `preferences` (`SYNCED_PREFERENCE_KEYS`),
+`connectivity` (one item per list, the lists' order, the default list id),
+`checklist` (Security Checklist progress: one item per marked slug, unset =
+tombstone; `store.checklistProgress` over `utils/features/checklist-progress.js`)
+and `speedtest` (the two size preferences, outside `SYNCED_PREFERENCE_KEYS`; no
+Preferences control, the homepage selects save them); IPs, snapshots and test
+results never do. The account chooses which:
+`GET / PUT /api/sync` (`store.syncSettings`, cached per user so a load starts
+before the fetch; nothing until decided; turning one off deletes its rows
+there). `use-account-sync.js` (App.vue) runs one engine
+(`utils/features/account-sync.js`) over four store adapters
+(`utils/features/preferences-sync.js` and the checklist's; the store stays the
+only writer).
+Per enabled collection: signed out, the data is the device's (no record);
+signed in, the account's — the first pull adopts (an empty account takes the
+device's data, else the account replaces it), then edits stamp by hash and
+merge per item: a list deleted syncs as a tombstone (never Mine), lists the
+`order` item lacks follow it by id. Turned off (here, or a 409 `sync_off`) → record dropped, data
+kept. The popup sign-in awaits `syncBeforeReload`; sign-out flushes, clears
+enabled collections and reloads; a boot that finds the session ended clears
+too. `widgets/SyncChoiceDialog.vue` asks once (`use-sync-dialog.js`,
+`shouldShowSyncDialog`): every exit saves a choice; Preferences edits it at
+once. Both use `widgets/SyncChoiceControls.vue` (`applySyncToggle`).
+Every preference edit goes through `store.editPreferences`
+(`updatePreference`; list ops through `editConnectivityLists`), every
+checklist mark through `store.editChecklist` (`setChecklistMark`,
+`resetChecklist`): each lands on what localStorage holds at that moment, so
+another tab's save survives; no tab ever reacts to another (no `storage`
+listener). A size arriving mid-run waits for the speed test to end.
 
 ### Overlays take no keyboard shortcuts
 
@@ -277,10 +322,6 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   `when: { delayMs, reach }` = `use-attention-gate.js`, `action.to` a route,
   `track` / `action.track` = `trackEvent` args on show / click),
   run by `use-toast-queue.js` in `Toast.vue` — never feature code there.
-- **Preferences at a section** — `store.openPreferencesAt(sectionId)` (the
-  section's element id) sets the one-shot `preferencesFocus`; `Preferences.vue`
-  clears it, scrolls there and briefly rings it. Never touch the panel's DOM
-  (IpSourceBlock).
 - **Site navigation** — one `Nav.vue` in `App.vue` above every route (fixed;
   `index.html` pads the body for it), never per page; `User` / `Preferences`
   sit beside it, one each. What a click does on the current route is

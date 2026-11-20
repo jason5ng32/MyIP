@@ -5,7 +5,10 @@ import { fileURLToPath } from 'url';
 import pinoHttp from 'pino-http';
 import logger from './server/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
-    requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './server/guards.js';
+    requireValidRecordType, requireValidReportId, requireValidSyncCollection, normalizeAsnQuery, requireUser, optionalUser,
+    requireUserStorage } from './server/guards.js';
+import { countFeatureUse } from './server/count-feature-use.js';
+import { FEATURE_USES } from './server/db/feature-uses.js';
 import { withTimeZone } from './server/ip-timezone.js';
 import { initSourceDailyLimits, sourceDailyLimit } from './server/source-daily-limits.js';
 import { inspectAllowedDomains } from './server/referer-check.js';
@@ -40,8 +43,11 @@ import { isCompleteProfile } from './server/asn-profile.js';
 import validateConfigs from './api/configs.js';
 import bulkLookupHandler from './api/bulk-lookup.js';
 import { bulkLookupSource } from './server/bulk-lookup-sources.js';
-import getUserinfo from './api/get-user-info.js';
-import updateUserAchievement from './api/update-user-achievement.js';
+import usageHandler from './api/usage.js';
+import listAchievementsHandler, { unlockAchievement as unlockAchievementHandler } from './api/achievements.js';
+import readSyncHandler, { writeSyncedItems as writeSyncHandler } from './api/sync.js';
+import readSyncSettingsHandler, { writeSyncSettings as writeSyncSettingsHandler } from './api/sync-settings.js';
+import { SYNC_MAX_BODY_BYTES } from './common/sync-collections.js';
 import { reloadMaxMindDatabases, isMaxMindReady, getMaxMindDbPaths } from './server/datasets/maxmind-service.js';
 import { bootstrapDatasets, startDatasetScheduler, watchDatasets } from './server/datasets/dataset-updater.js';
 import { datasets } from './server/datasets/datasets.js';
@@ -52,6 +58,7 @@ import { isAsRelLoaded } from './server/datasets/as-rel-db.js';
 import { isAsOrgLoaded } from './server/datasets/as-org-db.js';
 import { isOuiLoaded } from './server/datasets/oui-db.js';
 import { runOfflineBootstrap, requireOfflineData, isOfflineBootstrapping } from './server/offline-data.js';
+import { userStorage, accountSetupGap } from './server/db/user-storage.js';
 import { cacheable } from './server/cache-control.js';
 import { initUpstreamUserAgent } from './server/upstream-ua.js';
 import { createListenCallback } from './server/listen-callback.js';
@@ -90,6 +97,13 @@ if (process.env.LOG_HTTP === 'true') {
 // its own tight parser runs first, and the global one skips a body that is
 // already parsed.
 app.use('/api/bulk-lookup', express.json({ limit: '16kb' }));
+// An achievement unlock is one short name.
+app.use('/api/achievements', express.json({ limit: '1kb' }));
+// A sync item write: one collection's items, the Connectivity lists the largest.
+// It runs before the settings parser below, which then skips the parsed body.
+app.use('/api/sync/:collection', express.json({ limit: SYNC_MAX_BODY_BYTES }));
+// The sync settings: a few collection ids.
+app.use('/api/sync', express.json({ limit: '1kb' }));
 app.use(express.json({ limit: '500kb' }));
 
 // Default every /api/* response to no-store. Routes that want edge caching
@@ -154,6 +168,7 @@ for (const source of IP_SOURCES) {
         requirePublicIP(),
         ...(source.gates ?? []),
         sourceDailyLimit(source.key),
+        ...(source.featureUse ? [countFeatureUse(source.featureUse)] : []),
         withTimeZone(),
         ...(source.cacheSeconds ? [cacheable(source.cacheSeconds)] : []),
         source.handler);
@@ -200,17 +215,27 @@ app.get('/api/macchecker', needsOui, cacheable(THIRTY_DAYS_CACHE), macChecker);
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
 app.get('/api/dnsresolver', requireValidDomain('hostname'), requireValidRecordType(), dnsResolver);
-app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
-app.get('/api/invisibility', invisibilitytestHandler);
-app.get('/api/ipblocklist', requirePublicIP(), ipBlocklistHandler);
-app.get('/api/getuserinfo', getUserinfo);
-app.put('/api/updateuserachievement', updateUserAchievement);
+// Sign-in is verified here (server/guards.js): requireUser() refuses a
+// signed-out or invalid caller, optionalUser() lets a signed-out one through.
+// countFeatureUse() adds one to a signed-in caller's lifetime count after an
+// answer below 400 (user storage, for achievements; never a quota).
+app.get('/api/dnsleaktest/session/:token', requireUser(), countFeatureUse(FEATURE_USES.dnsleaktest), dnsLeakGetResult);
+app.get('/api/invisibility', requireUser(), countFeatureUse(FEATURE_USES.invisibility), invisibilitytestHandler);
+app.get('/api/ipblocklist', requirePublicIP(), optionalUser(), countFeatureUse(FEATURE_USES.ipblocklist), ipBlocklistHandler);
+app.get('/api/usage', requireUser(), usageHandler);
+// Achievements and synced items live in user storage: 503 without it.
+app.get('/api/achievements', requireUser(), requireUserStorage(), listAchievementsHandler);
+app.put('/api/achievements', requireUser(), requireUserStorage(), unlockAchievementHandler);
+app.get('/api/sync', requireUser(), requireUserStorage(), readSyncSettingsHandler);
+app.put('/api/sync', requireUser(), requireUserStorage(), writeSyncSettingsHandler);
+app.get('/api/sync/:collection', requireValidSyncCollection(), requireUser(), requireUserStorage(), readSyncHandler);
+app.put('/api/sync/:collection', requireValidSyncCollection(), requireUser(), requireUserStorage(), writeSyncHandler);
 // Shared reports stay no-store: an edge cache could serve a report past its
 // KV expiry, and private diagnostic data doesn't belong in a public cache.
 app.get('/api/report/:id', requireValidReportId(), getReportHandler);
 app.post('/api/report', createReportHandler);
 // One observation in, one graded report out — per-visitor by definition.
-app.post('/api/persona/evaluate', personaEvaluateHandler);
+app.post('/api/persona/evaluate', requireUser(), countFeatureUse(FEATURE_USES.persona), personaEvaluateHandler);
 // Bulk IP Lookup: local data only. Resolved here so a bad BULK_LOOKUP_SOURCE
 // warns at boot rather than on the first request.
 bulkLookupSource();
@@ -267,6 +292,14 @@ const bootBackend = async () => {
     // (asn-profile's degraded caching keys on it); a request that finds it
     // still empty fills it on demand.
     if (hasRadarApiKey()) startOutagePolling();
+
+    // Optional user storage: migrated behind the listener, never fatal; a
+    // storage that is not ready is re-checked on a later request.
+    const missingAccountSetup = accountSetupGap();
+    if (missingAccountSetup) {
+        logger.warn(`⚠️  ${missingAccountSetup} is not set: sign-in and user storage need each other, account data features stay off`);
+    }
+    userStorage.bootCheck();
 
     await runOfflineBootstrap([
         async () => {

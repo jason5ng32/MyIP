@@ -58,7 +58,7 @@ const store = useMainStore();
 const { isFireBaseSet } = storeToRefs(store);
 
 // Bump when the policy text changes materially.
-const LAST_UPDATED = '2026-08-20';
+const LAST_UPDATED = '2026-11-20';
 
 // Sentry telemetry is a build-time decision (see frontend/AGENTS.md): the
 // section only renders on deployments actually built with a DSN.
@@ -76,6 +76,12 @@ const isDocsAssistantEnabled = computed(() => isDocsAssistantAvailable(isDocsCon
 // gets its own section — gated exactly like the tool's listing, which keeps
 // the section off deployments without it.
 const isPersonaCheckEnabled = computed(() => isToolAvailable(TOOL_BY_SLUG.get('personacheck'), store.capabilities));
+
+// What an account stores: offered with sign-in and user storage.
+const isUserStorageEnabled = computed(() => store.capabilities.accounts && store.capabilities.userStorage);
+
+// Features served by the IPCheck.ing API: offered with sign-in and that API.
+const isIpCheckingApiEnabled = computed(() => store.usageAvailable);
 
 // Privacy copy is loaded on demand per locale (same loader as the security
 // checklist dataset), then merged into i18n so t() / tm() can resolve it.
@@ -114,6 +120,7 @@ const order = computed(() => {
   if (isDocsAssistantEnabled.value) ids.push('docsAssistant');
   if (isAnalyticsEnabled) ids.push('analytics');
   if (isFireBaseSet.value) ids.push('account');
+  if (isUserStorageEnabled.value) ids.push('accountStorage');
   if (isSentryEnabled) ids.push('telemetry');
   if (isAnalyticsEnabled || isFireBaseSet.value || isSentryEnabled) ids.push('why');
   ids.push('cookies');
@@ -121,9 +128,11 @@ const order = computed(() => {
   return ids;
 });
 
-// Resolve a section's paragraphs to display strings. Two sections are assembled
+// Resolve a section's paragraphs to display strings. Three sections are assembled
 // per-flag rather than from a fixed array: "why" carries a reason per collection
-// type, and "cookies" mentions the GA cookie only when analytics is on.
+// type, "cookies" mentions the GA cookie only when analytics is on and
+// account sync only with user storage, and "account" mentions the IPCheck.ing
+// API only where it serves features.
 const paragraphs = (id) => {
   if (id === 'why') {
     const out = [];
@@ -132,10 +141,16 @@ const paragraphs = (id) => {
     if (isSentryEnabled) out.push(t('privacy.sections.why.telemetry'));
     return out;
   }
+  if (id === 'account') {
+    const out = [t('privacy.sections.account.intro'), t('privacy.sections.account.email')];
+    if (isIpCheckingApiEnabled.value) out.push(t('privacy.sections.account.ipChecking'));
+    return out;
+  }
   if (id === 'cookies') {
     const out = [];
     if (isAnalyticsEnabled) out.push(t('privacy.sections.cookies.analytics'));
     out.push(t('privacy.sections.cookies.local'));
+    if (isUserStorageEnabled.value) out.push(t('privacy.sections.cookies.localSync'));
     return out;
   }
   const arr = tm(`privacy.sections.${id}.paragraphs`);

@@ -1,6 +1,6 @@
 <template>
-    <!-- Achievements panel -->
-    <Sheet v-if="isSignedIn" :open="isOpen" @update:open="onOpenChange">
+    <!-- Achievements panel: signed in, on a deployment with user storage -->
+    <Sheet v-if="isSignedIn && achievementsAvailable" :open="isOpen" @update:open="onOpenChange">
         <SheetContent side="left" :title="t('user.Achievements.Title')"
             :class="['flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[640px] max-w-[80vw]']">
             <!-- Header -->
@@ -120,7 +120,7 @@ const isMobile = computed(() => store.isMobile);
 const triggerAchievements = computed(() => store.triggerAchievements);
 
 const isSignedIn = computed(() => store.isSignedIn);
-const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
+const achievementsAvailable = computed(() => store.achievementsAvailable);
 
 const userAchievements = computed(() => store.userAchievements);
 const achievedList = computed(() =>
@@ -155,8 +155,12 @@ const flipCard = (achievementName) => {
 // first, and this async component can mount after the flag is already set.
 watch(() => triggerAchievements.value, (newVal) => {
     if (!newVal) return;
+    if (!achievementsAvailable.value) {
+        store.setTriggerAchievements(false);
+        return;
+    }
     openAchievements();
-    if (!remoteUserInfoFetched.value) {
+    if (!store.userAchievementsSynced) {
         store.setTriggerRemoteUserInfo(true);
     }
 }, { immediate: true });

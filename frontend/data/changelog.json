@@ -2463,6 +2463,28 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "You can now sync your preferences across devices",
+          "zh": "现在你可以跨设备同步你的使用偏好",
+          "zh-TW": "現在你可以跨裝置同步你的使用偏好",
+          "fr": "Vous pouvez désormais synchroniser vos préférences entre vos appareils",
+          "ru": "Теперь можно синхронизировать свои настройки между устройствами",
+          "pt-BR": "Agora você pode sincronizar suas preferências entre dispositivos"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "For developers: any fork can connect its own user system",
+          "zh": "为开发者：任何 fork 都可以接入自己的用户系统",
+          "zh-TW": "給開發者：任何 fork 都可以接入自己的使用者系統",
+          "fr": "Pour les développeurs : chaque fork peut brancher son propre système d’utilisateurs",
+          "ru": "Для разработчиков: любой форк может подключить собственную систему пользователей",
+          "pt-BR": "Para desenvolvedores: qualquer fork pode conectar seu próprio sistema de usuários"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Reworked the program's architecture to make plugging in more IP data sources easier",

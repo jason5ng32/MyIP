@@ -1,7 +1,7 @@
 // Enhanced DNS leak detection — thin proxy to the IPCheck.ing API.
 //
 //   - validates the 32-hex token locally (fail fast before any network hop),
-//   - forwards the listed caller headers (notably Authorization: Bearer <Firebase ID>),
+//   - sends the listed caller headers and the user id requireUser() verified,
 //   - attaches the apikey query param and forwards ?lang untouched,
 //   - passes the upstream status back with its JSON verbatim on success and
 //     the coded error body on failure, so the frontend can tell sign-in and
@@ -37,6 +37,7 @@ export async function getSessionResult(req, res) {
             keyParam: 'apikey',
             query: { lang },
             forwardFrom: req,
+            endUserId: res.locals.userId,
         });
 
         // Parse as JSON if we can, otherwise just keep an empty object so the

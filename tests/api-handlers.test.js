@@ -17,7 +17,7 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 import configsHandler from '../api/configs.js';
 import googleMapHandler from '../api/google-map.js';
 import dnsResolverHandler from '../api/dns-resolver.js';
-import getUserInfoHandler from '../api/get-user-info.js';
+import usageHandler from '../api/usage.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
 import invisibilityHandler from '../api/invisibility-test.js';
@@ -29,7 +29,15 @@ import asnProfileHandler, { peeringdbReadiness, connectivityReadiness } from '..
 import { isAsRelLoaded } from '../server/datasets/as-rel-db.js';
 import { describeMac } from '../server/datasets/oui-db.js';
 import { isCompleteProfile } from '../server/asn-profile.js';
-import updateAchievementHandler from '../api/update-user-achievement.js';
+import { createAchievementHandlers } from '../api/achievements.js';
+import { createSyncHandlers } from '../api/sync.js';
+import { createSyncSettingsHandlers } from '../api/sync-settings.js';
+import { SYNC_COLLECTIONS, SYNC_OFF_CODE } from '../common/sync-collections.js';
+import { sanitizeLists } from '../frontend/utils/features/connectivity-lists.js';
+import { requireUser, requireUserStorage, requireValidSyncCollection } from '../server/guards.js';
+import { AUTH_REASON } from '../common/codes/service-errors.js';
+import { FEATURE_USES, recordFeatureUse } from '../server/db/feature-uses.js';
+import { fakeUserDb, fakeStorage } from './fake-user-db.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { createBulkLookup } from '../api/bulk-lookup.js';
 import { BULK_LOOKUP_MAX_IPS } from '../common/bulk-lookup-limits.js';
@@ -62,13 +70,13 @@ function createRequest(options = {}) {
 // Visitor headers: the listed ones reach the IPCheck.ing API, the rest
 // (plus createRequest's referer) never do.
 const FORWARDED_VISITOR_HEADERS = {
-    authorization: 'Bearer t',
     'accept-language': 'de-DE',
     'user-agent': 'VisitorBrowser/1.0',
     'cf-connecting-ip': '203.0.113.7',
     'x-forwarded-for': '203.0.113.7',
 };
 const DROPPED_VISITOR_HEADERS = {
+    authorization: 'Bearer t',
     host: 'myip.example', cookie: 'session=1', origin: 'https://myip.example',
     'content-length': '999', 'content-type': 'application/json',
 };
@@ -81,7 +89,15 @@ const withVisitorHeaders = (req) => {
 // The exact header set sent upstream: the listed visitor headers plus `extra`.
 const assertForwardedHeaders = (headers, extra = {}) => {
     assert.deepEqual(headers, { ...FORWARDED_VISITOR_HEADERS, ...extra });
-    for (const name of ['host', 'cookie', 'referer', 'content-length']) assert.equal(name in headers, false, name);
+    for (const name of ['host', 'cookie', 'referer', 'content-length', 'authorization']) assert.equal(name in headers, false, name);
+};
+
+// The user id the sign-in guards put on res.locals, and the header carrying it.
+const USER_ID = 'user-123';
+const END_USER = { 'x-end-user-id': USER_ID };
+const signedIn = (res) => {
+    res.locals.userId = USER_ID;
+    return res;
 };
 
 // IPCheck.ing API failure bodies as it sends them, and the coded bodies the
@@ -89,6 +105,7 @@ const assertForwardedHeaders = (headers, extra = {}) => {
 const UPSTREAM_SIGN_IN_REQUIRED = { error: 'Sign in required', message: 'Authorization header is missing.', code: 'sign_in_required' };
 const UPSTREAM_INVALID_TOKEN = { error: 'Invalid token', message: 'Firebase ID token has expired.', code: 'invalid_token' };
 const UPSTREAM_QUOTA = { error: 'Monthly quota exceeded', code: 'quota_exceeded' };
+const UPSTREAM_SERVICE_LIMIT = { error: 'Service limit reached', code: 'service_limit' };
 const CODED_SIGN_IN_REQUIRED = { error: 'Sign in required', code: 'auth', reason: 'sign_in_required' };
 const CODED_INVALID_TOKEN = { error: 'Invalid token', code: 'auth', reason: 'invalid_token' };
 const CODED_QUOTA = { error: 'Monthly quota exceeded', code: 'quota' };
@@ -98,6 +115,7 @@ function createResponse() {
     return {
         statusCode: 200,
         body: undefined,
+        locals: {},
         status(code) { this.statusCode = code; return this; },
         json(payload) { this.body = payload; return this; },
         send(payload) { this.body = payload; return this; },
@@ -146,7 +164,7 @@ describe('configs handler', () => {
         const res = createResponse();
         configsHandler(createRequest(), res);
         assert.equal(res.statusCode, 200);
-        const flags = ['map', 'ipinfoio', 'ipChecking', 'ip2locationio', 'cloudFlare', 'ipapiis', 'reportSharing'];
+        const flags = ['map', 'ipinfoio', 'ipChecking', 'ip2locationio', 'cloudFlare', 'ipapiis', 'reportSharing', 'userStorage'];
         for (const key of flags) {
             assert.equal(typeof res.body[key], 'boolean');
         }
@@ -493,7 +511,7 @@ describe('persona handler', () => {
         };
 
         const req = withVisitorHeaders(createRequest({ method: 'POST', body: { persona: { country: 'JP' } } }));
-        const res = createResponse();
+        const res = signedIn(createResponse());
         await personaEvaluateHandler(req, res);
 
         assert.equal(res.statusCode, 200);
@@ -503,7 +521,7 @@ describe('persona handler', () => {
         // here: exactly one content-type goes along (two would arrive as
         // "application/json, application/json" and be refused with 415), and
         // no content-length.
-        assertForwardedHeaders(requested.options.headers, { 'content-type': 'application/json' });
+        assertForwardedHeaders(requested.options.headers, { 'content-type': 'application/json', ...END_USER });
         assert.equal(requested.options.body, JSON.stringify({ persona: { country: 'JP' } }));
         assert.match(requested.url, /\/persona\/evaluate\?key=test-key$/);
     });
@@ -515,6 +533,7 @@ describe('persona handler', () => {
             [403, UPSTREAM_SIGN_IN_REQUIRED, CODED_SIGN_IN_REQUIRED],
             [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
             [429, UPSTREAM_QUOTA, CODED_QUOTA],
+            [429, UPSTREAM_SERVICE_LIMIT, { error: 'Service limit reached' }],
             [400, { error: 'Invalid country' }, { error: 'Invalid country' }],
         ]) {
             globalThis.fetch = upstreamAnswer(status, upstream);
@@ -749,13 +768,23 @@ describe('invisibility-test handler', () => {
             called = { url: new URL(String(url)), init };
             return new Response(JSON.stringify({ status: 'pending' }), { status: 202 });
         };
-        const res = createResponse();
+        const res = signedIn(createResponse());
         await invisibilityHandler(withVisitorHeaders(createRequest({ query: { id: 'a'.repeat(28) } })), res);
         assert.equal(res.statusCode, 200);
         assert.deepEqual(res.body, { status: 'pending' });
         assert.equal(called.url.pathname, `/getpdresult/${'a'.repeat(28)}`);
         assert.equal(called.url.searchParams.get('apikey'), 'test-key');
-        assertForwardedHeaders(called.init.headers);
+        assertForwardedHeaders(called.init.headers, END_USER);
+    });
+
+    it('answers a service limit with its status and no quota code', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        globalThis.fetch = upstreamAnswer(429, UPSTREAM_SERVICE_LIMIT);
+        const res = createResponse();
+        await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
+        assert.equal(res.statusCode, 429);
+        assert.deepEqual(res.body, { error: 'Service limit reached' });
     });
 });
 
@@ -784,13 +813,16 @@ describe('ip-blocklist handler', () => {
             return { status: 200, ok: true, json: async () => ({ ip: '1.1.1.1', summary: { listed: 0 } }) };
         };
         const req = withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1' } }));
-        const res = createResponse();
+        const res = signedIn(createResponse());
         await ipBlocklistHandler(req, res);
         assert.equal(res.statusCode, 200);
         assert.deepEqual(res.body, { ip: '1.1.1.1', summary: { listed: 0 } });
         assert.equal(called.url.pathname, '/iphitlist');
         assert.equal(called.url.searchParams.get('ip'), '1.1.1.1');
         assert.equal(called.url.searchParams.get('key'), 'test-key');
+        assertForwardedHeaders(called.init.headers, END_USER);
+
+        await ipBlocklistHandler(withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1' } })), createResponse());
         assertForwardedHeaders(called.init.headers);
     });
 
@@ -815,6 +847,15 @@ describe('ip-blocklist handler', () => {
         await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
         assert.equal(res.statusCode, 429);
         assert.deepEqual(res.body, CODED_QUOTA);
+    });
+
+    it('passes a service limit through as 429 without the quota code', async () => {
+        configure();
+        globalThis.fetch = upstreamAnswer(429, UPSTREAM_SERVICE_LIMIT);
+        const res = createResponse();
+        await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        assert.equal(res.statusCode, 429);
+        assert.deepEqual(res.body, { error: 'Service limit reached' });
     });
 
     it('turns any other upstream failure into a 500', async () => {
@@ -1008,51 +1049,521 @@ describe('bulk-lookup handler', () => {
     });
 });
 
-// -- update-user-achievement handler --------------------------------------
+// -- achievements handlers ------------------------------------------------
 
-describe('update-user-achievement handler', () => {
-    it('rejects non-PUT methods with 405', async () => {
+describe('achievements handlers', () => {
+    // The route's chain: requireUser(), requireUserStorage(), then the handler.
+    const route = async (handler, req, { verify = async () => ({ id: USER_ID }), storage }) => {
         const res = createResponse();
-        await updateAchievementHandler(createRequest({ method: 'POST', body: { name: 'X' } }), res);
+        for (const step of [requireUser(verify), requireUserStorage(storage), handler]) {
+            let advanced = false;
+            await step(req, res, () => { advanced = true; });
+            if (step !== handler && !advanced) break;
+        }
+        return res;
+    };
+    const setup = (times = [1000, 2000, 3000]) => {
+        const stamps = times.map((ms) => new Date(ms));
+        const db = fakeUserDb({ now: () => stamps.shift() ?? new Date(9999) });
+        return { db, storage: fakeStorage(db), handlers: createAchievementHandlers(fakeStorage(db)) };
+    };
+    const put = (body) => createRequest({ method: 'PUT', body });
+
+    it('rejects the wrong method with 405', async () => {
+        const { handlers } = setup();
+        const res = signedIn(createResponse());
+        await handlers.list(createRequest({ method: 'POST' }), res);
         assert.equal(res.statusCode, 405);
-        assert.deepEqual(res.body, { error: 'Method not allowed' });
+        const res2 = signedIn(createResponse());
+        await handlers.unlock(createRequest({ method: 'GET' }), res2);
+        assert.equal(res2.statusCode, 405);
     });
 
-    it('reports missing API key before forwarding', async () => {
-        delete process.env.IPCHECKING_API_KEY;
-        const res = createResponse();
-        await updateAchievementHandler(createRequest({ method: 'PUT', body: { name: 'X' } }), res);
-        assert.equal(res.statusCode, 500);
-        assert.deepEqual(res.body, { error: 'API key is missing' });
+    it('signed out → 403 auth, before storage is touched', async () => {
+        const { db, storage, handlers } = setup();
+        const verify = async () => ({ reason: AUTH_REASON.SIGN_IN_REQUIRED });
+        for (const [handler, req] of [[handlers.list, createRequest()], [handlers.unlock, put({ name: 'IAmHuman' })]]) {
+            const res = await route(handler, req, { verify, storage });
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+        }
+        assert.equal(db.calls.length, 0);
     });
 
-    it('PUTs the re-serialized body as JSON with the listed caller headers', async () => {
-        process.env.IPCHECKING_API_KEY = 'test-key';
-        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
-        let called;
-        globalThis.fetch = async (url, init) => {
-            called = { url: new URL(String(url)), init };
-            return new Response(JSON.stringify({ ok: true }), { status: 200 });
-        };
-        const res = createResponse();
-        await updateAchievementHandler(withVisitorHeaders(createRequest({ method: 'PUT', body: { name: 'X' } })), res);
+    it('storage off or not ready → 503', async () => {
+        const { db, handlers } = setup();
+        for (const options of [{ configured: false }, { ready: false }]) {
+            const storage = fakeStorage(db, options);
+            for (const [handler, req] of [[handlers.list, createRequest()], [handlers.unlock, put({ name: 'IAmHuman' })]]) {
+                const res = await route(handler, req, { storage });
+                assert.equal(res.statusCode, 503);
+                assert.deepEqual(res.body, { error: 'User storage unavailable' });
+            }
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('PUT with an unknown, missing or non-string name → 400, nothing stored', async () => {
+        const { db, storage, handlers } = setup();
+        for (const body of [{ name: 'NoSuchBadge' }, {}, undefined, { name: 42 }, { name: 'constructor' }, { achievement: 'IAmHuman' }]) {
+            const res = await route(handlers.unlock, put(body), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(body));
+            assert.deepEqual(res.body, { error: 'Unknown achievement' });
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('a new user lists nothing, with zero uses, and gets a users row', async () => {
+        const { db, storage, handlers } = setup();
+        const res = await route(handlers.list, createRequest(), { storage });
         assert.equal(res.statusCode, 200);
-        assert.deepEqual(res.body, { ok: true });
-        assert.equal(called.url.pathname, '/updateuserachievements');
-        assert.equal(called.url.searchParams.get('key'), 'test-key');
-        assert.equal(called.init.method, 'PUT');
-        assert.equal(called.init.body, JSON.stringify({ name: 'X' }));
-        assertForwardedHeaders(called.init.headers, { 'content-type': 'application/json' });
+        assert.deepEqual(res.body, { achievements: {}, totalUses: 0 });
+        assert.ok(db.users.has(USER_ID));
+    });
+
+    it('PUT unlocks once; a repeat keeps the first time; GET lists it with the summed uses', async () => {
+        const { db, storage, handlers } = setup([1000, 2000, 3000, 4000]);
+        const first = await route(handlers.unlock, put({ name: 'IAmHuman' }), { storage });
+        assert.equal(first.statusCode, 200);
+        assert.equal(first.body.name, 'IAmHuman');
+        const again = await route(handlers.unlock, put({ name: 'IAmHuman' }), { storage });
+        assert.deepEqual(again.body, first.body);
+        await route(handlers.unlock, put({ name: 'CuriousCat' }), { storage });
+        await recordFeatureUse(db.query, USER_ID, FEATURE_USES.persona);
+        await recordFeatureUse(db.query, USER_ID, FEATURE_USES.persona);
+        await recordFeatureUse(db.query, USER_ID, FEATURE_USES.ipchecking);
+        await recordFeatureUse(db.query, 'someone-else', FEATURE_USES.ipchecking);
+
+        const res = await route(handlers.list, createRequest(), { storage });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, {
+            achievements: {
+                IAmHuman: { achieved: true, achievedTime: first.body.achievedTime },
+                CuriousCat: { achieved: true, achievedTime: res.body.achievements.CuriousCat.achievedTime },
+            },
+            totalUses: 3,
+        });
+        assert.equal(typeof first.body.achievedTime, 'number');
+        assert.ok(res.body.achievements.CuriousCat.achievedTime > first.body.achievedTime);
+    });
+
+    it('a storage failure answers 500 without its details', async () => {
+        const storage = fakeStorage({ query: async () => { throw new Error('relation "x" does not exist'); } });
+        const handlers = createAchievementHandlers(storage);
+        const listRes = await route(handlers.list, createRequest(), { storage });
+        assert.equal(listRes.statusCode, 500);
+        assert.deepEqual(listRes.body, { error: 'Achievements unavailable' });
+        const putRes = await route(handlers.unlock, put({ name: 'IAmHuman' }), { storage });
+        assert.equal(putRes.statusCode, 500);
+        assert.deepEqual(putRes.body, { error: 'Achievement not saved' });
     });
 });
 
-// -- get-user-info handler ------------------------------------------------
+// -- sync handlers --------------------------------------------------------
 
-describe('get-user-info handler', () => {
+describe('sync handlers', () => {
+    const NOW = 1_000_000;
+    const { preferences, connectivity } = SYNC_COLLECTIONS;
+    // A stand-in collection with deletes and small pages, exercising the generic engine.
+    const ticks = Object.freeze({
+        id: 'ticks', version: 1,
+        isValidItemId: (id) => typeof id === 'string' && /^[a-z0-9-]{1,32}$/.test(id),
+        isValidValue: (id, value) => value === 'checked' || value === 'ignored',
+        maxItems: 100, maxItemBytes: 64, allowDelete: true, pageSize: 3,
+    });
+    const COLLECTIONS = Object.freeze({ ...SYNC_COLLECTIONS, ticks });
+    // The route's chain: requireValidSyncCollection(), requireUser(), requireUserStorage(), then the handler.
+    const route = async (handler, req, { verify = async () => ({ id: USER_ID }), storage, collections = COLLECTIONS }) => {
+        const res = createResponse();
+        for (const step of [requireValidSyncCollection('collection', collections), requireUser(verify), requireUserStorage(storage), handler]) {
+            let advanced = false;
+            await step(req, res, () => { advanced = true; });
+            if (step !== handler && !advanced) break;
+        }
+        return res;
+    };
+    const enable = (db, user = USER_ID, ids = ['ticks', 'preferences', 'connectivity']) =>
+        db.syncSettings.set(user, { collections: ids, updated_at: new Date() });
+    const setup = ({ enabled = true } = {}) => {
+        const db = fakeUserDb();
+        if (enabled) for (const user of [USER_ID, 'alice', 'bob']) enable(db, user);
+        const storage = fakeStorage(db);
+        return { db, storage, handlers: createSyncHandlers(storage, { now: () => NOW }) };
+    };
+    const get = (collection, query = {}) => ({ ...createRequest({ query }), params: { collection } });
+    const put = (collection, body) => ({ ...createRequest({ method: 'PUT', body }), params: { collection } });
+    const as = (id) => async () => ({ id });
+    const tick = (id, updatedAt, value = 'checked') => ({ id, updatedAt, deleted: false, value });
+    const v = String(ticks.version);
+    const SYNC_OFF = { error: 'Sync is off for this collection', code: SYNC_OFF_CODE };
+
+    it('rejects the wrong method with 405', async () => {
+        const { handlers } = setup();
+        const res = signedIn(createResponse());
+        res.locals.syncCollection = ticks;
+        await handlers.read(createRequest({ method: 'POST' }), res);
+        assert.equal(res.statusCode, 405);
+        const res2 = signedIn(createResponse());
+        res2.locals.syncCollection = ticks;
+        await handlers.write(createRequest({ method: 'GET' }), res2);
+        assert.equal(res2.statusCode, 405);
+    });
+
+    it('an unknown collection → 404 before sign-in or storage; snapshots and IP history are not collections', async () => {
+        const { db, storage, handlers } = setup();
+        let verified = false;
+        const verify = async () => { verified = true; return { id: USER_ID }; };
+        for (const name of ['nope', 'snapshots', 'ipHistory', 'constructor', '__proto__', '']) {
+            for (const req of [get(name, { v: '1' }), put(name, { version: 1, items: [] })]) {
+                const res = await route(req.method === 'PUT' ? handlers.write : handlers.read, req, { verify, storage, collections: SYNC_COLLECTIONS });
+                assert.equal(res.statusCode, 404, name);
+                assert.deepEqual(res.body, { error: 'Unknown collection' });
+            }
+        }
+        assert.equal(verified, false);
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('signed out → 403 auth; storage off or not ready → 503; storage untouched either way', async () => {
+        const { db, storage, handlers } = setup();
+        const signedOut = async () => ({ reason: AUTH_REASON.SIGN_IN_REQUIRED });
+        for (const [handler, req] of [[handlers.read, get('ticks', { v })], [handlers.write, put('ticks', { version: 1, items: [] })]]) {
+            const res = await route(handler, req, { verify: signedOut, storage });
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+            for (const options of [{ configured: false }, { ready: false }]) {
+                const off = await route(handler, req, { storage: fakeStorage(db, options) });
+                assert.equal(off.statusCode, 503);
+            }
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('a collection the account has not enabled → 409 sync_off, nothing read or written', async () => {
+        const { db, storage, handlers } = setup({ enabled: false });
+        const attempt = async () => {
+            db.calls.length = 0;
+            const read = await route(handlers.read, get('preferences', { v: String(preferences.version) }), { storage });
+            const write = await route(handlers.write, put('preferences', {
+                version: preferences.version, items: [{ id: 'theme', updatedAt: 1, value: 'dark' }],
+            }), { storage });
+            return [read, write];
+        };
+        for (const ids of [null, [], ['connectivity']]) {
+            if (ids) enable(db, USER_ID, ids);
+            for (const res of await attempt()) {
+                assert.equal(res.statusCode, 409, JSON.stringify(ids));
+                assert.deepEqual(res.body, SYNC_OFF);
+            }
+            assert.ok(db.calls.every(({ text }) => !text.includes('synced_items')), 'synced_items untouched');
+            assert.equal(db.syncedItems.size, 0);
+        }
+        enable(db, USER_ID, ['preferences']);
+        const [read, write] = await attempt();
+        assert.equal(read.statusCode, 200);
+        assert.deepEqual(write.body, { base: 0, cursor: 1, conflicts: [], refused: [] });
+    });
+
+    it('GET with a bad v or since → 400, storage untouched', async () => {
+        const { db, storage, handlers } = setup();
+        for (const query of [{}, { v: '0' }, { v: '-1' }, { v: '1.5' }, { v: 'x' }, { v: '01' }, { v: '9999999999' }, { v: ['1', '2'] },
+            { v, since: '-1' }, { v, since: '1.5' }, { v, since: 'abc' }, { v, since: '99999999999999999' }, { v, since: ['1'] }]) {
+            const res = await route(handlers.read, get('ticks', query), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(query));
+            assert.equal(typeof res.body.error, 'string');
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('GET with nothing stored → an empty page at the given cursor, and a users row', async () => {
+        const { db, storage, handlers } = setup();
+        const res = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { cursor: 0, more: false, items: [] });
+        assert.ok(db.users.has(USER_ID));
+        const later = await route(handlers.read, get('ticks', { v, since: '42' }), { storage });
+        assert.deepEqual(later.body, { cursor: 42, more: false, items: [] });
+    });
+
+    it('PUT then GET round-trips; base / cursor tell whether the device missed anything', async () => {
+        const { storage, handlers } = setup();
+        const first = await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 10), tick('b', 20, 'ignored')] }), { storage });
+        assert.equal(first.statusCode, 200);
+        assert.deepEqual(first.body, { base: 0, cursor: 2, conflicts: [], refused: [] });
+        const second = await route(handlers.write, put('ticks', { version: 1, items: [{ id: 'a', updatedAt: 30, deleted: true }] }), { storage });
+        assert.deepEqual(second.body, { base: 2, cursor: 3, conflicts: [], refused: [] });
+        const all = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.deepEqual(all.body, { cursor: 3, more: false, items: [tick('b', 20, 'ignored'), { id: 'a', updatedAt: 30, deleted: true }] });
+        const since = await route(handlers.read, get('ticks', { v, since: '2' }), { storage });
+        assert.deepEqual(since.body, { cursor: 3, more: false, items: [{ id: 'a', updatedAt: 30, deleted: true }] });
+    });
+
+    it('the Connectivity lists, their order and the default list id round-trip; a list deletes as a tombstone', async () => {
+        const { storage, handlers } = setup();
+        const [mine] = sanitizeLists(null, null, []).lists;
+        const items = [
+            { id: 'order', updatedAt: 5, deleted: false, value: ['mine', 'work'] },
+            { id: 'defaultListId', updatedAt: 5, deleted: false, value: 'mine' },
+            { id: 'list:mine', updatedAt: 5, deleted: false, value: { name: null, members: mine.members } },
+            { id: 'list:work', updatedAt: 5, deleted: false, value: { name: 'Work', members: [] } },
+        ];
+        const saved = await route(handlers.write, put('connectivity', { version: connectivity.version, items }), { storage });
+        assert.deepEqual(saved.body, { base: 0, cursor: 4, conflicts: [], refused: [] });
+        const listed = await route(handlers.read, get('connectivity', { v: String(connectivity.version) }), { storage });
+        assert.deepEqual(listed.body, { cursor: 4, more: false, items });
+        const dropped = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
+            { id: 'list:work', updatedAt: 6, deleted: true },
+        ] }), { storage });
+        assert.deepEqual(dropped.body, { base: 4, cursor: 5, conflicts: [], refused: [] });
+        const bad = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
+            { id: 'list:work', updatedAt: 7, value: { name: 'Work', members: [], extra: 1 } },
+            { id: 'order', updatedAt: 7, value: ['mine', 'mine'] },
+            { id: 'defaultListId', updatedAt: 7, value: '' },
+        ] }), { storage });
+        assert.deepEqual(bad.body.refused, [
+            { id: 'list:work', reason: 'invalid' }, { id: 'order', reason: 'invalid' }, { id: 'defaultListId', reason: 'invalid' },
+        ]);
+        for (const id of ['lists', 'connectivityLists', 'list:']) {
+            const unknown = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
+                { id, updatedAt: 8, value: { name: 'X', members: [] } },
+            ] }), { storage });
+            assert.equal(unknown.statusCode, 400, id);
+        }
+    });
+
+    it('GET pages by the collection\'s pageSize with `more`', async () => {
+        const { storage, handlers } = setup();
+        const count = ticks.pageSize + 2;
+        const items = Array.from({ length: count }, (_, i) => tick(`s${i}`, i + 1));
+        const saved = await route(handlers.write, put('ticks', { version: 1, items }), { storage });
+        assert.deepEqual(saved.body, { base: 0, cursor: count, conflicts: [], refused: [] });
+        const page1 = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.equal(page1.body.items.length, ticks.pageSize);
+        assert.equal(page1.body.more, true);
+        assert.equal(page1.body.cursor, ticks.pageSize);
+        assert.deepEqual(page1.body.items[0], tick('s0', 1));
+        const page2 = await route(handlers.read, get('ticks', { v, since: String(page1.body.cursor) }), { storage });
+        assert.deepEqual(page2.body.items.map(({ id }) => id), Array.from({ length: 2 }, (_, i) => `s${ticks.pageSize + i}`));
+        assert.equal(page2.body.more, false);
+        assert.equal(page2.body.cursor, count);
+    });
+
+    it('a stored edit as new or newer stays and comes back in conflicts; a future time is clamped', async () => {
+        const { storage, handlers } = setup();
+        await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 100), tick('b', NOW * 3)] }), { storage });
+        const res = await route(handlers.write, put('ticks', {
+            version: 1, items: [tick('a', 100, 'ignored'), tick('b', NOW + 5, 'ignored'), tick('c', 1)],
+        }), { storage });
+        assert.deepEqual(res.body, { base: 2, cursor: 3, conflicts: [tick('a', 100), tick('b', NOW)], refused: [] });
+    });
+
+    it('refuses an item per reason and stores the rest', async () => {
+        const { storage, handlers } = setup();
+        const small = { ...COLLECTIONS, ticks: { ...ticks, maxItems: 1 } };
+        const res = await route(handlers.write, put('ticks', { version: 1, items: [
+            tick('bad', 1, 'maybe'), tick('ok', 1), tick('over', 1), { id: 'big', updatedAt: 1, value: 'x'.repeat(100) },
+        ] }), { storage, collections: small });
+        assert.deepEqual(res.body.refused, [
+            { id: 'bad', reason: 'invalid' }, { id: 'over', reason: 'full' }, { id: 'big', reason: 'too_large' },
+        ]);
+        const prefs = await route(handlers.write, put('preferences', { version: preferences.version, items: [
+            { id: 'theme', updatedAt: 1, deleted: true }, { id: 'lang', updatedAt: 1, value: 'fr' },
+        ] }), { storage });
+        assert.deepEqual(prefs.body.refused, [{ id: 'theme', reason: 'no_delete' }]);
+        const listed = await route(handlers.read, get('preferences', { v: String(preferences.version) }), { storage });
+        assert.deepEqual(listed.body.items, [{ id: 'lang', updatedAt: 1, deleted: false, value: 'fr' }]);
+    });
+
+    it('PUT with a bad shape or another version → 400, nothing written', async () => {
+        const { db, storage, handlers } = setup();
+        const many = Array.from({ length: 501 }, (_, i) => tick(`s-${i}`, 1));
+        for (const body of [
+            undefined, [], 'x', {}, { version: 1 }, { version: 1, items: {} },
+            { version: 2, items: [] }, { version: 0, items: [] }, { version: '1', items: [] },
+            { version: 1, items: many },
+            { version: 1, items: [null] },
+            { version: 1, items: [{ updatedAt: 1, value: 'checked' }] },
+            { version: 1, items: [tick('Not A Slug', 1)] },
+            { version: 1, items: [tick('a', 0)] },
+            { version: 1, items: [tick('a', -5)] },
+            { version: 1, items: [tick('a', 1.5)] },
+            { version: 1, items: [tick('a', '5')] },
+            { version: 1, items: [{ ...tick('a', 5), deleted: 'yes' }] },
+            { version: 1, items: [tick('a', 1), tick('a', 2)] },
+        ]) {
+            const res = await route(handlers.write, put('ticks', body), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(body)?.slice(0, 80));
+            assert.equal(typeof res.body.error, 'string');
+        }
+        assert.equal(db.calls.length, 0);
+        const prefs = await route(handlers.write, put('preferences', { version: 1, items: [{ id: 'theme', updatedAt: 1, value: 'dark' }] }), { storage });
+        assert.equal(prefs.statusCode, 400);
+        const unknownKey = await route(handlers.write, put('preferences', { version: preferences.version, items: [{ id: 'nope', updatedAt: 1, value: 1 }] }), { storage });
+        assert.equal(unknownKey.statusCode, 400);
+        assert.equal(db.syncedItems.size, 0);
+    });
+
+    it('a write to version N+1 never touches version N rows; GET serves each version its own rows', async () => {
+        const { db, storage, handlers } = setup();
+        await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 1), tick('b', 1)] }), { storage });
+        const next = { ...COLLECTIONS, ticks: { ...ticks, version: 2 } };
+        const stale = await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 5, 'ignored')] }), { storage, collections: next });
+        assert.equal(stale.statusCode, 400);
+        const res = await route(handlers.write, put('ticks', { version: 2, items: [tick('a', 5, 'ignored')] }), { storage, collections: next });
+        assert.deepEqual(res.body, { base: 0, cursor: 3, conflicts: [], refused: [] });
+        const v1 = await route(handlers.read, get('ticks', { v: '1' }), { storage, collections: next });
+        assert.deepEqual(v1.body.items, [tick('a', 1), tick('b', 1)]);
+        const v2 = await route(handlers.read, get('ticks', { v: '2' }), { storage, collections: next });
+        assert.deepEqual(v2.body.items, [tick('a', 5, 'ignored')]);
+        assert.deepEqual([...db.syncedItems.values()].filter((row) => row.schema_version === 1).map((row) => row.data), ['checked', 'checked']);
+    });
+
+    it('a user never sees another user\'s items', async () => {
+        const { storage, handlers } = setup();
+        await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 1)] }), { verify: as('alice'), storage });
+        const bob = await route(handlers.read, get('ticks', { v }), { verify: as('bob'), storage });
+        assert.deepEqual(bob.body, { cursor: 0, more: false, items: [] });
+        const bobPut = await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 2, 'ignored')] }), { verify: as('bob'), storage });
+        assert.deepEqual(bobPut.body, { base: 0, cursor: 2, conflicts: [], refused: [] });
+        const alice = await route(handlers.read, get('ticks', { v }), { verify: as('alice'), storage });
+        assert.deepEqual(alice.body.items, [tick('a', 1)]);
+    });
+
+    it('a storage failure answers 500 without its details', async () => {
+        const storage = fakeStorage({ query: async () => { throw new Error('relation "x" does not exist'); } });
+        const handlers = createSyncHandlers(storage);
+        const readRes = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.equal(readRes.statusCode, 500);
+        assert.deepEqual(readRes.body, { error: 'Sync unavailable' });
+        const putRes = await route(handlers.write, put('ticks', { version: 1, items: [] }), { storage });
+        assert.equal(putRes.statusCode, 500);
+        assert.deepEqual(putRes.body, { error: 'Sync not saved' });
+    });
+});
+
+// -- sync settings handlers -----------------------------------------------
+
+describe('sync settings handlers', () => {
+    // The route's chain: requireUser(), requireUserStorage(), then the handler.
+    const route = async (handler, req, { verify = async () => ({ id: USER_ID }), storage }) => {
+        const res = createResponse();
+        for (const step of [requireUser(verify), requireUserStorage(storage), handler]) {
+            let advanced = false;
+            await step(req, res, () => { advanced = true; });
+            if (step !== handler && !advanced) break;
+        }
+        return res;
+    };
+    const setup = () => {
+        const db = fakeUserDb();
+        const storage = fakeStorage(db);
+        return { db, storage, handlers: createSyncSettingsHandlers(storage) };
+    };
+    const put = (body) => createRequest({ method: 'PUT', body });
+    const itemsOf = (db, user) => [...db.syncedItems.values()].filter((row) => row.user_id === user).map((row) => row.collection).sort();
+    const putRow = (db, user, collection, version, item) => db.syncedItems.set([user, collection, version, item].join('\u0000'), {
+        user_id: user, collection, schema_version: version, item_id: item, updated_at: 1, deleted: false, data: 'v', seq: db.syncedItems.size + 1,
+    });
+
+    it('rejects the wrong method with 405', async () => {
+        const { handlers } = setup();
+        const res = signedIn(createResponse());
+        await handlers.read(createRequest({ method: 'POST' }), res);
+        assert.equal(res.statusCode, 405);
+        const res2 = signedIn(createResponse());
+        await handlers.write(createRequest({ method: 'GET' }), res2);
+        assert.equal(res2.statusCode, 405);
+    });
+
+    it('signed out → 403 auth; storage off or not ready → 503; storage untouched either way', async () => {
+        const { db, storage, handlers } = setup();
+        const signedOut = async () => ({ reason: AUTH_REASON.SIGN_IN_REQUIRED });
+        for (const [handler, req] of [[handlers.read, createRequest()], [handlers.write, put({ collections: [] })]]) {
+            const res = await route(handler, req, { verify: signedOut, storage });
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+            for (const options of [{ configured: false }, { ready: false }]) {
+                assert.equal((await route(handler, req, { storage: fakeStorage(db, options) })).statusCode, 503);
+            }
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('GET for a user who never decided → undecided, nothing enabled, and a users row', async () => {
+        const { db, storage, handlers } = setup();
+        const res = await route(handlers.read, createRequest(), { storage });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { decided: false, collections: [] });
+        assert.ok(db.users.has(USER_ID));
+    });
+
+    it('PUT with anything but an array of distinct registry ids → 400, nothing written', async () => {
+        const { db, storage, handlers } = setup();
+        for (const body of [
+            undefined, null, [], 'x', {}, { collections: 'preferences' }, { collections: {} }, { collections: null },
+            { collections: ['nope'] }, { collections: ['snapshots'] }, { collections: ['ipHistory'] },
+            { collections: ['preferences', 'preferences'] }, { collections: [1] }, { collections: [null] },
+            { collections: ['constructor'] }, { collections: ['__proto__'] },
+        ]) {
+            const res = await route(handlers.write, put(body), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(body));
+            assert.equal(typeof res.body.error, 'string');
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('PUT decides: nothing, then both, in registry order; GET reads it back', async () => {
+        const { db, storage, handlers } = setup();
+        const none = await route(handlers.write, put({ collections: [] }), { storage });
+        assert.equal(none.statusCode, 200);
+        assert.deepEqual(none.body, { decided: true, collections: [] });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { decided: true, collections: [] });
+        const both = await route(handlers.write, put({ collections: ['connectivity', 'preferences'] }), { storage });
+        assert.deepEqual(both.body, { decided: true, collections: ['preferences', 'connectivity'] });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, both.body);
+        assert.ok(db.users.has(USER_ID));
+    });
+
+    it('turning a collection off deletes exactly its rows, in every version; other users keep theirs', async () => {
+        const { db, storage, handlers } = setup();
+        await route(handlers.write, put({ collections: ['preferences', 'connectivity'] }), { storage });
+        for (const user of [USER_ID, 'other']) {
+            putRow(db, user, 'preferences', 7, 'theme');
+            putRow(db, user, 'preferences', 6, 'lang');
+            putRow(db, user, 'connectivity', 1, 'lists');
+        }
+        await route(handlers.write, put({ collections: ['connectivity'] }), { storage });
+        assert.deepEqual(itemsOf(db, USER_ID), ['connectivity']);
+        await route(handlers.write, put({ collections: [] }), { storage });
+        assert.deepEqual(itemsOf(db, USER_ID), []);
+        assert.deepEqual(itemsOf(db, 'other'), ['connectivity', 'preferences', 'preferences']);
+    });
+
+    it('GET leaves out stored ids the registry no longer has', async () => {
+        const { db, storage, handlers } = setup();
+        db.syncSettings.set(USER_ID, { collections: ['snapshots', 'preferences', 'ipHistory'], updated_at: new Date() });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { decided: true, collections: ['preferences'] });
+    });
+
+    it('a storage failure answers 500 without its details', async () => {
+        const storage = fakeStorage({ query: async () => { throw new Error('relation "x" does not exist'); } });
+        const handlers = createSyncSettingsHandlers(storage);
+        const readRes = await route(handlers.read, createRequest(), { storage });
+        assert.equal(readRes.statusCode, 500);
+        assert.deepEqual(readRes.body, { error: 'Sync settings unavailable' });
+        const putRes = await route(handlers.write, put({ collections: [] }), { storage });
+        assert.equal(putRes.statusCode, 500);
+        assert.deepEqual(putRes.body, { error: 'Sync settings not saved' });
+    });
+});
+
+// -- usage handler --------------------------------------------------------
+
+describe('usage handler', () => {
     it('reports missing API key before fetch', async () => {
         delete process.env.IPCHECKING_API_KEY;
         const res = createResponse();
-        await getUserInfoHandler(createRequest(), res);
+        await usageHandler(createRequest(), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
@@ -1062,26 +1573,34 @@ describe('get-user-info handler', () => {
         delete process.env.IPCHECKING_API_ENDPOINT;
         globalThis.fetch = async () => assert.fail('no upstream call');
         const res = createResponse();
-        await getUserInfoHandler(createRequest(), res);
+        await usageHandler(createRequest(), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
 
-    it('asks /userinfo with the system key and the listed caller headers', async () => {
+    // Fields beyond { userLevel, quota } (an older upstream's) are not relayed.
+    const upstreamSummary = {
+        userLevel: 'Standard',
+        quota: { month: '2026-11', isSponsor: false, features: {} },
+        functionUses: { total: 9 },
+        achievements: { IAmHuman: { achieved: true, achievedTime: 1 } },
+    };
+
+    it('asks /usage with the system key and the listed caller headers, relaying { userLevel, quota }', async () => {
         process.env.IPCHECKING_API_KEY = 'test-key';
         process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
         let called;
         globalThis.fetch = async (url, init) => {
             called = { url: new URL(String(url)), init };
-            return new Response(JSON.stringify({ uid: 'u1' }), { status: 200 });
+            return new Response(JSON.stringify(upstreamSummary), { status: 200 });
         };
-        const res = createResponse();
-        await getUserInfoHandler(withVisitorHeaders(createRequest()), res);
+        const res = signedIn(createResponse());
+        await usageHandler(withVisitorHeaders(createRequest()), res);
         assert.equal(res.statusCode, 200);
-        assert.deepEqual(res.body, { uid: 'u1' });
-        assert.equal(called.url.pathname, '/userinfo');
+        assert.deepEqual(res.body, { userLevel: 'Standard', quota: upstreamSummary.quota });
+        assert.equal(called.url.pathname, '/usage');
         assert.equal(called.url.searchParams.get('key'), 'test-key');
-        assertForwardedHeaders(called.init.headers);
+        assertForwardedHeaders(called.init.headers, END_USER);
     });
 });
 
@@ -1135,13 +1654,13 @@ describe('dns-leak-test getSessionResult', () => {
             called = { url: new URL(String(url)), init };
             return new Response(JSON.stringify(UPSTREAM_SIGN_IN_REQUIRED), { status: 403 });
         };
-        const res = createResponse();
+        const res = signedIn(createResponse());
         const req = withVisitorHeaders({ method: 'GET', headers: { referer: 'http://localhost/' }, query: {}, params: { token: 'a'.repeat(32) } });
         await dnsLeakGetResult(req, res);
         assert.equal(res.statusCode, 403);
         assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
         assert.equal(called.url.pathname, `/dnsleaktest/session/${'a'.repeat(32)}`);
-        assertForwardedHeaders(called.init.headers);
+        assertForwardedHeaders(called.init.headers, END_USER);
     });
 
     it('answers invalid-token and quota rejections with their status and code', async () => {
@@ -1150,6 +1669,7 @@ describe('dns-leak-test getSessionResult', () => {
         for (const [status, upstream, coded] of [
             [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
             [429, UPSTREAM_QUOTA, CODED_QUOTA],
+            [429, UPSTREAM_SERVICE_LIMIT, { error: 'Service limit reached' }],
         ]) {
             globalThis.fetch = upstreamAnswer(status, upstream);
             const res = createResponse();
@@ -1270,6 +1790,9 @@ describe('ipcheck-ing handler', () => {
         const failing = await silenced(() => callWith(async () => new Response('busy', { status: 503 })));
         assert.equal(failing.statusCode, 500);
         assert.deepEqual(failing.body, { error: 'API responded with status: 503' });
+        const limited = await silenced(() => callWith(upstreamAnswer(429, UPSTREAM_SERVICE_LIMIT)));
+        assert.equal(limited.statusCode, 500);
+        assert.equal('code' in limited.body, false);
         const down = await silenced(() => callWith(async () => { throw new Error('network down'); }));
         assert.equal(down.statusCode, 500);
         assert.match(down.body.error, /network down/);
@@ -1293,13 +1816,16 @@ describe('ipcheck-ing handler', () => {
             called = { url: new URL(String(url)), init };
             return new Response(JSON.stringify(geo), { status: 200 });
         };
-        const res = createResponse();
+        const res = signedIn(createResponse());
         await ipcheckIngHandler(withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1', lang: 'en&ip=10.0.0.1' } })), res);
         assert.equal(res.statusCode, 200);
         assert.equal(called.url.pathname, '/ipinfo');
         assert.equal(called.url.searchParams.get('key'), 'test-key');
         assert.deepEqual(called.url.searchParams.getAll('ip'), ['1.1.1.1']);
         assert.equal(called.url.searchParams.get('lang'), 'en&ip=10.0.0.1');
+        assertForwardedHeaders(called.init.headers, END_USER);
+
+        await ipcheckIngHandler(withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1' } })), createResponse());
         assertForwardedHeaders(called.init.headers);
     });
 });

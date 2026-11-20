@@ -14,7 +14,7 @@
       </header>
 
       <!-- Content (scrollable) -->
-      <div ref="scrollArea" class="flex-1 overflow-y-auto px-5 py-5 space-y-6">
+      <div class="flex-1 overflow-y-auto px-5 py-5 space-y-6">
         <!-- Top note -->
         <p class="text-xs text-muted-foreground leading-relaxed">
           {{ t('nav.preferences.preferenceTips') }}
@@ -55,6 +55,37 @@
               {{ opt.label }}
             </ToggleGroupItem>
           </ToggleGroup>
+        </section>
+
+        <!-- App Settings -->
+        <section id="Pref_appSettings">
+          <SectionTitle :icon="AppWindow">{{ t('nav.preferences.appSettings') }}</SectionTitle>
+          <div class="rounded-lg border bg-card divide-y">
+            <PrefRow id="simpleMode" :label="t('nav.preferences.simpleMode')" :tip="t('nav.preferences.simpleModeTips')"
+              :model-value="userPreferences.simpleMode" @update:model-value="prefSimpleMode" />
+          </div>
+        </section>
+
+        <!-- Sync settings: the title row carries the status badge; the shared controls (an Enable switch, the two
+             collections nested under it while on) apply at once; then what is synced and what never is. Only where
+             sync is possible; signed out, one sentence. -->
+        <section v-if="accountSyncAvailable" id="Pref_sync">
+          <div class="mb-2 flex items-center justify-between gap-2">
+            <h3 class="m-0 flex min-w-0 items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <RefreshCw class="size-3.5 shrink-0" />{{ t('nav.preferences.sync') }}</h3>
+            <span v-if="syncBadge" role="status" :title="t(syncBadge.title)" :aria-label="t(syncBadge.title)"
+              class="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium"
+              :class="textClass(syncBadge.tone)">
+              <component :is="SYNC_BADGE_ICONS[syncBadge.tone]" class="size-3.5" />{{ t(syncBadge.label) }}
+            </span>
+          </div>
+          <template v-if="isSignedIn">
+            <SyncChoiceControls :model-value="syncDraft" id-prefix="prefSync" :disabled="!syncEditable"
+              @update:model-value="setSync" />
+            <!-- <SectionTip>{{ t('nav.preferences.syncTips') }}</SectionTip> -->
+            <SectionTip>{{ t('nav.preferences.syncNever') }}</SectionTip>
+          </template>
+          <SectionTip v-else>{{ t('nav.preferences.syncSignedOut') }}</SectionTip>
         </section>
 
         <!-- IP Sources Count -->
@@ -157,15 +188,6 @@
           </div>
         </section>
 
-        <!-- App Settings -->
-        <section id="Pref_appSettings">
-          <SectionTitle :icon="AppWindow">{{ t('nav.preferences.appSettings') }}</SectionTitle>
-          <div class="rounded-lg border bg-card divide-y">
-            <PrefRow id="simpleMode" :label="t('nav.preferences.simpleMode')" :tip="t('nav.preferences.simpleModeTips')"
-              :model-value="userPreferences.simpleMode" @update:model-value="prefSimpleMode" />
-          </div>
-        </section>
-
         <!-- Snapshots: automatic recording, its label card, the change notice, retention. -->
         <section id="Pref_snapshots">
           <SectionTitle :icon="Camera">{{ t('nav.preferences.snapshots') }}</SectionTitle>
@@ -244,7 +266,7 @@
 </template>
 
 <script setup>
-import { computed, watch, h, ref, nextTick } from 'vue';
+import { computed, watch, h, ref } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -254,6 +276,12 @@ import {
 } from '@/utils/features/snapshots.js';
 import { clampLabelCard } from '@/utils/features/snapshot-entry.js';
 import { LOCALES } from '@/utils/locale-registry.js';
+import { syncStatusOf, syncStatusBadge } from '@/utils/features/account-sync.js';
+import { chosenCollections, defaultSyncChoice, syncChoiceOf } from '@/utils/features/sync-settings.js';
+import { saveSyncCollections } from '@/utils/features/account-sync-auth.js';
+import { useAccountSyncState } from '@/composables/use-account-sync.js';
+import { useStatusTone } from '@/composables/use-status-tone.js';
+import SyncChoiceControls from './SyncChoiceControls.vue';
 import { MINE_LIST_ID } from '@/data/connectivity-defaults.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -264,6 +292,9 @@ import {
   Activity,
   AppWindow,
   Camera,
+  CircleAlert,
+  CircleCheck,
+  CirclePause,
   Database,
   Languages,
   LaptopMinimal,
@@ -271,6 +302,7 @@ import {
   Moon,
   Palette,
   Play,
+  RefreshCw,
   Cog,
   Sun,
 } from '@lucide/vue';
@@ -286,31 +318,6 @@ const isOpen = computed(() => store.openSheet === 'preferences');
 const onOpenChange = (val) => {
   store.setOpenSheet(val ? 'preferences' : null);
 };
-
-// Section reveal (store.openPreferencesAt): once the panel shows, scroll the
-// named section into view, ring it briefly, and clear the request.
-const scrollArea = ref(null);
-const EMPHASIS = ['rounded-md', 'ring-2', 'ring-action/50', 'ring-offset-4', 'ring-offset-background'];
-const EMPHASIS_FADE = ['transition-shadow', 'duration-700'];
-let emphasisTimers = [];
-const revealSection = (id) => {
-  const section = scrollArea.value?.querySelector(`#${id}`);
-  if (!section) return;
-  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  section.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
-  emphasisTimers.forEach(clearTimeout);
-  section.classList.add(...EMPHASIS_FADE, ...EMPHASIS);
-  emphasisTimers = [
-    setTimeout(() => section.classList.remove(...EMPHASIS), 1600),
-    setTimeout(() => section.classList.remove(...EMPHASIS_FADE), 2400),
-  ];
-};
-watch(() => isOpen.value && store.preferencesFocus, async (id) => {
-  if (!id) return;
-  store.clearPreferencesFocus();
-  await nextTick();
-  requestAnimationFrame(() => revealSection(id));
-}, { immediate: true });
 
 // Text-only options — the picker deliberately shows no flags: a language
 // isn't a country (e.g. English under a US flag reads wrong to Brits).
@@ -375,6 +382,48 @@ const prefSimpleMode = (value) => {
   store.updatePreference('simpleMode', value);
   trackEvent('Nav', 'PrefereceClick', 'SimpleMode');
 };
+
+// Sync settings (composables/use-account-sync.js): the account's choice, applied at
+// once and optimistically; a failed save puts the controls back and the badge says so.
+const accountSyncAvailable = computed(() => store.accountSyncAvailable);
+const isSignedIn = computed(() => store.isSignedIn);
+const syncState = useAccountSyncState();
+const { textClass } = useStatusTone();
+const SYNC_BADGE_ICONS = { 'ok-fast': CircleCheck, 'ok-mild': CircleAlert, 'ok-slow': CirclePause, fail: CircleAlert };
+const syncDraft = ref(defaultSyncChoice());
+const syncSaving = ref(false);
+const syncSaveFailed = ref(false);
+const syncKnown = computed(() => store.syncSettings?.user === store.user?.uid && store.syncSettings?.status !== 'unknown');
+const syncEditable = computed(() => syncKnown.value && !syncSaving.value);
+// The draft follows the account; turned off, the collections are shown all on for the next Enable.
+watch(() => store.syncSettings, (settings) => {
+  if (syncSaving.value) return;
+  syncDraft.value = syncChoiceOf(settings?.collections ?? []);
+}, { immediate: true });
+const setSync = async (next) => {
+  const previous = syncDraft.value;
+  if (chosenCollections(next).join() === chosenCollections(previous).join()) {
+    syncDraft.value = next;
+    return;
+  }
+  syncDraft.value = next;
+  syncSaving.value = true;
+  syncSaveFailed.value = false;
+  const ok = await saveSyncCollections(chosenCollections(next));
+  syncSaving.value = false;
+  if (!ok) {
+    syncDraft.value = previous;
+    syncSaveFailed.value = true;
+  }
+  trackEvent('Nav', 'PrefereceClick', 'Sync');
+};
+const syncBadge = computed(() => {
+  const enabled = syncKnown.value ? store.syncSettings.collections : [];
+  return syncStatusBadge(syncStatusOf({
+    available: accountSyncAvailable.value, signedIn: isSignedIn.value,
+    states: enabled.map((id) => syncState[id]), saveFailed: syncSaveFailed.value,
+  }));
+});
 
 // Per-module startup auto-run toggle. The EnergySaver achievement rule
 // (earned once every auto-run module is off) lives in data/achievement-rules.js.

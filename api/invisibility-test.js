@@ -27,6 +27,7 @@ export default async (req, res) => {
         const apiResponse = await requestIpCheckingApi(`/getpdresult/${id}`, {
             keyParam: 'apikey',
             forwardFrom: req,
+            endUserId: res.locals.userId,
         });
 
         // Upstream 404 = "result not computed yet" — a normal answer while

@@ -1,55 +1,50 @@
+// Tests for the achievement list both halves read (common/codes/achievements.js), its badge images and the store's initial state.
 import assert from 'node:assert/strict';
+import { readdirSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
-import {
-  ACHIEVEMENTS_DEFINITIONS,
-  createInitialAchievementsState,
-} from '../frontend/data/achievements.js';
+import { ACHIEVEMENT_NAMES } from '../common/codes/achievements.js';
+import { ACHIEVEMENT_NAMES as BRIDGED_NAMES } from '../frontend/utils/codes/achievements.js';
+import { achievementImage, createInitialAchievementsState } from '../frontend/data/achievements.js';
 
-describe('ACHIEVEMENTS_DEFINITIONS', () => {
-  it('has exactly 27 entries', () => {
-    assert.equal(ACHIEVEMENTS_DEFINITIONS.length, 27);
+const IMAGE_DIR = new URL('../public/achievements/', import.meta.url);
+
+describe('ACHIEVEMENT_NAMES', () => {
+  it('has exactly 27 frozen, distinct names', () => {
+    assert.equal(ACHIEVEMENT_NAMES.length, 27);
+    assert.ok(Object.isFrozen(ACHIEVEMENT_NAMES));
+    assert.equal(new Set(ACHIEVEMENT_NAMES).size, ACHIEVEMENT_NAMES.length);
+    for (const name of ACHIEVEMENT_NAMES) assert.match(name, /^[A-Z][A-Za-z]+$/);
   });
 
-  it('each entry has name and img with absolute /achievements/*.webp path', () => {
-    for (const def of ACHIEVEMENTS_DEFINITIONS) {
-      assert.ok(def.name && typeof def.name === 'string', `missing name`);
-      assert.ok(def.img && typeof def.img === 'string', `missing img for ${def.name}`);
-      assert.match(def.img, /^\/achievements\/.+\.webp$/,
-        `${def.name} image path must start with /achievements/ and end with .webp`);
-    }
+  it('the front end reads the very same list', () => {
+    assert.equal(BRIDGED_NAMES, ACHIEVEMENT_NAMES);
   });
 
-  it('has no duplicate names', () => {
-    const names = ACHIEVEMENTS_DEFINITIONS.map((d) => d.name);
-    assert.equal(new Set(names).size, names.length);
+  it('names and badge images cannot drift: one image per name, no image without a name', () => {
+    const images = readdirSync(IMAGE_DIR).filter((file) => file.endsWith('.webp')).map((file) => `/achievements/${file}`);
+    assert.deepEqual(ACHIEVEMENT_NAMES.map(achievementImage).sort(), images.sort());
   });
 });
 
 describe('createInitialAchievementsState()', () => {
-  it('returns an object keyed by achievement name', () => {
-    const state = createInitialAchievementsState();
-    for (const def of ACHIEVEMENTS_DEFINITIONS) {
-      assert.ok(def.name in state, `missing ${def.name} in state`);
-    }
-    assert.equal(Object.keys(state).length, ACHIEVEMENTS_DEFINITIONS.length);
+  it('returns an object keyed by achievement name, in list order', () => {
+    const state = createInitialAchievementsState(ACHIEVEMENT_NAMES);
+    assert.deepEqual(Object.keys(state), [...ACHIEVEMENT_NAMES]);
   });
 
   it('each entry has the expected runtime shape', () => {
-    const state = createInitialAchievementsState();
+    const state = createInitialAchievementsState(ACHIEVEMENT_NAMES);
     for (const name of Object.keys(state)) {
-      const entry = state[name];
-      assert.equal(entry.name, name);
-      assert.equal(entry.achieved, false);
-      assert.equal(entry.achievedTime, null);
-      assert.equal(entry.showDetails, false);
-      assert.ok(entry.img && typeof entry.img === 'string');
+      assert.deepEqual(state[name], {
+        name, img: achievementImage(name), achieved: false, achievedTime: null, showDetails: false,
+      });
     }
   });
 
   it('returns a fresh object each call (no shared references)', () => {
-    const a = createInitialAchievementsState();
-    const b = createInitialAchievementsState();
+    const a = createInitialAchievementsState(ACHIEVEMENT_NAMES);
+    const b = createInitialAchievementsState(ACHIEVEMENT_NAMES);
     assert.notEqual(a, b);
     assert.notEqual(a.IAmHuman, b.IAmHuman);
     a.IAmHuman.achieved = true;

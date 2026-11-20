@@ -13,12 +13,14 @@ import * as webrtcCodes from '../common/codes/webrtc.js';
 import * as speedtestCodes from '../common/codes/speedtest.js';
 import * as personaCodes from '../common/codes/persona.js';
 import * as serviceErrorCodes from '../common/codes/service-errors.js';
+import * as achievementCodes from '../common/codes/achievements.js';
 import * as ipCodesBridge from '../frontend/utils/codes/ip.js';
 import * as connectivityCodesBridge from '../frontend/utils/codes/connectivity.js';
 import * as webrtcCodesBridge from '../frontend/utils/codes/webrtc.js';
 import * as speedtestCodesBridge from '../frontend/utils/codes/speedtest.js';
 import * as personaCodesBridge from '../frontend/utils/codes/persona.js';
 import * as serviceErrorCodesBridge from '../frontend/utils/codes/service-errors.js';
+import * as achievementCodesBridge from '../frontend/utils/codes/achievements.js';
 import { VERDICT, AXIS, GRADE } from '../frontend/utils/persona/check-ids.js';
 import { IP_TYPE_I18N_KEYS, IP_TYPE_UNKNOWN_KEY, ABUSE_LEVEL_I18N_KEYS } from '../frontend/utils/codes/ip-labels.js';
 import { CONNECTIVITY_STATUS_KEYS } from '../frontend/utils/codes/connectivity-labels.js';
@@ -36,6 +38,7 @@ describe('code list bridges', () => {
         ['speedtest', speedtestCodes, speedtestCodesBridge],
         ['persona', personaCodes, personaCodesBridge],
         ['service-errors', serviceErrorCodes, serviceErrorCodesBridge],
+        ['achievements', achievementCodes, achievementCodesBridge],
     ];
     for (const [name, source, bridge] of pairs) {
         it(`${name}: re-exports every list as the same object`, () => {

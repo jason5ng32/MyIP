@@ -25,8 +25,8 @@ Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `cf-radar` / `asn-history` / `asn-connectivity` / `asn-profile` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona` /
-`ip-blocklist` / `bulk-lookup`), user
-proxies (`get-user-info` / `update-user-achievement`), platform (`configs` /
+`ip-blocklist` / `bulk-lookup`), account data (`usage`, a proxy;
+`achievements` / `sync` / `sync-settings`, from user storage), platform (`configs` /
 `sentry-tunnel` / `share-report`). Each file's header comment states its route
 and purpose — read those for specifics.
 
@@ -169,6 +169,20 @@ resolver list behind `dns-resolver` (gated by
   picker and `resolveDns` also read; otherwise the DoH branch would forward any
   string to four third-party endpoints.
 - `requireValidReportId()` — `/api/report/:id` route param (22-char base64url).
+- `requireValidSyncCollection()` — `/api/sync/:collection` route param: a
+  `common/sync-collections.js` id, else 404; the row lands on
+  `res.locals.syncCollection`.
+- `optionalUser()` / `requireUser()` — sign-in, verified here
+  (`server/sign-in-token.js`: the `authorization` Bearer token checked
+  against Google's public certificates, RS256 only, the project from
+  `VITE_FIREBASE_PROJECT_ID`; without it every request is signed out).
+  A verified user id lands on `res.locals.userId`. `requireUser()` refuses
+  a signed-out caller and both refuse a token that fails: 403 `{ error,
+  code: 'auth', reason }` (`common/codes/service-errors.js`); a certificate
+  outage is 503, uncoded. Verdicts are cached per token for 5 minutes,
+  never past its `exp`. Optional on `/api/ipchecking` (its
+  `api/ip-sources.js` row's `gates`) and `/api/ipblocklist`; required on
+  the other IPCheck.ing API routes, so an invalid token never goes upstream.
 - `sourceDailyLimit('<key>')` (`server/source-daily-limits.js`, not a guard
   here) — the geo routes' daily ceiling from `IP_SOURCE_DAILY_LIMITS`
   (`<key>=<n>`, key = the route's last segment, as listed by
@@ -178,6 +192,9 @@ resolver list behind `dns-resolver` (gated by
   connection; a used-up day answers 429 `{ error, code: 'source_daily_limit' }`
   (never cached). Counts reset on the server-local day, persist to
   `common/source-limits-db/` every few seconds, and are per process.
+- `requireUserStorage()` — user storage configured and ready, else 503
+  `{ error }` (uncoded); a not-ready storage is re-checked here after a
+  cooldown. See "User storage".
 
 New param shape → new guard there, attached in `backend-server.js`.
 Rewrites go through `setQueryParam()` there: Express 5's `req.query` re-parses
@@ -210,15 +227,27 @@ on demand.
 ### IPCheck.ing API requests go through one helper with a header list
 
 Handlers proxying the IPCheck.ing API (`ipcheck-ing`,
-`invisibility-test`, `update-user-achievement`, `get-user-info`,
+`invisibility-test`, `usage`,
 `dns-leak-test`, `persona`, `ip-blocklist`, and `asn-profile`'s reputation via
 `server/asn-reputation.js`) send their requests through
 `server/ipcheck-ing-api.js`. It forwards a fixed list of the caller's headers
-(`authorization`, `accept-language`, `user-agent`, `cf-connecting-ip`,
-`x-forwarded-for`; `FORWARDED_HEADERS`) and sets `content-type` itself for
+(`accept-language`, `user-agent`, `cf-connecting-ip`, `x-forwarded-for`;
+`FORWARDED_HEADERS` — never `authorization`), sends `res.locals.userId` as
+`x-end-user-id` when the handler passes it (`endUserId`; an opaque end-user
+identifier to the API, absent for a guest) and sets `content-type` itself for
 JSON bodies; handlers never pass headers of their own. The ASN reputation
-request carries no caller headers. Third-party upstreams get only what's
+request carries no caller headers. `ipCheckingApiErrorBody` codes 401 / 403
+as `auth` and a 429 as `quota`, except a 429 whose upstream `code` is
+`service_limit` (the deployment's key at its limit): that one carries no code,
+so no feature is marked used up. Third-party upstreams get only what's
 explicitly needed.
+
+Usage reaches MyIP two ways: that `quota`-coded answer (the front end marks the
+feature used up) and the `/api/usage` summary, relayed as `{ userLevel,
+quota }` and held in memory only (`store.remoteUserInfo`; MyIP reads its
+`quota.features`). Each quota has exactly one meter — the IPCheck.ing API; the
+lifetime counts in user storage (`feature_uses`) feed achievements only, never
+a quota. Pinned by `tests/usage-contract.test.js`.
 
 ### Firebase Auth handler proxy
 
@@ -230,6 +259,110 @@ the installed PWA's webview and Safari's storage partition, where
 `getRedirectResult` finds the result. Every OAuth provider must accept
 `https://<host>/__/auth/handler` per environment. Not an `/api` route: no
 guards, caching or per-request logs.
+
+### User storage
+
+Optional Postgres through the plain `pg` driver (connection, pool and
+readiness: `server/db/user-storage.js`; repositories beside it). No
+`DATABASE_URL` → `pg` is never loaded: only `server/db/` names it, through
+dynamic `import()` alone, and no ORM rides the manifests
+(`tests/pg-boundary.test.js`). Repositories get a narrow handle — `query(text,
+params)` and `transaction(fn)`, never the pool — and pass every value as a
+`$n` parameter, never interpolated into SQL.
+
+Migrations are append-only, numbered plain SQL files
+(`server/db/migrations/NNNN_name.sql`); a published one is never edited — a
+change is a new file. Behind the listener, the boot run
+(`server/db/migrate.js`) applies the pending ones under a Postgres advisory
+lock on one dedicated connection (several processes may boot together), each
+file in its own transaction with its `myip_migrations` row. A recorded name
+missing on disk only warns; a failure rolls that file back and stops. Never
+fatal: until a run succeeds, the `requireUserStorage()` guard answers 503 and
+re-runs it after a cooldown, and a query that loses its connection sends it
+back there. `/api/configs` `userStorage` = configured (the answer is
+edge-cached), not ready. Specs drive the runner and repositories with fakes;
+`DATABASE_URL_TEST` runs the optional real-database spec. Data minimisation:
+store only what a feature needs keyed by the opaque user id — no e-mail,
+name, IP, user agent, last-seen time or test result. Synced content is
+preferences, Connectivity lists (the lists hold the sites a user added
+themselves), Security Checklist marks and the speed test's two sizes only.
+
+Tables: `users` (id, created), `achievements` (user, name, unlock time; one
+row per unlocked name), `feature_uses` (user, feature, lifetime count) —
+nothing about a use but the count: no target, IP or time — and
+`synced_items` (user, collection, schema version, item id, the device's edit
+time `updated_at` in epoch ms, `deleted`, `data` jsonb, `seq`; one row per
+item, a delete kept as a tombstone with `data` NULL) and `sync_settings`
+(user, the enabled collection ids as `text[]`, updated time; a row means the
+user decided, an empty list = sync nothing). `seq` comes from
+`synced_items_seq`, a new value on every insert or update.
+
+- **Achievements** (`api/achievements.js`, behind `requireUser()` +
+  `requireUserStorage()`, no-store, the users row ensured on first contact):
+  `GET /api/achievements` → `{ achievements: { <Name>: { achieved: true,
+  achievedTime } }, totalUses }` (epoch ms; unlocked names only; `totalUses` =
+  the user's summed `feature_uses`); `PUT /api/achievements` `{ name }` (own
+  1 KB body limit) → `{ name, achievedTime }`, 400 for a name outside
+  `common/codes/achievements.js` — the one name list, which the front end
+  reads too. A repeat unlock keeps the first time.
+- **Sync settings** (`api/sync-settings.js`, `server/db/sync-settings.js`,
+  behind `requireUser()` + `requireUserStorage()`, no-store, users row
+  ensured, own 1 KB body limit): the account, not the device, chooses what
+  syncs. `GET /api/sync` → `{ decided, collections }` (no row → `{ decided:
+  false, collections: [] }`; ids the registry no longer has are left out).
+  `PUT /api/sync` `{ collections }` (an array of distinct registry ids, else
+  400) → `{ decided: true, collections }` in registry order. One transaction
+  under the user's `users` row lock: the row upserted, then every
+  `synced_items` row of the user whose collection is left out deleted — all
+  versions, tombstones too — in one `DELETE … WHERE user_id = $1 AND
+  collection <> ALL($2)`, bounded by the primary key's `user_id` prefix.
+- **Sync items** (`api/sync.js`, behind `requireValidSyncCollection()` +
+  `requireUser()` + `requireUserStorage()`, no-store, users row ensured, own
+  `SYNC_MAX_BODY_BYTES` (320 KB) PUT body limit, mounted before the settings'
+  1 KB one). Collections: `common/sync-collections.js`, one frozen registry
+  (`preferences` · `connectivity` · `checklist` · `speedtest`), each with its schema `version`, item id
+  and value checks, `maxItems` (live rows per user and version), `maxRows`
+  (tombstones included, where deletes are on),
+  `maxItemBytes`, `allowDelete` and `pageSize`; `connectivity` (v2, deletes
+  on) holds one `list:<list id>` item per list (`{ name, members }`,
+  `isValidConnectivityList`), the lists' `order` and `defaultListId`, checked
+  in `common/preferences-schema.js`; its `maxItems` is the list cap plus those
+  two. `checklist` (deletes on) holds one item per marked slug, `'checked'` /
+  `'ignored'`; slugs live in the locale datasets, so ids are checked by shape
+  and `maxItems` is a fixed 1000. `speedtest` holds `downloadBytes` /
+  `uploadBytes` from `SPEEDTEST_SIZE_OPTIONS`. A collection the user has not enabled
+  in `sync_settings` → 409 `{ error, code: 'sync_off' }` (`SYNC_OFF_CODE`),
+  nothing read or written; for a PUT the check runs inside the write
+  transaction, after the lock, so a write racing a disable leaves nothing.
+  `GET /api/sync/:collection?v=&since=` →
+  `{ cursor, more, items: [{ id, updatedAt, deleted, value? }] }`: that
+  version's rows with `seq > since`, in `seq` order, one page; any `v` is
+  served. `PUT` `{ version, items }` → `{ base, cursor, conflicts, refused }`;
+  a `version` other than the registry's, or a malformed body (≤ 500 items,
+  valid ids, positive integer `updatedAt`, no repeats) → 400, nothing
+  written. Per item (`planSyncWrite`, `server/db/synced-items.js`): a bad
+  value, an oversized one, a delete where deletes are off, a new live row
+  past `maxItems` or a new row past `maxRows` is refused (`invalid` /
+  `too_large` / `no_delete` / `full`; the request's deletes free their room
+  first); a delete of an id without a row is kept as a tombstone while rows
+  remain under `maxRows`, else writes nothing; `updatedAt` is
+  clamped to now; no row → insert, a stored
+  `updated_at` as new or newer stays and comes back in `conflicts`, else
+  replaced (a delete too, as a tombstone). One transaction: the user's
+  `users` row locked first (so a user's `seq` commit in order and a cursor
+  never skips one), the enabled check, the collection's tombstones older
+  than 90 days removed, every write in one `INSERT … SELECT` over a jsonb
+  parameter. `base` / `cursor` = the version's highest `seq` before / after;
+  a device whose cursor was `base` may take `cursor` without a GET. Rows of
+  other versions are never touched.
+- **Use counting** (`server/count-feature-use.js`): `countFeatureUse(<id>)`,
+  attached in `backend-server.js` to the five IPCheck.ing-API-backed routes
+  (`/api/ipchecking` via its `api/ip-sources.js` row's `featureUse`), adds
+  one for a signed-in caller once the route answered below 400. It watches
+  the response's `finish`, never delays or fails it, skips guests and a
+  storage that is off or not ready, and a failed write only warns. The ids
+  (`FEATURE_USES`, `server/db/feature-uses.js`) are MyIP's own `<kind>:<name>`
+  (`ipdb:ipchecking`, `tool:persona`), never the upstream's metered names.
 
 ## Edge caching
 

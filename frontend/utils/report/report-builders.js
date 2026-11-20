@@ -256,8 +256,7 @@ const buildMtrtest = (payload) => {
 };
 
 // ruletest:finished — { uniqueIPCount, workers: [{ id, ip, country_code, org }] }
-// uniqueIPCount is recomputed from valid IPs only — the event's own count
-// (kept for achievement rules) also counts error placeholders as "IPs".
+// uniqueIPCount is recomputed here from the workers it keeps (valid IPs, capped).
 const buildRuletest = (payload) => {
     const workers = (payload?.workers ?? [])
         .filter((worker) => isValidIP(worker?.ip))

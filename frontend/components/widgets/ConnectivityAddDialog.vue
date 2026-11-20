@@ -194,7 +194,7 @@
 // Tabbed dialog behind the Connectivity "Add Test" tile and the header
 // menu's manage entry: import a curated list, hand-add a custom target, or
 // manage the lists themselves. All mutations go through the pure ops in
-// utils/features/connectivity-lists.js and persist into connectivityLists.
+// utils/features/connectivity-lists.js, run by the store on the freshest lists.
 import { ref, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
@@ -231,13 +231,6 @@ const emit = defineEmits(['update:open']);
 const { t } = useI18n();
 const store = useMainStore();
 const lists = computed(() => store.userPreferences.connectivityLists?.lists || []);
-
-const updateLists = (nextLists) => {
-  store.updatePreference('connectivityLists', {
-    ...store.userPreferences.connectivityLists,
-    lists: nextLists,
-  });
-};
 
 // Mine's stored name is null — its display name is localized.
 const listName = (list) => (list.id === MINE_LIST_ID ? t('connectivity.lists.Mine') : list.name);
@@ -284,7 +277,7 @@ watch(tab, (v) => {
 
 // ── Curated-list import ────────────────────────────────────────────────────
 const importIntoExisting = (curated, listId) => {
-  const result = importIntoList(lists.value, listId, curated);
+  const result = store.editConnectivityLists((current) => importIntoList(current, listId, curated));
   if (result.error === 'capacity') {
     importResult.value = t('connectivity.importDialog.NotEnoughCapacity', {
       need: result.plan.freshCount,
@@ -293,19 +286,18 @@ const importIntoExisting = (curated, listId) => {
     return;
   }
   if (result.error) return;
-  updateLists(result.lists);
   importResult.value = '';
   trackEvent('Section', 'ImportList', curated.id);
 };
 
 const importToNewList = (curated) => {
-  const result = importAsNewList(lists.value, curated, t('connectivity.importLists.' + curated.id));
+  const name = t('connectivity.importLists.' + curated.id);
+  const result = store.editConnectivityLists((current) => importAsNewList(current, curated, name));
   if (result.error === 'list-limit') {
     importResult.value = t('connectivity.lists.LimitReached', { limit: CONNECTIVITY_LIST_LIMIT });
     return;
   }
   if (result.error) return;
-  updateLists(result.lists);
   importResult.value = '';
   trackEvent('Section', 'ImportList', curated.id);
   trackEvent('Section', 'CreateConnectivityList', 'Connectivity');
@@ -364,12 +356,12 @@ const handleAdd = () => {
     name: name.slice(0, 20),
     url,
   };
-  const result = addMember(lists.value, destListId.value, newTarget);
+  const listId = destListId.value;
+  const result = store.editConnectivityLists((current) => addMember(current, listId, newTarget));
   if (result.error) {
     addError.value = t('connectivity.addCustom.LimitReached');
     return;
   }
-  updateLists(result.lists);
   trackEvent('Section', 'AddCustomTarget', 'Connectivity');
   // Hand-add only — the import paths deliberately don't emit this.
   emitAppEvent('connectivity:custom-added', { name: newTarget.name, url: newTarget.url });
@@ -386,18 +378,20 @@ const listErrorMessage = (code) => {
   return '';
 };
 
-const applyListOp = (result) => {
+// Runs `op` on the freshest lists → true when it was saved.
+const applyListOp = (op) => {
+  const result = store.editConnectivityLists(op);
   if (result.error) {
     listError.value = listErrorMessage(result.error);
     return false;
   }
   listError.value = '';
-  updateLists(result.lists);
   return true;
 };
 
 const handleCreateList = () => {
-  if (applyListOp(createList(lists.value, newListName.value))) {
+  const name = newListName.value;
+  if (applyListOp((current) => createList(current, name))) {
     newListName.value = '';
     trackEvent('Section', 'CreateConnectivityList', 'Connectivity');
   }
@@ -409,18 +403,19 @@ const startRename = (list) => {
 };
 
 const confirmRename = (list) => {
-  if (applyListOp(renameList(lists.value, list.id, renameDraft.value))) {
+  const name = renameDraft.value;
+  if (applyListOp((current) => renameList(current, list.id, name))) {
     renamingId.value = null;
     trackEvent('Section', 'RenameConnectivityList', 'Connectivity');
   }
 };
 
 const handleMove = (list, direction) => {
-  applyListOp(moveList(lists.value, list.id, direction));
+  applyListOp((current) => moveList(current, list.id, direction));
 };
 
 const handleDelete = (list) => {
-  if (applyListOp(deleteList(lists.value, list.id))) {
+  if (applyListOp((current) => deleteList(current, list.id))) {
     trackEvent('Section', 'DeleteConnectivityList', 'Connectivity');
   }
 };

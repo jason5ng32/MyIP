@@ -1,12 +1,12 @@
 // Tests for server/ipcheck-ing-api.js: header picking, URL building, the
-// unconfigured short-circuit, what a request sends and returns, and the coded
-// error body. fetch is stubbed.
+// unconfigured short-circuit, what a request sends and returns (the end-user
+// header included), and the coded error body. fetch is stubbed.
 
 import assert from 'node:assert/strict';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
 import {
-    FORWARDED_HEADERS, buildIpCheckingUrl, ipCheckingApiErrorBody, isIpCheckingApiConfigured, pickForwardedHeaders,
+    END_USER_HEADER, FORWARDED_HEADERS, buildIpCheckingUrl, ipCheckingApiErrorBody, isIpCheckingApiConfigured, pickForwardedHeaders,
     requestIpCheckingApi,
 } from '../server/ipcheck-ing-api.js';
 import { SERVICE_ERROR_CODE, AUTH_REASON } from '../common/codes/service-errors.js';
@@ -42,6 +42,7 @@ const VISITOR_HEADERS = {
     'sentry-trace': 'abc-def-1',
     baggage: 'sentry-release=x',
     authorization: 'Bearer t',
+    'x-end-user-id': 'visitor-supplied',
     'accept-language': 'ja-JP,ja;q=0.9',
     'user-agent': 'VisitorBrowser/1.0',
     'cf-connecting-ip': '203.0.113.7',
@@ -61,27 +62,26 @@ afterEach(() => {
 });
 
 describe('pickForwardedHeaders', () => {
-    it('keeps exactly the listed headers', () => {
+    it('keeps exactly the listed headers, never the visitor authorization', () => {
         assert.deepEqual(pickForwardedHeaders(VISITOR_HEADERS), {
-            authorization: 'Bearer t',
             'accept-language': 'ja-JP,ja;q=0.9',
             'user-agent': 'VisitorBrowser/1.0',
             'cf-connecting-ip': '203.0.113.7',
             'x-forwarded-for': '203.0.113.7, 198.51.100.1',
         });
         assert.deepEqual(FORWARDED_HEADERS.toSorted(),
-            ['accept-language', 'authorization', 'cf-connecting-ip', 'user-agent', 'x-forwarded-for']);
+            ['accept-language', 'cf-connecting-ip', 'user-agent', 'x-forwarded-for']);
     });
 
     it('matches names in any casing and keys them in lower case', () => {
         assert.deepEqual(
             pickForwardedHeaders({ Authorization: 'Bearer t', 'Accept-Language': 'de', 'X-Forwarded-For': '203.0.113.7', Host: 'x' }),
-            { authorization: 'Bearer t', 'accept-language': 'de', 'x-forwarded-for': '203.0.113.7' },
+            { 'accept-language': 'de', 'x-forwarded-for': '203.0.113.7' },
         );
     });
 
     it('leaves absent headers out', () => {
-        assert.deepEqual(pickForwardedHeaders({ 'accept-language': 'en', authorization: undefined }), { 'accept-language': 'en' });
+        assert.deepEqual(pickForwardedHeaders({ 'accept-language': 'en', 'user-agent': undefined }), { 'accept-language': 'en' });
         assert.deepEqual(pickForwardedHeaders({}), {});
         assert.deepEqual(pickForwardedHeaders(undefined), {});
     });
@@ -89,8 +89,8 @@ describe('pickForwardedHeaders', () => {
 
 describe('buildIpCheckingUrl', () => {
     it('appends the path to the endpoint and sets the key under the given name', () => {
-        const withKey = buildIpCheckingUrl('https://upstream.invalid/v1', '/userinfo', { key: 'k' });
-        assert.equal(withKey.pathname, '/v1/userinfo');
+        const withKey = buildIpCheckingUrl('https://upstream.invalid/v1', '/usage', { key: 'k' });
+        assert.equal(withKey.pathname, '/v1/usage');
         assert.equal(withKey.searchParams.get('key'), 'k');
         const withApikey = buildIpCheckingUrl('https://upstream.invalid', '/getpdresult/abc', { key: 'k', keyParam: 'apikey' });
         assert.equal(withApikey.searchParams.get('apikey'), 'k');
@@ -121,7 +121,7 @@ describe('requestIpCheckingApi', () => {
             if (endpoint) process.env.IPCHECKING_API_ENDPOINT = endpoint;
             else delete process.env.IPCHECKING_API_ENDPOINT;
             assert.equal(isIpCheckingApiConfigured(), false);
-            assert.equal(await requestIpCheckingApi('/userinfo', { forwardFrom: { headers: VISITOR_HEADERS } }), null);
+            assert.equal(await requestIpCheckingApi('/usage', { forwardFrom: { headers: VISITOR_HEADERS } }), null);
         }
         assert.equal(calls.length, 0);
         configure();
@@ -131,12 +131,13 @@ describe('requestIpCheckingApi', () => {
     it('forwards only the listed visitor headers', async () => {
         configure();
         const calls = stubFetch();
-        await requestIpCheckingApi('/userinfo', { forwardFrom: { headers: VISITOR_HEADERS } });
+        await requestIpCheckingApi('/usage', { forwardFrom: { headers: VISITOR_HEADERS } });
         const { url, init } = calls[0];
-        assert.equal(url.pathname, '/userinfo');
+        assert.equal(url.pathname, '/usage');
         assert.equal(url.searchParams.get('key'), 'test-key');
         assert.deepEqual(init.headers, pickForwardedHeaders(VISITOR_HEADERS));
-        for (const name of ['host', 'cookie', 'referer', 'origin', 'content-length', 'content-type', 'sentry-trace', 'baggage']) {
+        for (const name of ['host', 'cookie', 'referer', 'origin', 'content-length', 'content-type', 'sentry-trace', 'baggage',
+            'authorization', END_USER_HEADER]) {
             assert.equal(name in init.headers, false, name);
         }
         assert.equal(init.method, undefined);
@@ -147,11 +148,11 @@ describe('requestIpCheckingApi', () => {
         configure();
         const calls = stubFetch();
         const body = { name: 'X', nested: { a: 1 } };
-        await requestIpCheckingApi('/updateuserachievements', {
-            method: 'PUT', body, forwardFrom: { headers: VISITOR_HEADERS },
+        await requestIpCheckingApi('/persona/evaluate', {
+            method: 'POST', body, forwardFrom: { headers: VISITOR_HEADERS },
         });
         const { init } = calls[0];
-        assert.equal(init.method, 'PUT');
+        assert.equal(init.method, 'POST');
         assert.equal(init.body, JSON.stringify(body));
         assert.equal(init.headers['content-type'], 'application/json');
         assert.equal(Object.keys(init.headers).filter((name) => name.toLowerCase() === 'content-type').length, 1);
@@ -163,12 +164,23 @@ describe('requestIpCheckingApi', () => {
         configure();
         setUpstreamUserAgent('MyIP/v0.0.0/https://example.test');
         const calls = stubFetch();
-        await requestIpCheckingApi('/userinfo', { forwardFrom: { headers: { 'User-Agent': 'VisitorBrowser/1.0' } } });
+        await requestIpCheckingApi('/usage', { forwardFrom: { headers: { 'User-Agent': 'VisitorBrowser/1.0' } } });
         const visitor = Object.entries(calls[0].init.headers).filter(([name]) => name.toLowerCase() === 'user-agent');
         assert.deepEqual(visitor, [['user-agent', 'VisitorBrowser/1.0']]);
         await requestIpCheckingApi('/asnreputation', { query: { asn: 13335 } });
         const fallback = Object.entries(calls[1].init.headers).filter(([name]) => name.toLowerCase() === 'user-agent');
         assert.deepEqual(fallback, [['User-Agent', 'MyIP/v0.0.0/https://example.test']]);
+    });
+
+    it('sends the end-user id as its own header only when given', async () => {
+        configure();
+        const calls = stubFetch();
+        await requestIpCheckingApi('/usage', { forwardFrom: { headers: VISITOR_HEADERS }, endUserId: 'user-123' });
+        assert.equal(END_USER_HEADER, 'x-end-user-id');
+        assert.deepEqual(calls[0].init.headers, { ...pickForwardedHeaders(VISITOR_HEADERS), 'x-end-user-id': 'user-123' });
+        await requestIpCheckingApi('/usage', { forwardFrom: { headers: VISITOR_HEADERS }, endUserId: undefined });
+        assert.equal(END_USER_HEADER in calls[1].init.headers, false);
+        assert.equal('authorization' in calls[1].init.headers, false);
     });
 
     it('sends no visitor header without forwardFrom', async () => {
@@ -224,6 +236,14 @@ describe('ipCheckingApiErrorBody', () => {
             await ipCheckingApiErrorBody(answer(429, { error: 'Monthly quota exceeded', code: 'anything' })),
             { error: 'Monthly quota exceeded', code: SERVICE_ERROR_CODE.QUOTA },
         );
+    });
+
+    it('gives a 429 service limit no code: it is not the user quota', async () => {
+        assert.deepEqual(
+            await ipCheckingApiErrorBody(answer(429, { error: 'Service limit reached', code: 'service_limit' })),
+            { error: 'Service limit reached' },
+        );
+        assert.deepEqual(await ipCheckingApiErrorBody(answer(429, { code: 'service_limit' })), { error: 'Upstream status 429' });
     });
 
     it('gives other statuses no code, and drops the upstream code field', async () => {

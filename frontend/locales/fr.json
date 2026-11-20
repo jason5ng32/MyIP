@@ -11,7 +11,7 @@
     "QuotaSponsorCta": "Sponsoriser nous",
     "ViewUsage": "Voir l'utilisation",
     "Usage": {
-      "Title": "Statistiques d'utilisation",
+      "Title": "Utilisation d’IPCheck.ing",
       "Note": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé automatiquement au début de chaque mois (UTC). Les requêtes répétées de données IP avancées sont servies depuis le cache et ne consomment pas de quota.",
       "IpinfoFeature": "Données IP avancées",
       "PercentUsed": "{percent} % utilisé",
@@ -39,35 +39,40 @@
     "Benefits": {
       "Title": "Avantages et utilisation",
       "Benefit": "Avantages",
-      "Note1": "En tant que produit open source, IPCheck.ing est gratuit. Sa maintenance demande des efforts et des coûts considérables.",
-      "Note2": "Pour assurer la pérennité du projet et éviter les abus, certaines fonctionnalités avancées nécessitent une connexion. Chaque utilisateur connecté dispose d'un quota mensuel largement suffisant — s'il ne vous suffit pas, envisagez de nous sponsoriser pour obtenir des limites plus élevées.",
+      "Intro": "Les outils principaux sont gratuits et utilisables sans compte ; la connexion en ajoute d’autres, listés ci-dessous.",
       "Current": "Actuel",
+      "Groups": {
+        "Basic": "Avantages de base",
+        "IpChecking": "Avantages IPCheck.ing"
+      },
       "Tiers": {
         "Visitor": {
           "Name": "Visiteurs",
-          "Item1": "Recherche d'IP avec comparaison multi-sources",
-          "Item2": "Tests de connectivité et de disponibilité des services",
-          "Item3": "Tests de fuite WebRTC / DNS",
-          "Item4": "Test de vitesse, latence mondiale et MTR",
-          "Item5": "Whois, résolveur DNS et autres outils avancés",
-          "Item6": "Aucune inscription requise — open source et auto-hébergeable"
+          "IpLookup": "Recherche d'IP avec comparaison multi-sources",
+          "Connectivity": "Tests de connectivité et de disponibilité des services",
+          "LeakTests": "Tests de fuite WebRTC / DNS",
+          "SpeedTest": "Test de vitesse, latence mondiale et MTR",
+          "Tools": "Whois, résolveur DNS et autres outils avancés",
+          "OpenSource": "Aucune inscription requise — open source et auto-hébergeable"
         },
         "SignedIn": {
           "Name": "Utilisateurs connectés",
-          "Item1": "Tous les avantages des visiteurs",
-          "Item2": "Consultez les données IP avancées : score de qualité, détection de proxy, type de réseau et nativité",
-          "Item3": "Utilisez le test d'invisibilité",
-          "Item4": "Utilisez le test approfondi de fuite DNS",
-          "Item5": "Consultez vos badges de succès",
-          "Item6": "Interrogez IPilot, notre assistant IA",
-          "Item7": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé chaque mois"
+          "IncludesVisitor": "Tous les avantages des visiteurs",
+          "Achievements": "Consultez vos badges de succès",
+          "AccountSync": "Synchronisez vos préférences et vos listes du test de connectivité entre vos appareils",
+          "AdvancedIp": "Consultez les données IP avancées : score de qualité, détection de proxy, type de réseau et nativité",
+          "InvisibilityTest": "Utilisez le test d'invisibilité",
+          "DnsLeakTest": "Utilisez le test approfondi de fuite DNS",
+          "PersonaCheck": "Utilisez la vérification de persona approfondie",
+          "IPilot": "Interrogez IPilot, notre assistant IA",
+          "MonthlyQuota": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé chaque mois"
         },
         "Sponsor": {
           "Name": "Sponsors",
-          "Item1": "Tous les avantages des utilisateurs connectés",
-          "Item2": "Quotas mensuels plus élevés pour les fonctionnalités avancées",
-          "Item3": "Soutenez le développement continu de ce projet open source",
-          "Item4": "Limite de 24 heures plus généreuse"
+          "IncludesSignedIn": "Tous les avantages des utilisateurs connectés",
+          "HigherQuota": "Quotas mensuels plus élevés pour les fonctionnalités avancées",
+          "DailyLimit": "Limite de 24 heures plus généreuse",
+          "SupportProject": "Soutenez le développement continu de ce projet open source"
         }
       }
     },
@@ -165,7 +170,7 @@
         },
         "CrossingTheWall": {
           "Title": "Huit personnes traversent la muraille",
-          "Meet": "Toutes les 8 adresses IP de test sont différentes dans le test de règles"
+          "Meet": "Obtenez au moins 8 adresses IP différentes dans le test de règles"
         },
         "GlobeTrotter": {
           "Title": "Globe-trotteur",
@@ -356,6 +361,24 @@
       "autoRunTips": "Les infos IP sont toujours vérifiées au chargement de la page. Choisissez quels autres modules s'exécutent automatiquement au démarrage.",
       "simpleMode": "Mode Simple",
       "simpleModeTips": "Masque le texte de description de chaque module. Effectif uniquement sur les appareils mobiles.",
+      "sync": "Synchronisation",
+      "syncEnable": "Activer",
+      "syncPreferences": "Préférences",
+      "syncConnectivity": "Listes du test de connectivité",
+      "syncChecklist": "Progression de la liste de vérification de sécurité",
+      "syncSpeedtest": "Options du test de vitesse",
+      "syncNever": "Les IP, l'historique des recherches, les instantanés, les résultats des tests et autres données de ce type ne sont jamais synchronisés. Ils restent uniquement dans ce navigateur.",
+      "syncTips": "Ce qui est activé suit votre compte sur chaque appareil. La déconnexion le retire de cet appareil jusqu'à votre prochaine connexion.",
+      "syncSignedOut": "Connectez-vous pour synchroniser avec votre compte.",
+      "syncSynced": "Synchronisé avec votre compte.",
+      "syncReload": "La synchronisation est en pause sur cette page. Rechargez la page pour continuer.",
+      "syncSaveFailed": "Impossible d'enregistrer le réglage de synchronisation. Réessayez.",
+      "syncFailed": "La dernière synchronisation n'a pas abouti. Elle sera retentée à votre prochaine modification ou visite.",
+      "syncPartial": "Une partie de ces données n'a pas pu être enregistrée dans votre compte et reste uniquement sur cet appareil.",
+      "syncStatusSynced": "Synchronisé",
+      "syncStatusPaused": "En pause",
+      "syncStatusFailed": "Non synchronisé",
+      "syncStatusPartial": "Synchronisé en partie",
       "connectivity": {
         "defaultList": "Liste par défaut",
         "defaultListTips": "La liste affichée par la section au chargement de la page.",
@@ -2067,8 +2090,7 @@
     },
     "sourceFields": {
       "source": "Source des données",
-      "preferences": "Préférences",
-      "sentence": "Base de données de géolocalisation utilisée : {source}. Vous pouvez la modifier dans les {preferences}."
+      "sentence": "Base de données de géolocalisation IP utilisée : {source}. Vous pouvez la modifier dans les Préférences."
     },
     "countryTraffic": {
       "subtitle": "Répartition hebdomadaire de l'activité en ligne de ce pays/région — affichez uniquement le trafic généré par des humains, ou tout le trafic (bots et trafic automatisé inclus).",
@@ -2478,5 +2500,11 @@
   "pwa": {
     "appDescription": "La boîte à outils IP tout-en-un",
     "installDescription": "Vous avez déjà utilisé IPCheck.ing {count} fois — installez-le comme application pour une expérience plus fluide et un accès plus rapide."
+  },
+  "syncDialog": {
+    "Title": "Synchroniser vos réglages",
+    "Note": "Vous pouvez synchroniser vos données non sensibles entre vos appareils.",
+    "Save": "Enregistrer",
+    "Later": "Plus tard"
   }
 }

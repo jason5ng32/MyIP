@@ -1,6 +1,6 @@
 // Reactive state, boot-draw orchestration, and Cloudflare engine lifecycle for SpeedTest.
 import {
-  computed, getCurrentScope, markRaw, nextTick, onScopeDispose, reactive, ref, toValue,
+  computed, getCurrentScope, markRaw, nextTick, onScopeDispose, reactive, ref, toValue, watch,
 } from 'vue';
 import { useStatusTone } from './use-status-tone.js';
 import { trackEvent } from '../utils/analytics.js';
@@ -8,6 +8,7 @@ import { emitAppEvent } from '../utils/app-events.js';
 import { fetchWithTimeout } from '../utils/fetch-with-timeout.js';
 import { isValidIP } from '../utils/ip/valid-ip.js';
 import { parseTrace } from '../utils/ip/parse-trace.js';
+import { SPEEDTEST_SIZE_OPTIONS } from '../utils/preferences-schema.js';
 import getCountryName from '../utils/country-name.js';
 import {
   computeCloudSyncScore, createSpeedTestSession,
@@ -16,13 +17,14 @@ import {
 
 const HANDSHAKE_MERGE_MS = 320;
 const BOOT_DRAW_MS = 580;
-export const SPEEDTEST_SIZE_OPTIONS = [1e6, 10e6, 15e6, 50e6, 100e6];
+export { SPEEDTEST_SIZE_OPTIONS };
 
 let SpeedTestEngineClass = null;
 let speedTestEnginePromise = null;
 
+// `sizes()` → `{ download, upload }` in bytes, the chosen sizes (a preference); without it the defaults below stay.
 export const useSpeedTest = ({
-  t, lang, updateAllIPs = () => {},
+  t, lang, sizes = null, updateAllIPs = () => {},
   initStartingPoints = () => Promise.resolve(),
   updateCharts = () => {}, resetChartData = () => {}, destroyCharts = () => {},
 }) => {
@@ -59,6 +61,21 @@ export const useSpeedTest = ({
   const isFinished = computed(() => state.speedTest.status === 'finished');
   const isError = computed(() => state.speedTest.status === 'error');
   const isCeremony = computed(() => Boolean(state.speedTest.handshakeStage || state.speedTest.isDrawing));
+
+  // The chosen sizes reach the package whenever no test is running or paused: one that arrives mid-run (another tab or
+  // device) waits for the run to end, and the run keeps the sizes it started with.
+  if (sizes) {
+    const applySizes = () => {
+      const next = sizes();
+      if (!next || isRunning.value || isPaused.value) return;
+      state.config.package.download.bytes = next.download;
+      state.config.package.upload.bytes = next.upload;
+    };
+    watch(() => {
+      const next = sizes();
+      return [next?.download, next?.upload, state.speedTest.status];
+    }, applySizes, { immediate: true });
+  }
 
   // Estimated payload across all configured download + upload rounds (in MB).
   const estimatedTotalMB = computed(() => {

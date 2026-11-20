@@ -28,6 +28,7 @@ export default async (req, res) => {
             method: 'POST',
             body: req.body,
             forwardFrom: req,
+            endUserId: res.locals.userId,
         });
 
         // The status passes through, the payload verbatim on success and as

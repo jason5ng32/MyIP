@@ -2,6 +2,7 @@
 import { isReportSharingConfigured } from './share-report.js';
 import { bulkLookupSource } from '../server/bulk-lookup-sources.js';
 import { ipSourceFlags } from './ip-sources.js';
+import { isUserStorageConfigured } from '../server/db/user-storage.js';
 
 export default (req, res) => {
     // defensive; app.get() in backend-server.js already gates method, but a
@@ -19,6 +20,8 @@ export default (req, res) => {
         cloudFlare: process.env.CLOUDFLARE_API_KEY || process.env.CLOUDFLARE_API,
         // Share-link feature gate: all three CLOUDFLARE_* KV variables present.
         reportSharing: isReportSharingConfigured(),
+        // Configured, not ready: this answer is edge-cached.
+        userStorage: isUserStorageConfigured(),
     };
     let result = {};
     for (const key in envConfigs) {

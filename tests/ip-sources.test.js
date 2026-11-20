@@ -51,9 +51,15 @@ describe('IP_SOURCES', () => {
         for (const source of IP_SOURCES.filter((s) => s.key !== 'ipchecking')) assert.equal(source.cacheSeconds, ONE_DAY, source.key);
     });
 
-    it('gates only maxmind', () => {
-        assert.deepEqual(keysWhere((s) => s.gates), ['maxmind']);
-        for (const gate of IP_SOURCES.find((s) => s.key === 'maxmind').gates) assert.equal(typeof gate, 'function');
+    it('counts signed-in uses of ipchecking only', () => {
+        assert.deepEqual(IP_SOURCES.filter((s) => s.featureUse).map((s) => [s.key, s.featureUse]), [['ipchecking', 'ipdb:ipchecking']]);
+    });
+
+    it('gates maxmind on its data and ipchecking on an optional sign-in', () => {
+        assert.deepEqual(keysWhere((s) => s.gates), ['maxmind', 'ipchecking']);
+        for (const key of ['maxmind', 'ipchecking']) {
+            for (const gate of IP_SOURCES.find((s) => s.key === key).gates) assert.equal(typeof gate, 'function');
+        }
     });
 });
 

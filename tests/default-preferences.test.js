@@ -31,6 +31,8 @@ describe('DEFAULT_PREFERENCES', () => {
       connectivityLists: null,
       connectivityDefaultListId: 'mine',
       connectivityCardTitleOpensSite: false,
+      speedtestDownloadBytes: 50e6,
+      speedtestUploadBytes: 15e6,
       connectivityTargets: null,
       customConnectivityTargets: [],
     });

@@ -11,7 +11,7 @@
     "QuotaSponsorCta": "贊助我們",
     "ViewUsage": "檢視用量",
     "Usage": {
-      "Title": "用量統計",
+      "Title": "IPCheck.ing 用量",
       "Note": "進階功能設有每月免費額度，每月（UTC）自動重置。IP 進階資料的重複查詢會命中快取，不消耗額度。",
       "IpinfoFeature": "IP 進階資料",
       "PercentUsed": "已用 {percent}%",
@@ -39,35 +39,40 @@
     "Benefits": {
       "Title": "權益與用量",
       "Benefit": "權益",
-      "Note1": "作為一個開源產品，你使用 IPCheck.ing 的過程是免費的。我們維護這個開源產品付出大量的精力和成本。",
-      "Note2": "為了讓這個專案可以長期穩定地執行，避免濫用，部分進階功能需要登入才能使用。我們對每個登入使用者設定了足夠使用的每月額度，如果你覺得額度不夠，可以考慮贊助我們，贊助後可以獲得更高的額度。",
+      "Intro": "核心工具無需帳號即可免費使用；登入後可獲得更多功能，詳見下方。",
       "Current": "目前",
+      "Groups": {
+        "Basic": "基礎權益",
+        "IpChecking": "IPCheck.ing 權益"
+      },
       "Tiers": {
         "Visitor": {
           "Name": "未登入使用者",
-          "Item1": "查詢 IP 資訊，多資料來源對比",
-          "Item2": "網路連通性與服務可用性檢測",
-          "Item3": "WebRTC / DNS 洩漏檢測",
-          "Item4": "網速、全球延遲與 MTR 測試",
-          "Item5": "Whois、DNS 解析等更多進階工具",
-          "Item6": "無需註冊，開源可自部署"
+          "IpLookup": "查詢 IP 資訊，多資料來源對比",
+          "Connectivity": "網路連通性與服務可用性檢測",
+          "LeakTests": "WebRTC / DNS 洩漏檢測",
+          "SpeedTest": "網速、全球延遲與 MTR 測試",
+          "Tools": "Whois、DNS 解析等更多進階工具",
+          "OpenSource": "無需註冊，開源可自部署"
         },
         "SignedIn": {
           "Name": "登入使用者",
-          "Item1": "包含未登入使用者的所有權益",
-          "Item2": "可以檢視 IP 品質評分、代理判斷、網路類型、ASN 與地理位置一致性等進階資訊",
-          "Item3": "可以使用隱身測試",
-          "Item4": "可以使用深度 DNS 洩漏測試",
-          "Item5": "可以看到自己獲得的成就勳章",
-          "Item6": "可以使用 AI 助手 IPilot 提問",
-          "Item7": "進階功能享有每月免費額度，每月自動重置"
+          "IncludesVisitor": "包含未登入使用者的所有權益",
+          "Achievements": "可以看到自己獲得的成就勳章",
+          "AccountSync": "可以在多台裝置間同步偏好設定與連通性測試清單",
+          "AdvancedIp": "可以檢視 IP 品質評分、代理判斷、網路類型、ASN 與地理位置一致性等進階資訊",
+          "InvisibilityTest": "可以使用隱身測試",
+          "DnsLeakTest": "可以使用深度 DNS 洩漏測試",
+          "PersonaCheck": "可以使用深度畫像檢測",
+          "IPilot": "可以使用 AI 助手 IPilot 提問",
+          "MonthlyQuota": "進階功能享有每月免費額度，每月自動重置"
         },
         "Sponsor": {
           "Name": "贊助使用者",
-          "Item1": "包含登入使用者的所有權益",
-          "Item2": "進階功能獲得更高的每月額度",
-          "Item3": "支援這個開源專案的持續開發與營運",
-          "Item4": "更寬鬆的 24 小時額度"
+          "IncludesSignedIn": "包含登入使用者的所有權益",
+          "HigherQuota": "進階功能獲得更高的每月額度",
+          "DailyLimit": "更寬鬆的 24 小時額度",
+          "SupportProject": "支援這個開源專案的持續開發與營運"
         }
       }
     },
@@ -165,7 +170,7 @@
         },
         "CrossingTheWall": {
           "Title": "八仙過牆",
-          "Meet": "在規則測試中，8 個測試的 IP 全部不相同"
+          "Meet": "在規則測試中，出現至少 8 個不同的 IP"
         },
         "GlobeTrotter": {
           "Title": "包羅萬有",
@@ -356,6 +361,24 @@
       "autoRunTips": "頁面載入時一定會檢查 IP 資訊。你可以選擇其他模組是否在啟動時自動執行。",
       "simpleMode": "簡潔模式",
       "simpleModeTips": "隱藏每個模組的說明文字，適合已熟悉本應用程式的使用者。",
+      "sync": "同步設定",
+      "syncEnable": "開啟",
+      "syncPreferences": "偏好設定",
+      "syncConnectivity": "連通性測試清單",
+      "syncChecklist": "安全檢查清單進度",
+      "syncSpeedtest": "測速偏好",
+      "syncNever": "IP、查詢記錄、快照和測試結果等永遠不會同步，只儲存在本瀏覽器中。",
+      "syncTips": "開啟的內容會在你登入的每台裝置上跟隨帳號。登出會把它們從本裝置移除，再次登入後恢復。",
+      "syncSignedOut": "登入後即可與帳號同步。",
+      "syncSynced": "已與帳號同步。",
+      "syncReload": "本頁面的同步已暫停，重新整理頁面後繼續。",
+      "syncSaveFailed": "同步設定未能儲存，請重試。",
+      "syncFailed": "上次同步沒有完成，會在你下次修改或造訪時重試。",
+      "syncPartial": "有一部分資料沒能儲存到帳號，只留在這台裝置上。",
+      "syncStatusSynced": "已同步",
+      "syncStatusPaused": "已暫停",
+      "syncStatusFailed": "未同步",
+      "syncStatusPartial": "部分同步",
       "connectivity": {
         "defaultList": "預設清單",
         "defaultListTips": "開啟頁面時，連線測試預設顯示的清單。",
@@ -2067,8 +2090,7 @@
     },
     "sourceFields": {
       "source": "資料來源",
-      "preferences": "偏好設定",
-      "sentence": "目前使用的地理位置資料庫：{source}。你可以在{preferences}裡面修改。"
+      "sentence": "目前使用的 IP 地理位置資料庫：{source}。你可以在偏好設定裡面修改。"
     },
     "countryTraffic": {
       "subtitle": "該國家/地區的每週網路活躍分布——你可以選擇僅看人類所產生的流量或全部流量（包含機器人/自動化流量）。",
@@ -2478,5 +2500,11 @@
   "pwa": {
     "appDescription": "一站式 IP 工具箱",
     "installDescription": "這已經是你第 {count} 次使用 IPCheck.ing 了，將它安裝為應用程式，可以獲得更好的使用體驗，開啟也更方便。"
+  },
+  "syncDialog": {
+    "Title": "同步你的設定",
+    "Note": "你可以在多裝置上同步你的非敏感資訊。",
+    "Save": "儲存",
+    "Later": "暫不"
   }
 }

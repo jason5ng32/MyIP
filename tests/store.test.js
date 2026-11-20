@@ -33,10 +33,15 @@ globalThis.document = {
 };
 
 import assert from 'node:assert/strict';
-import { describe, it, beforeEach } from 'node:test';
+import { describe, it, beforeEach, afterEach } from 'node:test';
 import { createPinia, setActivePinia } from 'pinia';
+import { effectScope, nextTick } from 'vue';
 
 const { useMainStore } = await import('../frontend/store.js');
+const { useAccountSync, createSyncAdapters } = await import('../frontend/composables/use-account-sync.js');
+const { fakeServer } = await import('./fake-sync-server.js');
+const { readSyncRecord } = await import('../frontend/utils/features/account-sync.js');
+const { SYNC_COLLECTIONS } = await import('../frontend/utils/sync-collections.js');
 
 beforeEach(() => {
   setActivePinia(createPinia());
@@ -82,17 +87,6 @@ describe('store — sheet toggling', () => {
     assert.equal(s.openSheet, 'tools');
   });
 
-  it('openPreferencesAt opens Preferences with a section to reveal, cleared once shown', () => {
-    const s = useMainStore();
-    assert.equal(s.preferencesFocus, null);
-    s.setOpenSheet('pulse');
-    s.openPreferencesAt('Pref_ipGeoSource');
-    assert.equal(s.openSheet, 'preferences');
-    assert.equal(s.preferencesFocus, 'Pref_ipGeoSource');
-    s.clearPreferencesFocus();
-    assert.equal(s.preferencesFocus, null);
-    assert.equal(s.openSheet, 'preferences');
-  });
 });
 
 describe('store — dark mode side effect', () => {
@@ -204,6 +198,329 @@ describe('store — preferences', () => {
   });
 });
 
+describe('store — preference edits and account sync', () => {
+  const RECORD_KEY = 'accountSync_preferences_v7';
+  const record = () => JSON.parse(globalThis.localStorage.getItem(RECORD_KEY) ?? 'null');
+  // A synced record holding one stamped key.
+  const seedRecord = () => globalThis.localStorage.setItem(RECORD_KEY, JSON.stringify({
+    user: 'u1', cursor: 3, lastSyncAt: 1, items: { theme: { hash: 'x', at: 5, ack: 5 } },
+  }));
+
+  it('updatePreference and setPreferences count an edit and write no sync record', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    s.updatePreference('theme', 'dark');
+    s.updatePreference('connectivityDefaultListId', 'work');
+    s.setPreferences({ ...s.userPreferences, lang: 'fr' });
+    assert.equal(s.preferenceEdits, 3);
+    assert.equal(record(), null);
+  });
+
+  it('loadPreferences counts no edit and gives defaults unstamped hashes in an existing record', () => {
+    seedRecord();
+    globalThis.localStorage.setItem('userPreferences_v7', JSON.stringify({ theme: 'dark' }));
+    const s = useMainStore();
+    s.loadPreferences();
+    assert.equal(s.preferenceEdits, 0);
+    const { items } = record();
+    assert.deepEqual(items.theme, { hash: 'x', at: 5, ack: 5 }, 'a stored value is left as recorded');
+    assert.equal(typeof items.lang.hash, 'string');
+    assert.equal(items.lang.at, undefined, 'a default is no edit');
+    assert.equal(items.connectivityLists, undefined, 'Connectivity lists are their own collection');
+  });
+
+  it('loadPreferences starts no record', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    assert.equal(record(), null);
+  });
+
+  it('applySyncedPreferences writes and persists without counting an edit, skipping invalid values', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    s.applySyncedPreferences({ theme: 'light', ipCardsToShow: 3, connectivityDefaultListId: '', simpleMode: true, junk: 1 });
+    assert.equal(s.userPreferences.theme, 'light');
+    assert.equal(s.userPreferences.simpleMode, true);
+    assert.equal(s.userPreferences.ipCardsToShow, 2);
+    assert.equal(s.userPreferences.connectivityDefaultListId, 'mine');
+    assert.equal('junk' in s.userPreferences, false);
+    assert.equal(JSON.parse(globalThis.localStorage.getItem('userPreferences_v7')).theme, 'light');
+    assert.equal(s.preferenceEdits, 0);
+  });
+
+  it('applySyncedPreferences sanitizes Connectivity lists and falls back from an unavailable IP source', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    s.ipDBs = s.ipDBs.map((db) => ({ ...db, enabled: db.id !== 2 }));
+    const lists = { schemaVersion: 1, lists: [{ id: 'mine', name: null, members: [] }] };
+    s.applySyncedPreferences({ ipGeoSource: 2, connectivityLists: lists, connectivityDefaultListId: 'work' });
+    assert.equal(s.userPreferences.ipGeoSource, 3);
+    assert.ok(s.userPreferences.connectivityLists.lists[0].members.length > 0, 'an emptied Mine is re-seeded');
+    assert.equal(s.userPreferences.connectivityDefaultListId, 'work');
+    s.applySyncedPreferences({ connectivityLists: { schemaVersion: 1, lists: 'nope' } });
+    assert.ok(Array.isArray(s.userPreferences.connectivityLists.lists), 'an invalid model is skipped');
+  });
+
+  it('the config-driven IP source fallback refreshes its hash unstamped and counts no edit', async () => {
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ipChecking: false }) });
+    try {
+      const s = useMainStore();
+      s.loadPreferences();
+      seedRecord();
+      s.fetchConfigs();
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      assert.notEqual(s.userPreferences.ipGeoSource, 0);
+      assert.equal(typeof record().items.ipGeoSource.hash, 'string');
+      assert.equal(record().items.ipGeoSource.at, undefined);
+      assert.equal(s.preferenceEdits, 0);
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+
+  it('resetSyncedPreferences resets one collection to a fresh visitor\'s values and counts no edit', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    const freshLists = s.userPreferences.connectivityLists;
+    s.updatePreference('theme', 'dark');
+    s.updatePreference('ipCardsToShow', 4);
+    s.updatePreference('connectivityDefaultListId', 'work');
+    s.updatePreference('connectivityLists', { ...freshLists, lists: [...freshLists.lists, { id: 'work', name: 'Work', members: [] }] });
+    const edits = s.preferenceEdits;
+    s.resetSyncedPreferences('preferences');
+    assert.equal(s.userPreferences.theme, 'auto');
+    assert.equal(s.userPreferences.ipCardsToShow, 2);
+    assert.equal(s.userPreferences.connectivityDefaultListId, 'work', 'the other collection is left alone');
+    s.resetSyncedPreferences('connectivity');
+    assert.equal(s.userPreferences.connectivityDefaultListId, 'mine');
+    assert.deepEqual(s.userPreferences.connectivityLists, freshLists);
+    assert.equal(JSON.parse(globalThis.localStorage.getItem('userPreferences_v7')).theme, 'auto');
+    assert.equal(s.preferenceEdits, edits);
+  });
+
+  it('setSyncSettings holds the account\'s settings, unknown at first', () => {
+    const s = useMainStore();
+    assert.equal(s.syncSettings.status, 'unknown');
+    s.setSyncSettings({ user: 'u1', status: 'fresh', decided: true, collections: ['preferences'] });
+    assert.deepEqual(s.syncSettings.collections, ['preferences']);
+  });
+
+  it('accountSyncAvailable needs sign-in and user storage', () => {
+    const s = useMainStore();
+    for (const [accounts, configs, available] of [
+      [false, { userStorage: true }, false], [true, {}, false], [true, { userStorage: true }, true],
+    ]) {
+      s.isFireBaseSet = accounts;
+      s.configs = configs;
+      assert.equal(s.accountSyncAvailable, available, JSON.stringify({ accounts, configs }));
+    }
+  });
+});
+
+describe('store — an edit lands on the freshest stored preferences', () => {
+  const PREFS_KEY = 'userPreferences_v7';
+  const stored = () => JSON.parse(globalThis.localStorage.getItem(PREFS_KEY));
+  // A tab: its own store over the shared localStorage, booted like the page.
+  const tab = () => {
+    setActivePinia(createPinia());
+    const s = useMainStore();
+    s.loadPreferences();
+    return s;
+  };
+  const listIds = (s) => s.userPreferences.connectivityLists.lists.map((list) => list.id);
+  const addList = (id) => (lists) => ({ lists: [...lists, { id, name: id, members: [] }] });
+
+  it('a key edit keeps the keys another tab saved since', () => {
+    const one = tab();
+    const two = tab();
+    one.updatePreference('theme', 'dark');
+    two.updatePreference('simpleMode', true);
+    assert.equal(stored().theme, 'dark');
+    assert.equal(stored().simpleMode, true);
+    assert.equal(two.userPreferences.theme, 'dark', 'the editing tab shows it too');
+    assert.equal(one.userPreferences.simpleMode, false, 'an idle tab is never rewritten');
+  });
+
+  it('a list edit runs on the freshest lists: two tabs each adding a list keep both', () => {
+    const one = tab();
+    const two = tab();
+    one.editConnectivityLists(addList('list-a'));
+    two.editConnectivityLists(addList('list-b'));
+    assert.deepEqual(listIds(two), ['mine', 'list-a', 'list-b']);
+    assert.deepEqual(stored().connectivityLists.lists.map((list) => list.id), ['mine', 'list-a', 'list-b']);
+    assert.deepEqual(listIds(one), ['mine', 'list-a'], 'the idle tab keeps what it showed');
+  });
+
+  it('account sync reads what storage holds now, so another tab\'s new list is not taken for a delete here', () => {
+    const one = tab();
+    const two = tab();
+    one.editConnectivityLists(addList('list-a'));
+    const items = createSyncAdapters(two).find((adapter) => adapter.id === 'connectivity').readLocal();
+    assert.ok(Object.hasOwn(items, 'list:list-a'));
+    assert.deepEqual(items.order, ['mine', 'list-a']);
+  });
+
+  it('editConnectivityLists returns the op\'s result; an error saves nothing and counts no edit', () => {
+    const s = tab();
+    const edits = s.preferenceEdits;
+    assert.deepEqual(s.editConnectivityLists(() => ({ error: 'list-limit' })), { error: 'list-limit' });
+    assert.equal(s.preferenceEdits, edits);
+    const result = s.editConnectivityLists(addList('list-a'));
+    assert.deepEqual(result.lists.map((list) => list.id), ['mine', 'list-a']);
+    assert.equal(s.preferenceEdits, edits + 1);
+  });
+
+  it('values read back are checked as at boot: invalid ones ignored, lists sanitized', () => {
+    const s = tab();
+    globalThis.localStorage.setItem(PREFS_KEY, JSON.stringify({
+      ...stored(), theme: 'purple', ipCardsToShow: 4, junk: 1,
+      connectivityLists: { schemaVersion: 1, lists: [{ id: 'mine', name: null, members: [] }, { id: 'x', name: '', members: [] }] },
+    }));
+    s.updatePreference('simpleMode', true);
+    assert.equal(s.userPreferences.theme, 'auto');
+    assert.equal(s.userPreferences.ipCardsToShow, 4);
+    assert.equal('junk' in s.userPreferences, false);
+    assert.deepEqual(listIds(s), ['mine']);
+    assert.ok(s.userPreferences.connectivityLists.lists[0].members.length > 0, 'an emptied Mine is re-seeded');
+    assert.equal(stored().theme, 'auto');
+  });
+
+  it('a missing or unreadable blob changes nothing but the edit', () => {
+    const s = tab();
+    s.updatePreference('theme', 'dark');
+    for (const blob of [null, '{x', '[1]', '"text"']) {
+      if (blob === null) globalThis.localStorage.removeItem(PREFS_KEY);
+      else globalThis.localStorage.setItem(PREFS_KEY, blob);
+      s.updatePreference('simpleMode', !s.userPreferences.simpleMode);
+      assert.equal(s.userPreferences.theme, 'dark', String(blob));
+      assert.equal(stored().theme, 'dark', String(blob));
+    }
+  });
+
+  describe('with account sync in both tabs', () => {
+    const scopes = [];
+    afterEach(() => scopes.splice(0).forEach((scope) => scope.stop()));
+    const settle = async () => {
+      for (let i = 0; i < 8; i += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 2));
+        await nextTick();
+      }
+    };
+    let clock = 1_000_000;
+    const syncedTab = (server) => {
+      const s = tab();
+      Object.assign(s, { isFireBaseSet: true, configs: { userStorage: true }, user: { uid: 'u1' }, isSignedIn: true, authResolved: true });
+      const scope = effectScope();
+      scopes.push(scope);
+      // The second tab registers the commands again: that warning is expected here.
+      const realWarn = console.warn;
+      console.warn = () => {};
+      try {
+        scope.run(() => useAccountSync({ store: s, request: server.request, storage: globalThis.localStorage, now: () => (clock += 1000), delayMs: 0 }));
+      } finally {
+        console.warn = realWarn;
+      }
+      return s;
+    };
+
+    it('two tabs each adding a list: both lists locally and in the account; the re-read stamps nothing', async () => {
+      const server = fakeServer();
+      const one = syncedTab(server);
+      await settle();
+      const two = syncedTab(server);
+      await settle();
+      one.editConnectivityLists(addList('list-a'));
+      await settle();
+      const mark = server.calls.length;
+      two.editConnectivityLists(addList('list-b'));
+      await settle();
+      assert.deepEqual(listIds(two), ['mine', 'list-a', 'list-b']);
+      assert.deepEqual(stored().connectivityLists.lists.map((list) => list.id), ['mine', 'list-a', 'list-b']);
+      assert.deepEqual(Object.keys(server.live('connectivity')).filter((id) => id.startsWith('list:')).sort(), ['list:list-a', 'list:list-b', 'list:mine']);
+      assert.deepEqual(server.live('connectivity').order, ['mine', 'list-a', 'list-b']);
+      const later = server.calls.slice(mark).filter((call) => call.method === 'PUT');
+      assert.deepEqual(later.map((call) => call.collection), ['connectivity'], 'no preference was stamped by the re-read');
+      assert.deepEqual(later[0].body.items.map((item) => item.id), ['order', 'list:list-b'], 'tab one\'s list is not sent again');
+      const record = readSyncRecord(globalThis.localStorage, SYNC_COLLECTIONS.connectivity);
+      assert.equal(Object.values(record.items).some((entry) => entry.at > (entry.ack ?? 0)), false, 'nothing left pending');
+    });
+  });
+});
+
+describe('store — Security Checklist progress', () => {
+  const KEY = 'securityChecklistSlugs';
+  const stored = () => JSON.parse(globalThis.localStorage.getItem(KEY));
+  const tab = () => {
+    setActivePinia(createPinia());
+    return useMainStore();
+  };
+
+  it('two tabs each marking a different item keep both; an idle tab is never rewritten', () => {
+    const one = tab();
+    const two = tab();
+    one.setChecklistMark('a-b', 'checked');
+    two.setChecklistMark('c-d', 'ignored');
+    assert.deepEqual(stored(), { 'a-b': 'checked', 'c-d': 'ignored' });
+    assert.deepEqual(two.checklistProgress, { 'a-b': 'checked', 'c-d': 'ignored' });
+    assert.deepEqual(one.checklistProgress, { 'a-b': 'checked' });
+    assert.equal(two.checklistEdits, 1);
+  });
+
+  it('unset and Reset are edits; Reset clears what another tab marked too', () => {
+    const one = tab();
+    const two = tab();
+    one.setChecklistMark('a-b', 'checked');
+    two.setChecklistMark('c-d', 'checked');
+    one.setChecklistMark('c-d', '');
+    assert.deepEqual(stored(), { 'a-b': 'checked' });
+    two.resetChecklist();
+    assert.deepEqual(stored(), {});
+    assert.deepEqual(two.checklistProgress, {});
+    assert.equal(two.checklistEdits, 2);
+  });
+
+  it('reads the stored copy as it is kept: \'\' entries and junk drop, an unreadable copy changes nothing', () => {
+    const s = tab();
+    globalThis.localStorage.setItem(KEY, JSON.stringify({ 'a-b': 'checked', 'c-d': '', 'E F': 'checked', 'g-h': 'maybe' }));
+    s.adoptStoredChecklist();
+    assert.deepEqual(s.checklistProgress, { 'a-b': 'checked' });
+    globalThis.localStorage.setItem(KEY, '{x');
+    s.adoptStoredChecklist();
+    assert.deepEqual(s.checklistProgress, { 'a-b': 'checked' });
+    s.setChecklistMark('i-j', 'ignored');
+    assert.deepEqual(stored(), { 'a-b': 'checked', 'i-j': 'ignored' });
+  });
+
+  it('account sync\'s changes and clearing are not edits', () => {
+    const s = tab();
+    s.setChecklistMark('a-b', 'checked');
+    s.applySyncedChecklist({ upserts: { 'c-d': 'ignored' }, deletes: ['a-b'] });
+    assert.deepEqual(stored(), { 'c-d': 'ignored' });
+    s.clearChecklist();
+    assert.deepEqual(stored(), {});
+    assert.deepEqual(s.checklistProgress, {});
+    assert.equal(s.checklistEdits, 1);
+  });
+});
+
+describe('store — speed test sizes', () => {
+  it('are preferences with today\'s defaults; only a size option is taken from sync or storage', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    assert.equal(s.userPreferences.speedtestDownloadBytes, 50e6);
+    assert.equal(s.userPreferences.speedtestUploadBytes, 15e6);
+    s.applySyncedPreferences({ speedtestDownloadBytes: 100e6, speedtestUploadBytes: 2e6 });
+    assert.equal(s.userPreferences.speedtestDownloadBytes, 100e6);
+    assert.equal(s.userPreferences.speedtestUploadBytes, 15e6);
+    globalThis.localStorage.setItem('userPreferences_v7', JSON.stringify({ ...s.userPreferences, speedtestUploadBytes: 'x' }));
+    s.updatePreference('speedtestDownloadBytes', 10e6);
+    assert.equal(s.userPreferences.speedtestUploadBytes, 15e6);
+    s.resetSyncedPreferences('speedtest');
+    assert.equal(s.userPreferences.speedtestDownloadBytes, 50e6);
+  });
+});
+
 describe('store — getters', () => {
   it('allHasLoaded is false when any loading flag is false', () => {
     const s = useMainStore();
@@ -231,10 +548,36 @@ describe('store — getters', () => {
     s.configs = { ipChecking: true, cloudFlare: false };
     s.isFireBaseSet = false;
     s.probeCapabilities = { invisibilityProbe: false, dnsLeakProbe: false };
-    const base = { ipChecking: true, cloudFlare: false, invisibilityProbe: false, dnsLeakProbe: false };
+    const base = { ipChecking: true, cloudFlare: false, invisibilityProbe: false, dnsLeakProbe: false, userStorage: false };
     assert.deepEqual(s.capabilities, { ...base, accounts: false });
     s.isFireBaseSet = true;
     assert.deepEqual(s.capabilities, { ...base, accounts: true });
+  });
+
+  it('capabilities carries userStorage from configs, false until they load', () => {
+    const s = useMainStore();
+    s.configs = {};
+    assert.equal(s.capabilities.userStorage, false);
+    s.configs = { userStorage: true };
+    assert.equal(s.capabilities.userStorage, true);
+  });
+
+  it('achievements need sign-in + user storage, usage sign-in + the IPCheck.ing API, independently', () => {
+    const s = useMainStore();
+    const combos = [
+      // [accounts, configs, achievements, usage]
+      [false, { userStorage: true, ipChecking: true }, false, false],
+      [true, {}, false, false],
+      [true, { userStorage: true }, true, false],
+      [true, { ipChecking: true }, false, true],
+      [true, { userStorage: true, ipChecking: true }, true, true],
+    ];
+    for (const [accounts, configs, achievements, usage] of combos) {
+      s.isFireBaseSet = accounts;
+      s.configs = configs;
+      assert.equal(s.achievementsAvailable, achievements, JSON.stringify({ accounts, configs }));
+      assert.equal(s.usageAvailable, usage, JSON.stringify({ accounts, configs }));
+    }
   });
 
   it('capabilities carries the build-time probe facts, never configs values', () => {
@@ -370,7 +713,7 @@ describe('store — handleSignInError', () => {
 });
 
 describe('store — quota snapshot', () => {
-  // The backend's /userinfo quota carries percentages only.
+  // The backend's /api/usage quota carries percentages only.
   const snapshot = (features) => ({ quota: { isSponsor: false, features } });
 
   it('quotaExceeded(key) reads the exhausted flag, not the percentage', () => {
