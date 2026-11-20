@@ -156,7 +156,7 @@ describe('configs handler', () => {
         const res = createResponse();
         configsHandler(createRequest(), res);
         assert.equal(res.statusCode, 200);
-        const flags = ['map', 'ipinfoio', 'ipChecking', 'ip2locationio', 'cloudFlare', 'ipapiis', 'reportSharing'];
+        const flags = ['map', 'ipinfoio', 'ipChecking', 'ip2locationio', 'cloudFlare', 'ipapiis', 'reportSharing', 'userStorage'];
         for (const key of flags) {
             assert.equal(typeof res.body[key], 'boolean');
         }

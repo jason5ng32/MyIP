@@ -37,6 +37,7 @@ Licensed under AGPL-3.0-only (`LICENSE`).
 | Backend | Express 5 |
 | Logger | `pino` singleton at `server/logger.js` (+ `pino-http`, opt-in) |
 | Auth | Firebase Auth (optional, env-gated) |
+| User storage | Postgres via `pg` + plain SQL migrations applied at boot (optional, env-gated by `DATABASE_URL`, lazily loaded — see api/AGENTS.md) |
 | Error monitoring | Sentry — optional & env-gated on both halves: `@sentry/vue` (no `VITE_SENTRY_DSN_FRONTEND`, no Sentry in the build — see frontend/AGENTS.md) + `@sentry/node` (no `SENTRY_DSN_BACKEND`, never loaded — see api/AGENTS.md) |
 | PWA | `manifest.webmanifest` only — installable but online-only, no service worker |
 | Tests | Node built-in test runner (`node --test`) |
@@ -65,7 +66,9 @@ use npm / yarn — they'd produce a competing lockfile.
 ├── frontend/                    ← Vue 3 SPA (see frontend/AGENTS.md)
 ├── api/                         ← Express handlers (see api/AGENTS.md)
 ├── server/                      ← backend-only code (logger / guards / …;
-│                                  datasets/ = the offline dataset engine)
+│                                  datasets/ = the offline dataset engine,
+│                                  db/ = the optional user storage +
+│                                  its SQL migrations)
 ├── common/                      ← code the frontend or build imports too
 │                                  (valid-ip / fetch-with-timeout / …) + the
 │                                  dataset dirs (`*-db/`, a self-host mount point)

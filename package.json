@@ -50,6 +50,7 @@
     "html-to-image": "^1.11.13",
     "http-proxy-middleware": "^4.2.1",
     "maxmind": "^5.0.8",
+    "pg": "^8.23.1",
     "pinia": "^4.1.0",
     "pino": "^10.4.0",
     "pino-http": "^11.0.0",

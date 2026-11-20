@@ -231,10 +231,18 @@ describe('store — getters', () => {
     s.configs = { ipChecking: true, cloudFlare: false };
     s.isFireBaseSet = false;
     s.probeCapabilities = { invisibilityProbe: false, dnsLeakProbe: false };
-    const base = { ipChecking: true, cloudFlare: false, invisibilityProbe: false, dnsLeakProbe: false };
+    const base = { ipChecking: true, cloudFlare: false, invisibilityProbe: false, dnsLeakProbe: false, userStorage: false };
     assert.deepEqual(s.capabilities, { ...base, accounts: false });
     s.isFireBaseSet = true;
     assert.deepEqual(s.capabilities, { ...base, accounts: true });
+  });
+
+  it('capabilities carries userStorage from configs, false until they load', () => {
+    const s = useMainStore();
+    s.configs = {};
+    assert.equal(s.capabilities.userStorage, false);
+    s.configs = { userStorage: true };
+    assert.equal(s.capabilities.userStorage, true);
   });
 
   it('capabilities carries the build-time probe facts, never configs values', () => {

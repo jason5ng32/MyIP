@@ -52,6 +52,7 @@ import { isAsRelLoaded } from './server/datasets/as-rel-db.js';
 import { isAsOrgLoaded } from './server/datasets/as-org-db.js';
 import { isOuiLoaded } from './server/datasets/oui-db.js';
 import { runOfflineBootstrap, requireOfflineData, isOfflineBootstrapping } from './server/offline-data.js';
+import { userStorage, accountSetupGap } from './server/db/user-storage.js';
 import { cacheable } from './server/cache-control.js';
 import { initUpstreamUserAgent } from './server/upstream-ua.js';
 import { createListenCallback } from './server/listen-callback.js';
@@ -269,6 +270,14 @@ const bootBackend = async () => {
     // (asn-profile's degraded caching keys on it); a request that finds it
     // still empty fills it on demand.
     if (hasRadarApiKey()) startOutagePolling();
+
+    // Optional user storage: migrated behind the listener, never fatal; a
+    // storage that is not ready is re-checked on a later request.
+    const missingAccountSetup = accountSetupGap();
+    if (missingAccountSetup) {
+        logger.warn(`⚠️  ${missingAccountSetup} is not set: sign-in and user storage need each other, account data features stay off`);
+    }
+    userStorage.bootCheck();
 
     await runOfflineBootstrap([
         async () => {

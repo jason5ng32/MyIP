@@ -13,6 +13,7 @@ import { DNS_RECORD_TYPE_SET } from '../common/dns-record-types.js';
 import { parseAsnInput } from '../common/asn-input.js';
 import { SERVICE_ERROR_CODE, AUTH_REASON } from '../common/codes/service-errors.js';
 import { verifySignIn } from './sign-in-token.js';
+import { userStorage } from './db/user-storage.js';
 
 // Express 5's req.query is a prototype getter that re-parses the URL on every
 // read, so a direct write is lost. Pin the parsed object as an own property
@@ -232,3 +233,10 @@ export const optionalUser = (verify = verifySignIn) => userGuard(false, verify);
 
 // Only a verified sign-in passes.
 export const requireUser = (verify = verifySignIn) => userGuard(true, verify);
+
+// User storage configured and ready, else 503 (uncoded, never cached). A
+// not-ready storage is re-checked here once its cooldown has passed.
+export const requireUserStorage = (storage = userStorage) => async (req, res, next) => {
+    if (storage.isConfigured() && await storage.ensureReady()) return next();
+    return res.status(503).json({ error: 'User storage unavailable' });
+};

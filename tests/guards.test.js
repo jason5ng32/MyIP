@@ -3,7 +3,8 @@ import { describe, it } from 'node:test';
 import express from 'express';
 import logger from '../server/logger.js';
 
-import { requireReferer, resetRefererRejectionLog, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery, optionalUser, requireUser } from '../server/guards.js';
+import { requireReferer, resetRefererRejectionLog, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery, optionalUser, requireUser, requireUserStorage } from '../server/guards.js';
+import { createUserStorage } from '../server/db/user-storage.js';
 import { AUTH_REASON } from '../common/codes/service-errors.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
@@ -574,5 +575,65 @@ describe('optionalUser / requireUser', () => {
         } finally {
             if (saved !== undefined) process.env.VITE_FIREBASE_PROJECT_ID = saved;
         }
+    });
+});
+
+describe('requireUserStorage', () => {
+    const run = async (guard) => {
+        const res = makeRes();
+        let nextCalled = false;
+        await guard(makeReq(), res, () => { nextCalled = true; });
+        return { res, nextCalled };
+    };
+
+    // A pg.Pool stand-in whose connection answers every statement, or fails a migration's SQL.
+    const fakeLoad = (migrationFails = false) => async () => class {
+        on() {}
+        async connect() {
+            return {
+                query: async (text) => {
+                    if (migrationFails && text === 'BROKEN') throw Object.assign(new Error('syntax error'), { severity: 'ERROR', code: '42601' });
+                    return { rows: [] };
+                },
+                release: () => {},
+            };
+        }
+    };
+    const migrations = async () => [{ name: '0001_x', sql: 'BROKEN' }];
+
+    it('answers 503 uncoded when DATABASE_URL is unset, loading nothing', async () => {
+        let loads = 0;
+        const storage = createUserStorage({ env: {}, load: async () => { loads += 1; return class {}; } });
+        const { res, nextCalled } = await run(requireUserStorage(storage));
+        assert.equal(nextCalled, false);
+        assert.equal(res.statusCode, 503);
+        assert.deepEqual(res.body, { error: 'User storage unavailable' });
+        assert.equal(loads, 0);
+    });
+
+    it('the default guard answers 503 with DATABASE_URL unset', async () => {
+        const saved = process.env.DATABASE_URL;
+        delete process.env.DATABASE_URL;
+        try {
+            const { res, nextCalled } = await run(requireUserStorage());
+            assert.equal(nextCalled, false);
+            assert.equal(res.statusCode, 503);
+        } finally {
+            if (saved !== undefined) process.env.DATABASE_URL = saved;
+        }
+    });
+
+    it('passes once storage is ready', async () => {
+        const storage = createUserStorage({ env: { DATABASE_URL: 'postgres://fake' }, load: fakeLoad(), readMigrations: migrations });
+        const { res, nextCalled } = await run(requireUserStorage(storage));
+        assert.equal(nextCalled, true);
+        assert.equal(res.statusCode, null);
+    });
+
+    it('answers 503 while a migration fails', async () => {
+        const storage = createUserStorage({ env: { DATABASE_URL: 'postgres://fake' }, load: fakeLoad(true), readMigrations: migrations });
+        const { res, nextCalled } = await run(requireUserStorage(storage));
+        assert.equal(nextCalled, false);
+        assert.equal(res.statusCode, 503);
     });
 });

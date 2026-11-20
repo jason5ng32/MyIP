@@ -105,8 +105,12 @@ export const useMainStore = defineStore('main', {
     },
     // What the deployment offers, for feature gates (utils/tool-availability.js):
     // the /api/configs flags plus the build-time facts — `accounts` (the
-    // sign-in setup) and the probe endpoints (`invisibilityProbe`, `dnsLeakProbe`).
-    capabilities: (state) => ({ ...state.configs, ...state.probeCapabilities, accounts: state.isFireBaseSet }),
+    // sign-in setup: can sign in) and the probe endpoints (`invisibilityProbe`,
+    // `dnsLeakProbe`); `userStorage` (can store) is false until configs load.
+    capabilities: (state) => ({
+      ...state.configs, ...state.probeCapabilities,
+      accounts: state.isFireBaseSet, userStorage: Boolean(state.configs.userStorage),
+    }),
     curlDomainsHadSet: (state) => {
       return state.curl.ipv4Domain && state.curl.ipv6Domain && state.curl.ipv64Domain;
     },

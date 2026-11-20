@@ -189,6 +189,9 @@ resolver list behind `dns-resolver` (gated by
   connection; a used-up day answers 429 `{ error, code: 'source_daily_limit' }`
   (never cached). Counts reset on the server-local day, persist to
   `common/source-limits-db/` every few seconds, and are per process.
+- `requireUserStorage()` — user storage configured and ready, else 503
+  `{ error }` (uncoded); a not-ready storage is re-checked here after a
+  cooldown. See "User storage".
 
 New param shape → new guard there, attached in `backend-server.js`.
 Rewrites go through `setQueryParam()` there: Express 5's `req.query` re-parses
@@ -252,6 +255,31 @@ the installed PWA's webview and Safari's storage partition, where
 `getRedirectResult` finds the result. Every OAuth provider must accept
 `https://<host>/__/auth/handler` per environment. Not an `/api` route: no
 guards, caching or per-request logs.
+
+### User storage
+
+Optional Postgres through the plain `pg` driver (connection, pool and
+readiness: `server/db/user-storage.js`; repositories beside it). No
+`DATABASE_URL` → `pg` is never loaded: only `server/db/` names it, through
+dynamic `import()` alone, and no ORM rides the manifests
+(`tests/pg-boundary.test.js`). Repositories get a narrow handle — `query(text,
+params)` and `transaction(fn)`, never the pool — and pass every value as a
+`$n` parameter, never interpolated into SQL.
+
+Migrations are append-only, numbered plain SQL files
+(`server/db/migrations/NNNN_name.sql`); a published one is never edited — a
+change is a new file. Behind the listener, the boot run
+(`server/db/migrate.js`) applies the pending ones under a Postgres advisory
+lock on one dedicated connection (several processes may boot together), each
+file in its own transaction with its `myip_migrations` row. A recorded name
+missing on disk only warns; a failure rolls that file back and stops. Never
+fatal: until a run succeeds, the `requireUserStorage()` guard answers 503 and
+re-runs it after a cooldown, and a query that loses its connection sends it
+back there. `/api/configs` `userStorage` = configured (the answer is
+edge-cached), not ready. Specs drive the runner and repositories with fakes;
+`DATABASE_URL_TEST` runs the optional real-database spec. Data minimisation:
+store only what a feature needs keyed by the opaque user id — no e-mail,
+name, IP, user agent or last-seen time.
 
 ## Edge caching
 
