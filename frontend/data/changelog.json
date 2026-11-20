@@ -2463,6 +2463,28 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "Preferences and Connectivity test lists can sync across devices",
+          "zh": "偏好设置与连通性测试列表可以跨设备同步",
+          "zh-TW": "偏好設定與連通性測試清單可以跨裝置同步",
+          "fr": "Les préférences et les listes du test de connectivité peuvent se synchroniser entre vos appareils",
+          "ru": "Настройки и списки теста доступности можно синхронизировать между устройствами",
+          "pt-BR": "As preferências e as listas do teste de conectividade podem ser sincronizadas entre dispositivos"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "For developers: any fork can connect its own user system",
+          "zh": "为开发者：任何 fork 都可以接入自己的用户系统",
+          "zh-TW": "給開發者：任何 fork 都可以接入自己的使用者系統",
+          "fr": "Pour les développeurs : chaque fork peut brancher son propre système d’utilisateurs",
+          "ru": "Для разработчиков: любой форк может подключить собственную систему пользователей",
+          "pt-BR": "Para desenvolvedores: qualquer fork pode conectar seu próprio sistema de usuários"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Reworked the program's architecture to make plugging in more IP data sources easier",
