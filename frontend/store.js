@@ -10,16 +10,36 @@ import { ACHIEVEMENT_NAMES } from './utils/codes/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
 import { createDefaultPreferences, PREFS_STORAGE_KEY } from './data/default-preferences.js';
 import { sanitizeLists } from './utils/features/connectivity-lists.js';
-import { refreshSyncRecords, syncItemDefaults, toPreferenceValues } from './utils/features/preferences-sync.js';
+import { refreshSyncRecords, syncDefaultPreferences } from './utils/features/preferences-sync.js';
 import { syncBeforeReload, clearAccountDataBeforeSignOut } from './utils/features/account-sync-auth.js';
 import { createSyncSettings } from './utils/features/sync-settings.js';
-import {
-  isValidPreferenceValue, isValidConnectivityLists, isValidConnectivityListId,
-} from './utils/preferences-schema.js';
+import { isValidPreferenceValue, isValidConnectivityListId } from './utils/preferences-schema.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
 import { PROBE_CAPABILITIES } from './utils/probe-endpoints.js';
 const { t } = i18n.global;
+
+// `{ <key>: value }` from account sync or localStorage → the entries the store takes, as at boot: Connectivity lists
+// sanitized, the IP source an available one, unknown keys and invalid values left out.
+const acceptedPreferenceEntries = (values, ipDBs) => Object.entries(values ?? {})
+  .filter(([key, value]) => (
+    key === 'connectivityLists' ? Array.isArray(value?.lists)
+      : key === 'connectivityDefaultListId' ? isValidConnectivityListId(value)
+        : isValidPreferenceValue(key, value)))
+  .map(([key, value]) => [key,
+    key === 'connectivityLists' ? sanitizeLists(value, null, [])
+      : key === 'ipGeoSource' ? nearestEnabledId(value, ipDBs)
+        : value]);
+
+// What localStorage holds now, or null when it is missing or unreadable.
+const readStoredPreferences = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem(PREFS_STORAGE_KEY) ?? 'null');
+    return typeof stored === 'object' && stored !== null && !Array.isArray(stored) ? stored : null;
+  } catch {
+    return null;
+  }
+};
 
 // The two sign-in buttons. `other` is the provider to point a visitor at when
 // their email already owns an account through the other one;
@@ -235,36 +255,54 @@ export const useMainStore = defineStore('main', {
       this.userPreferences = userPreferences;
       localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(userPreferences));
     },
-    // set user preferences (an edit)
-    setPreferences(userPreferences) {
-      this.persistPreferences(userPreferences);
-      this.preferenceEdits += 1;
+    // This tab's preferences brought up to what localStorage holds now (another tab may have saved since). Part of
+    // this tab's own edit only, never on its own; not an edit, and records are left alone: what another tab
+    // stamped already matches them.
+    adoptStoredPreferences() {
+      for (const [key, value] of acceptedPreferenceEntries(readStoredPreferences(), this.ipDBs)) {
+        this.userPreferences[key] = value;
+      }
     },
-    // update user preferences (an edit)
-    updatePreference(key, value) {
-      this.userPreferences[key] = value;
+    // Every edit lands here: `change(prefs)` runs on the freshest preferences and returns the
+    // `{ <key>: value }` to save, or null for none.
+    editPreferences(change) {
+      this.adoptStoredPreferences();
+      const values = change(this.userPreferences);
+      if (!values) return;
+      Object.assign(this.userPreferences, values);
       this.persistPreferences();
       this.preferenceEdits += 1;
+    },
+    // set several preferences (an edit)
+    setPreferences(values) {
+      this.editPreferences(() => values);
+    },
+    // update one preference (an edit)
+    updatePreference(key, value) {
+      this.editPreferences(() => ({ [key]: value }));
+    },
+    // A Connectivity lists edit: `op(lists)` (an op of utils/features/connectivity-lists.js) runs on the freshest
+    // lists → its result, whose `lists` are saved.
+    editConnectivityLists(op) {
+      let result = null;
+      this.editPreferences((prefs) => {
+        result = op(prefs.connectivityLists?.lists ?? []);
+        return result?.lists ? { connectivityLists: { ...prefs.connectivityLists, lists: result.lists } } : null;
+      });
+      return result;
     },
     // Values from account sync (`{ <key>: value }`), not counted as an edit. Connectivity lists are
     // sanitized and the IP source falls back to an available one, as at boot.
     applySyncedPreferences(values) {
-      const entries = Object.entries(values ?? {}).filter(([key, value]) => (
-        key === 'connectivityLists' ? isValidConnectivityLists(value)
-          : key === 'connectivityDefaultListId' ? isValidConnectivityListId(value)
-            : isValidPreferenceValue(key, value)));
+      const entries = acceptedPreferenceEntries(values, this.ipDBs);
       if (!entries.length) return;
-      for (const [key, value] of entries) {
-        if (key === 'connectivityLists') this.userPreferences[key] = sanitizeLists(value, null, []);
-        else if (key === 'ipGeoSource') this.userPreferences[key] = nearestEnabledId(value, this.ipDBs);
-        else this.userPreferences[key] = value;
-      }
+      for (const [key, value] of entries) this.userPreferences[key] = value;
       this.persistPreferences();
     },
     // Sign-out: one synced collection's keys ('preferences' / 'connectivity') back
     // to a fresh visitor's values, not counted as an edit.
     resetSyncedPreferences(collectionId) {
-      this.applySyncedPreferences(toPreferenceValues(collectionId, syncItemDefaults(collectionId)));
+      this.applySyncedPreferences(syncDefaultPreferences(collectionId));
     },
     // Written by account sync only.
     setSyncSettings(settings) {

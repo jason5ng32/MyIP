@@ -574,12 +574,9 @@ onDeactivated(() => {
 });
 
 const removeTargetById = (id) => {
-  const result = removeMember(lists.value, activeListId.value, id);
+  const listId = activeListId.value;
+  const result = store.editConnectivityLists((lists) => removeMember(lists, listId, id));
   if (result.error) return;
-  store.updatePreference('connectivityLists', {
-    ...userPreferences.value.connectivityLists,
-    lists: result.lists,
-  });
   trackEvent('Section', 'RemoveCustomTarget', 'Connectivity');
 };
 

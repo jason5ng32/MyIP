@@ -4,11 +4,13 @@ import { describe, it } from 'node:test';
 
 import {
     SYNC_COLLECTIONS, SYNC_COLLECTION_IDS, syncCollectionOf, syncValueBytes,
-    CONNECTIVITY_SYNC_VERSION, CONNECTIVITY_SYNC_ITEM_IDS, SYNC_OFF_CODE,
+    CONNECTIVITY_SYNC_VERSION, CONNECTIVITY_SYNC_ITEM_IDS, SYNC_OFF_CODE, connectivityListItemId, connectivityListIdOf,
     SYNC_MAX_ITEMS_PER_REQUEST, SYNC_TOMBSTONE_TTL_MS, SYNC_MAX_BODY_BYTES,
 } from '../common/sync-collections.js';
 import * as syncBridge from '../frontend/utils/sync-collections.js';
-import { PREFERENCES_VERSION, SYNCED_PREFERENCE_KEYS, CONNECTIVITY_LIST_LIMIT, CONNECTIVITY_TARGET_LIMIT } from '../common/preferences-schema.js';
+import {
+    PREFERENCES_VERSION, SYNCED_PREFERENCE_KEYS, CONNECTIVITY_LIST_LIMIT, CONNECTIVITY_TARGET_LIMIT, CONNECTIVITY_ORDER_LIMIT,
+} from '../common/preferences-schema.js';
 import { DEFAULT_PREFERENCES } from '../frontend/data/default-preferences.js';
 import { sanitizeLists } from '../frontend/utils/features/connectivity-lists.js';
 
@@ -57,6 +59,8 @@ describe('sync collections registry', () => {
         assert.equal(syncBridge.CONNECTIVITY_SYNC_VERSION, CONNECTIVITY_SYNC_VERSION);
         assert.equal(syncBridge.SYNC_OFF_CODE, SYNC_OFF_CODE);
         assert.equal(syncBridge.SYNC_MAX_BODY_BYTES, SYNC_MAX_BODY_BYTES);
+        assert.equal(syncBridge.connectivityListItemId, connectivityListItemId);
+        assert.equal(syncBridge.connectivityListIdOf, connectivityListIdOf);
     });
 
     it('measures values as UTF-8 JSON', () => {
@@ -94,47 +98,56 @@ describe('preferences collection', () => {
 
 describe('connectivity collection', () => {
     const member = (i) => ({ id: `m${i}`, name: `Site ${i}`.padEnd(100, 'x'), url: `https://site-${i}.example.com/${'p'.repeat(60)}`, siteUrl: `https://site-${i}.example.com/` });
-    const busyLists = () => ({
-        schemaVersion: 1,
-        lists: Array.from({ length: CONNECTIVITY_LIST_LIMIT }, (_, l) => ({
-            id: l ? `list-${l}` : 'mine', name: l ? `List ${l}` : null,
-            members: Array.from({ length: CONNECTIVITY_TARGET_LIMIT }, (_, m) => member(l * 100 + m)),
-        })),
-    });
+    const busyList = () => ({ name: 'x'.repeat(40), members: Array.from({ length: CONNECTIVITY_TARGET_LIMIT }, (_, m) => member(m)) });
 
-    it('is version 1, exactly two items, no deletes, one small page', () => {
+    it('is version 2: one item per list plus the order and the default list id, with deletes', () => {
         assert.equal(connectivity.version, CONNECTIVITY_SYNC_VERSION);
-        assert.equal(connectivity.version, 1);
-        assert.deepEqual([...CONNECTIVITY_SYNC_ITEM_IDS], ['lists', 'defaultListId']);
-        assert.equal(connectivity.maxItems, 2);
-        assert.equal(connectivity.allowDelete, false);
-        assert.equal(connectivity.maxItemBytes, 256 * KB);
-        assert.ok(connectivity.pageSize <= 2);
+        assert.equal(connectivity.version, 2);
+        assert.deepEqual([...CONNECTIVITY_SYNC_ITEM_IDS], ['order', 'defaultListId']);
+        assert.equal(connectivity.maxItems, CONNECTIVITY_LIST_LIMIT + 2);
+        assert.equal(connectivity.allowDelete, true);
+        assert.equal(connectivity.maxItemBytes, 32 * KB);
+        assert.equal(connectivity.pageSize, connectivity.maxItems);
     });
 
-    it('accepts its two item ids only', () => {
-        for (const id of CONNECTIVITY_SYNC_ITEM_IDS) assert.equal(connectivity.isValidItemId(id), true, id);
-        for (const id of ['connectivityLists', 'mine', 'constructor', '__proto__', 'toString', '', null, 1]) {
+    it('list item ids: `list:` and a bounded list id', () => {
+        assert.equal(connectivityListItemId('work'), 'list:work');
+        assert.equal(connectivityListIdOf('list:mine'), 'mine');
+        assert.equal(connectivityListIdOf('list:list-1700000000000'), 'list-1700000000000');
+        for (const id of ['list:', `list:${'x'.repeat(65)}`, 'order', 'mine', 'lists', null, 3]) {
+            assert.equal(connectivityListIdOf(id), null, String(id));
+        }
+    });
+
+    it('accepts list items, `order` and `defaultListId` only', () => {
+        for (const id of [...CONNECTIVITY_SYNC_ITEM_IDS, 'list:mine', 'list:work']) assert.equal(connectivity.isValidItemId(id), true, id);
+        for (const id of ['lists', 'connectivityLists', 'mine', 'list:', 'constructor', '__proto__', 'toString', '', null, 1]) {
             assert.equal(connectivity.isValidItemId(id), false, String(id));
         }
         assert.equal(connectivity.isValidValue('constructor', {}), false);
+        assert.equal(connectivity.isValidValue('lists', sanitizeLists(null, null, [])), false);
     });
 
-    it('the sanitized default lists pass as `lists`, the default list id as `defaultListId`', () => {
-        const lists = sanitizeLists(null, null, []);
-        assert.equal(connectivity.isValidValue('lists', lists), true);
+    it('the sanitized default list passes as its item, ids as `order` and `defaultListId`', () => {
+        const [mine] = sanitizeLists(null, null, []).lists;
+        assert.equal(connectivity.isValidValue('list:mine', { name: mine.name, members: mine.members }), true);
+        assert.equal(connectivity.isValidValue('list:mine', mine), false, 'the id rides the item id');
+        assert.equal(connectivity.isValidValue('list:work', { name: null, members: [] }), false, 'only Mine is unnamed');
+        assert.equal(connectivity.isValidValue('list:mine', { name: 'Mine', members: [] }), false);
+        assert.equal(connectivity.isValidValue('order', ['mine', 'list-1']), true);
+        for (const bad of [['mine', 'mine'], [''], 'mine', Array.from({ length: CONNECTIVITY_ORDER_LIMIT + 1 }, (_, i) => `l${i}`)]) {
+            assert.equal(connectivity.isValidValue('order', bad), false, JSON.stringify(bad));
+        }
         assert.equal(connectivity.isValidValue('defaultListId', DEFAULT_PREFERENCES.connectivityDefaultListId), true);
-        assert.equal(connectivity.isValidValue('defaultListId', lists), false);
-        assert.equal(connectivity.isValidValue('lists', 'mine'), false);
-        for (const bad of ['', 'x'.repeat(65), 3, null]) assert.equal(connectivity.isValidValue('defaultListId', bad), false, String(bad));
-        assert.equal(connectivity.isValidValue('lists', { ...lists, extra: 1 }), false);
+        for (const bad of ['', 'x'.repeat(65), 3, null, ['mine']]) assert.equal(connectivity.isValidValue('defaultListId', bad), false, String(bad));
     });
 
-    it('a busy model (every list full, long names and URLs) fits the item cap', (t) => {
-        const lists = busyLists();
-        assert.equal(connectivity.isValidValue('lists', lists), true);
-        const bytes = syncValueBytes(lists);
-        t.diagnostic(`busy lists ${bytes} B, cap ${connectivity.maxItemBytes} B`);
+    it('a busy list (full, long names and URLs) fits the item cap; every list at once fits the body limit in batches', (t) => {
+        const list = busyList();
+        assert.equal(connectivity.isValidValue('list:work', list), true);
+        const bytes = syncValueBytes(list);
+        t.diagnostic(`busy list ${bytes} B, cap ${connectivity.maxItemBytes} B`);
         assert.ok(bytes < connectivity.maxItemBytes, `${bytes} B`);
+        assert.ok(SYNC_MAX_BODY_BYTES >= connectivity.maxItemBytes + 16 * KB);
     });
 });

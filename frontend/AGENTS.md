@@ -195,8 +195,8 @@ separate from Share Report and `Report*.vue`.
 ### Account sync
 
 Two collections sync, `preferences` (`SYNCED_PREFERENCE_KEYS`) and
-`connectivity` (the lists model + default list id); IPs, snapshots, test
-results and the checklist never do. The account chooses which:
+`connectivity` (one item per list, the lists' order, the default list id);
+IPs, snapshots, test results and the checklist never do. The account chooses which:
 `GET / PUT /api/sync` (`store.syncSettings`, cached per user so a load starts
 before the fetch; nothing until decided; turning one off deletes its rows
 there). `use-account-sync.js` (App.vue) runs one engine
@@ -205,12 +205,17 @@ there). `use-account-sync.js` (App.vue) runs one engine
 Per enabled collection: signed out, the data is the device's (no record);
 signed in, the account's — the first pull adopts (an empty account takes the
 device's data, else the account replaces it), then edits stamp by hash and
-merge per item. Turned off (here, or a 409 `sync_off`) → record dropped, data
+merge per item: a list deleted syncs as a tombstone (never Mine), lists the
+`order` item lacks follow it by id. Turned off (here, or a 409 `sync_off`) → record dropped, data
 kept. The popup sign-in awaits `syncBeforeReload`; sign-out flushes, clears
 enabled collections and reloads; a boot that finds the session ended clears
 too. `widgets/SyncChoiceDialog.vue` asks once (`use-sync-dialog.js`,
 `shouldShowSyncDialog`): every exit saves a choice; Preferences edits it at
 once. Both use `widgets/SyncChoiceControls.vue` (`applySyncToggle`).
+Every preference edit goes through `store.editPreferences`
+(`updatePreference`; list ops through `editConnectivityLists`): it lands on
+what localStorage holds at that moment, so another tab's save survives; no
+tab ever reacts to another (no `storage` listener).
 
 ### Overlays take no keyboard shortcuts
 

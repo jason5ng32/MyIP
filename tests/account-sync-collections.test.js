@@ -1,5 +1,5 @@
 // Tests for the per-collection pure helpers of account sync: the preferences and Connectivity items over
-// userPreferences and the unstamped hash refresh (utils/features/preferences-sync.js), the account's sync settings,
+// userPreferences, what a pull's changes make of them (lists rebuilt in order, Mine kept) and the unstamped hash refresh (utils/features/preferences-sync.js), the account's sync settings,
 // their cache and the one-time dialog's show rule (utils/features/sync-settings.js), and the commands app code awaits
 // (utils/features/account-sync-auth.js).
 
@@ -7,8 +7,8 @@ import assert from 'node:assert/strict';
 import { describe, it, afterEach } from 'node:test';
 
 import {
-    SYNC_ITEM_READERS, CONNECTIVITY_ITEM_KEYS, syncItemKey, toPreferenceValues, syncItemDefaults, changedSyncItems,
-    refreshSyncRecords,
+    SYNC_ITEM_READERS, SYNC_ITEM_WRITERS, applySyncItems, syncDefaultPreferences, orderConnectivityLists,
+    changedSyncItems, refreshSyncRecords,
 } from '../frontend/utils/features/preferences-sync.js';
 import {
     SYNC_SETTINGS_CACHE_KEY, createSyncSettings, readSyncSettingsAnswer, readCachedSyncSettings,
@@ -34,6 +34,11 @@ const memoryStorage = (initial = {}) => ({
 });
 
 const prefs = (over = {}) => ({ ...DEFAULT_PREFERENCES, connectivityLists: sanitizeLists(null, null, []), ...over });
+const site = (id) => ({ id, name: `Site ${id}`, url: `https://${id}.example.com/favicon.ico` });
+const withWork = () => {
+    const base = sanitizeLists(null, null, []);
+    return { ...base, lists: [...base.lists, { id: 'work', name: 'Work', members: [] }] };
+};
 
 describe('account sync — the collections', () => {
     it('exactly the two registry collections, each read from userPreferences', () => {
@@ -51,23 +56,62 @@ describe('account sync — the collections', () => {
         for (const key of ['connectivityLists', 'connectivityDefaultListId', 'connectivityTargets']) assert.equal(key in items, false, key);
     });
 
-    it('connectivity: the sanitized lists and the default list id, valid for the server', () => {
-        const items = SYNC_ITEM_READERS.connectivity(prefs({ connectivityLists: null, connectivityDefaultListId: 'mine' }));
-        assert.deepEqual(Object.keys(items), ['lists', 'defaultListId']);
+    it('connectivity: the order, the default list id and one item per list without its id, valid for the server', () => {
+        const items = SYNC_ITEM_READERS.connectivity(prefs({ connectivityLists: withWork(), connectivityDefaultListId: 'mine' }));
+        assert.deepEqual(Object.keys(items), ['order', 'defaultListId', 'list:mine', 'list:work']);
+        assert.deepEqual(items.order, ['mine', 'work']);
+        assert.deepEqual(items['list:work'], { name: 'Work', members: [] });
+        assert.equal(items['list:mine'].name, null);
         for (const [id, value] of Object.entries(items)) assert.ok(SYNC_COLLECTIONS.connectivity.isValidValue(id, value), id);
+        assert.deepEqual(Object.keys(SYNC_ITEM_READERS.connectivity(prefs({ connectivityLists: null }))), ['order', 'defaultListId', 'list:mine']);
     });
 
-    it('item ids map to userPreferences keys', () => {
-        assert.equal(syncItemKey('connectivity', 'lists'), CONNECTIVITY_ITEM_KEYS.lists);
-        assert.equal(syncItemKey('preferences', 'theme'), 'theme');
-        assert.deepEqual(toPreferenceValues('connectivity', { lists: 1, defaultListId: 'x', junk: 2 }),
-            { connectivityLists: 1, connectivityDefaultListId: 'x' });
+    it('writers: the collection\'s own items give back the very same preferences', () => {
+        for (const id of SYNC_COLLECTION_IDS) {
+            const current = prefs({ theme: 'dark', connectivityLists: withWork(), connectivityDefaultListId: 'work' });
+            const values = applySyncItems(id, prefs(), { upserts: SYNC_ITEM_READERS[id](current), deletes: [] });
+            assert.deepEqual(SYNC_ITEM_READERS[id]({ ...prefs(), ...values }), SYNC_ITEM_READERS[id](current), id);
+        }
+        assert.equal(SYNC_ITEM_WRITERS.preferences(prefs(), { upserts: {}, deletes: ['theme'] }).theme, DEFAULT_PREFERENCES.theme);
     });
 
-    it('defaults are a fresh visitor\'s values', () => {
-        assert.equal(syncItemDefaults('preferences').theme, DEFAULT_PREFERENCES.theme);
-        assert.equal(syncItemDefaults('connectivity').defaultListId, DEFAULT_PREFERENCES.connectivityDefaultListId);
-        assert.deepEqual(syncItemDefaults('connectivity').lists, sanitizeLists(null, null, []));
+    it('connectivity writer: lists added, replaced and deleted on top of the current model', () => {
+        const current = prefs({ connectivityLists: withWork() });
+        const { connectivityLists, ...rest } = applySyncItems('connectivity', current, {
+            upserts: { 'list:home': { name: 'Home', members: [site('h')] }, 'list:work': { name: 'Office', members: [] } },
+            deletes: [],
+        });
+        assert.deepEqual(rest, {}, 'the default list id is left alone');
+        assert.deepEqual(connectivityLists.lists.map((list) => [list.id, list.name]), [['mine', null], ['work', 'Office'], ['home', 'Home']]);
+        const deleted = applySyncItems('connectivity', current, { upserts: {}, deletes: ['list:work', 'defaultListId'] });
+        assert.deepEqual(deleted.connectivityLists.lists.map((list) => list.id), ['mine']);
+        assert.equal(deleted.connectivityDefaultListId, DEFAULT_PREFERENCES.connectivityDefaultListId);
+    });
+
+    it('connectivity writer: a tombstone never removes Mine, and Mine keeps a null name', () => {
+        const current = prefs({ connectivityLists: withWork() });
+        const mine = current.connectivityLists.lists[0];
+        const kept = applySyncItems('connectivity', current, { upserts: {}, deletes: ['list:mine'] });
+        assert.deepEqual(kept.connectivityLists.lists[0], mine);
+        const renamed = applySyncItems('connectivity', current, { upserts: { 'list:mine': { name: 'Mine', members: [site('m')] } }, deletes: [] });
+        assert.deepEqual(renamed.connectivityLists.lists[0], { id: 'mine', name: null, members: [site('m')] });
+    });
+
+    it('order: the order item\'s ids first, ids without a list skipped, the lists it lacks after it by id', () => {
+        const byId = new Map(['mine', 'list-3', 'list-1', 'list-2'].map((id) => [id, { id }]));
+        assert.deepEqual(orderConnectivityLists(['list-2', 'gone', 'mine', 'list-2'], byId).map((list) => list.id), ['list-2', 'mine', 'list-1', 'list-3']);
+        const current = prefs({ connectivityLists: withWork() });
+        const reordered = applySyncItems('connectivity', current, { upserts: { order: ['work', 'mine'] }, deletes: [] });
+        assert.deepEqual(reordered.connectivityLists.lists.map((list) => list.id), ['work', 'mine']);
+    });
+
+    it('a fresh visitor\'s values per collection', () => {
+        assert.equal(syncDefaultPreferences('preferences').theme, DEFAULT_PREFERENCES.theme);
+        assert.equal('connectivityLists' in syncDefaultPreferences('preferences'), false);
+        assert.deepEqual(syncDefaultPreferences('connectivity'), {
+            connectivityLists: sanitizeLists(null, null, []),
+            connectivityDefaultListId: DEFAULT_PREFERENCES.connectivityDefaultListId,
+        });
     });
 
     it('changedSyncItems compares normalised values: a legacy form is no change, a missing key is', () => {

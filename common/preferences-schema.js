@@ -1,4 +1,4 @@
-// The synced preferences contract both halves read: the schema version, the synced keys and each key's value check, plus the Connectivity lists model's checks.
+// The synced preferences contract both halves read: the schema version, the synced keys and each key's value check, plus the checks of one Connectivity list, the lists' order and the default list id.
 
 // The preferences schema version; the front end's storage key carries it as its suffix.
 export const PREFERENCES_VERSION = 7;
@@ -52,30 +52,29 @@ const isValidMember = (member) => isPlainObject(member)
     && (!('siteUrl' in member) || isHttpUrl(member.siteUrl))
     && (!('favicon' in member) || (typeof member.favicon === 'string' && FAVICON_PATTERN.test(member.favicon)));
 
-const LIST_KEYS = Object.freeze(['id', 'name', 'members']);
-
-// A list: { id, name, members }; Mine's name is null, any other's a bounded non-empty string.
-const isValidList = (list) => isPlainObject(list)
-    && hasOnlyKeys(list, LIST_KEYS)
-    && isBoundedString(list.id, ID_MAX)
-    && (list.id === MINE_LIST_ID
-        ? list.name === null
-        : isBoundedString(list.name, CONNECTIVITY_LIST_NAME_LIMIT) && list.name.trim().length > 0)
-    && Array.isArray(list.members)
-    && list.members.length <= CONNECTIVITY_TARGET_LIMIT
-    && list.members.every(isValidMember);
-
-// The whole `connectivityLists` model: versioned, at most CONNECTIVITY_LIST_LIMIT lists with distinct ids.
-export const isValidConnectivityLists = (value) => isPlainObject(value)
-    && hasOnlyKeys(value, ['schemaVersion', 'lists'])
-    && value.schemaVersion === CONNECTIVITY_LISTS_SCHEMA_VERSION
-    && Array.isArray(value.lists)
-    && value.lists.length <= CONNECTIVITY_LIST_LIMIT
-    && value.lists.every(isValidList)
-    && new Set(value.lists.map((list) => list.id)).size === value.lists.length;
-
-// A `connectivityDefaultListId`: any bounded non-empty id.
+// A list id, as the `connectivityDefaultListId` holds it: any bounded non-empty string.
 export const isValidConnectivityListId = (value) => isBoundedString(value, ID_MAX);
+
+const LIST_VALUE_KEYS = Object.freeze(['name', 'members']);
+
+// One list without its id, `{ name, members }`, as list `listId`: Mine's name is null, any other's a bounded
+// non-empty string; at most CONNECTIVITY_TARGET_LIMIT members.
+export const isValidConnectivityList = (listId, value) => isValidConnectivityListId(listId)
+    && isPlainObject(value)
+    && hasOnlyKeys(value, LIST_VALUE_KEYS)
+    && (listId === MINE_LIST_ID
+        ? value.name === null
+        : isBoundedString(value.name, CONNECTIVITY_LIST_NAME_LIMIT) && value.name.trim().length > 0)
+    && Array.isArray(value.members)
+    && value.members.length <= CONNECTIVITY_TARGET_LIMIT
+    && value.members.every(isValidMember);
+
+// The lists' order: distinct list ids. Its bound leaves room for two devices' lists meeting past the list cap.
+export const CONNECTIVITY_ORDER_LIMIT = 2 * CONNECTIVITY_LIST_LIMIT;
+export const isValidConnectivityListOrder = (value) => Array.isArray(value)
+    && value.length <= CONNECTIVITY_ORDER_LIMIT
+    && value.every(isValidConnectivityListId)
+    && new Set(value).size === value.length;
 
 const isBoolean = (value) => typeof value === 'boolean';
 const oneOf = (options) => (value) => options.includes(value);

@@ -19,7 +19,7 @@ import {
     mergePull, settleApplied, buildUploadBatches, markRefused, readSyncSave, mergeSave, hashItems, changedSince,
     hasHeldBack,
 } from '../utils/features/account-sync.js';
-import { SYNC_ITEM_READERS, syncItemDefaults, toPreferenceValues } from '../utils/features/preferences-sync.js';
+import { SYNC_ITEM_READERS, applySyncItems } from '../utils/features/preferences-sync.js';
 import {
     createSyncSettings, readSyncSettingsAnswer, readCachedSyncSettings, writeCachedSyncSettings,
     clearCachedSyncSettings, collectionSyncState,
@@ -51,18 +51,19 @@ const defaultStorage = () => {
 };
 
 /**
- * The two adapters, both over the store (the only writer of userPreferences). `readLocal()` → `{ <id>: value }`;
- * `applyRemote({ upserts, deletes })` writes unstamped (a deleted item goes back to its default); `clearLocal()`
- * resets the collection to a fresh visitor's; `signal()` changes on a local edit.
+ * The two adapters, both over the store (the only writer of userPreferences). `readLocal()` → `{ <id>: value }`, of
+ * what localStorage holds now (another tab's save is not taken for this tab's delete);
+ * `applyRemote({ upserts, deletes })` writes unstamped what those changes make of the current preferences (a deleted
+ * preference goes back to its default, a deleted list leaves the lists); `clearLocal()` resets the collection to a
+ * fresh visitor's; `signal()` changes on a local edit.
  */
 export const createSyncAdapters = (store) => Object.keys(SYNC_ITEM_READERS).map((id) => ({
     id,
-    readLocal: () => SYNC_ITEM_READERS[id](store.userPreferences),
-    applyRemote: ({ upserts, deletes }) => {
-        const defaults = syncItemDefaults(id);
-        const reset = Object.fromEntries(deletes.filter((item) => Object.hasOwn(defaults, item)).map((item) => [item, defaults[item]]));
-        store.applySyncedPreferences(toPreferenceValues(id, { ...reset, ...upserts }));
+    readLocal: () => {
+        store.adoptStoredPreferences();
+        return SYNC_ITEM_READERS[id](store.userPreferences);
     },
+    applyRemote: (changes) => store.applySyncedPreferences(applySyncItems(id, store.userPreferences, changes)),
     clearLocal: () => store.resetSyncedPreferences(id),
     signal: () => store.preferenceEdits,
 }));

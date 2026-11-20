@@ -322,9 +322,11 @@ user decided, an empty list = sync nothing). `seq` comes from
   1 KB one). Collections: `common/sync-collections.js`, one frozen registry
   (`preferences` · `connectivity`), each with its schema `version`, item id
   and value checks, `maxItems` (live rows per user and version),
-  `maxItemBytes`, `allowDelete` and `pageSize`; `connectivity` holds `lists`
-  (the lists model, `isValidConnectivityLists`) and `defaultListId`, checked
-  in `common/preferences-schema.js`. A collection the user has not enabled
+  `maxItemBytes`, `allowDelete` and `pageSize`; `connectivity` (v2, deletes
+  on) holds one `list:<list id>` item per list (`{ name, members }`,
+  `isValidConnectivityList`), the lists' `order` and `defaultListId`, checked
+  in `common/preferences-schema.js`; its `maxItems` is the list cap plus those
+  two. A collection the user has not enabled
   in `sync_settings` → 409 `{ error, code: 'sync_off' }` (`SYNC_OFF_CODE`),
   nothing read or written; for a PUT the check runs inside the write
   transaction, after the lock, so a write racing a disable leaves nothing.

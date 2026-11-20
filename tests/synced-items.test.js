@@ -10,7 +10,7 @@ import { ensureUser } from '../server/db/users.js';
 import { fakeUserDb } from './fake-user-db.js';
 
 const NOW = 1_000_000_000_000;
-const { preferences } = SYNC_COLLECTIONS;
+const { preferences, connectivity } = SYNC_COLLECTIONS;
 // A stand-in collection with deletes, exercising the generic engine (tombstones, caps) no registry row uses.
 const checklist = Object.freeze({
     id: 'ticks', version: 1,
@@ -89,6 +89,21 @@ describe('planSyncWrite', () => {
         // Reviving a tombstone counts as a new live item.
         assert.deepEqual(plan([tick('z', 5)], { collection: small, stored: [tick('a', 1), tick('b', 1), drop('z', 1)] }).refused,
             [{ id: 'z', reason: SYNC_REFUSAL.FULL }]);
+    });
+});
+
+describe('planSyncWrite over the Connectivity collection', () => {
+    const list = (id, updatedAt) => ({ id: `list:${id}`, updatedAt, deleted: false, value: { name: id, members: [] } });
+
+    it('takes list tombstones; past the order, the default list id and CONNECTIVITY_LIST_LIMIT lists a new list is full', () => {
+        const stored = [
+            { id: 'order', updatedAt: 1, deleted: false, value: [] },
+            { id: 'defaultListId', updatedAt: 1, deleted: false, value: 'mine' },
+            ...Array.from({ length: connectivity.maxItems - 2 }, (_, i) => list(`l${i}`, 1)),
+        ];
+        const result = plan([list('extra', 5), drop('list:l0', 5), list('again', 5)], { collection: connectivity, stored });
+        assert.deepEqual(result.refused, [{ id: 'list:extra', reason: SYNC_REFUSAL.FULL }]);
+        assert.deepEqual(result.writes, [drop('list:l0', 5), list('again', 5)]);
     });
 });
 

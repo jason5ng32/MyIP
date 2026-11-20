@@ -33,10 +33,15 @@ globalThis.document = {
 };
 
 import assert from 'node:assert/strict';
-import { describe, it, beforeEach } from 'node:test';
+import { describe, it, beforeEach, afterEach } from 'node:test';
 import { createPinia, setActivePinia } from 'pinia';
+import { effectScope, nextTick } from 'vue';
 
 const { useMainStore } = await import('../frontend/store.js');
+const { useAccountSync, createSyncAdapters } = await import('../frontend/composables/use-account-sync.js');
+const { fakeServer } = await import('./fake-sync-server.js');
+const { readSyncRecord } = await import('../frontend/utils/features/account-sync.js');
+const { SYNC_COLLECTIONS } = await import('../frontend/utils/sync-collections.js');
 
 beforeEach(() => {
   setActivePinia(createPinia());
@@ -310,6 +315,136 @@ describe('store — preference edits and account sync', () => {
       s.configs = configs;
       assert.equal(s.accountSyncAvailable, available, JSON.stringify({ accounts, configs }));
     }
+  });
+});
+
+describe('store — an edit lands on the freshest stored preferences', () => {
+  const PREFS_KEY = 'userPreferences_v7';
+  const stored = () => JSON.parse(globalThis.localStorage.getItem(PREFS_KEY));
+  // A tab: its own store over the shared localStorage, booted like the page.
+  const tab = () => {
+    setActivePinia(createPinia());
+    const s = useMainStore();
+    s.loadPreferences();
+    return s;
+  };
+  const listIds = (s) => s.userPreferences.connectivityLists.lists.map((list) => list.id);
+  const addList = (id) => (lists) => ({ lists: [...lists, { id, name: id, members: [] }] });
+
+  it('a key edit keeps the keys another tab saved since', () => {
+    const one = tab();
+    const two = tab();
+    one.updatePreference('theme', 'dark');
+    two.updatePreference('simpleMode', true);
+    assert.equal(stored().theme, 'dark');
+    assert.equal(stored().simpleMode, true);
+    assert.equal(two.userPreferences.theme, 'dark', 'the editing tab shows it too');
+    assert.equal(one.userPreferences.simpleMode, false, 'an idle tab is never rewritten');
+  });
+
+  it('a list edit runs on the freshest lists: two tabs each adding a list keep both', () => {
+    const one = tab();
+    const two = tab();
+    one.editConnectivityLists(addList('list-a'));
+    two.editConnectivityLists(addList('list-b'));
+    assert.deepEqual(listIds(two), ['mine', 'list-a', 'list-b']);
+    assert.deepEqual(stored().connectivityLists.lists.map((list) => list.id), ['mine', 'list-a', 'list-b']);
+    assert.deepEqual(listIds(one), ['mine', 'list-a'], 'the idle tab keeps what it showed');
+  });
+
+  it('account sync reads what storage holds now, so another tab\'s new list is not taken for a delete here', () => {
+    const one = tab();
+    const two = tab();
+    one.editConnectivityLists(addList('list-a'));
+    const items = createSyncAdapters(two).find((adapter) => adapter.id === 'connectivity').readLocal();
+    assert.ok(Object.hasOwn(items, 'list:list-a'));
+    assert.deepEqual(items.order, ['mine', 'list-a']);
+  });
+
+  it('editConnectivityLists returns the op\'s result; an error saves nothing and counts no edit', () => {
+    const s = tab();
+    const edits = s.preferenceEdits;
+    assert.deepEqual(s.editConnectivityLists(() => ({ error: 'list-limit' })), { error: 'list-limit' });
+    assert.equal(s.preferenceEdits, edits);
+    const result = s.editConnectivityLists(addList('list-a'));
+    assert.deepEqual(result.lists.map((list) => list.id), ['mine', 'list-a']);
+    assert.equal(s.preferenceEdits, edits + 1);
+  });
+
+  it('values read back are checked as at boot: invalid ones ignored, lists sanitized', () => {
+    const s = tab();
+    globalThis.localStorage.setItem(PREFS_KEY, JSON.stringify({
+      ...stored(), theme: 'purple', ipCardsToShow: 4, junk: 1,
+      connectivityLists: { schemaVersion: 1, lists: [{ id: 'mine', name: null, members: [] }, { id: 'x', name: '', members: [] }] },
+    }));
+    s.updatePreference('simpleMode', true);
+    assert.equal(s.userPreferences.theme, 'auto');
+    assert.equal(s.userPreferences.ipCardsToShow, 4);
+    assert.equal('junk' in s.userPreferences, false);
+    assert.deepEqual(listIds(s), ['mine']);
+    assert.ok(s.userPreferences.connectivityLists.lists[0].members.length > 0, 'an emptied Mine is re-seeded');
+    assert.equal(stored().theme, 'auto');
+  });
+
+  it('a missing or unreadable blob changes nothing but the edit', () => {
+    const s = tab();
+    s.updatePreference('theme', 'dark');
+    for (const blob of [null, '{x', '[1]', '"text"']) {
+      if (blob === null) globalThis.localStorage.removeItem(PREFS_KEY);
+      else globalThis.localStorage.setItem(PREFS_KEY, blob);
+      s.updatePreference('simpleMode', !s.userPreferences.simpleMode);
+      assert.equal(s.userPreferences.theme, 'dark', String(blob));
+      assert.equal(stored().theme, 'dark', String(blob));
+    }
+  });
+
+  describe('with account sync in both tabs', () => {
+    const scopes = [];
+    afterEach(() => scopes.splice(0).forEach((scope) => scope.stop()));
+    const settle = async () => {
+      for (let i = 0; i < 8; i += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 2));
+        await nextTick();
+      }
+    };
+    let clock = 1_000_000;
+    const syncedTab = (server) => {
+      const s = tab();
+      Object.assign(s, { isFireBaseSet: true, configs: { userStorage: true }, user: { uid: 'u1' }, isSignedIn: true, authResolved: true });
+      const scope = effectScope();
+      scopes.push(scope);
+      // The second tab registers the commands again: that warning is expected here.
+      const realWarn = console.warn;
+      console.warn = () => {};
+      try {
+        scope.run(() => useAccountSync({ store: s, request: server.request, storage: globalThis.localStorage, now: () => (clock += 1000), delayMs: 0 }));
+      } finally {
+        console.warn = realWarn;
+      }
+      return s;
+    };
+
+    it('two tabs each adding a list: both lists locally and in the account; the re-read stamps nothing', async () => {
+      const server = fakeServer();
+      const one = syncedTab(server);
+      await settle();
+      const two = syncedTab(server);
+      await settle();
+      one.editConnectivityLists(addList('list-a'));
+      await settle();
+      const mark = server.calls.length;
+      two.editConnectivityLists(addList('list-b'));
+      await settle();
+      assert.deepEqual(listIds(two), ['mine', 'list-a', 'list-b']);
+      assert.deepEqual(stored().connectivityLists.lists.map((list) => list.id), ['mine', 'list-a', 'list-b']);
+      assert.deepEqual(Object.keys(server.live('connectivity')).filter((id) => id.startsWith('list:')).sort(), ['list:list-a', 'list:list-b', 'list:mine']);
+      assert.deepEqual(server.live('connectivity').order, ['mine', 'list-a', 'list-b']);
+      const later = server.calls.slice(mark).filter((call) => call.method === 'PUT');
+      assert.deepEqual(later.map((call) => call.collection), ['connectivity'], 'no preference was stamped by the re-read');
+      assert.deepEqual(later[0].body.items.map((item) => item.id), ['order', 'list:list-b'], 'tab one\'s list is not sent again');
+      const record = readSyncRecord(globalThis.localStorage, SYNC_COLLECTIONS.connectivity);
+      assert.equal(Object.values(record.items).some((entry) => entry.at > (entry.ack ?? 0)), false, 'nothing left pending');
+    });
   });
 });
 

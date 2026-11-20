@@ -5,7 +5,7 @@ import { describe, it } from 'node:test';
 
 import {
     PREFERENCES_VERSION, SYNCED_PREFERENCE_KEYS, isSyncedPreferenceKey, isValidPreferenceValue,
-    isValidConnectivityLists, isValidConnectivityListId,
+    isValidConnectivityList, isValidConnectivityListOrder, isValidConnectivityListId, CONNECTIVITY_ORDER_LIMIT,
     IP_CARDS_OPTIONS, SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_AUTO_MODES,
     CONNECTIVITY_LISTS_SCHEMA_VERSION, CONNECTIVITY_TARGET_LIMIT, CONNECTIVITY_LIST_LIMIT, CONNECTIVITY_LIST_NAME_LIMIT,
 } from '../common/preferences-schema.js';
@@ -20,11 +20,6 @@ const LEGACY_KEYS = ['connectivityTargets', 'customConnectivityTargets'];
 const CONNECTIVITY_KEYS = ['connectivityLists', 'connectivityDefaultListId'];
 
 const member = (over = {}) => ({ id: 'custom-1', name: 'Example', url: 'https://example.com/favicon.ico', ...over });
-const lists = (over = {}) => ({
-    schemaVersion: CONNECTIVITY_LISTS_SCHEMA_VERSION,
-    lists: [{ id: 'mine', name: null, members: [member()] }],
-    ...over,
-});
 
 describe('synced preference keys', () => {
     it('are every default preference but the legacy and Connectivity list ones, frozen', () => {
@@ -40,7 +35,7 @@ describe('synced preference keys', () => {
 
     it('every default value passes its own check; so do the sanitized lists and the default list id', () => {
         for (const key of SYNCED_PREFERENCE_KEYS) assert.ok(isValidPreferenceValue(key, DEFAULT_PREFERENCES[key]), key);
-        assert.ok(isValidConnectivityLists(sanitizeLists(null, null, [])));
+        for (const { id, name, members } of sanitizeLists(null, null, []).lists) assert.ok(isValidConnectivityList(id, { name, members }), id);
         assert.ok(isValidConnectivityListId(DEFAULT_PREFERENCES.connectivityDefaultListId));
     });
 });
@@ -53,7 +48,9 @@ describe('the front end agrees with the shared schema', () => {
     it('the bridge, snapshots and Connectivity lists read the very same values', () => {
         assert.equal(bridge.SYNCED_PREFERENCE_KEYS, SYNCED_PREFERENCE_KEYS);
         assert.equal(bridge.isValidPreferenceValue, isValidPreferenceValue);
-        assert.equal(bridge.isValidConnectivityLists, isValidConnectivityLists);
+        assert.equal(bridge.isValidConnectivityList, isValidConnectivityList);
+        assert.equal(bridge.isValidConnectivityListOrder, isValidConnectivityListOrder);
+        assert.equal(bridge.CONNECTIVITY_ORDER_LIMIT, CONNECTIVITY_ORDER_LIMIT);
         assert.equal(bridge.isValidConnectivityListId, isValidConnectivityListId);
         assert.equal(snapshots.SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_KEEP_LAST_OPTIONS);
         assert.equal(snapshots.SNAPSHOTS_AUTO_MODES, SNAPSHOTS_AUTO_MODES);
@@ -105,48 +102,49 @@ describe('isValidPreferenceValue', () => {
         for (const value of ['', 'x'.repeat(65), 3, null]) assert.equal(isValidConnectivityListId(value), false, JSON.stringify(value));
     });
 
-    it('connectivityLists: accepts the stored shape', () => {
-        assert.ok(isValidConnectivityLists(lists()));
-        assert.ok(isValidConnectivityLists(lists({
-            lists: [
-                { id: 'mine', name: null, members: [member({ siteUrl: 'https://example.com', favicon: '/favicons/example.png' })] },
-                { id: 'list-1', name: 'Work', members: [] },
-            ],
-        })));
+    it('a Connectivity list: accepts the stored shape, its id riding apart', () => {
+        assert.ok(isValidConnectivityList('mine', { name: null, members: [member()] }));
+        assert.ok(isValidConnectivityList('mine', { name: null, members: [member({ siteUrl: 'https://example.com', favicon: '/favicons/example.png' })] }));
+        assert.ok(isValidConnectivityList('list-1', { name: 'Work', members: [] }));
         const full = Array.from({ length: CONNECTIVITY_TARGET_LIMIT }, (_, i) => member({ id: `m${i}` }));
-        assert.ok(isValidConnectivityLists(lists({ lists: [{ id: 'mine', name: null, members: full }] })));
+        assert.ok(isValidConnectivityList('mine', { name: null, members: full }));
     });
 
-    it('connectivityLists: rejects anything else', () => {
-        const mine = (members) => ({ id: 'mine', name: null, members });
+    it('a Connectivity list: rejects anything else', () => {
+        const mine = (members) => ['mine', { name: null, members }];
         const bad = [
-            null, [], 'x',
-            lists({ schemaVersion: 2 }),
-            { lists: lists().lists },
-            { ...lists(), extra: 1 },
-            lists({ lists: 'x' }),
-            lists({ lists: Array.from({ length: CONNECTIVITY_LIST_LIMIT + 1 }, (_, i) => ({ id: `l${i}`, name: 'L', members: [] })) }),
-            lists({ lists: [mine([]), mine([])] }),
-            lists({ lists: [{ id: 'mine', name: 'Mine', members: [] }] }),
-            lists({ lists: [{ id: 'l1', name: null, members: [] }] }),
-            lists({ lists: [{ id: 'l1', name: '   ', members: [] }] }),
-            lists({ lists: [{ id: 'l1', name: 'x'.repeat(CONNECTIVITY_LIST_NAME_LIMIT + 1), members: [] }] }),
-            lists({ lists: [{ id: '', name: 'L', members: [] }] }),
-            lists({ lists: [{ id: 'l1', name: 'L', members: [], color: 'red' }] }),
-            lists({ lists: [{ id: 'l1', name: 'L' }] }),
-            lists({ lists: [mine(Array.from({ length: CONNECTIVITY_TARGET_LIMIT + 1 }, (_, i) => member({ id: `m${i}` })))] }),
-            lists({ lists: [mine([member({ url: 'javascript:alert(1)' })])] }),
-            lists({ lists: [mine([member({ url: 'ftp://example.com/' })])] }),
-            lists({ lists: [mine([member({ url: 'not a url' })])] }),
-            lists({ lists: [mine([member({ url: `https://example.com/${'a'.repeat(2048)}` })])] }),
-            lists({ lists: [mine([member({ siteUrl: 'data:text/html,x' })])] }),
-            lists({ lists: [mine([member({ favicon: 'https://evil.example/x.png' })])] }),
-            lists({ lists: [mine([member({ name: '' })])] }),
-            lists({ lists: [mine([member({ name: 'x'.repeat(101) })])] }),
-            lists({ lists: [mine([member({ id: 7 })])] }),
-            lists({ lists: [mine([member({ source: 'import' })])] }),
-            lists({ lists: [mine([null])] }),
+            ['mine', null], ['mine', []], ['mine', 'x'],
+            ['', { name: 'L', members: [] }],
+            ['x'.repeat(65), { name: 'L', members: [] }],
+            ['mine', { id: 'mine', name: null, members: [] }],
+            ['mine', { name: 'Mine', members: [] }],
+            ['l1', { name: null, members: [] }],
+            ['l1', { name: '   ', members: [] }],
+            ['l1', { name: 'x'.repeat(CONNECTIVITY_LIST_NAME_LIMIT + 1), members: [] }],
+            ['l1', { name: 'L', members: [], color: 'red' }],
+            ['l1', { name: 'L' }],
+            mine(Array.from({ length: CONNECTIVITY_TARGET_LIMIT + 1 }, (_, i) => member({ id: `m${i}` }))),
+            mine([member({ url: 'javascript:alert(1)' })]),
+            mine([member({ url: 'ftp://example.com/' })]),
+            mine([member({ url: 'not a url' })]),
+            mine([member({ url: `https://example.com/${'a'.repeat(2048)}` })]),
+            mine([member({ siteUrl: 'data:text/html,x' })]),
+            mine([member({ favicon: 'https://evil.example/x.png' })]),
+            mine([member({ name: '' })]),
+            mine([member({ name: 'x'.repeat(101) })]),
+            mine([member({ id: 7 })]),
+            mine([member({ source: 'import' })]),
+            mine([null]),
         ];
-        for (const value of bad) assert.equal(isValidConnectivityLists(value), false, JSON.stringify(value)?.slice(0, 120));
+        for (const [id, value] of bad) assert.equal(isValidConnectivityList(id, value), false, JSON.stringify([id, value])?.slice(0, 120));
+    });
+
+    it('the lists\' order: distinct list ids, bounded', () => {
+        assert.ok(isValidConnectivityListOrder([]));
+        assert.ok(isValidConnectivityListOrder(['mine', 'list-1']));
+        assert.ok(CONNECTIVITY_ORDER_LIMIT > CONNECTIVITY_LIST_LIMIT, 'room for lists meeting past the cap');
+        for (const bad of [null, 'mine', ['mine', 'mine'], [''], [3], Array.from({ length: CONNECTIVITY_ORDER_LIMIT + 1 }, (_, i) => `l${i}`)]) {
+            assert.equal(isValidConnectivityListOrder(bad), false, JSON.stringify(bad));
+        }
     });
 });

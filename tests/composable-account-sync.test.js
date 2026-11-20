@@ -1,9 +1,10 @@
-// Tests for frontend/composables/use-account-sync.js over a fake sync server and storage: the account's settings
-// (fetched once signed in, cached per user, the cache starting pulls early and the answer correcting it), gating on
-// them, enabling (an empty account takes the device's data, a non-empty one replaces it), disabling (record dropped,
-// data kept), a 409 `sync_off`, no stamps while signed out, the debounced push, paging, another user's record, the
-// 400 / 403 / 5xx handling, the sign-out flush-then-clear of enabled collections only, the boot-time clearing, and
-// the popup sign-in's step before its reload.
+// Tests for frontend/composables/use-account-sync.js over a fake sync server (tests/fake-sync-server.js) and storage:
+// the account's settings (fetched once signed in, cached per user, the cache starting pulls early and the answer
+// correcting it), gating on them, enabling (an empty account takes the device's data, a non-empty one replaces it),
+// disabling (record dropped, data kept), a 409 `sync_off`, no stamps while signed out, the debounced push, paging,
+// another user's record, the 400 / 403 / 5xx handling, one item per Connectivity list (two devices' lists, deletes,
+// order, Mine kept, an oversized list held back), the sign-out flush-then-clear of enabled collections only, the
+// boot-time clearing, and the popup sign-in's step before its reload.
 
 // The composable's default request imports the store, which needs these globals at import time.
 globalThis.localStorage ??= { getItem: () => null, setItem() {}, removeItem() {} };
@@ -20,12 +21,12 @@ import { effectScope, reactive, nextTick } from 'vue';
 const { useAccountSync, useAccountSyncState, SYNC_ENDPOINT } = await import('../frontend/composables/use-account-sync.js');
 const { readSyncRecord, writeSyncRecord, syncRecordKey } = await import('../frontend/utils/features/account-sync.js');
 const {
-    syncItemDefaults, toPreferenceValues,
+    syncDefaultPreferences, applySyncItems, SYNC_ITEM_READERS,
 } = await import('../frontend/utils/features/preferences-sync.js');
 const {
     createSyncSettings, writeCachedSyncSettings, readCachedSyncSettings, SYNC_SETTINGS_CACHE_KEY,
 } = await import('../frontend/utils/features/sync-settings.js');
-const { SYNC_COLLECTIONS, SYNC_OFF_CODE } = await import('../frontend/utils/sync-collections.js');
+const { SYNC_COLLECTIONS } = await import('../frontend/utils/sync-collections.js');
 const { SYNCED_PREFERENCE_KEYS } = await import('../frontend/utils/preferences-schema.js');
 const { sanitizeLists } = await import('../frontend/utils/features/connectivity-lists.js');
 const { DEFAULT_PREFERENCES } = await import('../frontend/data/default-preferences.js');
@@ -49,82 +50,10 @@ const settle = async () => {
     }
 };
 
-const httpError = (status, code) => Object.assign(new Error(`HTTP ${status}`), { status, ...(code ? { code } : {}) });
-
-const BOTH = ['preferences', 'connectivity'];
-
-// The settings and item endpoints over memory: per collection a seq-ordered item map, the newer `updatedAt` winning;
-// an item route of a collection that is off answers 409 sync_off; turning one off deletes its rows.
-const fakeServer = ({ settings = { decided: true, collections: BOTH }, pageSize } = {}) => {
-    const rows = { preferences: new Map(), connectivity: new Map() };
-    let seq = 0;
-    const server = {
-        calls: [],
-        rows,
-        settings: { ...settings },
-        fail: null, // (collection, method) → an error to throw, or null
-        hold: null, // a promise every item request waits on
-        holdSettings: null, // a promise the settings GET waits on
-        seed(collection, item) {
-            seq += 1;
-            rows[collection].set(item.id, { ...item, deleted: Boolean(item.deleted), seq });
-        },
-        live(collection) {
-            return Object.fromEntries([...rows[collection].values()].filter((row) => !row.deleted).map((row) => [row.id, row.value]));
-        },
-        async request(url, method = 'GET', body = null) {
-            const { pathname, searchParams } = new URL(url, 'http://test');
-            const collection = pathname === SYNC_ENDPOINT ? 'settings' : pathname.slice(SYNC_ENDPOINT.length + 1);
-            server.calls.push({ collection, method, body, since: searchParams.get('since') });
-            if (collection === 'settings') {
-                if (method === 'GET' && server.holdSettings) await server.holdSettings;
-                const error = server.fail?.('settings', method);
-                if (error) throw error;
-                if (method === 'PUT') {
-                    server.settings = { decided: true, collections: body.collections };
-                    for (const id of Object.keys(rows)) if (!body.collections.includes(id)) rows[id].clear();
-                }
-                return { ...server.settings, collections: [...server.settings.collections] };
-            }
-            if (server.hold) await server.hold;
-            const error = server.fail?.(collection, method);
-            if (error) throw error;
-            if (!server.settings.collections.includes(collection)) throw httpError(409, SYNC_OFF_CODE);
-            const registry = SYNC_COLLECTIONS[collection];
-            if (method === 'GET') {
-                const since = Number(searchParams.get('since'));
-                const size = pageSize ?? registry.pageSize;
-                const all = [...rows[collection].values()].filter((row) => row.seq > since).sort((a, b) => a.seq - b.seq);
-                const page = all.slice(0, size);
-                return {
-                    cursor: page.length ? page.at(-1).seq : since,
-                    more: all.length > size,
-                    items: page.map(({ id, updatedAt, deleted, value }) => (deleted ? { id, updatedAt, deleted } : { id, updatedAt, deleted, value })),
-                };
-            }
-            const base = seq;
-            const conflicts = [];
-            const refused = [];
-            for (const item of body.items) {
-                if (!item.deleted && !registry.isValidValue(item.id, item.value)) {
-                    refused.push({ id: item.id, reason: 'invalid' });
-                    continue;
-                }
-                const stored = rows[collection].get(item.id);
-                if (stored && stored.updatedAt >= item.updatedAt) {
-                    const { seq: _, ...rest } = stored;
-                    conflicts.push(rest);
-                    continue;
-                }
-                server.seed(collection, item);
-            }
-            return { base, cursor: seq, conflicts, refused };
-        },
-    };
-    return server;
-};
+const { fakeServer, httpError, BOTH } = await import('./fake-sync-server.js');
 
 let scope = null;
+let scopes = [];
 let clock = 1_000_000;
 
 const freshPrefs = (over = {}) => ({ ...DEFAULT_PREFERENCES, connectivityLists: sanitizeLists(null, null, []), ...over });
@@ -142,11 +71,12 @@ const startSync = ({
         syncSettings: createSyncSettings(),
         userPreferences: freshPrefs(prefs),
         preferenceEdits: 0,
+        adoptStoredPreferences() {},
         applySyncedPreferences(values) {
             Object.assign(this.userPreferences, values);
         },
         resetSyncedPreferences(id) {
-            this.applySyncedPreferences(toPreferenceValues(id, syncItemDefaults(id)));
+            this.applySyncedPreferences(syncDefaultPreferences(id));
         },
         setSyncSettings(settings) {
             this.syncSettings = settings;
@@ -157,7 +87,15 @@ const startSync = ({
         store.preferenceEdits += 1;
     };
     scope = effectScope();
-    scope.run(() => useAccountSync({ store, request, storage, now: () => (clock += 1000), delayMs: 0, flushMs }));
+    scopes.push(scope);
+    // A second device in one spec registers the commands again: that warning is expected here.
+    const realWarn = console.warn;
+    console.warn = (...args) => (String(args[0]).startsWith('[app-commands]') ? undefined : realWarn(...args));
+    try {
+        scope.run(() => useAccountSync({ store, request, storage, now: () => (clock += 1000), delayMs: 0, flushMs }));
+    } finally {
+        console.warn = realWarn;
+    }
     return { store, server, storage, edit };
 };
 
@@ -179,9 +117,20 @@ const otherLists = () => ({
     ...sanitizeLists(null, null, []),
     lists: [...sanitizeLists(null, null, []).lists, { id: 'work', name: 'Work', members: [] }],
 });
+// The Connectivity items of a lists model (and a default list id), as another device would have stored them.
+const seedLists = (server, model, updatedAt = 5, defaultListId = null) => {
+    const items = SYNC_ITEM_READERS.connectivity({ connectivityLists: model, ...(defaultListId ? { connectivityDefaultListId: defaultListId } : {}) });
+    for (const [id, value] of Object.entries(items)) server.seed('connectivity', { id, updatedAt, value });
+};
+// The lists model the account holds.
+const accountLists = (server) => applySyncItems('connectivity', freshPrefs(), { upserts: server.live('connectivity'), deletes: [] }).connectivityLists;
+const listIds = (model) => model.lists.map((list) => list.id);
+// A model with one more list.
+const plusList = (model, id, name = id) => ({ ...model, lists: [...model.lists, { id, name, members: [] }] });
 
 afterEach(() => {
-    scope?.stop();
+    scopes.forEach((each) => each.stop());
+    scopes = [];
     scope = null;
 });
 
@@ -304,7 +253,8 @@ describe('account sync — enabling and disabling', () => {
         assert.deepEqual(calls(server, 'settings', 'PUT')[0].body, { collections: BOTH });
         assert.deepEqual(sent(server, 'preferences').sort(), [...SYNCED_PREFERENCE_KEYS].sort());
         assert.equal(server.live('preferences').theme, 'dark');
-        assert.deepEqual(server.live('connectivity').lists, lists);
+        assert.deepEqual(accountLists(server), lists);
+        assert.deepEqual(sent(server, 'connectivity'), ['order', 'defaultListId', 'list:mine', 'list:work']);
         assert.equal(record(storage, 'connectivity').user, 'u1');
         assert.equal(state.connectivity, 'synced');
     });
@@ -313,8 +263,7 @@ describe('account sync — enabling and disabling', () => {
         const server = fakeServer({ settings: { decided: true, collections: [] } });
         const { store } = startSync({ server, prefs: { connectivityDefaultListId: 'mine' } });
         await settle();
-        server.seed('connectivity', { id: 'lists', updatedAt: 5, value: otherLists() });
-        server.seed('connectivity', { id: 'defaultListId', updatedAt: 5, value: 'work' });
+        seedLists(server, otherLists(), 5, 'work');
         await saveSyncCollections(['connectivity']);
         await settle();
         assert.equal(store.userPreferences.connectivityDefaultListId, 'work');
@@ -395,18 +344,18 @@ describe('account sync — signed in, enabled', () => {
         assert.equal(calls(server, 'connectivity', 'PUT').length, 0);
         edit('connectivityLists', otherLists());
         await settle();
-        assert.deepEqual(sent(server, 'connectivity'), ['lists']);
+        assert.deepEqual(sent(server, 'connectivity'), ['order', 'list:work'], 'only the new list and the order');
     });
 
     it('follows `more` across pages', async () => {
         const server = fakeServer({ pageSize: 1 });
-        server.seed('connectivity', { id: 'lists', updatedAt: 5, value: otherLists() });
-        server.seed('connectivity', { id: 'defaultListId', updatedAt: 5, value: 'work' });
+        seedLists(server, otherLists(), 5, 'work');
         const { store, storage } = startSync({ server });
         await settle();
-        assert.deepEqual(calls(server, 'connectivity', 'GET').map((c) => c.since), ['0', '1']);
+        assert.deepEqual(calls(server, 'connectivity', 'GET').map((c) => c.since), ['0', '1', '2', '3']);
         assert.equal(store.userPreferences.connectivityDefaultListId, 'work');
-        assert.equal(record(storage, 'connectivity').cursor, 2);
+        assert.deepEqual(store.userPreferences.connectivityLists, otherLists());
+        assert.equal(record(storage, 'connectivity').cursor, 4);
     });
 
     it('another device\'s write in between: the push is followed by a pull', async () => {
@@ -432,23 +381,99 @@ describe('account sync — signed in, enabled', () => {
 });
 
 describe('account sync — items the account refuses', () => {
-    it('a list over the size the account takes: the rest syncs, the panel says partly, and trimming it clears that', async () => {
+    it('a list over the size the account takes is held back while the other lists sync; trimming it clears that', async () => {
         const base = sanitizeLists(null, null, []);
         const members = Array.from({ length: CONNECTIVITY_TARGET_LIMIT + 1 }, (_, i) => ({ id: `m${i}`, name: `Site ${i}`, url: `https://example.com/${i}.ico` }));
-        const big = { ...base, lists: base.lists.map((list) => (list.id === 'mine' ? { ...list, members } : list)) };
+        const withMine = (mineMembers) => ({ ...base, lists: base.lists.map((list) => (list.id === 'mine' ? { ...list, members: mineMembers } : list)) });
         const server = fakeServer();
         const { edit } = startSync({ server });
         await settle();
         const before = calls(server, 'connectivity', 'PUT').length;
-        edit('connectivityLists', big);
+        edit('connectivityLists', plusList(withMine(members), 'work', 'Work'));
         await settle();
         assert.equal(state.connectivity, 'partial');
         assert.equal(state.preferences, 'synced');
-        assert.equal(calls(server, 'connectivity', 'PUT').length, before, 'never sent');
-        edit('connectivityLists', { ...big, lists: big.lists.map((list) => (list.id === 'mine' ? { ...list, members: members.slice(0, 3) } : list)) });
+        assert.deepEqual(sent(server, 'connectivity').slice(-2), ['order', 'list:work'], 'the other list and the order went');
+        assert.equal(calls(server, 'connectivity', 'PUT').length, before + 1);
+        assert.notEqual(server.live('connectivity')['list:mine'].members.length, members.length, 'the oversized list never went');
+        edit('connectivityLists', plusList(withMine(members.slice(0, 3)), 'work', 'Work'));
         await settle();
         assert.equal(state.connectivity, 'synced');
-        assert.equal(calls(server, 'connectivity', 'PUT').length, before + 1);
+        assert.deepEqual(server.live('connectivity')['list:mine'].members, members.slice(0, 3));
+    });
+});
+
+describe('account sync — one item per Connectivity list', () => {
+    // A device signed in to the shared account, its edits pushed; `reload()` starts it again over the same storage.
+    const device = async (server, prefs = {}) => {
+        const session = startSync({ server, prefs });
+        await settle();
+        const reload = async () => {
+            const next = startSync({ server, storage: session.storage, prefs: { ...session.store.userPreferences } });
+            await settle();
+            return next;
+        };
+        return { ...session, reload };
+    };
+
+    it('two devices each adding a list: both lists survive, in the account and on both devices', async () => {
+        const server = fakeServer();
+        const one = await device(server);
+        const two = await device(server);
+        one.edit('connectivityLists', plusList(one.store.userPreferences.connectivityLists, 'list-1', 'A'));
+        two.edit('connectivityLists', plusList(two.store.userPreferences.connectivityLists, 'list-2', 'B'));
+        await settle();
+        assert.deepEqual(listIds(accountLists(server)).slice().sort(), ['list-1', 'list-2', 'mine']);
+        assert.deepEqual(listIds(two.store.userPreferences.connectivityLists).slice().sort(), ['list-1', 'list-2', 'mine']);
+        const again = await one.reload();
+        assert.deepEqual(listIds(again.store.userPreferences.connectivityLists).slice().sort(), ['list-1', 'list-2', 'mine']);
+        assert.deepEqual(listIds(again.store.userPreferences.connectivityLists), listIds(two.store.userPreferences.connectivityLists),
+            'the same order on both devices');
+    });
+
+    it('a list deleted on one device disappears on the other', async () => {
+        const server = fakeServer();
+        const one = await device(server, { connectivityLists: otherLists() });
+        const two = await device(server);
+        assert.deepEqual(listIds(two.store.userPreferences.connectivityLists), ['mine', 'work']);
+        one.edit('connectivityLists', sanitizeLists(null, null, []));
+        await settle();
+        assert.equal(server.rows.connectivity.get('list:work').deleted, true, 'a tombstone');
+        const again = await two.reload();
+        assert.deepEqual(listIds(again.store.userPreferences.connectivityLists), ['mine']);
+        assert.equal(calls(server, 'connectivity', 'PUT').filter((put) => put.body.items.some((item) => item.id === 'list:work' && !item.deleted)).length, 1,
+            'only the first upload sent the list');
+    });
+
+    it('a list reordered on one device is reordered on the other', async () => {
+        const server = fakeServer();
+        const one = await device(server, { connectivityLists: otherLists() });
+        const model = one.store.userPreferences.connectivityLists;
+        one.edit('connectivityLists', { ...model, lists: [...model.lists].reverse() });
+        await settle();
+        const two = await device(server);
+        assert.deepEqual(listIds(two.store.userPreferences.connectivityLists), ['work', 'mine']);
+    });
+
+    it('a tombstone for Mine never removes it, and nothing is sent back for it', async () => {
+        const server = fakeServer();
+        const one = await device(server);
+        const mine = one.store.userPreferences.connectivityLists.lists[0];
+        server.seed('connectivity', { id: 'list:mine', updatedAt: clock + 10_000_000, deleted: true });
+        const again = await one.reload();
+        assert.deepEqual(again.store.userPreferences.connectivityLists.lists, [mine]);
+        assert.equal(sent(server, 'connectivity').filter((id) => id === 'list:mine').length, 1, 'only the first upload');
+        assert.equal(record(again.storage, 'connectivity').items['list:mine'].at, undefined, 'kept unstamped');
+    });
+
+    it('an account with lists replaces this device\'s lists wholesale at adoption', async () => {
+        const server = fakeServer();
+        seedLists(server, plusList(sanitizeLists(null, null, []), 'home', 'Home'), 5, 'home');
+        const { store } = startSync({ server, prefs: { connectivityLists: otherLists() } });
+        await settle();
+        assert.deepEqual(listIds(store.userPreferences.connectivityLists), ['mine', 'home']);
+        assert.equal(store.userPreferences.connectivityDefaultListId, 'home');
+        assert.equal(calls(server, 'connectivity', 'PUT').length, 0);
     });
 });
 
@@ -511,8 +536,7 @@ describe('account sync — sign-out', () => {
     const signedInDevice = async (options = {}) => {
         const server = options.server ?? fakeServer();
         server.seed('preferences', { id: 'theme', updatedAt: 5, value: 'dark' });
-        server.seed('connectivity', { id: 'defaultListId', updatedAt: 5, value: 'work' });
-        server.seed('connectivity', { id: 'lists', updatedAt: 5, value: otherLists() });
+        seedLists(server, otherLists(), 5, 'work');
         const session = startSync({ server, ...options });
         await settle();
         return session;

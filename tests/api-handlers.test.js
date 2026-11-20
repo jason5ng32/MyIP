@@ -1298,25 +1298,37 @@ describe('sync handlers', () => {
         assert.deepEqual(since.body, { cursor: 3, more: false, items: [{ id: 'a', updatedAt: 30, deleted: true }] });
     });
 
-    it('the Connectivity lists and default list id round-trip', async () => {
+    it('the Connectivity lists, their order and the default list id round-trip; a list deletes as a tombstone', async () => {
         const { storage, handlers } = setup();
-        const lists = sanitizeLists(null, null, []);
+        const [mine] = sanitizeLists(null, null, []).lists;
         const items = [
-            { id: 'lists', updatedAt: 5, deleted: false, value: lists },
+            { id: 'order', updatedAt: 5, deleted: false, value: ['mine', 'work'] },
             { id: 'defaultListId', updatedAt: 5, deleted: false, value: 'mine' },
+            { id: 'list:mine', updatedAt: 5, deleted: false, value: { name: null, members: mine.members } },
+            { id: 'list:work', updatedAt: 5, deleted: false, value: { name: 'Work', members: [] } },
         ];
         const saved = await route(handlers.write, put('connectivity', { version: connectivity.version, items }), { storage });
-        assert.deepEqual(saved.body, { base: 0, cursor: 2, conflicts: [], refused: [] });
+        assert.deepEqual(saved.body, { base: 0, cursor: 4, conflicts: [], refused: [] });
         const listed = await route(handlers.read, get('connectivity', { v: String(connectivity.version) }), { storage });
-        assert.deepEqual(listed.body, { cursor: 2, more: false, items });
+        assert.deepEqual(listed.body, { cursor: 4, more: false, items });
+        const dropped = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
+            { id: 'list:work', updatedAt: 6, deleted: true },
+        ] }), { storage });
+        assert.deepEqual(dropped.body, { base: 4, cursor: 5, conflicts: [], refused: [] });
         const bad = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
-            { id: 'lists', updatedAt: 6, value: { ...lists, extra: 1 } }, { id: 'defaultListId', updatedAt: 6, value: '' },
+            { id: 'list:work', updatedAt: 7, value: { name: 'Work', members: [], extra: 1 } },
+            { id: 'order', updatedAt: 7, value: ['mine', 'mine'] },
+            { id: 'defaultListId', updatedAt: 7, value: '' },
         ] }), { storage });
-        assert.deepEqual(bad.body.refused, [{ id: 'lists', reason: 'invalid' }, { id: 'defaultListId', reason: 'invalid' }]);
-        const unknown = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
-            { id: 'connectivityLists', updatedAt: 6, value: lists },
-        ] }), { storage });
-        assert.equal(unknown.statusCode, 400);
+        assert.deepEqual(bad.body.refused, [
+            { id: 'list:work', reason: 'invalid' }, { id: 'order', reason: 'invalid' }, { id: 'defaultListId', reason: 'invalid' },
+        ]);
+        for (const id of ['lists', 'connectivityLists', 'list:']) {
+            const unknown = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
+                { id, updatedAt: 8, value: { name: 'X', members: [] } },
+            ] }), { storage });
+            assert.equal(unknown.statusCode, 400, id);
+        }
     });
 
     it('GET pages by the collection\'s pageSize with `more`', async () => {
