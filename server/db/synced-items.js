@@ -21,13 +21,22 @@ export const mergeDecision = (stored, updatedAt) => {
  * unique) against the stored items of that collection and version (`stored`:
  * id → item) and their live count → `{ writes, conflicts, refused }`, in
  * request order. Edit times are clamped to `now`; a kept stored item is
- * returned as a conflict; a write that would pass `maxItems` is refused.
+ * returned as a conflict; a new live item past `maxItems`, or a new row past
+ * `maxRows` (`rowCount`: live items and tombstones), is refused. The
+ * request's deletes free their room first, wherever they sit in it; a delete
+ * of an id that has no row writes nothing.
  */
-export const planSyncWrite = ({ collection, items, stored, liveCount, now }) => {
+export const planSyncWrite = ({ collection, items, stored, liveCount, rowCount = liveCount, now }) => {
     const writes = [];
     const conflicts = [];
     const refused = [];
-    let live = liveCount;
+    const maxRows = collection.maxRows ?? Infinity;
+    const replaces = (id, sent) => mergeDecision(stored.get(id) ?? null, Math.min(sent, now)) !== 'keep';
+    const freed = collection.allowDelete
+        ? items.filter(({ id, updatedAt, deleted }) => deleted && stored.get(id)?.deleted === false && replaces(id, updatedAt)).length
+        : 0;
+    let live = liveCount - freed;
+    let rows = rowCount;
     for (const { id, updatedAt: sent, deleted, value } of items) {
         if (deleted && !collection.allowDelete) {
             refused.push({ id, reason: SYNC_REFUSAL.NO_DELETE });
@@ -43,16 +52,18 @@ export const planSyncWrite = ({ collection, items, stored, liveCount, now }) => 
         }
         const updatedAt = Math.min(sent, now);
         const current = stored.get(id) ?? null;
+        if (deleted && !current) continue;
         if (mergeDecision(current, updatedAt) === 'keep') {
             conflicts.push(current);
             continue;
         }
         const wasLive = Boolean(current && !current.deleted);
-        if (!deleted && !wasLive && live >= collection.maxItems) {
+        if (!deleted && !wasLive && (live >= collection.maxItems || (!current && rows >= maxRows))) {
             refused.push({ id, reason: SYNC_REFUSAL.FULL });
             continue;
         }
-        live += (deleted ? 0 : 1) - (wasLive ? 1 : 0);
+        if (!deleted && !wasLive) live += 1;
+        if (!current) rows += 1;
         writes.push(deleted ? { id, updatedAt, deleted: true } : { id, updatedAt, deleted: false, value });
     }
     return { writes, conflicts, refused };
@@ -91,7 +102,7 @@ export const saveSyncedItems = (transaction, { userId, collection, version, item
     await query(`DELETE FROM synced_items
         WHERE user_id = $1 AND collection = $2 AND deleted AND updated_at < $3`,
     [userId, collection.id, now - SYNC_TOMBSTONE_TTL_MS]);
-    const { rows: [state] } = await query(`SELECT COALESCE(MAX(seq), 0) AS base, COUNT(*) FILTER (WHERE NOT deleted) AS live
+    const { rows: [state] } = await query(`SELECT COALESCE(MAX(seq), 0) AS base, COUNT(*) FILTER (WHERE NOT deleted) AS live, COUNT(*) AS total
         FROM synced_items WHERE user_id = $1 AND collection = $2 AND schema_version = $3`,
     [userId, collection.id, version]);
     const { rows: storedRows } = items.length
@@ -101,7 +112,9 @@ export const saveSyncedItems = (transaction, { userId, collection, version, item
         : { rows: [] };
 
     const stored = new Map(storedRows.map((row) => [row.item_id, toItem(row)]));
-    const plan = planSyncWrite({ collection, items, stored, liveCount: Number(state.live), now });
+    const plan = planSyncWrite({
+        collection, items, stored, liveCount: Number(state.live), rowCount: Number(state.total), now,
+    });
     const base = Number(state.base);
     let cursor = base;
     if (plan.writes.length) {

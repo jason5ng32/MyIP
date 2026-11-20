@@ -16,7 +16,7 @@ const SQL = {
     listSynced: 'SELECT item_id, updated_at, deleted, data, seq FROM synced_items '
         + 'WHERE user_id = $1 AND collection = $2 AND schema_version = $3 AND seq > $4 ORDER BY seq LIMIT $5',
     pruneTombstones: 'DELETE FROM synced_items WHERE user_id = $1 AND collection = $2 AND deleted AND updated_at < $3',
-    syncState: 'SELECT COALESCE(MAX(seq), 0) AS base, COUNT(*) FILTER (WHERE NOT deleted) AS live '
+    syncState: 'SELECT COALESCE(MAX(seq), 0) AS base, COUNT(*) FILTER (WHERE NOT deleted) AS live, COUNT(*) AS total '
         + 'FROM synced_items WHERE user_id = $1 AND collection = $2 AND schema_version = $3',
     selectSynced: 'SELECT item_id, updated_at, deleted, data, seq FROM synced_items '
         + 'WHERE user_id = $1 AND collection = $2 AND schema_version = $3 AND item_id = ANY($4::text[])',
@@ -106,7 +106,7 @@ export const fakeUserDb = ({ now = () => new Date() } = {}) => {
             case SQL.syncState: {
                 const rows = syncedOf(id, value, params[2]);
                 const base = rows.reduce((max, row) => Math.max(max, row.seq), 0);
-                return { rows: [{ base: String(base), live: String(rows.filter((row) => !row.deleted).length) }] };
+                return { rows: [{ base: String(base), live: String(rows.filter((row) => !row.deleted).length), total: String(rows.length) }] };
             }
             case SQL.selectSynced: {
                 const wanted = new Set(params[3]);

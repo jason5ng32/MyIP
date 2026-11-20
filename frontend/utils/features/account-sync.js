@@ -193,8 +193,9 @@ const mergeItem = (state, item, local) => {
  * uploaded); an empty account takes this device's data ('adopt': every local item stamped `now` and pending) or
  * leaves the device empty ('foreign': every local item deleted). `keep`: ids edited while this user was already
  * signed in, before the pull — edits of this session, so they stay, stamped `now`, whatever the account holds.
+ * `dropped`: ids removed in that same span — the account's live item is not taken back; a delete stamped `now` waits.
  */
-export const mergePull = ({ prepared, record, local, items, cursor, userId, now, keep = [] }) => {
+export const mergePull = ({ prepared, record, local, items, cursor, userId, now, keep = [], dropped = [] }) => {
     const done = (state) => ({
         record: { user: userId, cursor, lastSyncAt: now, items: state.items },
         upserts: state.upserts,
@@ -205,7 +206,12 @@ export const mergePull = ({ prepared, record, local, items, cursor, userId, now,
         const kept = new Set(keep.filter((id) => Object.hasOwn(local, id)));
         const stampNow = (id) => { state.items[id] = { hash: hashSyncValue(local[id]), at: now }; };
         if (items.length) {
-            for (const item of items) if (!kept.has(item.id)) take(state, item, local);
+            const gone = new Set(dropped.filter((id) => !Object.hasOwn(local, id)));
+            for (const item of items) {
+                if (kept.has(item.id)) continue;
+                if (gone.has(item.id) && !item.deleted) state.items[item.id] = { deleted: true, at: now };
+                else take(state, item, local);
+            }
             for (const id of Object.keys(local)) {
                 if (kept.has(id)) stampNow(id);
                 else if (!state.items[id]?.hash && !state.deletes.includes(id)) state.deletes.push(id);
@@ -239,7 +245,12 @@ export const changedSince = (baseline, local) => (baseline
     ? Object.entries(local).filter(([id, value]) => baseline[id] !== hashSyncValue(value)).map(([id]) => id)
     : []);
 
-// `{ id: hash }` of local items, the baseline changedSince compares with.
+// Ids of a `{ id: hash }` baseline that are gone locally; no baseline, none.
+export const droppedSince = (baseline, local) => (baseline
+    ? Object.keys(baseline).filter((id) => !Object.hasOwn(local, id))
+    : []);
+
+// `{ id: hash }` of local items, the baseline changedSince and droppedSince compare with.
 export const hashItems = (local) => (local
     ? Object.fromEntries(Object.entries(local).map(([id, value]) => [id, hashSyncValue(value)]))
     : null);

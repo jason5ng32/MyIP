@@ -100,7 +100,7 @@ describe('user storage on Postgres', { skip: url ? false : 'DATABASE_URL_TEST is
     const { preferences, connectivity } = SYNC_COLLECTIONS;
     const NOW = Date.now();
     const pref = (id, updatedAt, value) => ({ id, updatedAt, deleted: false, value });
-    const lists = { schemaVersion: 1, lists: [{ id: 'mine', name: null, members: [{ id: 'g', name: 'G', url: 'https://g.example/' }] }] };
+    const mine = pref('list:mine', 10, { name: null, members: [{ id: 'g', name: 'G', url: 'https://g.example/' }] });
     const userWith = async (suffix, enabled = ['preferences', 'connectivity']) => {
         const db = await storage.getDb();
         const id = `${ID_PREFIX}${suffix}`;
@@ -119,10 +119,10 @@ describe('user storage on Postgres', { skip: url ? false : 'DATABASE_URL_TEST is
 
     it('round-trips synced items: values, conflicts and the cursor', async () => {
         const { save, list } = await userWith('e');
-        const conn = await save([pref('lists', 10, lists), pref('defaultListId', 10, 'mine')], connectivity);
+        const conn = await save([pref('order', 10, ['mine']), mine, pref('defaultListId', 10, 'mine')], connectivity);
         assert.equal(conn.base, 0);
         assert.ok(conn.cursor > 0);
-        assert.deepEqual((await list({ collection: connectivity })).items, [pref('lists', 10, lists), pref('defaultListId', 10, 'mine')]);
+        assert.deepEqual((await list({ collection: connectivity })).items, [pref('order', 10, ['mine']), mine, pref('defaultListId', 10, 'mine')]);
 
         const first = await save([pref('theme', 100, 'dark'), pref('lang', 100, 'fr')]);
         const second = await save([pref('theme', 200, 'light'), pref('lang', 50, 'de')]);
@@ -198,7 +198,7 @@ describe('user storage on Postgres', { skip: url ? false : 'DATABASE_URL_TEST is
         for (const user of [mine, theirs]) {
             await user.save([pref('theme', 1, 'dark')]);
             await user.save([pref('theme', 1, 'dark')], { ...preferences, version: preferences.version - 1 });
-            await user.save([pref('lists', 1, lists)], connectivity);
+            await user.save([mine], connectivity);
         }
         const count = async (user) => (await mine.query(
             'SELECT collection, count(*)::int AS n FROM synced_items WHERE user_id = $1 GROUP BY collection ORDER BY collection', [user.id])).rows;

@@ -20,11 +20,12 @@ const checklist = Object.freeze({
 });
 const tick = (id, updatedAt, value = 'checked') => ({ id, updatedAt, deleted: false, value });
 const drop = (id, updatedAt) => ({ id, updatedAt, deleted: true });
-const plan = (items, { collection = checklist, stored = [], liveCount, now = NOW } = {}) => planSyncWrite({
+const plan = (items, { collection = checklist, stored = [], liveCount, rowCount, now = NOW } = {}) => planSyncWrite({
     collection,
     items,
     stored: new Map(stored.map((item) => [item.id, item])),
     liveCount: liveCount ?? stored.filter((item) => !item.deleted).length,
+    rowCount: rowCount ?? stored.length,
     now,
 });
 
@@ -56,7 +57,8 @@ describe('planSyncWrite', () => {
 
     it('a delete replaces like an edit and is written as a tombstone; a newer edit revives one', () => {
         assert.deepEqual(plan([drop('a', 200)], { stored: [tick('a', 100)] }).writes, [drop('a', 200)]);
-        assert.deepEqual(plan([drop('new', 5)]).writes, [drop('new', 5)]);
+        const unknown = plan([drop('new', 5)]);
+        assert.deepEqual([unknown.writes, unknown.conflicts, unknown.refused], [[], [], []], 'a delete of an id without a row writes nothing');
         assert.deepEqual(plan([tick('a', 300)], { stored: [drop('a', 200)] }).writes, [tick('a', 300)]);
         assert.deepEqual(plan([tick('a', 100)], { stored: [drop('a', 200)] }).conflicts, [drop('a', 200)]);
     });
@@ -79,16 +81,41 @@ describe('planSyncWrite', () => {
         assert.deepEqual(prefs.writes, [{ id: 'lang', updatedAt: 5, deleted: false, value: 'fr' }]);
     });
 
-    it('refuses new live items past maxItems, in request order; deletes and replacements free or keep room', () => {
+    it('refuses new live items past maxItems, in request order; the request\'s deletes free their room first', () => {
         const small = { ...checklist, maxItems: 2 };
         const full = plan([tick('c', 5), drop('a', 5), tick('d', 5), tick('e', 5), tick('b', 5, 'ignored')], {
             collection: small, stored: [tick('a', 1), tick('b', 1), drop('z', 1)],
         });
-        assert.deepEqual(full.refused, [{ id: 'c', reason: SYNC_REFUSAL.FULL }, { id: 'e', reason: SYNC_REFUSAL.FULL }]);
-        assert.deepEqual(full.writes, [drop('a', 5), tick('d', 5), tick('b', 5, 'ignored')]);
+        assert.deepEqual(full.refused, [{ id: 'd', reason: SYNC_REFUSAL.FULL }, { id: 'e', reason: SYNC_REFUSAL.FULL }]);
+        assert.deepEqual(full.writes, [tick('c', 5), drop('a', 5), tick('b', 5, 'ignored')]);
+        // A delete the stored item outlives frees nothing.
+        assert.deepEqual(plan([tick('c', 5), drop('a', 1)], { collection: small, stored: [tick('a', 1), tick('b', 1)] }).refused,
+            [{ id: 'c', reason: SYNC_REFUSAL.FULL }]);
         // Reviving a tombstone counts as a new live item.
         assert.deepEqual(plan([tick('z', 5)], { collection: small, stored: [tick('a', 1), tick('b', 1), drop('z', 1)] }).refused,
             [{ id: 'z', reason: SYNC_REFUSAL.FULL }]);
+    });
+});
+
+describe('planSyncWrite — rows, tombstones included', () => {
+    const capped = { ...checklist, maxItems: 2, maxRows: 3 };
+
+    it('a new row past maxRows is refused; a row that exists can still change', () => {
+        const stored = [tick('a', 1), drop('y', 1), drop('z', 1)];
+        const result = plan([tick('new', 5), tick('y', 5), drop('a', 5)], { collection: capped, stored, rowCount: 3 });
+        assert.deepEqual(result.refused, [{ id: 'new', reason: SYNC_REFUSAL.FULL }]);
+        assert.deepEqual(result.writes, [tick('y', 5), drop('a', 5)]);
+    });
+
+    it('counts the rows the request itself adds', () => {
+        const result = plan([tick('b', 5), tick('c', 5)], { collection: capped, stored: [tick('a', 1), drop('z', 1)], rowCount: 2 });
+        assert.deepEqual(result.writes, [tick('b', 5)]);
+        assert.deepEqual(result.refused, [{ id: 'c', reason: SYNC_REFUSAL.FULL }]);
+    });
+
+    it('fresh ids sent as deletes never become rows', () => {
+        const fresh = Array.from({ length: 500 }, (_, i) => drop(`x${i}`, 5));
+        assert.deepEqual(plan(fresh, { stored: [tick('a', 1)] }).writes, []);
     });
 });
 
@@ -102,8 +129,9 @@ describe('planSyncWrite over the Connectivity collection', () => {
             ...Array.from({ length: connectivity.maxItems - 2 }, (_, i) => list(`l${i}`, 1)),
         ];
         const result = plan([list('extra', 5), drop('list:l0', 5), list('again', 5)], { collection: connectivity, stored });
-        assert.deepEqual(result.refused, [{ id: 'list:extra', reason: SYNC_REFUSAL.FULL }]);
-        assert.deepEqual(result.writes, [drop('list:l0', 5), list('again', 5)]);
+        assert.deepEqual(result.writes, [list('extra', 5), drop('list:l0', 5)], 'the replacement takes the deleted list\'s room');
+        assert.deepEqual(result.refused, [{ id: 'list:again', reason: SYNC_REFUSAL.FULL }]);
+        assert.equal(connectivity.maxRows > connectivity.maxItems, true);
     });
 });
 
@@ -163,11 +191,13 @@ describe('synced items repository', () => {
     it('removes this collection\'s tombstones older than 90 days on a write, in every version', async () => {
         const { db, save, list } = await setup();
         const old = NOW - SYNC_TOMBSTONE_TTL_MS - 1;
-        await save('u', [drop('gone', old), drop('fresh', NOW - 1), tick('live', old)]);
+        await save('u', [tick('gone', old - 1), tick('fresh', old - 1), tick('live', old)]);
+        await save('u', [drop('gone', old), drop('fresh', NOW - 1)]);
         assert.equal(db.syncedItems.size, 3, 'an expired tombstone written now stays until the next write');
         // A write to another version of the collection prunes this version too.
+        await save('u', [tick('other-version', old - 1)], { version: checklist.version + 1 });
         await save('u', [drop('other-version', old)], { version: checklist.version + 1 });
-        assert.deepEqual((await list('u')).items.map(({ id }) => id), ['fresh', 'live']);
+        assert.deepEqual((await list('u')).items.map(({ id }) => id), ['live', 'fresh']);
         // Another collection's write leaves these alone.
         await save('u', [{ id: 'theme', updatedAt: old, deleted: false, value: 'dark' }], { collection: preferences });
         assert.equal((await list('u', { version: checklist.version + 1 })).items.length, 1);

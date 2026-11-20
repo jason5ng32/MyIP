@@ -56,6 +56,8 @@ const isConnectivityValue = (id, value) => {
 
 // Live items at most: every list, its order and the default list id.
 const CONNECTIVITY_MAX_ITEMS = CONNECTIVITY_LIST_LIMIT + CONNECTIVITY_SYNC_ITEM_IDS.length;
+// Rows at most, deleted lists' tombstones included (each list ever created is one row until its tombstone expires).
+const CONNECTIVITY_MAX_ROWS = CONNECTIVITY_MAX_ITEMS + 100;
 
 // Security Checklist progress: item slugs (lowercase words joined by hyphens, up to ~80 chars today) and their two
 // marks; an unset item is a delete. The slug list lives in the locale datasets, so ids are checked by shape.
@@ -92,6 +94,7 @@ export const SYNC_COLLECTIONS = Object.freeze({
         isValidItemId: isConnectivityItemId,
         isValidValue: isConnectivityValue,
         maxItems: CONNECTIVITY_MAX_ITEMS,
+        maxRows: CONNECTIVITY_MAX_ROWS,
         maxItemBytes: 32 * KB,
         allowDelete: true,
         pageSize: CONNECTIVITY_MAX_ITEMS,
@@ -103,6 +106,7 @@ export const SYNC_COLLECTIONS = Object.freeze({
         isValidItemId: isChecklistSlug,
         isValidValue: (id, value) => isChecklistSlug(id) && isChecklistMark(value),
         maxItems: CHECKLIST_MAX_ITEMS,
+        maxRows: CHECKLIST_MAX_ITEMS,
         maxItemBytes: 16,
         allowDelete: true,
         pageSize: CHECKLIST_MAX_ITEMS,

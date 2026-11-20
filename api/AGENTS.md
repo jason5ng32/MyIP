@@ -321,7 +321,8 @@ user decided, an empty list = sync nothing). `seq` comes from
   `SYNC_MAX_BODY_BYTES` (320 KB) PUT body limit, mounted before the settings'
   1 KB one). Collections: `common/sync-collections.js`, one frozen registry
   (`preferences` · `connectivity` · `checklist` · `speedtest`), each with its schema `version`, item id
-  and value checks, `maxItems` (live rows per user and version),
+  and value checks, `maxItems` (live rows per user and version), `maxRows`
+  (tombstones included, where deletes are on),
   `maxItemBytes`, `allowDelete` and `pageSize`; `connectivity` (v2, deletes
   on) holds one `list:<list id>` item per list (`{ name, members }`,
   `isValidConnectivityList`), the lists' `order` and `defaultListId`, checked
@@ -340,9 +341,11 @@ user decided, an empty list = sync nothing). `seq` comes from
   a `version` other than the registry's, or a malformed body (≤ 500 items,
   valid ids, positive integer `updatedAt`, no repeats) → 400, nothing
   written. Per item (`planSyncWrite`, `server/db/synced-items.js`): a bad
-  value, an oversized one, a delete where deletes are off or a new live row
-  past `maxItems` is refused (`invalid` / `too_large` / `no_delete` /
-  `full`); `updatedAt` is clamped to now; no row → insert, a stored
+  value, an oversized one, a delete where deletes are off, a new live row
+  past `maxItems` or a new row past `maxRows` is refused (`invalid` /
+  `too_large` / `no_delete` / `full`; the request's deletes free their room
+  first); a delete of an id without a row writes nothing; `updatedAt` is
+  clamped to now; no row → insert, a stored
   `updated_at` as new or newer stays and comes back in `conflicts`, else
   replaced (a delete too, as a tombstone). One transaction: the user's
   `users` row locked first (so a user's `seq` commit in order and a cursor

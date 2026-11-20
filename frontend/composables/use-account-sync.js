@@ -18,7 +18,7 @@ import { SYNC_COLLECTIONS, SYNC_COLLECTION_IDS, SYNC_OFF_CODE } from '../utils/s
 import {
     readSyncRecord, writeSyncRecord, removeSyncRecord, isOwnRecord, detectLocalChanges, preparePull, readSyncPage,
     mergePull, settleApplied, buildUploadBatches, markRefused, readSyncSave, mergeSave, hashItems, changedSince,
-    hasHeldBack,
+    hasHeldBack, droppedSince,
 } from '../utils/features/account-sync.js';
 import { SYNC_ITEM_READERS, applySyncItems } from '../utils/features/preferences-sync.js';
 import {
@@ -191,6 +191,7 @@ const createRunner = ({ adapter, storage, request, now, delayMs, active, userId,
             apply(mergePull({
                 prepared: preparePull(stored, uid, now()), record: stored, local, items: fetched.items,
                 cursor: fetched.cursor, userId: uid, now: now(), keep: changedSince(baseline, local),
+                dropped: droppedSince(baseline, local),
             }));
             baseline = null;
             pulled = true;

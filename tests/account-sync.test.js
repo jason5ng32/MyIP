@@ -10,7 +10,7 @@ import {
     SYNC_BATCH_MAX_BYTES, hashSyncValue, syncRecordKey, createSyncRecord, readSyncRecord, writeSyncRecord,
     isPending, isOwnRecord, removeSyncRecord, detectLocalChanges, refreshSyncHashes, readSyncItem, readSyncPage, preparePull, mergePull,
     settleApplied, changedSince, hashItems, buildUploadBatches, markRefused, readSyncSave, mergeSave, syncStatusOf,
-    syncStatusBadge, SYNC_STATUS_BADGES, hasHeldBack,
+    syncStatusBadge, SYNC_STATUS_BADGES, hasHeldBack, droppedSince,
 } from '../frontend/utils/features/account-sync.js';
 import {
     SYNC_COLLECTIONS, SYNC_TOMBSTONE_TTL_MS, SYNC_MAX_ITEMS_PER_REQUEST, SYNC_MAX_BODY_BYTES,
@@ -275,6 +275,19 @@ describe('account sync — merging a pull', () => {
             assert.deepEqual(result.deletes, []);
             assert.ok(Object.values(result.record.items).every(isPending));
         });
+    });
+
+    it('an id removed since the session began is not taken back: a delete waits instead', () => {
+        const local = { a: 'x' };
+        const result = mergePull({
+            prepared: prepared(null), record: null, local, items: [live('a', 'x', 5), live('b', 'y', 5), gone('c', 5)],
+            cursor: 20, userId: 'u1', now: 2000, dropped: droppedSince({ a: h('x'), b: h('y'), c: h('z') }, local),
+        });
+        assert.deepEqual(result.upserts, {});
+        assert.deepEqual(result.record.items.b, { deleted: true, at: 2000 });
+        assert.ok(isPending(result.record.items.b));
+        assert.deepEqual(result.record.items.c, { deleted: true, at: 5, ack: 5 });
+        assert.deepEqual(droppedSince(null, local), []);
     });
 
     describe('another user\'s record', () => {
