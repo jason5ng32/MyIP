@@ -372,9 +372,11 @@
       "syncReload": "La synchronisation est en pause sur cette page. Rechargez la page pour continuer.",
       "syncSaveFailed": "Impossible d'enregistrer le réglage de synchronisation. Réessayez.",
       "syncFailed": "La dernière synchronisation n'a pas abouti. Elle sera retentée à votre prochaine modification ou visite.",
+      "syncPartial": "Une partie de ces données n'a pas pu être enregistrée dans votre compte et reste uniquement sur cet appareil.",
       "syncStatusSynced": "Synchronisé",
       "syncStatusPaused": "En pause",
       "syncStatusFailed": "Non synchronisé",
+      "syncStatusPartial": "Synchronisé en partie",
       "connectivity": {
         "defaultList": "Liste par défaut",
         "defaultListTips": "La liste affichée par la section au chargement de la page.",

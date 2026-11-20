@@ -372,9 +372,11 @@
       "syncReload": "本頁面的同步已暫停，重新整理頁面後繼續。",
       "syncSaveFailed": "同步設定未能儲存，請重試。",
       "syncFailed": "上次同步沒有完成，會在你下次修改或造訪時重試。",
+      "syncPartial": "有一部分資料沒能儲存到帳號，只留在這台裝置上。",
       "syncStatusSynced": "已同步",
       "syncStatusPaused": "已暫停",
       "syncStatusFailed": "未同步",
+      "syncStatusPartial": "部分同步",
       "connectivity": {
         "defaultList": "預設清單",
         "defaultListTips": "開啟頁面時，連線測試預設顯示的清單。",

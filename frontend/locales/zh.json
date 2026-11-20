@@ -372,9 +372,11 @@
       "syncReload": "本页面的同步已暂停，刷新页面后继续。",
       "syncSaveFailed": "同步设置没能保存，请重试。",
       "syncFailed": "上次同步没有完成，会在你下次修改或访问时重试。",
+      "syncPartial": "有一部分数据没能保存到账号，只留在这台设备上。",
       "syncStatusSynced": "已同步",
       "syncStatusPaused": "已暂停",
       "syncStatusFailed": "未同步",
+      "syncStatusPartial": "部分同步",
       "connectivity": {
         "defaultList": "默认列表",
         "defaultListTips": "打开页面时，连通性测试默认显示的列表。",

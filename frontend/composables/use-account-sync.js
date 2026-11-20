@@ -17,7 +17,7 @@ import { SYNC_COLLECTIONS, SYNC_OFF_CODE } from '../utils/sync-collections.js';
 import {
     readSyncRecord, writeSyncRecord, removeSyncRecord, isOwnRecord, detectLocalChanges, preparePull, readSyncPage,
     mergePull, settleApplied, buildUploadBatches, markRefused, readSyncSave, mergeSave, hashItems, changedSince,
-    hashSyncValue,
+    hasHeldBack,
 } from '../utils/features/account-sync.js';
 import { SYNC_ITEM_READERS, syncItemDefaults, toPreferenceValues } from '../utils/features/preferences-sync.js';
 import {
@@ -27,14 +27,14 @@ import {
 import {
     BEFORE_RELOAD_COMMAND, SIGN_OUT_COMMAND, SET_SYNC_COLLECTIONS_COMMAND, SIGN_OUT_FLUSH_MS,
 } from '../utils/features/account-sync-auth.js';
-import { PREFS_STORAGE_KEY } from '../data/default-preferences.js';
 import { useAppCommand } from './use-app-command.js';
 
 export const SYNC_ENDPOINT = '/api/sync';
 export const SYNC_PUSH_DELAY_MS = 2000;
 
-// This page load's state per collection, read by the Preferences panel: 'idle' | 'synced' | 'failed' (the last pull or
-// push did not go through; retried silently) | 'reload' | 'stopped'.
+// This page load's state per collection, read by the Preferences panel: 'idle' | 'synced' | 'partial' (synced but for
+// items the account refused) | 'failed' (the last pull or push did not go through; retried silently) | 'reload' |
+// 'stopped'.
 const syncState = reactive({ preferences: 'idle', connectivity: 'idle' });
 export const useAccountSyncState = () => readonly(syncState);
 
@@ -103,6 +103,9 @@ const createRunner = ({ adapter, storage, request, now, delayMs, active, userId,
         if (ids.length || deletes.length) adapter.applyRemote({ upserts, deletes });
         write(settleApplied(next, adapter.readLocal() ?? {}, ids));
     };
+
+    // A pull or push went through.
+    const settled = () => { syncState[id] = hasHeldBack(record()) ? 'partial' : 'synced'; };
 
     const stop = () => {
         stopped = true;
@@ -177,7 +180,7 @@ const createRunner = ({ adapter, storage, request, now, delayMs, active, userId,
             }));
             baseline = null;
             pulled = true;
-            syncState[id] = 'synced';
+            settled();
             schedule(); // pending edits (an adoption's upload), if any
             return true;
         } catch (error) {
@@ -211,7 +214,7 @@ const createRunner = ({ adapter, storage, request, now, delayMs, active, userId,
                 apply(merged);
                 pullNeeded ||= merged.pullNeeded;
             }
-            syncState[id] = 'synced';
+            settled();
         } catch (error) {
             fail(at, error, 'push');
             return;
@@ -293,7 +296,6 @@ const within = (promise, ms) => new Promise((resolve) => {
 export const useAccountSync = ({
     store, request = authenticatedFetch, storage = defaultStorage(), now = () => Date.now(),
     delayMs = SYNC_PUSH_DELAY_MS, flushMs = SIGN_OUT_FLUSH_MS, adapters = createSyncAdapters(store),
-    events = globalThis.window,
 }) => {
     if (!storage) return;
     const userId = computed(() => (store.isSignedIn && store.user?.uid) || null);
@@ -359,7 +361,7 @@ export const useAccountSync = ({
                 if (userId.value) fetchSettings(userId.value);
             },
         });
-        runners.push({ ...runner, adapter, syncOn, active: () => active.value });
+        runners.push({ ...runner, adapter, syncOn });
 
         // Stamps stay close to the edit: checked on every local edit, for the signed-in user's own record only.
         watch(adapter.signal, () => {
@@ -381,28 +383,6 @@ export const useAccountSync = ({
             if (isActive) runner.pull(uid);
         }, { immediate: true });
     }
-
-    // Another tab saved preferences: its values for the collections syncing here reach this tab unstamped, so this
-    // tab's next edit is compared with them and not with what it loaded.
-    const onStorage = (event) => {
-        if (event.key !== PREFS_STORAGE_KEY || !event.newValue) return;
-        let prefs;
-        try {
-            prefs = JSON.parse(event.newValue);
-        } catch {
-            return;
-        }
-        if (!prefs || typeof prefs !== 'object') return;
-        for (const runner of runners) {
-            if (!runner.active()) continue;
-            const local = runner.adapter.readLocal();
-            if (!local) continue;
-            const upserts = Object.fromEntries(Object.entries(SYNC_ITEM_READERS[runner.adapter.id]?.(prefs) ?? {})
-                .filter(([id, value]) => hashSyncValue(value) !== hashSyncValue(local[id])));
-            if (Object.keys(upserts).length) runner.adapter.applyRemote({ upserts, deletes: [] });
-        }
-    };
-    events?.addEventListener?.('storage', onStorage);
 
     // A session that ended without the sign-out action (Firebase resolved: nobody signed in) leaves records naming
     // a user: the account's data goes, as on sign-out, without a flush.
@@ -454,8 +434,5 @@ export const useAccountSync = ({
         return own.length;
     });
 
-    onScopeDispose(() => {
-        events?.removeEventListener?.('storage', onStorage);
-        runners.forEach((runner) => runner.dispose());
-    });
+    onScopeDispose(() => runners.forEach((runner) => runner.dispose()));
 };

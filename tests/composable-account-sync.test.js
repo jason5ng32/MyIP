@@ -18,7 +18,7 @@ import { describe, it, afterEach } from 'node:test';
 import { effectScope, reactive, nextTick } from 'vue';
 
 const { useAccountSync, useAccountSyncState, SYNC_ENDPOINT } = await import('../frontend/composables/use-account-sync.js');
-const { readSyncRecord, writeSyncRecord, syncRecordKey, hashSyncValue } = await import('../frontend/utils/features/account-sync.js');
+const { readSyncRecord, writeSyncRecord, syncRecordKey } = await import('../frontend/utils/features/account-sync.js');
 const {
     syncItemDefaults, toPreferenceValues,
 } = await import('../frontend/utils/features/preferences-sync.js');
@@ -28,7 +28,8 @@ const {
 const { SYNC_COLLECTIONS, SYNC_OFF_CODE } = await import('../frontend/utils/sync-collections.js');
 const { SYNCED_PREFERENCE_KEYS } = await import('../frontend/utils/preferences-schema.js');
 const { sanitizeLists } = await import('../frontend/utils/features/connectivity-lists.js');
-const { DEFAULT_PREFERENCES, PREFS_STORAGE_KEY } = await import('../frontend/data/default-preferences.js');
+const { DEFAULT_PREFERENCES } = await import('../frontend/data/default-preferences.js');
+const { CONNECTIVITY_TARGET_LIMIT } = await import('../frontend/data/connectivity-defaults.js');
 const {
     BEFORE_RELOAD_COMMAND, SIGN_OUT_COMMAND, syncBeforeReload, clearAccountDataBeforeSignOut, saveSyncCollections,
 } = await import('../frontend/utils/features/account-sync-auth.js');
@@ -156,12 +157,8 @@ const startSync = ({
         store.preferenceEdits += 1;
     };
     scope = effectScope();
-    const listeners = [];
-    const events = { addEventListener: (type, fn) => listeners.push(fn), removeEventListener() {} };
-    scope.run(() => useAccountSync({ store, request, storage, now: () => (clock += 1000), delayMs: 0, flushMs, events }));
-    // Another tab saved `prefs` under `key`.
-    const otherTab = (prefs, key = PREFS_STORAGE_KEY) => listeners.forEach((fn) => fn({ key, newValue: JSON.stringify(prefs) }));
-    return { store, server, storage, edit, otherTab };
+    scope.run(() => useAccountSync({ store, request, storage, now: () => (clock += 1000), delayMs: 0, flushMs }));
+    return { store, server, storage, edit };
 };
 
 const record = (storage, id) => readSyncRecord(storage, SYNC_COLLECTIONS[id]);
@@ -375,35 +372,6 @@ describe('account sync — signed in, enabled', () => {
         assert.deepEqual(sent(server, 'connectivity'), ['lists']);
     });
 
-    it('another tab\'s saved values reach this tab unstamped, so its next edit does not send its old ones', async () => {
-        const server = fakeServer();
-        const { store, storage, edit, otherTab } = startSync({ server, prefs: { theme: 'auto' } });
-        await settle();
-        const before = calls(server, 'preferences', 'PUT').length;
-        // The other tab's edit, as it leaves things: sent, held in the shared record, saved to storage.
-        const at = clock + 500;
-        server.seed('preferences', { id: 'theme', updatedAt: at, value: 'dark' });
-        const shared = record(storage, 'preferences');
-        writeSyncRecord(storage, SYNC_COLLECTIONS.preferences, {
-            ...shared, items: { ...shared.items, theme: { hash: hashSyncValue('dark'), at, ack: at } },
-        });
-        otherTab({ ...store.userPreferences, theme: 'dark' });
-        assert.equal(store.userPreferences.theme, 'dark');
-        otherTab({ theme: 'light' }, 'someOtherKey');
-        assert.equal(store.userPreferences.theme, 'dark');
-        edit('simpleMode', !store.userPreferences.simpleMode);
-        await settle();
-        assert.deepEqual(calls(server, 'preferences', 'PUT').slice(before).flatMap((put) => put.body.items.map((item) => item.id)), ['simpleMode']);
-        assert.equal(server.live('preferences').theme, 'dark');
-    });
-
-    it('another tab\'s values are left alone while the collection does not sync here', async () => {
-        const { store, otherTab } = startSync({ server: fakeServer({ settings: { decided: true, collections: [] } }), prefs: { theme: 'auto' } });
-        await settle();
-        otherTab({ ...store.userPreferences, theme: 'dark' });
-        assert.equal(store.userPreferences.theme, 'auto');
-    });
-
     it('follows `more` across pages', async () => {
         const server = fakeServer({ pageSize: 1 });
         server.seed('connectivity', { id: 'lists', updatedAt: 5, value: otherLists() });
@@ -434,6 +402,27 @@ describe('account sync — signed in, enabled', () => {
         assert.equal(store.userPreferences.theme, DEFAULT_PREFERENCES.theme);
         assert.equal(calls(server, 'preferences', 'PUT').length, 0);
         assert.equal(record(storage, 'preferences').user, 'u1');
+    });
+});
+
+describe('account sync — items the account refuses', () => {
+    it('a list over the size the account takes: the rest syncs, the panel says partly, and trimming it clears that', async () => {
+        const base = sanitizeLists(null, null, []);
+        const members = Array.from({ length: CONNECTIVITY_TARGET_LIMIT + 1 }, (_, i) => ({ id: `m${i}`, name: `Site ${i}`, url: `https://example.com/${i}.ico` }));
+        const big = { ...base, lists: base.lists.map((list) => (list.id === 'mine' ? { ...list, members } : list)) };
+        const server = fakeServer();
+        const { edit } = startSync({ server });
+        await settle();
+        const before = calls(server, 'connectivity', 'PUT').length;
+        edit('connectivityLists', big);
+        await settle();
+        assert.equal(state.connectivity, 'partial');
+        assert.equal(state.preferences, 'synced');
+        assert.equal(calls(server, 'connectivity', 'PUT').length, before, 'never sent');
+        edit('connectivityLists', { ...big, lists: big.lists.map((list) => (list.id === 'mine' ? { ...list, members: members.slice(0, 3) } : list)) });
+        await settle();
+        assert.equal(state.connectivity, 'synced');
+        assert.equal(calls(server, 'connectivity', 'PUT').length, before + 1);
     });
 });
 

@@ -259,6 +259,10 @@ export const settleApplied = (record, local, ids) => {
     }
     return { ...record, items };
 };
+// The record holds an item the server will not take as it is: it waits for its next edit.
+export const hasHeldBack = (record) => Object.values(record?.items ?? {})
+    .some((entry) => Boolean(entry.at) && entry.refused === entry.at);
+
 // --- pushing ----------------------------------------------------------------
 
 /**
@@ -354,15 +358,16 @@ export const mergeSave = ({ record, sent, answer, local, now }) => {
 
 // --- the Preferences panel --------------------------------------------------
 
-// The Sync section's status: 'signedOut' | 'saveFailed' | 'failed' | 'paused' | 'synced', or null for none.
-// `states` per enabled collection ('idle' | 'synced' | 'failed' | 'reload' | 'stopped'); a failed settings save
-// comes first, then a failed sync, then a pause (a version mismatch or a refused sign-in).
+// The Sync section's status: 'signedOut' | 'saveFailed' | 'failed' | 'paused' | 'partial' | 'synced', or null for
+// none. `states` per enabled collection ('idle' | 'synced' | 'partial' | 'failed' | 'reload' | 'stopped'); a failed
+// settings save comes first, then a failed sync, a pause (a version mismatch or a refused sign-in), then items held back.
 export const syncStatusOf = ({ available, signedIn, states, saveFailed = false }) => {
     if (!available) return null;
     if (!signedIn) return 'signedOut';
     if (saveFailed) return 'saveFailed';
     if (states.includes('failed')) return 'failed';
     if (states.includes('reload') || states.includes('stopped')) return 'paused';
+    if (states.includes('partial')) return 'partial';
     return states.includes('synced') ? 'synced' : null;
 };
 
@@ -370,6 +375,7 @@ export const syncStatusOf = ({ available, signedIn, states, saveFailed = false }
 // full sentence's key for the hover text; null for none (signed out says so in the section body instead).
 export const SYNC_STATUS_BADGES = Object.freeze({
     synced: Object.freeze({ tone: 'ok-fast', label: 'nav.preferences.syncStatusSynced', title: 'nav.preferences.syncSynced' }),
+    partial: Object.freeze({ tone: 'ok-mild', label: 'nav.preferences.syncStatusPartial', title: 'nav.preferences.syncPartial' }),
     paused: Object.freeze({ tone: 'ok-slow', label: 'nav.preferences.syncStatusPaused', title: 'nav.preferences.syncReload' }),
     failed: Object.freeze({ tone: 'fail', label: 'nav.preferences.syncStatusFailed', title: 'nav.preferences.syncFailed' }),
     saveFailed: Object.freeze({ tone: 'fail', label: 'nav.preferences.syncStatusFailed', title: 'nav.preferences.syncSaveFailed' }),

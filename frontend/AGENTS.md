@@ -206,8 +206,7 @@ Per enabled collection: signed out, the data is the device's (no record);
 signed in, the account's — the first pull adopts (an empty account takes the
 device's data, else the account replaces it), then edits stamp by hash and
 merge per item. Turned off (here, or a 409 `sync_off`) → record dropped, data
-kept. Another tab's saved preferences reach this tab unstamped (`storage`
-event) while their collection syncs. The popup sign-in awaits `syncBeforeReload`; sign-out flushes, clears
+kept. The popup sign-in awaits `syncBeforeReload`; sign-out flushes, clears
 enabled collections and reloads; a boot that finds the session ended clears
 too. `widgets/SyncChoiceDialog.vue` asks once (`use-sync-dialog.js`,
 `shouldShowSyncDialog`): every exit saves a choice; Preferences edits it at

@@ -10,7 +10,7 @@ import {
     SYNC_BATCH_MAX_BYTES, hashSyncValue, syncRecordKey, createSyncRecord, readSyncRecord, writeSyncRecord,
     isPending, isOwnRecord, removeSyncRecord, detectLocalChanges, refreshSyncHashes, readSyncItem, readSyncPage, preparePull, mergePull,
     settleApplied, changedSince, hashItems, buildUploadBatches, markRefused, readSyncSave, mergeSave, syncStatusOf,
-    syncStatusBadge, SYNC_STATUS_BADGES,
+    syncStatusBadge, SYNC_STATUS_BADGES, hasHeldBack,
 } from '../frontend/utils/features/account-sync.js';
 import {
     SYNC_COLLECTIONS, SYNC_TOMBSTONE_TTL_MS, SYNC_MAX_ITEMS_PER_REQUEST, SYNC_MAX_BODY_BYTES,
@@ -367,6 +367,9 @@ describe('account sync — upload batches', () => {
     it('markRefused holds an item back until its next edit', () => {
         const next = markRefused(record({ a: { hash: h('x'), at: 5 } }), ['a', 'missing']);
         assert.equal(isPending(next.items.a), false);
+        assert.equal(hasHeldBack(next), true);
+        assert.equal(hasHeldBack(detectLocalChanges(next, { a: 'x2' }, 9).record), false);
+        assert.equal(hasHeldBack(record({ a: { hash: h('x'), at: 5, ack: 5 }, b: { hash: h('y') } })), false);
         assert.ok(isPending(detectLocalChanges(next, { a: 'x2' }, 9).record.items.a));
     });
 });
@@ -455,6 +458,9 @@ describe('account sync — panel status', () => {
         assert.deepEqual(syncStatusBadge('paused'), { tone: 'ok-slow', label: 'nav.preferences.syncStatusPaused', title: 'nav.preferences.syncReload' });
         assert.deepEqual(syncStatusBadge('failed'), { tone: 'fail', label: 'nav.preferences.syncStatusFailed', title: 'nav.preferences.syncFailed' });
         assert.deepEqual(syncStatusBadge('saveFailed'), { tone: 'fail', label: 'nav.preferences.syncStatusFailed', title: 'nav.preferences.syncSaveFailed' });
+        assert.deepEqual(syncStatusBadge('partial'), { tone: 'ok-mild', label: 'nav.preferences.syncStatusPartial', title: 'nav.preferences.syncPartial' });
+        assert.equal(syncStatusOf({ available: true, signedIn: true, states: ['synced', 'partial'] }), 'partial');
+        assert.equal(syncStatusOf({ available: true, signedIn: true, states: ['partial', 'reload'] }), 'paused');
         assert.equal(syncStatusBadge('signedOut'), null);
         assert.equal(syncStatusBadge(null), null);
         assert.ok(Object.isFrozen(SYNC_STATUS_BADGES));

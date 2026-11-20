@@ -372,9 +372,11 @@
       "syncReload": "A sincronização está pausada nesta página. Recarregue a página para continuar.",
       "syncSaveFailed": "Não foi possível salvar a configuração de sincronização. Tente novamente.",
       "syncFailed": "A última sincronização não foi concluída. Ela será tentada de novo na sua próxima alteração ou visita.",
+      "syncPartial": "Parte destes dados não pôde ser salva na sua conta e fica apenas neste dispositivo.",
       "syncStatusSynced": "Sincronizado",
       "syncStatusPaused": "Pausado",
       "syncStatusFailed": "Não sincronizado",
+      "syncStatusPartial": "Sincronizado em parte",
       "connectivity": {
         "defaultList": "Lista padrão",
         "defaultListTips": "A lista exibida pela seção quando a página carrega.",

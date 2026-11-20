@@ -372,9 +372,11 @@
       "syncReload": "Sync is paused on this page. Reload the page to continue.",
       "syncSaveFailed": "Could not save the sync setting. Try again.",
       "syncFailed": "The last sync did not go through. It tries again on your next change or visit.",
+      "syncPartial": "Some of this data could not be saved to your account and stays on this device only.",
       "syncStatusSynced": "Synced",
       "syncStatusPaused": "Paused",
       "syncStatusFailed": "Not synced",
+      "syncStatusPartial": "Partly synced",
       "connectivity": {
         "defaultList": "Default List",
         "defaultListTips": "The list the section opens on when the page loads.",

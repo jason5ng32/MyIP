@@ -389,7 +389,7 @@ const accountSyncAvailable = computed(() => store.accountSyncAvailable);
 const isSignedIn = computed(() => store.isSignedIn);
 const syncState = useAccountSyncState();
 const { textClass } = useStatusTone();
-const SYNC_BADGE_ICONS = { 'ok-fast': CircleCheck, 'ok-slow': CirclePause, fail: CircleAlert };
+const SYNC_BADGE_ICONS = { 'ok-fast': CircleCheck, 'ok-mild': CircleAlert, 'ok-slow': CirclePause, fail: CircleAlert };
 const syncDraft = ref({ master: false, preferences: true, connectivity: true });
 const syncSaving = ref(false);
 const syncSaveFailed = ref(false);
