@@ -253,6 +253,32 @@ describe('account sync — the account\'s settings', () => {
         assert.ok(record(storage, 'preferences'), 'still syncing');
     });
 
+    it('a save that fails over a pending read: the settings are read again', async () => {
+        const server = fakeServer({ settings: { decided: true, collections: BOTH } });
+        let answerRead;
+        let held = false;
+        const request = (url, method = 'GET', body = null) => {
+            if (url !== SYNC_ENDPOINT || method !== 'GET' || held) return server.request(url, method, body);
+            held = true;
+            return new Promise((resolve) => { answerRead = () => resolve({ decided: true, collections: BOTH }); });
+        };
+        const storage = memoryStorage();
+        writeCachedSyncSettings(storage, { user: 'u1', decided: true, collections: [] });
+        const { store } = startSync({ server, storage, request });
+        await settle();
+        server.fail = (collection, method) => (collection === 'settings' && method === 'PUT' ? httpError(500) : null);
+        const { result } = await quiet(async () => {
+            const saved = await saveSyncCollections(['preferences']);
+            await settle();
+            return saved;
+        });
+        assert.equal(result, false);
+        answerRead();
+        await settle();
+        assert.equal(store.syncSettings.status, 'fresh');
+        assert.deepEqual(store.syncSettings.collections, BOTH);
+    });
+
     it('another user\'s cache is ignored', async () => {
         const storage = memoryStorage();
         writeCachedSyncSettings(storage, { user: 'u2', decided: true, collections: BOTH });

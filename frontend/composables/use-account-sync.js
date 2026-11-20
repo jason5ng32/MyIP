@@ -419,6 +419,8 @@ export const useAccountSync = ({
             return true;
         } catch (error) {
             warn('settings', 'save failed', error);
+            // A read this save overlapped was dropped: read again.
+            if (userId.value === uid) fetchSettings(uid);
             return false;
         }
     });
