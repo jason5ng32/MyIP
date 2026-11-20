@@ -64,7 +64,7 @@ user storage (`GET /api/achievements`, loaded and unlocked through
 `PUT /api/achievements` by `User.vue`); its `totalUses` feeds
 `user:info-loaded`. Achievements need `store.achievementsAvailable` (sign-in +
 `userStorage`); the user level and the usage dialog need `store.usageAvailable`
-(sign-in + `ipChecking`, `/api/getuserinfo`) — each works, or is absent,
+(sign-in + `ipChecking`, `/api/usage`) — each works, or is absent,
 without the other. The account dialog's Benefits list is a registry
 (`data/user-benefits.js`: groups → tiers → items, each with its own gate),
 resolved by `utils/features/user-benefits.js`; the dialog and its menu entry

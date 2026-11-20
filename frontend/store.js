@@ -154,7 +154,7 @@ export const useMainStore = defineStore('main', {
       });
     },
     // quotaExceeded(quotaKey): whether a metered feature's monthly quota is
-    // exhausted, from the /api/getuserinfo quota snapshot in remoteUserInfo.
+    // exhausted, from the /api/usage quota snapshot in remoteUserInfo.
     // Keys come from the registries (`quotaKey` in data/tools.js and
     // data/ip-databases.js). Frontend first line only — the backend enforces
     // the same limits; absent data (signed out, old backend, fetch pending)

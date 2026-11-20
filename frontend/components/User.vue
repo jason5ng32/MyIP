@@ -152,7 +152,7 @@ const openUserBenefits = () => {
     // Signed-in visitors open straight onto their usage numbers.
     activeTab.value = isSignedIn.value && benefitsView.value.usageTab ? 'usage' : 'benefits';
     isOpen.value = true;
-    if (isSignedIn.value) refreshUserInfo();
+    if (isSignedIn.value) refreshUsage();
     trackEvent('Nav', 'NavClick', 'UserBenefits');
 };
 
@@ -197,10 +197,10 @@ const dailyRow = computed(() => {
 
 // Refetch on every open (bypassing the one-shot page-load guard) so the
 // numbers reflect what the visitor just consumed in this session.
-const refreshUserInfo = async () => {
+const refreshUsage = async () => {
     if (!isSignedIn.value || !usageAvailable.value) return;
     try {
-        store.remoteUserInfo = await authenticatedFetch(`/api/getuserinfo`);
+        store.remoteUserInfo = await authenticatedFetch(`/api/usage`);
     } catch (error) {
         console.error('Error refreshing user info:', error);
     }
@@ -208,10 +208,10 @@ const refreshUserInfo = async () => {
 
 // Fetch the usage summary ({ userLevel, quota }). `remoteUserInfoFetched`
 // flips only on success, so a failed round stays refetchable from the menu.
-const getUserInfo = async () => {
+const getUsage = async () => {
     if (remoteUserInfoFetched.value || !isSignedIn.value || !usageAvailable.value) return;
     try {
-        store.remoteUserInfo = await authenticatedFetch(`/api/getuserinfo`);
+        store.remoteUserInfo = await authenticatedFetch(`/api/usage`);
         store.remoteUserInfoFetched = true;
     } catch (error) {
         console.error('Error fetching user info:', error);
@@ -274,7 +274,7 @@ const updateUserAchievement = async (achievementName) => {
 // independently, each once its capability is known; both self-guard.
 const accountDataReady = computed(() => isSignedIn.value && (store.allHasLoaded || isOffHome.value));
 watch(() => accountDataReady.value && usageAvailable.value, (ready) => {
-    if (ready) getUserInfo();
+    if (ready) getUsage();
 }, { immediate: true });
 watch(() => accountDataReady.value && achievementsAvailable.value, (ready) => {
     if (ready) getAchievements();
@@ -294,7 +294,7 @@ watch(() => route.path, () => {
 watch(() => triggerRemoteUserInfo.value, (newVal) => {
     if (!newVal) return;
     store.triggerRemoteUserInfo = false;
-    getUserInfo();
+    getUsage();
     getAchievements();
 });
 

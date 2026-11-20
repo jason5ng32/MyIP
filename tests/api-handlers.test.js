@@ -17,7 +17,7 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 import configsHandler from '../api/configs.js';
 import googleMapHandler from '../api/google-map.js';
 import dnsResolverHandler from '../api/dns-resolver.js';
-import getUserInfoHandler from '../api/get-user-info.js';
+import usageHandler from '../api/usage.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
 import invisibilityHandler from '../api/invisibility-test.js';
@@ -1545,13 +1545,13 @@ describe('sync settings handlers', () => {
     });
 });
 
-// -- get-user-info handler ------------------------------------------------
+// -- usage handler --------------------------------------------------------
 
-describe('get-user-info handler', () => {
+describe('usage handler', () => {
     it('reports missing API key before fetch', async () => {
         delete process.env.IPCHECKING_API_KEY;
         const res = createResponse();
-        await getUserInfoHandler(createRequest(), res);
+        await usageHandler(createRequest(), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
@@ -1561,7 +1561,7 @@ describe('get-user-info handler', () => {
         delete process.env.IPCHECKING_API_ENDPOINT;
         globalThis.fetch = async () => assert.fail('no upstream call');
         const res = createResponse();
-        await getUserInfoHandler(createRequest(), res);
+        await usageHandler(createRequest(), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
@@ -1574,7 +1574,7 @@ describe('get-user-info handler', () => {
         achievements: { IAmHuman: { achieved: true, achievedTime: 1 } },
     };
 
-    it('asks /userinfo with the system key and the listed caller headers, relaying { userLevel, quota }', async () => {
+    it('asks /usage with the system key and the listed caller headers, relaying { userLevel, quota }', async () => {
         process.env.IPCHECKING_API_KEY = 'test-key';
         process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
         let called;
@@ -1583,10 +1583,10 @@ describe('get-user-info handler', () => {
             return new Response(JSON.stringify(upstreamSummary), { status: 200 });
         };
         const res = signedIn(createResponse());
-        await getUserInfoHandler(withVisitorHeaders(createRequest()), res);
+        await usageHandler(withVisitorHeaders(createRequest()), res);
         assert.equal(res.statusCode, 200);
         assert.deepEqual(res.body, { userLevel: 'Standard', quota: upstreamSummary.quota });
-        assert.equal(called.url.pathname, '/userinfo');
+        assert.equal(called.url.pathname, '/usage');
         assert.equal(called.url.searchParams.get('key'), 'test-key');
         assertForwardedHeaders(called.init.headers, END_USER);
     });

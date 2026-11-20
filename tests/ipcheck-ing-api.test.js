@@ -89,8 +89,8 @@ describe('pickForwardedHeaders', () => {
 
 describe('buildIpCheckingUrl', () => {
     it('appends the path to the endpoint and sets the key under the given name', () => {
-        const withKey = buildIpCheckingUrl('https://upstream.invalid/v1', '/userinfo', { key: 'k' });
-        assert.equal(withKey.pathname, '/v1/userinfo');
+        const withKey = buildIpCheckingUrl('https://upstream.invalid/v1', '/usage', { key: 'k' });
+        assert.equal(withKey.pathname, '/v1/usage');
         assert.equal(withKey.searchParams.get('key'), 'k');
         const withApikey = buildIpCheckingUrl('https://upstream.invalid', '/getpdresult/abc', { key: 'k', keyParam: 'apikey' });
         assert.equal(withApikey.searchParams.get('apikey'), 'k');
@@ -121,7 +121,7 @@ describe('requestIpCheckingApi', () => {
             if (endpoint) process.env.IPCHECKING_API_ENDPOINT = endpoint;
             else delete process.env.IPCHECKING_API_ENDPOINT;
             assert.equal(isIpCheckingApiConfigured(), false);
-            assert.equal(await requestIpCheckingApi('/userinfo', { forwardFrom: { headers: VISITOR_HEADERS } }), null);
+            assert.equal(await requestIpCheckingApi('/usage', { forwardFrom: { headers: VISITOR_HEADERS } }), null);
         }
         assert.equal(calls.length, 0);
         configure();
@@ -131,9 +131,9 @@ describe('requestIpCheckingApi', () => {
     it('forwards only the listed visitor headers', async () => {
         configure();
         const calls = stubFetch();
-        await requestIpCheckingApi('/userinfo', { forwardFrom: { headers: VISITOR_HEADERS } });
+        await requestIpCheckingApi('/usage', { forwardFrom: { headers: VISITOR_HEADERS } });
         const { url, init } = calls[0];
-        assert.equal(url.pathname, '/userinfo');
+        assert.equal(url.pathname, '/usage');
         assert.equal(url.searchParams.get('key'), 'test-key');
         assert.deepEqual(init.headers, pickForwardedHeaders(VISITOR_HEADERS));
         for (const name of ['host', 'cookie', 'referer', 'origin', 'content-length', 'content-type', 'sentry-trace', 'baggage',
@@ -164,7 +164,7 @@ describe('requestIpCheckingApi', () => {
         configure();
         setUpstreamUserAgent('MyIP/v0.0.0/https://example.test');
         const calls = stubFetch();
-        await requestIpCheckingApi('/userinfo', { forwardFrom: { headers: { 'User-Agent': 'VisitorBrowser/1.0' } } });
+        await requestIpCheckingApi('/usage', { forwardFrom: { headers: { 'User-Agent': 'VisitorBrowser/1.0' } } });
         const visitor = Object.entries(calls[0].init.headers).filter(([name]) => name.toLowerCase() === 'user-agent');
         assert.deepEqual(visitor, [['user-agent', 'VisitorBrowser/1.0']]);
         await requestIpCheckingApi('/asnreputation', { query: { asn: 13335 } });
@@ -175,10 +175,10 @@ describe('requestIpCheckingApi', () => {
     it('sends the end-user id as its own header only when given', async () => {
         configure();
         const calls = stubFetch();
-        await requestIpCheckingApi('/userinfo', { forwardFrom: { headers: VISITOR_HEADERS }, endUserId: 'user-123' });
+        await requestIpCheckingApi('/usage', { forwardFrom: { headers: VISITOR_HEADERS }, endUserId: 'user-123' });
         assert.equal(END_USER_HEADER, 'x-end-user-id');
         assert.deepEqual(calls[0].init.headers, { ...pickForwardedHeaders(VISITOR_HEADERS), 'x-end-user-id': 'user-123' });
-        await requestIpCheckingApi('/userinfo', { forwardFrom: { headers: VISITOR_HEADERS }, endUserId: undefined });
+        await requestIpCheckingApi('/usage', { forwardFrom: { headers: VISITOR_HEADERS }, endUserId: undefined });
         assert.equal(END_USER_HEADER in calls[1].init.headers, false);
         assert.equal('authorization' in calls[1].init.headers, false);
     });

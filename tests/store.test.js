@@ -505,7 +505,7 @@ describe('store — handleSignInError', () => {
 });
 
 describe('store — quota snapshot', () => {
-  // The backend's /userinfo quota carries percentages only.
+  // The backend's /api/usage quota carries percentages only.
   const snapshot = (features) => ({ quota: { isSponsor: false, features } });
 
   it('quotaExceeded(key) reads the exhausted flag, not the percentage', () => {

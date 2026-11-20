@@ -73,7 +73,7 @@ const hitsOf = (pattern, files = [...SOURCES.keys()]) => files.flatMap((path) =>
 
 // --- fixture ----------------------------------------------------------------
 
-// The /api/getuserinfo summary, `{ userLevel, quota }`, as the front end reads it (invented values).
+// The /api/usage summary, `{ userLevel, quota }`, as the front end reads it (invented values).
 const summaryFixture = () => ({
   userLevel: 'Standard',
   quota: {

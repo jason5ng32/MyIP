@@ -60,13 +60,21 @@
       },
       "account": {
         "title": "What we collect when you sign in",
+        "intro": "Signing in is optional — you can use most of the tools on the site without an account. We use Google Firebase Authentication to manage your login.",
+        "email": "Your sign-in e-mail is used to identify your account and to sync your account data.",
+        "ipChecking": "Some features on this site are provided through the IPCheck.ing API. It requires each user to be identified by their sign-in e-mail to prevent abuse, and how much you use those features is counted for the same purpose."
+      },
+      "accountStorage": {
+        "title": "What is stored with your account",
         "paragraphs": [
-          "Signing in is optional — you can use most of the tools on the site without an account. Signing in is not a way for us to charge you, now or later; it is what we need to keep the service from being abused. We use Google Firebase Authentication to manage your login and to sync your achievements. When you are signed in, the following is collected:"
+          "When you sign in, this deployment keeps the following in its own database, linked to your account:"
         ],
         "bullets": [
-          "Your sign-in email, used to identify your account so we can provide the features that require logging in.",
-          "Your usage count of advanced features, used to detect malicious abuse.",
-          "At the end of each accounting period, the abuse-analysis logs for each signed-in user, if any, are cleared automatically; only the total usage counts are kept."
+          "An account identifier, which is a random string rather than your e-mail or name, and the time it was first stored.",
+          "The achievements you have unlocked and when you unlocked them.",
+          "How many times you have used each counted feature, as a number only: no target, IP address or time of use.",
+          "Only if you turn sync on: your preferences and your Connectivity test lists, including the sites you added to them. Turning a sync item off deletes it from your account.",
+          "No IP address, test result, snapshot, e-mail address, name or user agent is stored there."
         ]
       },
       "telemetry": {
@@ -91,7 +99,8 @@
       "cookies": {
         "title": "Cookies & local storage",
         "analytics": "Google Analytics stores a cookie to recognise returning visitors.",
-        "local": "Your own settings (theme, language, tool preferences) are kept in your browser's local storage. If you sign in with sync on, they are also stored in your account."
+        "local": "Your own settings (theme, language, tool preferences) are kept in your browser's local storage.",
+        "localSync": "If you sign in with sync on, they are also stored in your account."
       },
       "eu": {
         "title": "If you are in the EU/EEA or UK",

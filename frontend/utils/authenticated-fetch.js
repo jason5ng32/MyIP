@@ -1,8 +1,8 @@
-// Authenticated fetch wrapper: attaches the Firebase ID token for /api/* proxy
-// calls and enforces a client-side timeout so a hung backend can't pin the
-// request open indefinitely. Every caller hits an /api/* proxy whose upstream is
-// capped at 8s (fetchUpstream); the 10s client default sits just above that so
-// the server's own error surfaces instead of the browser aborting first.
+// Authenticated fetch wrapper: attaches the Firebase ID token for /api/* calls
+// (the backend verifies it) and enforces a client-side timeout so a hung backend
+// can't pin the request open indefinitely. A proxy's upstream is capped at 8s
+// (fetchUpstream); the 10s client default sits just above that so the server's
+// own error surfaces instead of the browser aborting first.
 import { useMainStore } from '../store.js';
 import { fetchWithTimeout } from './fetch-with-timeout.js';
 
@@ -27,7 +27,7 @@ export async function authenticatedFetch(url, method = 'GET', body = null, timeo
         timeoutMs,
     };
 
-    // Check if the URL is a proxy API that needs authentication
+    // Every /api/* call carries the signed-in user's token
     const isProxyApi = url.startsWith('/api/');
 
     if (isProxyApi && store.user) {

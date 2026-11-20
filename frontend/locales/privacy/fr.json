@@ -60,13 +60,21 @@
       },
       "account": {
         "title": "Ce que nous collectons lorsque vous vous connectez",
+        "intro": "La connexion est facultative — vous pouvez utiliser la plupart des outils du site sans compte. Nous utilisons Google Firebase Authentication pour gérer votre connexion.",
+        "email": "Votre e-mail de connexion sert à identifier votre compte et à synchroniser les données de votre compte.",
+        "ipChecking": "Certaines fonctionnalités de ce site sont fournies par l’API IPCheck.ing. Elle exige que chaque utilisateur soit identifié par son e-mail de connexion afin de prévenir les abus, et votre utilisation de ces fonctionnalités est comptabilisée dans le même but."
+      },
+      "accountStorage": {
+        "title": "Ce qui est stocké avec votre compte",
         "paragraphs": [
-          "La connexion est facultative — vous pouvez utiliser la plupart des outils du site sans compte. La connexion n'est pas un moyen de vous facturer, ni aujourd'hui ni demain : elle nous est nécessaire pour empêcher les abus du service. Nous utilisons Google Firebase Authentication pour gérer votre connexion et synchroniser vos succès. Lorsque vous êtes connecté, les éléments suivants sont collectés :"
+          "Lorsque vous vous connectez, ce site conserve les éléments suivants dans sa propre base de données, liés à votre compte :"
         ],
         "bullets": [
-          "Votre adresse e-mail de connexion, utilisée pour identifier votre compte afin de fournir les fonctionnalités nécessitant une connexion.",
-          "Votre nombre d'utilisations des fonctionnalités avancées, utilisé pour détecter les abus malveillants.",
-          "À la fin de chaque période de comptabilisation, les journaux d'analyse des abus de chaque utilisateur connecté, le cas échéant, sont effacés automatiquement ; seuls les totaux d'utilisation sont conservés."
+          "Un identifiant de compte, une chaîne aléatoire qui n'est ni votre adresse e-mail ni votre nom, et la date de son premier enregistrement.",
+          "Les succès que vous avez débloqués et la date de leur déblocage.",
+          "Le nombre de fois où vous avez utilisé chaque fonctionnalité comptabilisée, sous forme de simple nombre : ni cible, ni adresse IP, ni date d'utilisation.",
+          "Uniquement si vous activez la synchronisation : vos préférences et vos listes du test de connectivité, y compris les sites que vous y avez ajoutés. Désactiver un élément synchronisé le supprime de votre compte.",
+          "Aucune adresse IP, aucun résultat de test, aucun instantané, aucune adresse e-mail, aucun nom ni user agent n'y est stocké."
         ]
       },
       "telemetry": {
@@ -91,7 +99,8 @@
       "cookies": {
         "title": "Cookies et stockage local",
         "analytics": "Google Analytics stocke un cookie pour reconnaître les visiteurs récurrents.",
-        "local": "Vos propres réglages (thème, langue, préférences des outils) sont conservés dans le stockage local de votre navigateur. Si vous êtes connecté avec la synchronisation activée, ils sont aussi stockés dans votre compte."
+        "local": "Vos propres réglages (thème, langue, préférences des outils) sont conservés dans le stockage local de votre navigateur.",
+        "localSync": "Si vous êtes connecté avec la synchronisation activée, ils sont aussi stockés dans votre compte."
       },
       "eu": {
         "title": "Si vous êtes dans l'UE/EEE ou au Royaume-Uni",

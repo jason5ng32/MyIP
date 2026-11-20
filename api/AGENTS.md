@@ -25,7 +25,7 @@ Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `cf-radar` / `asn-history` / `asn-connectivity` / `asn-profile` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona` /
-`ip-blocklist` / `bulk-lookup`), account data (`get-user-info`, a proxy;
+`ip-blocklist` / `bulk-lookup`), account data (`usage`, a proxy;
 `achievements` / `sync` / `sync-settings`, from user storage), platform (`configs` /
 `sentry-tunnel` / `share-report`). Each file's header comment states its route
 and purpose — read those for specifics.
@@ -227,7 +227,7 @@ on demand.
 ### IPCheck.ing API requests go through one helper with a header list
 
 Handlers proxying the IPCheck.ing API (`ipcheck-ing`,
-`invisibility-test`, `get-user-info`,
+`invisibility-test`, `usage`,
 `dns-leak-test`, `persona`, `ip-blocklist`, and `asn-profile`'s reputation via
 `server/asn-reputation.js`) send their requests through
 `server/ipcheck-ing-api.js`. It forwards a fixed list of the caller's headers
@@ -243,7 +243,7 @@ so no feature is marked used up. Third-party upstreams get only what's
 explicitly needed.
 
 Usage reaches MyIP two ways: that `quota`-coded answer (the front end marks the
-feature used up) and the `/api/getuserinfo` summary, relayed as `{ userLevel,
+feature used up) and the `/api/usage` summary, relayed as `{ userLevel,
 quota }` and held in memory only (`store.remoteUserInfo`; MyIP reads its
 `quota.features`). Each quota has exactly one meter — the IPCheck.ing API; the
 lifetime counts in user storage (`feature_uses`) feed achievements only, never

@@ -43,7 +43,7 @@ import { isCompleteProfile } from './server/asn-profile.js';
 import validateConfigs from './api/configs.js';
 import bulkLookupHandler from './api/bulk-lookup.js';
 import { bulkLookupSource } from './server/bulk-lookup-sources.js';
-import getUserinfo from './api/get-user-info.js';
+import usageHandler from './api/usage.js';
 import listAchievementsHandler, { unlockAchievement as unlockAchievementHandler } from './api/achievements.js';
 import readSyncHandler, { writeSyncedItems as writeSyncHandler } from './api/sync.js';
 import readSyncSettingsHandler, { writeSyncSettings as writeSyncSettingsHandler } from './api/sync-settings.js';
@@ -222,7 +222,7 @@ app.get('/api/dnsresolver', requireValidDomain('hostname'), requireValidRecordTy
 app.get('/api/dnsleaktest/session/:token', requireUser(), countFeatureUse(FEATURE_USES.dnsleaktest), dnsLeakGetResult);
 app.get('/api/invisibility', requireUser(), countFeatureUse(FEATURE_USES.invisibility), invisibilitytestHandler);
 app.get('/api/ipblocklist', requirePublicIP(), optionalUser(), countFeatureUse(FEATURE_USES.ipblocklist), ipBlocklistHandler);
-app.get('/api/getuserinfo', requireUser(), getUserinfo);
+app.get('/api/usage', requireUser(), usageHandler);
 // Achievements and synced items live in user storage: 503 without it.
 app.get('/api/achievements', requireUser(), requireUserStorage(), listAchievementsHandler);
 app.put('/api/achievements', requireUser(), requireUserStorage(), unlockAchievementHandler);
