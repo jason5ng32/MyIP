@@ -165,7 +165,7 @@
         },
         "CrossingTheWall": {
           "Title": "Crossing The Wall",
-          "Meet": "All 8 test IPs are different in the Rule Test"
+          "Meet": "Get at least 8 different IPs in the Rule Test"
         },
         "GlobeTrotter": {
           "Title": "Globe Trotter",

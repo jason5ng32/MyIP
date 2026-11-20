@@ -37,8 +37,8 @@ export const ACHIEVEMENT_RULES = [
     // Whois lookup ran — payload { query }.
     { event: 'whois:lookup', slug: 'CuriousCat', when: (p) => (p.query || '').toLowerCase().includes('ipcheck.ing') },
 
-    // Rule test finished — payload { uniqueIPCount }.
-    { event: 'ruletest:finished', slug: 'CrossingTheWall', when: (p) => p.uniqueIPCount === 8 },
+    // Rule test finished — payload { uniqueIPCount }: distinct valid IPs over the tests.
+    { event: 'ruletest:finished', slug: 'CrossingTheWall', when: (p) => p.uniqueIPCount >= 8 },
 
     // Invisibility test — payloads: {} / { proxyScore, vpnScore } (floored ints).
     { event: 'invisibility:started', slug: 'JustInCase' },

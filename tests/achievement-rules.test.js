@@ -116,10 +116,11 @@ describe('whois:lookup', () => {
 });
 
 describe('ruletest:finished', () => {
-  it('CrossingTheWall needs exactly 8 unique IPs', () => {
+  it('CrossingTheWall needs at least 8 unique IPs', () => {
     const rule = rulesFor('ruletest:finished').CrossingTheWall;
     assert.equal(fires(rule, { uniqueIPCount: 7 }), false);
     assert.equal(fires(rule, { uniqueIPCount: 8 }), true);
+    assert.equal(fires(rule, { uniqueIPCount: 12 }), true);
   });
 });
 

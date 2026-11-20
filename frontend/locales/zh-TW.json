@@ -165,7 +165,7 @@
         },
         "CrossingTheWall": {
           "Title": "八仙過牆",
-          "Meet": "在規則測試中，8 個測試的 IP 全部不相同"
+          "Meet": "在規則測試中，出現至少 8 個不同的 IP"
         },
         "GlobeTrotter": {
           "Title": "包羅萬有",

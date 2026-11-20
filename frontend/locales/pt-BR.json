@@ -165,7 +165,7 @@
         },
         "CrossingTheWall": {
           "Title": "Cruzando o muro",
-          "Meet": "Todos os 8 IPs de teste são diferentes no Teste de regras"
+          "Meet": "Obtenha pelo menos 8 IPs diferentes no Teste de regras"
         },
         "GlobeTrotter": {
           "Title": "Viajante global",
