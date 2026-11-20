@@ -11,8 +11,8 @@
       <p class="mt-4 mb-0 text-sm font-medium leading-relaxed">{{ t('nav.preferences.syncNever') }}</p>
 
       <div class="mt-5 flex flex-wrap justify-end gap-2">
-        <Button variant="outline" @click="emit('dismiss')">{{ t('syncDialog.Later') }}</Button>
-        <Button @click="emit('save', choice)">{{ t('syncDialog.Save') }}</Button>
+        <Button variant="outline" @click="emit('dismiss')" class="cursor-pointer">{{ t('syncDialog.Later') }}</Button>
+        <Button @click="emit('save', choice)" class="cursor-pointer">{{ t('syncDialog.Save') }}</Button>
       </div>
     </DialogContent>
   </Dialog>

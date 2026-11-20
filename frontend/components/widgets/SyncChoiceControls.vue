@@ -13,7 +13,7 @@
       <label v-for="option in SYNC_OPTIONS" :key="option.id" class="flex items-center gap-2 text-sm select-none"
         :class="disabled || !modelValue.master ? 'opacity-50' : 'cursor-pointer'">
         <Checkbox :model-value="!modelValue.master || modelValue[option.id]" :disabled="disabled || !modelValue.master"
-          @update:model-value="(value) => toggle(option.id, value === true)" />
+          @update:model-value="(value) => toggle(option.id, value === true)" :class="disabled || !modelValue.master ? '' : 'cursor-pointer'" />
         {{ t(option.label) }}
       </label>
     </div>
