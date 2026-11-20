@@ -82,17 +82,6 @@ describe('store — sheet toggling', () => {
     assert.equal(s.openSheet, 'tools');
   });
 
-  it('openPreferencesAt opens Preferences with a section to reveal, cleared once shown', () => {
-    const s = useMainStore();
-    assert.equal(s.preferencesFocus, null);
-    s.setOpenSheet('pulse');
-    s.openPreferencesAt('Pref_ipGeoSource');
-    assert.equal(s.openSheet, 'preferences');
-    assert.equal(s.preferencesFocus, 'Pref_ipGeoSource');
-    s.clearPreferencesFocus();
-    assert.equal(s.preferencesFocus, null);
-    assert.equal(s.openSheet, 'preferences');
-  });
 });
 
 describe('store — dark mode side effect', () => {

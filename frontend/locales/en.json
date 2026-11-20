@@ -11,7 +11,7 @@
     "QuotaSponsorCta": "Sponsor Us",
     "ViewUsage": "View usage",
     "Usage": {
-      "Title": "Usage Stats",
+      "Title": "IPCheck.ing usage",
       "Note": "Advanced features come with a free monthly quota, which resets automatically at the start of each month (UTC). Repeat IP advanced data queries are served from cache and don't use your quota.",
       "IpinfoFeature": "IP Advanced Data",
       "PercentUsed": "{percent}% used",
@@ -39,35 +39,40 @@
     "Benefits": {
       "Title": "Benefits & Usage",
       "Benefit": "Benefits",
-      "Note1": "As an open-source product, IPCheck.ing is free to use. Maintaining it takes considerable effort and cost.",
-      "Note2": "To keep the project running sustainably and prevent abuse, some advanced features require signing in. Every signed-in user gets a generous monthly quota — if it's not enough for you, consider sponsoring us to unlock higher limits.",
+      "Intro": "The core tools are free to use without an account; signing in adds more, as listed below.",
       "Current": "Current",
+      "Groups": {
+        "Basic": "Basic benefits",
+        "IpChecking": "IPCheck.ing benefits"
+      },
       "Tiers": {
         "Visitor": {
           "Name": "Visitors",
-          "Item1": "IP lookup with multi-source comparison",
-          "Item2": "Connectivity and service availability checks",
-          "Item3": "WebRTC / DNS leak tests",
-          "Item4": "Speed test, global latency and MTR",
-          "Item5": "Whois, DNS resolver and more advanced tools",
-          "Item6": "No registration required — open source and self-hostable"
+          "IpLookup": "IP lookup with multi-source comparison",
+          "Connectivity": "Connectivity and service availability checks",
+          "LeakTests": "WebRTC / DNS leak tests",
+          "SpeedTest": "Speed test, global latency and MTR",
+          "Tools": "Whois, DNS resolver and more advanced tools",
+          "OpenSource": "No registration required — open source and self-hostable"
         },
         "SignedIn": {
           "Name": "Signed-in Users",
-          "Item1": "Everything in Visitors",
-          "Item2": "View advanced IP data: quality score, proxy detection, network type and nativeness",
-          "Item3": "Use the invisibility test",
-          "Item4": "Use the in-depth DNS leak test",
-          "Item5": "View your achievement badges",
-          "Item6": "Ask IPilot, our AI assistant",
-          "Item7": "Advanced features come with a free monthly quota that resets every month"
+          "IncludesVisitor": "Everything in Visitors",
+          "Achievements": "View your achievement badges",
+          "AccountSync": "Sync your preferences and Connectivity test lists across devices",
+          "AdvancedIp": "View advanced IP data: quality score, proxy detection, network type and nativeness",
+          "InvisibilityTest": "Use the invisibility test",
+          "DnsLeakTest": "Use the in-depth DNS leak test",
+          "PersonaCheck": "Use the in-depth Persona Check",
+          "IPilot": "Ask IPilot, our AI assistant",
+          "MonthlyQuota": "Advanced features come with a free monthly quota that resets every month"
         },
         "Sponsor": {
           "Name": "Sponsors",
-          "Item1": "Everything in Signed-in Users",
-          "Item2": "Higher monthly quotas for advanced features",
-          "Item3": "Support the ongoing development of this open-source project",
-          "Item4": "More generous 24-hour limit"
+          "IncludesSignedIn": "Everything in Signed-in Users",
+          "HigherQuota": "Higher monthly quotas for advanced features",
+          "DailyLimit": "More generous 24-hour limit",
+          "SupportProject": "Support the ongoing development of this open-source project"
         }
       }
     },
@@ -2081,8 +2086,7 @@
     },
     "sourceFields": {
       "source": "Data source",
-      "preferences": "Preferences",
-      "sentence": "Geolocation database in use: {source}. You can change it in {preferences}."
+      "sentence": "IP geolocation database in use: {source}. You can change it in Preferences."
     },
     "countryTraffic": {
       "subtitle": "Typical weekly online activity in this country/region — view human-generated traffic only, or all traffic (including bot/automated traffic).",

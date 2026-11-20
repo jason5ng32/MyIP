@@ -98,15 +98,15 @@
         </DropdownMenuItem>
       </template>
 
-      <!-- Every state: preferences + benefits & usage (where the usage summary exists) -->
+      <!-- Every state: preferences + the benefits dialog (where signing in adds something) -->
       <DropdownMenuSeparator />
       <DropdownMenuItem class="cursor-pointer" @select="openPreferences">
         <Cog />
         <span>{{ t('nav.preferences.title') }}</span>
       </DropdownMenuItem>
-      <DropdownMenuItem v-if="usageAvailable" class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
+      <DropdownMenuItem v-if="benefitsView.entry" class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
         <HeartHandshake />
-        <span>{{ t('user.Benefits.Title') }}</span>
+        <span>{{ t(benefitsView.titleKey) }}</span>
       </DropdownMenuItem>
 
       <template v-if="isSignedIn">
@@ -129,6 +129,7 @@ import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { unixToDateTime } from '@/utils/time-utils';
+import { userBenefitsView } from '@/utils/features/user-benefits.js';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -160,6 +161,13 @@ const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
 // The level badge and usage need the IPCheck.ing API; achievements need user storage.
 const usageAvailable = computed(() => store.usageAvailable);
 const achievementsAvailable = computed(() => store.achievementsAvailable);
+// Whether the benefits dialog exists here, and its title.
+const benefitsView = computed(() => userBenefitsView({
+  capabilities: store.capabilities,
+  achievements: achievementsAvailable.value,
+  accountSync: store.accountSyncAvailable,
+  usage: usageAvailable.value,
+}));
 // Sign-in methods attached to this account.
 const linkedProviders = computed(() => store.linkedProviders);
 

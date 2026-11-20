@@ -1,63 +1,24 @@
 <template>
-    <!-- User account dialog: Benefits + Usage merged behind Tabs. Signed-in
-         visitors land on the Usage tab (their own numbers are what they came
-         for); signed-out visitors land on Benefits. Opens only where the
-         usage summary exists (store.usageAvailable). This component also
-         loads and saves the account's achievements. -->
+    <!-- User account dialog: the Benefits list, plus the IPCheck.ing usage
+         tab where the usage summary exists (store.usageAvailable) — without
+         it there is no tab strip. Signed-in visitors land on Usage when it
+         exists. Opens only when signing in adds something
+         (userBenefitsView().entry). This component also loads and saves the
+         account's achievements. -->
     <Dialog :open="isOpen" @update:open="isOpen = $event">
-        <DialogContent :title="t('user.Benefits.Title')" class="max-w-2xl">
-            <DialogHeader :icon="HeartHandshake" :title="t('user.Benefits.Title')" />
+        <DialogContent :title="t(benefitsView.titleKey)" class="max-w-2xl">
+            <DialogHeader :icon="HeartHandshake" :title="t(benefitsView.titleKey)" />
 
-            <Tabs v-model="activeTab">
+            <UserBenefits v-if="!benefitsView.usageTab" :groups="benefitsView.groups" :is-sponsor="isSponsor" />
+
+            <Tabs v-else v-model="activeTab">
                 <TabsList class="grid w-full grid-cols-2">
                     <TabsTrigger value="benefits" class="cursor-pointer">{{ t('user.Benefits.Benefit') }}</TabsTrigger>
                     <TabsTrigger value="usage" class="cursor-pointer">{{ t('user.Usage.Title') }}</TabsTrigger>
                 </TabsList>
 
-                <!-- Benefits tab: one card per tier, stacked single-column on
-                     every viewport. Each tier's first item is "everything in
-                     the previous tier" so the lists stay short; the sponsor
-                     CTA is a button under its card, not a feature row. -->
-                <TabsContent value="benefits" class="space-y-3 pt-3">
-                    <p class="text-sm text-muted-foreground leading-relaxed">
-                        {{ t('user.Benefits.Note1') }} {{ t('user.Benefits.Note2') }}
-                    </p>
-
-                    <section v-for="tier in benefitTiers" :key="tier.key"
-                        class="flex flex-col rounded-lg border bg-card p-3"
-                        :class="tier.current && 'border-success/60'">
-                        <header class="flex items-center gap-1.5 mb-2">
-                            <component :is="tier.icon" class="size-4 text-muted-foreground shrink-0" />
-                            <h4 class="text-sm font-semibold m-0 truncate">
-                                {{ t(`user.Benefits.Tiers.${tier.key}.Name`) }}
-                            </h4>
-                            <Badge v-if="tier.current" variant="success"
-                                class="ml-auto text-[10px] px-1.5 py-0 h-4 shrink-0">
-                                {{ t('user.Benefits.Current') }}
-                            </Badge>
-                        </header>
-                        <ul class="space-y-1.5 list-none p-0 m-0">
-                            <li v-for="n in tier.count" :key="n"
-                                class="flex items-start gap-1.5 text-xs leading-relaxed">
-                                <!-- Item1 of the higher tiers = "everything in the
-                                     previous tier" — rendered muted with a plus so
-                                     real additions stand out. -->
-                                <component :is="tier.key !== 'Visitor' && n === 1 ? Plus : Check"
-                                    class="size-3.5 shrink-0 mt-0.5"
-                                    :class="tier.key !== 'Visitor' && n === 1 ? 'text-muted-foreground' : 'text-success'" />
-                                <span :class="tier.key !== 'Visitor' && n === 1 ? 'text-muted-foreground' : ''">
-                                    {{ t(`user.Benefits.Tiers.${tier.key}.Item${n}`) }}
-                                </span>
-                            </li>
-                        </ul>
-                        <Button v-if="tier.key === 'Sponsor' && !isSponsor" as-child size="sm" variant="action"
-                            class="mt-3 w-full">
-                            <a href="https://github.com/sponsors/jason5ng32" target="_blank" rel="noopener">
-                                <Heart class="size-3.5" />
-                                {{ t('user.QuotaSponsorCta') }}
-                            </a>
-                        </Button>
-                    </section>
+                <TabsContent value="benefits" class="pt-3">
+                    <UserBenefits :groups="benefitsView.groups" :is-sponsor="isSponsor" />
                 </TabsContent>
 
                 <!-- Usage tab: the 24-hour limit (IP advanced data only, when the
@@ -72,8 +33,6 @@
                     </div>
 
                     <section v-else-if="usageRows.length" class="space-y-4">
-                        <!-- Every quota row comes from one service: one group, titled with its name. -->
-                        <h3 class="text-base font-semibold m-0">{{ QUOTA_SERVICE_NAME }}</h3>
                         <!-- 24-hour limit: one row; once it is used up, when the
                              next lookup becomes possible (the oldest target in the
                              window ages out — a rolling window never resets as a whole). -->
@@ -142,13 +101,15 @@ import { formatClockTime } from '@/utils/time-utils.js';
 import { ADVANCED_TOOLS } from '@/data/tools.js';
 import { IP_DATABASES } from '@/data/ip-databases.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
+import { isDocsConfigured } from '@/composables/use-docs-assistant.js';
+import { isDocsAssistantAvailable } from '@/utils/docs-assistant-gate.js';
+import { userBenefitsView } from '@/utils/features/user-benefits.js';
+import UserBenefits from '@/components/UserBenefits.vue';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Spinner } from '@/components/ui/spinner';
-import { Check, Heart, HeartHandshake, Info, Plus, UserRound, UserRoundCheck } from '@lucide/vue';
+import { HeartHandshake, Info } from '@lucide/vue';
 
 const { t, locale } = useI18n();
 
@@ -175,21 +136,21 @@ const isUpdateAchievementsSuccess = ref(false);
 const isOpen = ref(false);
 const activeTab = ref('benefits');
 
-// Three user tiers shown on the Benefits tab. `count` = number of ItemN keys
-// in the locale pack; `current` badges the visitor's own tier (sponsor status
-// comes from the backend's quota snapshot).
+// Sponsor status comes from the backend's quota snapshot.
 const isSponsor = computed(() => remoteUserInfo.value?.quota?.isSponsor === true);
-const benefitTiers = computed(() => [
-    { key: 'Visitor', icon: UserRound, count: 6, current: !isSignedIn.value },
-    { key: 'SignedIn', icon: UserRoundCheck, count: 7, current: isSignedIn.value && !isSponsor.value },
-    { key: 'Sponsor', icon: HeartHandshake, count: 4, current: isSignedIn.value && isSponsor.value },
-]);
+const benefitsView = computed(() => userBenefitsView({
+    capabilities: store.capabilities,
+    achievements: achievementsAvailable.value,
+    accountSync: store.accountSyncAvailable,
+    usage: usageAvailable.value,
+    docsAssistant: isDocsAssistantAvailable(isDocsConfigured, store.capabilities),
+}, { signedIn: isSignedIn.value, sponsor: isSponsor.value }));
 
 const openUserBenefits = () => {
     store.triggerUserBenefits = false;
-    if (!usageAvailable.value) return;
+    if (!benefitsView.value.entry) return;
     // Signed-in visitors open straight onto their usage numbers.
-    activeTab.value = isSignedIn.value ? 'usage' : 'benefits';
+    activeTab.value = isSignedIn.value && benefitsView.value.usageTab ? 'usage' : 'benefits';
     isOpen.value = true;
     if (isSignedIn.value) refreshUserInfo();
     trackEvent('Nav', 'NavClick', 'UserBenefits');
@@ -203,11 +164,8 @@ const USAGE_LABEL_KEYS = Object.fromEntries([
     ...ADVANCED_TOOLS.filter((tool) => tool.quotaKey).map((tool) => [tool.quotaKey, tool.titleKey]),
 ]);
 
-// The metered IP data source: its quotaKey carries the 24-hour limit, and
-// its display name titles the quota group (every row is that service's).
-const QUOTA_SOURCE = IP_DATABASES.find((db) => db.quotaKey);
-const DAILY_QUOTA_KEY = QUOTA_SOURCE?.quotaKey;
-const QUOTA_SERVICE_NAME = QUOTA_SOURCE?.text ?? '';
+// The metered IP data source: its quotaKey carries the 24-hour limit.
+const DAILY_QUOTA_KEY = IP_DATABASES.find((db) => db.quotaKey)?.quotaKey;
 
 // Rows for the usage dialog. Empty until the (re)fetched user info lands or
 // when the backend predates the quota field — the template then shows the

@@ -49,9 +49,9 @@ Every file opens with a header comment stating its purpose — read those.
 - **Data-source sentence:** `IpSourceBlock.vue`, inline after the IP section's
   notes (`IpInfos.vue`; hidden with them in simple mode): the source that
   answered a card, else the one selected in Preferences (`answeringSource` →
-  its `data/ip-databases.js` row, the name linking `attribution.url`) and a
-  "Preferences" link that opens Preferences at the picker, as
-  `ipInfos.sourceFields.sentence` slots. Cards carry no geo-source row;
+  its `data/ip-databases.js` row, the name linking `attribution.url`), the
+  `{source}` slot of `ipInfos.sourceFields.sentence`; the sentence names the
+  picker by its Preferences label (`nav.preferences.ipDB`). Cards carry no geo-source row;
   `geoSourceId` stays for the sentence, the cache and Snapshots.
 
 ### Achievements are event-driven
@@ -65,7 +65,11 @@ user storage (`GET /api/achievements`, loaded and unlocked through
 `user:info-loaded`. Achievements need `store.achievementsAvailable` (sign-in +
 `userStorage`); the user level and the usage dialog need `store.usageAvailable`
 (sign-in + `ipChecking`, `/api/getuserinfo`) — each works, or is absent,
-without the other. New achievement = a name in `common/codes/achievements.js`
+without the other. The account dialog's Benefits list is a registry
+(`data/user-benefits.js`: groups → tiers → items, each with its own gate),
+resolved by `utils/features/user-benefits.js`; the dialog and its menu entry
+exist when sign-in adds something (achievements, account sync or usage), the
+IPCheck.ing usage tab only with `usageAvailable`. New achievement = a name in `common/codes/achievements.js`
 + its `public/achievements/<lowercased name>.webp` + rule + (only if no
 suitable event exists) a new event. The shareable report
 rides the same bus: `<domain>:finished` → `use-report-collector.js` →
@@ -306,10 +310,6 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   `when: { delayMs, reach }` = `use-attention-gate.js`, `action.to` a route,
   `track` / `action.track` = `trackEvent` args on show / click),
   run by `use-toast-queue.js` in `Toast.vue` — never feature code there.
-- **Preferences at a section** — `store.openPreferencesAt(sectionId)` (the
-  section's element id) sets the one-shot `preferencesFocus`; `Preferences.vue`
-  clears it, scrolls there and briefly rings it. Never touch the panel's DOM
-  (IpSourceBlock).
 - **Site navigation** — one `Nav.vue` in `App.vue` above every route (fixed;
   `index.html` pads the body for it), never per page; `User` / `Preferences`
   sit beside it, one each. What a click does on the current route is

@@ -11,7 +11,7 @@
     "QuotaSponsorCta": "Patrocine-nos",
     "ViewUsage": "Ver uso",
     "Usage": {
-      "Title": "Estatísticas de uso",
+      "Title": "Uso do IPCheck.ing",
       "Note": "Recursos avançados incluem uma cota mensal gratuita, redefinida automaticamente no início de cada mês (UTC). Consultas repetidas de dados avançados de IP são atendidas pelo cache e não consomem cota.",
       "IpinfoFeature": "Dados avançados de IP",
       "PercentUsed": "{percent}% usado",
@@ -39,35 +39,40 @@
     "Benefits": {
       "Title": "Benefícios e uso",
       "Benefit": "Benefícios",
-      "Note1": "Como produto de código aberto, o IPCheck.ing é gratuito. Mantê-lo exige esforço e custos consideráveis.",
-      "Note2": "Para manter o projeto sustentável e evitar abuso, alguns recursos avançados exigem login. Todo usuário autenticado recebe uma cota mensal generosa — se ela não for suficiente para você, considere nos patrocinar para liberar limites maiores.",
+      "Intro": "As ferramentas principais são gratuitas e não exigem conta; ao entrar, você ganha mais recursos, listados abaixo.",
       "Current": "Atual",
+      "Groups": {
+        "Basic": "Benefícios básicos",
+        "IpChecking": "Benefícios IPCheck.ing"
+      },
       "Tiers": {
         "Visitor": {
           "Name": "Visitantes",
-          "Item1": "Consulta de IP com comparação entre várias fontes",
-          "Item2": "Verificações de conectividade e disponibilidade de serviços",
-          "Item3": "Testes de vazamento WebRTC / DNS",
-          "Item4": "Teste de velocidade, latência global e MTR",
-          "Item5": "Whois, resolvedor DNS e mais ferramentas avançadas",
-          "Item6": "Sem cadastro obrigatório — código aberto e auto-hospedável"
+          "IpLookup": "Consulta de IP com comparação entre várias fontes",
+          "Connectivity": "Verificações de conectividade e disponibilidade de serviços",
+          "LeakTests": "Testes de vazamento WebRTC / DNS",
+          "SpeedTest": "Teste de velocidade, latência global e MTR",
+          "Tools": "Whois, resolvedor DNS e mais ferramentas avançadas",
+          "OpenSource": "Sem cadastro obrigatório — código aberto e auto-hospedável"
         },
         "SignedIn": {
           "Name": "Usuários autenticados",
-          "Item1": "Tudo em Visitantes",
-          "Item2": "Visualização de dados avançados de IP: pontuação de qualidade, detecção de proxy, tipo de rede e alinhamento geográfico",
-          "Item3": "Uso do teste de invisibilidade",
-          "Item4": "Uso do teste aprofundado de vazamento de DNS",
-          "Item5": "Visualização dos seus emblemas de conquistas",
-          "Item6": "Perguntas ao IPilot, nosso assistente de IA",
-          "Item7": "Recursos avançados incluem uma cota mensal gratuita redefinida todo mês"
+          "IncludesVisitor": "Tudo em Visitantes",
+          "Achievements": "Visualização dos seus emblemas de conquistas",
+          "AccountSync": "Sincronização das suas preferências e listas do teste de conectividade entre dispositivos",
+          "AdvancedIp": "Visualização de dados avançados de IP: pontuação de qualidade, detecção de proxy, tipo de rede e alinhamento geográfico",
+          "InvisibilityTest": "Uso do teste de invisibilidade",
+          "DnsLeakTest": "Uso do teste aprofundado de vazamento de DNS",
+          "PersonaCheck": "Uso da verificação aprofundada de persona",
+          "IPilot": "Perguntas ao IPilot, nosso assistente de IA",
+          "MonthlyQuota": "Recursos avançados incluem uma cota mensal gratuita redefinida todo mês"
         },
         "Sponsor": {
           "Name": "Patrocinadores",
-          "Item1": "Tudo em Usuários autenticados",
-          "Item2": "Cotas mensais maiores para recursos avançados",
-          "Item3": "Apoio ao desenvolvimento contínuo deste projeto de código aberto",
-          "Item4": "Limite de 24 horas mais generoso"
+          "IncludesSignedIn": "Tudo em Usuários autenticados",
+          "HigherQuota": "Cotas mensais maiores para recursos avançados",
+          "DailyLimit": "Limite de 24 horas mais generoso",
+          "SupportProject": "Apoio ao desenvolvimento contínuo deste projeto de código aberto"
         }
       }
     },
@@ -2081,8 +2086,7 @@
     },
     "sourceFields": {
       "source": "Fonte dos dados",
-      "preferences": "Preferências",
-      "sentence": "Banco de geolocalização em uso: {source}. Você pode alterá-lo em {preferences}."
+      "sentence": "Banco de geolocalização de IP em uso: {source}. Você pode alterá-lo em Preferências."
     },
     "countryTraffic": {
       "subtitle": "Distribuição semanal da atividade online deste país/região — veja apenas o tráfego gerado por humanos ou todo o tráfego (incluindo bots/tráfego automatizado).",

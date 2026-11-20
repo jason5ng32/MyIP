@@ -81,7 +81,6 @@ export const useMainStore = defineStore('main', {
     probeCapabilities: { ...PROBE_CAPABILITIES },
     openSheet: null,
     // Preferences section id to reveal once the panel shows; Preferences.vue clears it.
-    preferencesFocus: null,
     loadingStatus: createLoadingStatus(),
     isDarkMode: false,
     isMobile: false,
@@ -223,14 +222,6 @@ export const useMainStore = defineStore('main', {
     },
     toggleSheet(name) {
       this.openSheet = (this.openSheet === name) ? null : name;
-    },
-    // Opens Preferences scrolled to one section (its element id, e.g. 'Pref_ipGeoSource').
-    openPreferencesAt(sectionId) {
-      this.preferencesFocus = sectionId;
-      this.openSheet = 'preferences';
-    },
-    clearPreferencesFocus() {
-      this.preferencesFocus = null;
     },
     // set dark mode
     setDarkMode(value) {
