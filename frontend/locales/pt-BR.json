@@ -367,8 +367,8 @@
       "syncConnectivity": "Listas do teste de conectividade",
       "syncChecklist": "Progresso do checklist de segurança",
       "syncSpeedtest": "Opções do teste de velocidade",
-      "syncNever": "IPs, instantâneos e resultados de testes nunca são sincronizados. Ficam apenas neste navegador.",
-      "syncTips": "O que estiver ativado acompanha sua conta em todos os dispositivos. Sair remove esses dados deste dispositivo até você entrar novamente. Desativar um item o exclui da sua conta e o mantém neste dispositivo.",
+      "syncNever": "IPs, histórico de consultas, instantâneos, resultados de testes e dados semelhantes nunca são sincronizados. Ficam apenas neste navegador.",
+      "syncTips": "O que estiver ativado acompanha sua conta em todos os dispositivos. Sair remove esses dados deste dispositivo até você entrar novamente.",
       "syncSignedOut": "Entre na sua conta para sincronizar.",
       "syncSynced": "Sincronizado com sua conta.",
       "syncReload": "A sincronização está pausada nesta página. Recarregue a página para continuar.",
@@ -2503,7 +2503,7 @@
   },
   "syncDialog": {
     "Title": "Sincronize suas configurações",
-    "Note": "Sua conta pode manter estas configurações iguais em todos os seus dispositivos.",
+    "Note": "Você pode sincronizar seus dados não sensíveis entre seus dispositivos.",
     "Save": "Salvar",
     "Later": "Agora não"
   }

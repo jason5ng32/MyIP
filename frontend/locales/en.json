@@ -367,8 +367,8 @@
       "syncConnectivity": "Connectivity test lists",
       "syncChecklist": "Security Checklist progress",
       "syncSpeedtest": "Speed test options",
-      "syncNever": "IPs, snapshots and test results are never synced. They stay in this browser only.",
-      "syncTips": "What is on follows your account on every device. Signing out removes it from this device until you sign in again. Turning an item off deletes it from your account and keeps it on this device.",
+      "syncNever": "IPs, lookup history, snapshots, test results and the like are never synced. They stay in this browser only.",
+      "syncTips": "What is on follows your account on every device. Signing out removes it from this device until you sign in again.",
       "syncSignedOut": "Sign in to sync with your account.",
       "syncSynced": "Synced with your account.",
       "syncReload": "Sync is paused on this page. Reload the page to continue.",
@@ -2503,7 +2503,7 @@
   },
   "syncDialog": {
     "Title": "Sync your settings",
-    "Note": "Your account can keep these settings the same on all your devices.",
+    "Note": "You can sync your non-sensitive data across your devices.",
     "Save": "Save",
     "Later": "Not now"
   }

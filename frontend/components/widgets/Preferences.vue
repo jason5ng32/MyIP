@@ -82,7 +82,7 @@
           <template v-if="isSignedIn">
             <SyncChoiceControls :model-value="syncDraft" id-prefix="prefSync" :disabled="!syncEditable"
               @update:model-value="setSync" />
-            <SectionTip>{{ t('nav.preferences.syncTips') }}</SectionTip>
+            <!-- <SectionTip>{{ t('nav.preferences.syncTips') }}</SectionTip> -->
             <SectionTip>{{ t('nav.preferences.syncNever') }}</SectionTip>
           </template>
           <SectionTip v-else>{{ t('nav.preferences.syncSignedOut') }}</SectionTip>

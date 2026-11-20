@@ -2465,12 +2465,12 @@
       {
         "type": "add",
         "change": {
-          "en": "Preferences and Connectivity test lists can sync across devices",
-          "zh": "偏好设置与连通性测试列表可以跨设备同步",
-          "zh-TW": "偏好設定與連通性測試清單可以跨裝置同步",
-          "fr": "Les préférences et les listes du test de connectivité peuvent se synchroniser entre vos appareils",
-          "ru": "Настройки и списки теста доступности можно синхронизировать между устройствами",
-          "pt-BR": "As preferências e as listas do teste de conectividade podem ser sincronizadas entre dispositivos"
+          "en": "You can now sync your preferences across devices",
+          "zh": "现在你可以跨设备同步你的使用偏好",
+          "zh-TW": "現在你可以跨裝置同步你的使用偏好",
+          "fr": "Vous pouvez désormais synchroniser vos préférences entre vos appareils",
+          "ru": "Теперь можно синхронизировать свои настройки между устройствами",
+          "pt-BR": "Agora você pode sincronizar suas preferências entre dispositivos"
         }
       },
       {
