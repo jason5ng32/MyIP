@@ -14,6 +14,8 @@
         <!-- Dialog hosts for the Nav's account menu and the tools' quota hints. -->
         <User />
         <Preferences v-if="hasOpenedPreferences" />
+        <SyncChoiceDialog v-if="hasOpenedSyncDialog" :open="syncDialogOpen" @save="saveSyncChoice"
+            @dismiss="dismissSyncDialog" />
         <Alert />
         <DocsAssistant />
         <PWA v-if="offerPwaInstall" />
@@ -42,6 +44,7 @@ const PWA = defineAsyncComponent(() => import('@/components/widgets/PWA.vue'));
 // Dialogs nothing shows on first paint: their code stays off the boot path.
 const User = defineAsyncComponent(() => import('@/components/User.vue'));
 const Preferences = defineAsyncComponent(() => import('@/components/widgets/Preferences.vue'));
+const SyncChoiceDialog = defineAsyncComponent(() => import('@/components/widgets/SyncChoiceDialog.vue'));
 const offerPwaInstall = ref(false);
 onMounted(() => {
     if (shouldOfferPwaInstall()) {
@@ -57,6 +60,8 @@ import { useSnapshotRecorder } from '@/composables/use-snapshot-recorder.js';
 import { useSnapshotNotice } from '@/composables/use-snapshot-notice.js';
 import { useSnapshotIntro } from '@/composables/use-snapshot-intro.js';
 import { useAppPersonaCollector } from '@/composables/use-persona-collector.js';
+import { useAccountSync } from '@/composables/use-account-sync.js';
+import { useSyncDialog } from '@/composables/use-sync-dialog.js';
 
 // A page change closes store.openSheet: a site-wide sheet would stay open over
 // the next page, and one a left page hosted would reopen when it returns.
@@ -123,6 +128,19 @@ useSnapshotIntro({ store, t });
 // snapshots the Persona Check cross-references, so opening the tool costs no
 // re-run of tests the visitor already went through.
 useAppPersonaCollector();
+
+// Account sync: preferences and Connectivity lists kept in step with the
+// signed-in account, as the account's settings choose (needs sign-in and user
+// storage); snapshots and test results never sync.
+useAccountSync({ store });
+
+// The one-time sync dialog, for a signed-in account that has not chosen yet;
+// its code loads only when it first opens.
+const { open: syncDialogOpen, saveChoice: saveSyncChoice, dismiss: dismissSyncDialog } = useSyncDialog({ store, route });
+const hasOpenedSyncDialog = ref(false);
+watch(syncDialogOpen, (open) => {
+    if (open) hasOpenedSyncDialog.value = true;
+});
 </script>
 
 <style scoped></style>

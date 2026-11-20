@@ -416,7 +416,7 @@ describe('/api/configs userStorage', () => {
     });
 });
 
-describe('achievement and feature-use migrations', () => {
+describe('achievement, feature-use, synced-item and sync-settings migrations', () => {
     // Pinned: the shapes other tooling (data migrations) is written against.
     const tableOf = (sql) => sql.split('\n').filter((line) => !line.startsWith('--')).join(' ').replace(/\s+/g, ' ').trim();
 
@@ -426,6 +426,24 @@ describe('achievement and feature-use migrations', () => {
             + 'name text NOT NULL, achieved_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY (user_id, name) );');
         assert.equal(tableOf(byName['0003_feature_uses']), 'CREATE TABLE feature_uses ( user_id text NOT NULL REFERENCES users(id), '
             + 'feature text NOT NULL, times integer NOT NULL DEFAULT 0, PRIMARY KEY (user_id, feature) );');
+    });
+
+    it('0004 creates synced_items, its seq sequence and its pull index, exactly', async () => {
+        const byName = Object.fromEntries((await readMigrationFiles()).map(({ name, sql }) => [name, sql]));
+        assert.equal(byName['0004_preferences'], undefined);
+        assert.equal(tableOf(byName['0004_synced_items']), 'CREATE SEQUENCE synced_items_seq; '
+            + 'CREATE TABLE synced_items ( user_id text NOT NULL REFERENCES users(id), collection text NOT NULL, '
+            + 'schema_version integer NOT NULL, item_id text NOT NULL, updated_at bigint NOT NULL, '
+            + 'deleted boolean NOT NULL DEFAULT false, data jsonb, seq bigint NOT NULL, '
+            + 'PRIMARY KEY (user_id, collection, schema_version, item_id) ); '
+            + 'ALTER SEQUENCE synced_items_seq OWNED BY synced_items.seq; '
+            + 'CREATE INDEX synced_items_user_seq ON synced_items (user_id, collection, schema_version, seq);');
+    });
+
+    it('0005 creates sync_settings, exactly', async () => {
+        const byName = Object.fromEntries((await readMigrationFiles()).map(({ name, sql }) => [name, sql]));
+        assert.equal(tableOf(byName['0005_sync_settings']), 'CREATE TABLE sync_settings ( user_id text PRIMARY KEY REFERENCES users(id), '
+            + 'collections text[] NOT NULL, updated_at timestamptz NOT NULL DEFAULT now() );');
     });
 });
 

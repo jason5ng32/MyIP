@@ -156,9 +156,10 @@ links to the Blocklist tool — no bulk path to the IPCheck.ing API.
 
 ### Snapshots
 
-Browser-local, per-visit homepage records: `use-snapshot-recorder.js` consumes
-`<domain>:finished` through the report builders; `utils/features/snapshots.js`
-owns storage, retention and schema validation. Read `snapshotsAuto` through
+Browser-local, per-visit homepage records (never synced):
+`use-snapshot-recorder.js` consumes `<domain>:finished` through the report
+builders; `utils/features/snapshots.js` owns storage, retention and schema
+validation. Read `snapshotsAuto` through
 `snapshotsAutoMode()`; smart-mode rules live in `snapshot-trigger.js`.
 Later results update only this visit's automatic snapshot; visits never
 merge. Manual saves (`use-snapshot-save.js`) are frozen copies; pinned
@@ -186,6 +187,26 @@ renders factual −/+ differences, never leak / safe / better / worse verdicts
 or summary chips. Use `--diff-removed` / `--diff-added` and their `-strong`
 variants only here; measurement drift folds while hidden. Keep this pipeline
 separate from Share Report and `Report*.vue`.
+
+### Account sync
+
+Two collections sync, `preferences` (`SYNCED_PREFERENCE_KEYS`) and
+`connectivity` (the lists model + default list id); IPs, snapshots, test
+results and the checklist never do. The account chooses which:
+`GET / PUT /api/sync` (`store.syncSettings`, cached per user so a load starts
+before the fetch; nothing until decided; turning one off deletes its rows
+there). `use-account-sync.js` (App.vue) runs one engine
+(`utils/features/account-sync.js`) over two store adapters
+(`utils/features/preferences-sync.js`; the store stays the only writer).
+Per enabled collection: signed out, the data is the device's (no record);
+signed in, the account's — the first pull adopts (an empty account takes the
+device's data, else the account replaces it), then edits stamp by hash and
+merge per item. Turned off (here, or a 409 `sync_off`) → record dropped, data
+kept. The popup sign-in awaits `syncBeforeReload`; sign-out flushes, clears
+enabled collections and reloads; a boot that finds the session ended clears
+too. `widgets/SyncChoiceDialog.vue` asks once (`use-sync-dialog.js`,
+`shouldShowSyncDialog`): every exit saves a choice; Preferences edits it at
+once. Both use `widgets/SyncChoiceControls.vue` (`applySyncToggle`).
 
 ### Overlays take no keyboard shortcuts
 

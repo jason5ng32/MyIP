@@ -91,7 +91,7 @@
       "cookies": {
         "title": "Cookies e armazenamento local",
         "analytics": "O Google Analytics armazena um cookie para reconhecer visitantes que retornam.",
-        "local": "Suas configurações (tema, idioma e preferências de ferramentas) são mantidas no armazenamento local do seu navegador e nunca saem do seu dispositivo."
+        "local": "Suas configurações (tema, idioma e preferências de ferramentas) são mantidas no armazenamento local do seu navegador. Se você entrar na sua conta com a sincronização ativada, elas também ficam armazenadas na sua conta."
       },
       "eu": {
         "title": "Se você estiver na UE/EEE ou no Reino Unido",

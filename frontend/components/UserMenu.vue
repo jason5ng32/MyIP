@@ -14,16 +14,22 @@
     <DropdownMenuTrigger as-child>
       <!-- Not signed in: the solid block reads as the "sign in"
            call-to-action, and the menu opens on the sign-in options, so
-           the affordance is self-explaining one click deep. -->
+           the affordance is self-explaining one click deep. A spinner while
+           a popup sign-in loads the account's preferences, or a sign-out
+           sends pending edits and clears synced data, before reloading. -->
       <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1.5 cursor-pointer"
-        aria-label="User menu">
-        <UserRound class="size-5" />
+        aria-label="User menu" :disabled="authPending">
+        <Spinner v-if="authPending" class="size-5" />
+        <UserRound v-else class="size-5" />
         <ChevronDown class="opacity-60" />
       </Button>
       <!-- Signed in: avatar + chevron -->
       <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1 cursor-pointer"
-        aria-label="User menu">
-        <span class="inline-flex size-7 overflow-hidden rounded-full">
+        aria-label="User menu" :disabled="authPending">
+        <span v-if="authPending" class="inline-flex size-7 items-center justify-center">
+          <Spinner class="size-5" />
+        </span>
+        <span v-else class="inline-flex size-7 overflow-hidden rounded-full">
           <img :src="userPhotoURL" :alt="userName" :title="userName" class="size-full object-cover"
             referrerpolicy="no-referrer">
         </span>
@@ -125,6 +131,7 @@ import { trackEvent } from '@/utils/analytics';
 import { unixToDateTime } from '@/utils/time-utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { JnTooltip } from '@/components/ui/tooltip';
 import {
   DropdownMenu,
@@ -144,6 +151,7 @@ const router = useRouter();
 // Firebase / User
 const isFireBaseSet = computed(() => store.isFireBaseSet);
 const isSignedIn = computed(() => store.isSignedIn);
+const authPending = computed(() => store.authPending);
 const userName = computed(() => store.user?.displayName);
 const userPhotoURL = computed(() => store.user?.photoURL);
 const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata?.createdAt, locale.value));

@@ -356,6 +356,20 @@
       "autoRunTips": "As informações de IP sempre são verificadas quando a página carrega. Escolha quais outros módulos serão executados automaticamente na inicialização.",
       "simpleMode": "Modo simples",
       "simpleModeTips": "Oculta o texto descritivo de cada módulo, adequado para usuários que já conhecem o aplicativo.",
+      "sync": "Sincronização",
+      "syncEnable": "Ativar",
+      "syncPreferences": "Preferências",
+      "syncConnectivity": "Listas do teste de conectividade",
+      "syncNever": "IPs, instantâneos e resultados de testes nunca são sincronizados. Ficam apenas neste navegador.",
+      "syncTips": "O que estiver ativado acompanha sua conta em todos os dispositivos. Sair remove esses dados deste dispositivo até você entrar novamente. Desativar um item o exclui da sua conta e o mantém neste dispositivo.",
+      "syncSignedOut": "Entre na sua conta para sincronizar.",
+      "syncSynced": "Sincronizado com sua conta.",
+      "syncReload": "A sincronização está pausada nesta página. Recarregue a página para continuar.",
+      "syncSaveFailed": "Não foi possível salvar a configuração de sincronização. Tente novamente.",
+      "syncFailed": "A última sincronização não foi concluída. Ela será tentada de novo na sua próxima alteração ou visita.",
+      "syncStatusSynced": "Sincronizado",
+      "syncStatusPaused": "Pausado",
+      "syncStatusFailed": "Não sincronizado",
       "connectivity": {
         "defaultList": "Lista padrão",
         "defaultListTips": "A lista exibida pela seção quando a página carrega.",
@@ -2478,5 +2492,11 @@
   "pwa": {
     "appDescription": "Caixa de ferramentas de IP tudo em um",
     "installDescription": "Você já usou o IPCheck.ing {count} vezes — instale-o como app para uma experiência mais fluida e acesso mais rápido."
+  },
+  "syncDialog": {
+    "Title": "Sincronize suas configurações",
+    "Note": "Sua conta pode manter estas configurações iguais em todos os seus dispositivos.",
+    "Save": "Salvar",
+    "Later": "Agora não"
   }
 }

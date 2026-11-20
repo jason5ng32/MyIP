@@ -7,6 +7,7 @@
 
 import { isValidIP } from '../ip/valid-ip.js';
 import { REPORT_VERSION, validateReport } from '../report/report-schema.js';
+import { SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_AUTO_MODES } from '../preferences-schema.js';
 
 // --- constants --------------------------------------------------------------
 
@@ -23,13 +24,12 @@ export const HOME_SECTION_IDS = Object.freeze(['ipinfo', 'connectivity', 'webrtc
 export const SNAPSHOT_LABEL_CARD_ID_MAX = 32;
 
 // Retention of unkept snapshots: the newest `snapshotsKeepLast` survive.
-export const SNAPSHOTS_KEEP_LAST_OPTIONS = Object.freeze([10, 50, 100]);
+export { SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_AUTO_MODES };
 export const SNAPSHOTS_KEEP_LAST_DEFAULT = 50;
 
 // Automatic recording (`snapshotsAuto`): 'smart' records a load that differs
 // notably from the newest snapshot (utils/features/snapshot-trigger.js),
-// 'every' records every load, 'off' none.
-export const SNAPSHOTS_AUTO_MODES = Object.freeze(['smart', 'every', 'off']);
+// 'every' records every load, 'off' none (SNAPSHOTS_AUTO_MODES).
 export const SNAPSHOTS_AUTO_DEFAULT = 'smart';
 
 // Kept snapshots are never pruned, so their number is capped instead.

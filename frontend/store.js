@@ -10,6 +10,12 @@ import { ACHIEVEMENT_NAMES } from './utils/codes/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
 import { createDefaultPreferences, PREFS_STORAGE_KEY } from './data/default-preferences.js';
 import { sanitizeLists } from './utils/features/connectivity-lists.js';
+import { refreshSyncRecords, syncItemDefaults, toPreferenceValues } from './utils/features/preferences-sync.js';
+import { syncBeforeReload, clearAccountDataBeforeSignOut } from './utils/features/account-sync-auth.js';
+import { createSyncSettings } from './utils/features/sync-settings.js';
+import {
+  isValidPreferenceValue, isValidConnectivityLists, isValidConnectivityListId,
+} from './utils/preferences-schema.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
 import { PROBE_CAPABILITIES } from './utils/probe-endpoints.js';
@@ -48,6 +54,8 @@ export const useMainStore = defineStore('main', {
     lang: 'en',
     user: null,
     isSignedIn: false,
+    // Firebase has told whether someone is signed in (initializeAuthListener / a redirect sign-in).
+    authResolved: false,
     triggerAchievements: false,
     triggerUserBenefits: false,
     triggerRemoteUserInfo: false,
@@ -85,6 +93,12 @@ export const useMainStore = defineStore('main', {
     allIPs: [],
     configs: {},
     userPreferences: {},
+    // Counts preference edits; account sync (use-account-sync.js) checks them for changes.
+    preferenceEdits: 0,
+    // A sign-in or sign-out waiting on account sync before the reload.
+    authPending: false,
+    // The signed-in account's choice of what syncs (utils/features/sync-settings.js); account sync writes it.
+    syncSettings: createSyncSettings(),
     alert: {
       alertToShow: false,
       alertStyle: "",
@@ -115,6 +129,10 @@ export const useMainStore = defineStore('main', {
     // Achievements need sign-in and user storage; the user level and the
     // usage dialog need sign-in and the IPCheck.ing API. Each works without the other.
     achievementsAvailable() {
+      return this.capabilities.accounts && this.capabilities.userStorage;
+    },
+    // Account sync needs sign-in and user storage.
+    accountSyncAvailable() {
       return this.capabilities.accounts && this.capabilities.userStorage;
     },
     usageAvailable() {
@@ -221,15 +239,45 @@ export const useMainStore = defineStore('main', {
         document.documentElement.classList.toggle('dark', !!value);
       }
     },
-    // set user preferences
-    setPreferences(userPreferences) {
+    // Writes userPreferences and localStorage; not counted as an edit.
+    persistPreferences(userPreferences = this.userPreferences) {
       this.userPreferences = userPreferences;
       localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(userPreferences));
     },
-    // update user preferences
+    // set user preferences (an edit)
+    setPreferences(userPreferences) {
+      this.persistPreferences(userPreferences);
+      this.preferenceEdits += 1;
+    },
+    // update user preferences (an edit)
     updatePreference(key, value) {
       this.userPreferences[key] = value;
-      localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(this.userPreferences));
+      this.persistPreferences();
+      this.preferenceEdits += 1;
+    },
+    // Values from account sync (`{ <key>: value }`), not counted as an edit. Connectivity lists are
+    // sanitized and the IP source falls back to an available one, as at boot.
+    applySyncedPreferences(values) {
+      const entries = Object.entries(values ?? {}).filter(([key, value]) => (
+        key === 'connectivityLists' ? isValidConnectivityLists(value)
+          : key === 'connectivityDefaultListId' ? isValidConnectivityListId(value)
+            : isValidPreferenceValue(key, value)));
+      if (!entries.length) return;
+      for (const [key, value] of entries) {
+        if (key === 'connectivityLists') this.userPreferences[key] = sanitizeLists(value, null, []);
+        else if (key === 'ipGeoSource') this.userPreferences[key] = nearestEnabledId(value, this.ipDBs);
+        else this.userPreferences[key] = value;
+      }
+      this.persistPreferences();
+    },
+    // Sign-out: one synced collection's keys ('preferences' / 'connectivity') back
+    // to a fresh visitor's values, not counted as an edit.
+    resetSyncedPreferences(collectionId) {
+      this.applySyncedPreferences(toPreferenceValues(collectionId, syncItemDefaults(collectionId)));
+    },
+    // Written by account sync only.
+    setSyncSettings(settings) {
+      this.syncSettings = settings;
     },
     // load user preferences from local storage
     loadPreferences() {
@@ -246,7 +294,9 @@ export const useMainStore = defineStore('main', {
       merged.connectivityLists = sanitizeLists(
         merged.connectivityLists, merged.connectivityTargets, merged.customConnectivityTargets,
       );
-      this.setPreferences(merged);
+      this.persistPreferences(merged);
+      // Defaults and sanitising are not edits: account sync takes them unstamped.
+      refreshSyncRecords(localStorage, currentPreferences, merged);
     },
     // Fetch configs from server. A longer timeout than the default: the boot
     // request competes with every other first-render fetch on slow links.
@@ -270,7 +320,11 @@ export const useMainStore = defineStore('main', {
           if (nearest !== preferred) {
             const from = this.ipDBs.find(db => db.id === preferred)?.text || `#${preferred}`;
             const to = this.ipDBs.find(db => db.id === nearest)?.text || `#${nearest}`;
-            this.updatePreference('ipGeoSource', nearest);
+            // Not a user edit: account sync takes it unstamped.
+            const before = { ...this.userPreferences };
+            this.userPreferences.ipGeoSource = nearest;
+            this.persistPreferences();
+            refreshSyncRecords(localStorage, before, this.userPreferences);
             this.setAlert(true, 'text-warning',
               t('alert.IpGeoSourceFallbackMessage', { from, to }),
               t('alert.IpGeoSourceFallbackTitle'), 5000);
@@ -290,9 +344,10 @@ export const useMainStore = defineStore('main', {
     async signInWithGithub() {
       await this.signInWithProvider('github');
     },
-    // Shared sign-in path for both buttons: popup in a browser tab, then
-    // reload; redirect in the installed PWA or when the popup can't open
-    // (utils/auth-redirect.js), finished at boot by completeRedirectSignIn.
+    // Shared sign-in path for both buttons: popup in a browser tab, then the
+    // account's sync settings and synced data (bounded wait) and a reload; redirect in the
+    // installed PWA or when the popup can't open (utils/auth-redirect.js),
+    // finished at boot by completeRedirectSignIn.
     async signInWithProvider(providerKey) {
       const descriptor = SIGN_IN_PROVIDERS[providerKey];
       try {
@@ -303,6 +358,10 @@ export const useMainStore = defineStore('main', {
             this.user = result.user;
             writeAuthHint(true);
             rememberAccountId(result.user?.uid);
+            if (result.user?.uid && this.accountSyncAvailable) {
+              this.authPending = true;
+              await syncBeforeReload(result.user.uid);
+            }
             window.location.reload();
             return;
           } catch (error) {
@@ -329,6 +388,7 @@ export const useMainStore = defineStore('main', {
         if (!result?.user) return false;
         this.user = result.user;
         this.isSignedIn = true;
+        this.authResolved = true;
         writeAuthHint(true);
         rememberAccountId(result.user.uid);
         return true;
@@ -361,16 +421,28 @@ export const useMainStore = defineStore('main', {
             t('alert.SignInFailed'));
       }
     },
-    // sign out
+    // Sign out. With account sync, pending edits are sent first (bounded) and
+    // the account's data leaves this device; the page then reloads, as after
+    // a sign-in, so no view keeps showing it.
     async signOut() {
+      let cleared = 0;
       try {
+        if (this.accountSyncAvailable && this.user?.uid) {
+          this.authPending = true;
+          cleared = await clearAccountDataBeforeSignOut(this.user.uid);
+        }
         const { auth, signOut: firebaseSignOut } = await loadFirebaseAuth();
         await firebaseSignOut(auth);
         this.user = null;
         this.isSignedIn = false;
         writeAuthHint(false);
+        if (cleared > 0) window.location.reload();
+        else this.authPending = false;
       } catch (error) {
         console.error("Sign out failed:", error);
+        // Cleared but still signed in: the reload takes the account's data back.
+        if (cleared > 0) window.location.reload();
+        else this.authPending = false;
       }
     },
     // Resolve the persisted auth state once, and keep the sign-in hint in
@@ -386,6 +458,7 @@ export const useMainStore = defineStore('main', {
             rememberAccountId(currentUser.uid);
           }
           writeAuthHint(!!currentUser);
+          this.authResolved = true;
           unsubscribe(); // unsubscribe immediately after getting user state
           resolve();
         });

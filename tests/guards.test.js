@@ -3,7 +3,8 @@ import { describe, it } from 'node:test';
 import express from 'express';
 import logger from '../server/logger.js';
 
-import { requireReferer, resetRefererRejectionLog, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery, optionalUser, requireUser, requireUserStorage } from '../server/guards.js';
+import { SYNC_COLLECTIONS } from '../common/sync-collections.js';
+import { requireReferer, resetRefererRejectionLog, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidSyncCollection, requireValidCountry, requireValidASN, normalizeAsnQuery, optionalUser, requireUser, requireUserStorage } from '../server/guards.js';
 import { createUserStorage } from '../server/db/user-storage.js';
 import { AUTH_REASON } from '../common/codes/service-errors.js';
 
@@ -285,6 +286,39 @@ describe('requireValidReportId', () => {
             assert.equal(res.statusCode, 400, `should reject "${bad}"`);
             assert.equal(nextCalled, false);
         }
+    });
+});
+
+describe('requireValidSyncCollection', () => {
+    // Reads the `:collection` route param; the row goes on res.locals.
+    const run = (guard, collection) => {
+        const res = { ...makeRes(), locals: {} };
+        let nextCalled = false;
+        guard({ headers: {}, params: collection === undefined ? {} : { collection } }, res, () => { nextCalled = true; });
+        return { res, nextCalled };
+    };
+
+    it('passes a registry id and puts its row on res.locals', () => {
+        for (const id of ['preferences', 'connectivity']) {
+            const { res, nextCalled } = run(requireValidSyncCollection(), id);
+            assert.equal(nextCalled, true, id);
+            assert.equal(res.locals.syncCollection, SYNC_COLLECTIONS[id]);
+        }
+    });
+
+    it('404s anything else, inherited names included', () => {
+        for (const bad of [undefined, '', 'nope', 'checklist', 'snapshots', 'Connectivity', 'constructor', '__proto__', 'toString']) {
+            const { res, nextCalled } = run(requireValidSyncCollection(), bad);
+            assert.equal(res.statusCode, 404, String(bad));
+            assert.deepEqual(res.body, { error: 'Unknown collection' });
+            assert.equal(nextCalled, false);
+        }
+    });
+
+    it('reads the registry it is given', () => {
+        const stub = Object.freeze({ other: Object.freeze({ id: 'other' }) });
+        assert.equal(run(requireValidSyncCollection('collection', stub), 'other').nextCalled, true);
+        assert.equal(run(requireValidSyncCollection('collection', stub), 'checklist').res.statusCode, 404);
     });
 });
 

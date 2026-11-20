@@ -91,7 +91,7 @@
       "cookies": {
         "title": "Cookies et stockage local",
         "analytics": "Google Analytics stocke un cookie pour reconnaître les visiteurs récurrents.",
-        "local": "Vos propres réglages (thème, langue, préférences des outils) sont conservés dans le stockage local de votre navigateur et ne quittent jamais votre appareil."
+        "local": "Vos propres réglages (thème, langue, préférences des outils) sont conservés dans le stockage local de votre navigateur. Si vous êtes connecté avec la synchronisation activée, ils sont aussi stockés dans votre compte."
       },
       "eu": {
         "title": "Si vous êtes dans l'UE/EEE ou au Royaume-Uni",

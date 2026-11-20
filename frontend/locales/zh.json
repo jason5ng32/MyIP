@@ -356,6 +356,20 @@
       "autoRunTips": "打开页面时始终会检测 IP 信息。你可以选择其它模块是否在启动时自动运行。",
       "simpleMode": "简洁模式",
       "simpleModeTips": "隐藏每个模块的说明文字，适合已经了解本应用的用户。",
+      "sync": "同步设置",
+      "syncEnable": "开启",
+      "syncPreferences": "偏好设置",
+      "syncConnectivity": "连通性测试列表",
+      "syncNever": "IP、快照和测试结果永远不会同步，只保存在本浏览器中。",
+      "syncTips": "开启的内容会在你登录的每台设备上跟随账号。退出登录会把它们从本设备移除，再次登录后恢复。关闭某一项会从账号中删除它，本设备上的仍然保留。",
+      "syncSignedOut": "登录后即可与账号同步。",
+      "syncSynced": "已与账号同步。",
+      "syncReload": "本页面的同步已暂停，刷新页面后继续。",
+      "syncSaveFailed": "同步设置没能保存，请重试。",
+      "syncFailed": "上次同步没有完成，会在你下次修改或访问时重试。",
+      "syncStatusSynced": "已同步",
+      "syncStatusPaused": "已暂停",
+      "syncStatusFailed": "未同步",
       "connectivity": {
         "defaultList": "默认列表",
         "defaultListTips": "打开页面时，连通性测试默认显示的列表。",
@@ -2478,5 +2492,11 @@
   "pwa": {
     "appDescription": "一站式 IP 工具箱",
     "installDescription": "这已经是你第 {count} 次使用 IPCheck.ing 了，把它安装为应用，可以获得更好的使用体验，打开也更方便。"
+  },
+  "syncDialog": {
+    "Title": "同步你的设置",
+    "Note": "你的账号可以让这些设置在你的所有设备上保持一致。",
+    "Save": "保存",
+    "Later": "暂不"
   }
 }

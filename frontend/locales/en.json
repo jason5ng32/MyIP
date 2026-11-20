@@ -356,6 +356,20 @@
       "autoRunTips": "IP info is always checked when the page loads. Choose which other modules run automatically on startup.",
       "simpleMode": "Simple Mode",
       "simpleModeTips": "Hide the description text of each module, suitable for users who are already familiar with the application.",
+      "sync": "Sync settings",
+      "syncEnable": "Enable",
+      "syncPreferences": "Preferences",
+      "syncConnectivity": "Connectivity test lists",
+      "syncNever": "IPs, snapshots and test results are never synced. They stay in this browser only.",
+      "syncTips": "What is on follows your account on every device. Signing out removes it from this device until you sign in again. Turning an item off deletes it from your account and keeps it on this device.",
+      "syncSignedOut": "Sign in to sync with your account.",
+      "syncSynced": "Synced with your account.",
+      "syncReload": "Sync is paused on this page. Reload the page to continue.",
+      "syncSaveFailed": "Could not save the sync setting. Try again.",
+      "syncFailed": "The last sync did not go through. It tries again on your next change or visit.",
+      "syncStatusSynced": "Synced",
+      "syncStatusPaused": "Paused",
+      "syncStatusFailed": "Not synced",
       "connectivity": {
         "defaultList": "Default List",
         "defaultListTips": "The list the section opens on when the page loads.",
@@ -2478,5 +2492,11 @@
   "pwa": {
     "appDescription": "All in one IP Toolbox",
     "installDescription": "You've already used IPCheck.ing {count} times — install it as an app for a smoother experience and quicker access."
+  },
+  "syncDialog": {
+    "Title": "Sync your settings",
+    "Note": "Your account can keep these settings the same on all your devices.",
+    "Save": "Save",
+    "Later": "Not now"
   }
 }

@@ -356,6 +356,20 @@
       "autoRunTips": "頁面載入時一定會檢查 IP 資訊。你可以選擇其他模組是否在啟動時自動執行。",
       "simpleMode": "簡潔模式",
       "simpleModeTips": "隱藏每個模組的說明文字，適合已熟悉本應用程式的使用者。",
+      "sync": "同步設定",
+      "syncEnable": "開啟",
+      "syncPreferences": "偏好設定",
+      "syncConnectivity": "連通性測試清單",
+      "syncNever": "IP、快照和測試結果永遠不會同步，只儲存在本瀏覽器中。",
+      "syncTips": "開啟的內容會在你登入的每台裝置上跟隨帳號。登出會把它們從本裝置移除，再次登入後恢復。關閉某一項會從帳號中刪除它，本裝置上的仍然保留。",
+      "syncSignedOut": "登入後即可與帳號同步。",
+      "syncSynced": "已與帳號同步。",
+      "syncReload": "本頁面的同步已暫停，重新整理頁面後繼續。",
+      "syncSaveFailed": "同步設定未能儲存，請重試。",
+      "syncFailed": "上次同步沒有完成，會在你下次修改或造訪時重試。",
+      "syncStatusSynced": "已同步",
+      "syncStatusPaused": "已暫停",
+      "syncStatusFailed": "未同步",
       "connectivity": {
         "defaultList": "預設清單",
         "defaultListTips": "開啟頁面時，連線測試預設顯示的清單。",
@@ -2478,5 +2492,11 @@
   "pwa": {
     "appDescription": "一站式 IP 工具箱",
     "installDescription": "這已經是你第 {count} 次使用 IPCheck.ing 了，將它安裝為應用程式，可以獲得更好的使用體驗，開啟也更方便。"
+  },
+  "syncDialog": {
+    "Title": "同步你的設定",
+    "Note": "你的帳號可以讓這些設定在你的所有裝置上保持一致。",
+    "Save": "儲存",
+    "Later": "暫不"
   }
 }

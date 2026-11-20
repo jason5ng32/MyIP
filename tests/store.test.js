@@ -204,6 +204,126 @@ describe('store — preferences', () => {
   });
 });
 
+describe('store — preference edits and account sync', () => {
+  const RECORD_KEY = 'accountSync_preferences_v7';
+  const record = () => JSON.parse(globalThis.localStorage.getItem(RECORD_KEY) ?? 'null');
+  // A synced record holding one stamped key.
+  const seedRecord = () => globalThis.localStorage.setItem(RECORD_KEY, JSON.stringify({
+    user: 'u1', cursor: 3, lastSyncAt: 1, items: { theme: { hash: 'x', at: 5, ack: 5 } },
+  }));
+
+  it('updatePreference and setPreferences count an edit and write no sync record', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    s.updatePreference('theme', 'dark');
+    s.updatePreference('connectivityDefaultListId', 'work');
+    s.setPreferences({ ...s.userPreferences, lang: 'fr' });
+    assert.equal(s.preferenceEdits, 3);
+    assert.equal(record(), null);
+  });
+
+  it('loadPreferences counts no edit and gives defaults unstamped hashes in an existing record', () => {
+    seedRecord();
+    globalThis.localStorage.setItem('userPreferences_v7', JSON.stringify({ theme: 'dark' }));
+    const s = useMainStore();
+    s.loadPreferences();
+    assert.equal(s.preferenceEdits, 0);
+    const { items } = record();
+    assert.deepEqual(items.theme, { hash: 'x', at: 5, ack: 5 }, 'a stored value is left as recorded');
+    assert.equal(typeof items.lang.hash, 'string');
+    assert.equal(items.lang.at, undefined, 'a default is no edit');
+    assert.equal(items.connectivityLists, undefined, 'Connectivity lists are their own collection');
+  });
+
+  it('loadPreferences starts no record', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    assert.equal(record(), null);
+  });
+
+  it('applySyncedPreferences writes and persists without counting an edit, skipping invalid values', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    s.applySyncedPreferences({ theme: 'light', ipCardsToShow: 3, connectivityDefaultListId: '', simpleMode: true, junk: 1 });
+    assert.equal(s.userPreferences.theme, 'light');
+    assert.equal(s.userPreferences.simpleMode, true);
+    assert.equal(s.userPreferences.ipCardsToShow, 2);
+    assert.equal(s.userPreferences.connectivityDefaultListId, 'mine');
+    assert.equal('junk' in s.userPreferences, false);
+    assert.equal(JSON.parse(globalThis.localStorage.getItem('userPreferences_v7')).theme, 'light');
+    assert.equal(s.preferenceEdits, 0);
+  });
+
+  it('applySyncedPreferences sanitizes Connectivity lists and falls back from an unavailable IP source', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    s.ipDBs = s.ipDBs.map((db) => ({ ...db, enabled: db.id !== 2 }));
+    const lists = { schemaVersion: 1, lists: [{ id: 'mine', name: null, members: [] }] };
+    s.applySyncedPreferences({ ipGeoSource: 2, connectivityLists: lists, connectivityDefaultListId: 'work' });
+    assert.equal(s.userPreferences.ipGeoSource, 3);
+    assert.ok(s.userPreferences.connectivityLists.lists[0].members.length > 0, 'an emptied Mine is re-seeded');
+    assert.equal(s.userPreferences.connectivityDefaultListId, 'work');
+    s.applySyncedPreferences({ connectivityLists: { schemaVersion: 1, lists: 'nope' } });
+    assert.ok(Array.isArray(s.userPreferences.connectivityLists.lists), 'an invalid model is skipped');
+  });
+
+  it('the config-driven IP source fallback refreshes its hash unstamped and counts no edit', async () => {
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ipChecking: false }) });
+    try {
+      const s = useMainStore();
+      s.loadPreferences();
+      seedRecord();
+      s.fetchConfigs();
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      assert.notEqual(s.userPreferences.ipGeoSource, 0);
+      assert.equal(typeof record().items.ipGeoSource.hash, 'string');
+      assert.equal(record().items.ipGeoSource.at, undefined);
+      assert.equal(s.preferenceEdits, 0);
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+
+  it('resetSyncedPreferences resets one collection to a fresh visitor\'s values and counts no edit', () => {
+    const s = useMainStore();
+    s.loadPreferences();
+    const freshLists = s.userPreferences.connectivityLists;
+    s.updatePreference('theme', 'dark');
+    s.updatePreference('ipCardsToShow', 4);
+    s.updatePreference('connectivityDefaultListId', 'work');
+    s.updatePreference('connectivityLists', { ...freshLists, lists: [...freshLists.lists, { id: 'work', name: 'Work', members: [] }] });
+    const edits = s.preferenceEdits;
+    s.resetSyncedPreferences('preferences');
+    assert.equal(s.userPreferences.theme, 'auto');
+    assert.equal(s.userPreferences.ipCardsToShow, 2);
+    assert.equal(s.userPreferences.connectivityDefaultListId, 'work', 'the other collection is left alone');
+    s.resetSyncedPreferences('connectivity');
+    assert.equal(s.userPreferences.connectivityDefaultListId, 'mine');
+    assert.deepEqual(s.userPreferences.connectivityLists, freshLists);
+    assert.equal(JSON.parse(globalThis.localStorage.getItem('userPreferences_v7')).theme, 'auto');
+    assert.equal(s.preferenceEdits, edits);
+  });
+
+  it('setSyncSettings holds the account\'s settings, unknown at first', () => {
+    const s = useMainStore();
+    assert.equal(s.syncSettings.status, 'unknown');
+    s.setSyncSettings({ user: 'u1', status: 'fresh', decided: true, collections: ['preferences'] });
+    assert.deepEqual(s.syncSettings.collections, ['preferences']);
+  });
+
+  it('accountSyncAvailable needs sign-in and user storage', () => {
+    const s = useMainStore();
+    for (const [accounts, configs, available] of [
+      [false, { userStorage: true }, false], [true, {}, false], [true, { userStorage: true }, true],
+    ]) {
+      s.isFireBaseSet = accounts;
+      s.configs = configs;
+      assert.equal(s.accountSyncAvailable, available, JSON.stringify({ accounts, configs }));
+    }
+  });
+});
+
 describe('store — getters', () => {
   it('allHasLoaded is false when any loading flag is false', () => {
     const s = useMainStore();

@@ -356,6 +356,20 @@
       "autoRunTips": "Les infos IP sont toujours vérifiées au chargement de la page. Choisissez quels autres modules s'exécutent automatiquement au démarrage.",
       "simpleMode": "Mode Simple",
       "simpleModeTips": "Masque le texte de description de chaque module. Effectif uniquement sur les appareils mobiles.",
+      "sync": "Synchronisation",
+      "syncEnable": "Activer",
+      "syncPreferences": "Préférences",
+      "syncConnectivity": "Listes du test de connectivité",
+      "syncNever": "Les IP, les instantanés et les résultats des tests ne sont jamais synchronisés. Ils restent uniquement dans ce navigateur.",
+      "syncTips": "Ce qui est activé suit votre compte sur chaque appareil. La déconnexion le retire de cet appareil jusqu'à votre prochaine connexion. Désactiver un élément le supprime de votre compte et le garde sur cet appareil.",
+      "syncSignedOut": "Connectez-vous pour synchroniser avec votre compte.",
+      "syncSynced": "Synchronisé avec votre compte.",
+      "syncReload": "La synchronisation est en pause sur cette page. Rechargez la page pour continuer.",
+      "syncSaveFailed": "Impossible d'enregistrer le réglage de synchronisation. Réessayez.",
+      "syncFailed": "La dernière synchronisation n'a pas abouti. Elle sera retentée à votre prochaine modification ou visite.",
+      "syncStatusSynced": "Synchronisé",
+      "syncStatusPaused": "En pause",
+      "syncStatusFailed": "Non synchronisé",
       "connectivity": {
         "defaultList": "Liste par défaut",
         "defaultListTips": "La liste affichée par la section au chargement de la page.",
@@ -2478,5 +2492,11 @@
   "pwa": {
     "appDescription": "La boîte à outils IP tout-en-un",
     "installDescription": "Vous avez déjà utilisé IPCheck.ing {count} fois — installez-le comme application pour une expérience plus fluide et un accès plus rapide."
+  },
+  "syncDialog": {
+    "Title": "Synchroniser vos réglages",
+    "Note": "Votre compte peut garder ces réglages identiques sur tous vos appareils.",
+    "Save": "Enregistrer",
+    "Later": "Plus tard"
   }
 }

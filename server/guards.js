@@ -14,6 +14,7 @@ import { parseAsnInput } from '../common/asn-input.js';
 import { SERVICE_ERROR_CODE, AUTH_REASON } from '../common/codes/service-errors.js';
 import { verifySignIn } from './sign-in-token.js';
 import { userStorage } from './db/user-storage.js';
+import { SYNC_COLLECTIONS, syncCollectionOf } from '../common/sync-collections.js';
 
 // Express 5's req.query is a prototype getter that re-parses the URL on every
 // read, so a direct write is lost. Pin the parsed object as an own property
@@ -199,6 +200,18 @@ export const requireValidProviderId = (paramName = 'id') => (req, res, next) => 
     if (!STATUS_PROVIDER_IDS.has(id)) {
         return res.status(400).json({ error: 'Invalid provider id' });
     }
+    next();
+};
+
+// The `:collection` route param names a synced collection
+// (common/sync-collections.js), else 404; its registry row lands on
+// `res.locals.syncCollection`.
+export const requireValidSyncCollection = (paramName = 'collection', collections = SYNC_COLLECTIONS) => (req, res, next) => {
+    const collection = syncCollectionOf(req.params?.[paramName], collections);
+    if (!collection) {
+        return res.status(404).json({ error: 'Unknown collection' });
+    }
+    res.locals.syncCollection = collection;
     next();
 };
 

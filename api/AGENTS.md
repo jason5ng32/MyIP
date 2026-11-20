@@ -26,7 +26,7 @@ Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona` /
 `ip-blocklist` / `bulk-lookup`), account data (`get-user-info`, a proxy;
-`achievements`, from user storage), platform (`configs` /
+`achievements` / `sync` / `sync-settings`, from user storage), platform (`configs` /
 `sentry-tunnel` / `share-report`). Each file's header comment states its route
 and purpose — read those for specifics.
 
@@ -169,6 +169,9 @@ resolver list behind `dns-resolver` (gated by
   picker and `resolveDns` also read; otherwise the DoH branch would forward any
   string to four third-party endpoints.
 - `requireValidReportId()` — `/api/report/:id` route param (22-char base64url).
+- `requireValidSyncCollection()` — `/api/sync/:collection` route param: a
+  `common/sync-collections.js` id, else 404; the row lands on
+  `res.locals.syncCollection`.
 - `optionalUser()` / `requireUser()` — sign-in, verified here
   (`server/sign-in-token.js`: the `authorization` Bearer token checked
   against Google's public certificates, RS256 only, the project from
@@ -280,11 +283,19 @@ back there. `/api/configs` `userStorage` = configured (the answer is
 edge-cached), not ready. Specs drive the runner and repositories with fakes;
 `DATABASE_URL_TEST` runs the optional real-database spec. Data minimisation:
 store only what a feature needs keyed by the opaque user id — no e-mail,
-name, IP, user agent or last-seen time.
+name, IP, user agent, last-seen time or test result. Synced content is
+preferences and Connectivity lists only (the lists hold the sites a user
+added themselves).
 
 Tables: `users` (id, created), `achievements` (user, name, unlock time; one
-row per unlocked name) and `feature_uses` (user, feature, lifetime count) —
-nothing about a use but the count: no target, IP or time.
+row per unlocked name), `feature_uses` (user, feature, lifetime count) —
+nothing about a use but the count: no target, IP or time — and
+`synced_items` (user, collection, schema version, item id, the device's edit
+time `updated_at` in epoch ms, `deleted`, `data` jsonb, `seq`; one row per
+item, a delete kept as a tombstone with `data` NULL) and `sync_settings`
+(user, the enabled collection ids as `text[]`, updated time; a row means the
+user decided, an empty list = sync nothing). `seq` comes from
+`synced_items_seq`, a new value on every insert or update.
 
 - **Achievements** (`api/achievements.js`, behind `requireUser()` +
   `requireUserStorage()`, no-store, the users row ensured on first contact):
@@ -294,6 +305,47 @@ nothing about a use but the count: no target, IP or time.
   1 KB body limit) → `{ name, achievedTime }`, 400 for a name outside
   `common/codes/achievements.js` — the one name list, which the front end
   reads too. A repeat unlock keeps the first time.
+- **Sync settings** (`api/sync-settings.js`, `server/db/sync-settings.js`,
+  behind `requireUser()` + `requireUserStorage()`, no-store, users row
+  ensured, own 1 KB body limit): the account, not the device, chooses what
+  syncs. `GET /api/sync` → `{ decided, collections }` (no row → `{ decided:
+  false, collections: [] }`; ids the registry no longer has are left out).
+  `PUT /api/sync` `{ collections }` (an array of distinct registry ids, else
+  400) → `{ decided: true, collections }` in registry order. One transaction
+  under the user's `users` row lock: the row upserted, then every
+  `synced_items` row of the user whose collection is left out deleted — all
+  versions, tombstones too — in one `DELETE … WHERE user_id = $1 AND
+  collection <> ALL($2)`, bounded by the primary key's `user_id` prefix.
+- **Sync items** (`api/sync.js`, behind `requireValidSyncCollection()` +
+  `requireUser()` + `requireUserStorage()`, no-store, users row ensured, own
+  `SYNC_MAX_BODY_BYTES` (320 KB) PUT body limit, mounted before the settings'
+  1 KB one). Collections: `common/sync-collections.js`, one frozen registry
+  (`preferences` · `connectivity`), each with its schema `version`, item id
+  and value checks, `maxItems` (live rows per user and version),
+  `maxItemBytes`, `allowDelete` and `pageSize`; `connectivity` holds `lists`
+  (the lists model, `isValidConnectivityLists`) and `defaultListId`, checked
+  in `common/preferences-schema.js`. A collection the user has not enabled
+  in `sync_settings` → 409 `{ error, code: 'sync_off' }` (`SYNC_OFF_CODE`),
+  nothing read or written; for a PUT the check runs inside the write
+  transaction, after the lock, so a write racing a disable leaves nothing.
+  `GET /api/sync/:collection?v=&since=` →
+  `{ cursor, more, items: [{ id, updatedAt, deleted, value? }] }`: that
+  version's rows with `seq > since`, in `seq` order, one page; any `v` is
+  served. `PUT` `{ version, items }` → `{ base, cursor, conflicts, refused }`;
+  a `version` other than the registry's, or a malformed body (≤ 500 items,
+  valid ids, positive integer `updatedAt`, no repeats) → 400, nothing
+  written. Per item (`planSyncWrite`, `server/db/synced-items.js`): a bad
+  value, an oversized one, a delete where deletes are off or a new live row
+  past `maxItems` is refused (`invalid` / `too_large` / `no_delete` /
+  `full`); `updatedAt` is clamped to now; no row → insert, a stored
+  `updated_at` as new or newer stays and comes back in `conflicts`, else
+  replaced (a delete too, as a tombstone). One transaction: the user's
+  `users` row locked first (so a user's `seq` commit in order and a cursor
+  never skips one), the enabled check, the collection's tombstones older
+  than 90 days removed, every write in one `INSERT … SELECT` over a jsonb
+  parameter. `base` / `cursor` = the version's highest `seq` before / after;
+  a device whose cursor was `base` may take `cursor` without a GET. Rows of
+  other versions are never touched.
 - **Use counting** (`server/count-feature-use.js`): `countFeatureUse(<id>)`,
   attached in `backend-server.js` to the five IPCheck.ing-API-backed routes
   (`/api/ipchecking` via its `api/ip-sources.js` row's `featureUse`), adds

@@ -5,7 +5,8 @@ import { fileURLToPath } from 'url';
 import pinoHttp from 'pino-http';
 import logger from './server/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
-    requireValidRecordType, requireValidReportId, normalizeAsnQuery, requireUser, optionalUser, requireUserStorage } from './server/guards.js';
+    requireValidRecordType, requireValidReportId, requireValidSyncCollection, normalizeAsnQuery, requireUser, optionalUser,
+    requireUserStorage } from './server/guards.js';
 import { countFeatureUse } from './server/count-feature-use.js';
 import { FEATURE_USES } from './server/db/feature-uses.js';
 import { withTimeZone } from './server/ip-timezone.js';
@@ -44,6 +45,9 @@ import bulkLookupHandler from './api/bulk-lookup.js';
 import { bulkLookupSource } from './server/bulk-lookup-sources.js';
 import getUserinfo from './api/get-user-info.js';
 import listAchievementsHandler, { unlockAchievement as unlockAchievementHandler } from './api/achievements.js';
+import readSyncHandler, { writeSyncedItems as writeSyncHandler } from './api/sync.js';
+import readSyncSettingsHandler, { writeSyncSettings as writeSyncSettingsHandler } from './api/sync-settings.js';
+import { SYNC_MAX_BODY_BYTES } from './common/sync-collections.js';
 import { reloadMaxMindDatabases, isMaxMindReady, getMaxMindDbPaths } from './server/datasets/maxmind-service.js';
 import { bootstrapDatasets, startDatasetScheduler, watchDatasets } from './server/datasets/dataset-updater.js';
 import { datasets } from './server/datasets/datasets.js';
@@ -95,6 +99,11 @@ if (process.env.LOG_HTTP === 'true') {
 app.use('/api/bulk-lookup', express.json({ limit: '16kb' }));
 // An achievement unlock is one short name.
 app.use('/api/achievements', express.json({ limit: '1kb' }));
+// A sync item write: one collection's items, the Connectivity lists the largest.
+// It runs before the settings parser below, which then skips the parsed body.
+app.use('/api/sync/:collection', express.json({ limit: SYNC_MAX_BODY_BYTES }));
+// The sync settings: a few collection ids.
+app.use('/api/sync', express.json({ limit: '1kb' }));
 app.use(express.json({ limit: '500kb' }));
 
 // Default every /api/* response to no-store. Routes that want edge caching
@@ -214,9 +223,13 @@ app.get('/api/dnsleaktest/session/:token', requireUser(), countFeatureUse(FEATUR
 app.get('/api/invisibility', requireUser(), countFeatureUse(FEATURE_USES.invisibility), invisibilitytestHandler);
 app.get('/api/ipblocklist', requirePublicIP(), optionalUser(), countFeatureUse(FEATURE_USES.ipblocklist), ipBlocklistHandler);
 app.get('/api/getuserinfo', requireUser(), getUserinfo);
-// Achievements live in user storage: 503 without it.
+// Achievements and synced items live in user storage: 503 without it.
 app.get('/api/achievements', requireUser(), requireUserStorage(), listAchievementsHandler);
 app.put('/api/achievements', requireUser(), requireUserStorage(), unlockAchievementHandler);
+app.get('/api/sync', requireUser(), requireUserStorage(), readSyncSettingsHandler);
+app.put('/api/sync', requireUser(), requireUserStorage(), writeSyncSettingsHandler);
+app.get('/api/sync/:collection', requireValidSyncCollection(), requireUser(), requireUserStorage(), readSyncHandler);
+app.put('/api/sync/:collection', requireValidSyncCollection(), requireUser(), requireUserStorage(), writeSyncHandler);
 // Shared reports stay no-store: an edge cache could serve a report past its
 // KV expiry, and private diagnostic data doesn't belong in a public cache.
 app.get('/api/report/:id', requireValidReportId(), getReportHandler);

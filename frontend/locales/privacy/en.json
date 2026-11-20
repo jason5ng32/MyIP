@@ -91,7 +91,7 @@
       "cookies": {
         "title": "Cookies & local storage",
         "analytics": "Google Analytics stores a cookie to recognise returning visitors.",
-        "local": "Your own settings (theme, language, tool preferences) are kept in your browser's local storage and never leave your device."
+        "local": "Your own settings (theme, language, tool preferences) are kept in your browser's local storage. If you sign in with sync on, they are also stored in your account."
       },
       "eu": {
         "title": "If you are in the EU/EEA or UK",

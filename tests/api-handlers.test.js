@@ -30,7 +30,11 @@ import { isAsRelLoaded } from '../server/datasets/as-rel-db.js';
 import { describeMac } from '../server/datasets/oui-db.js';
 import { isCompleteProfile } from '../server/asn-profile.js';
 import { createAchievementHandlers } from '../api/achievements.js';
-import { requireUser, requireUserStorage } from '../server/guards.js';
+import { createSyncHandlers } from '../api/sync.js';
+import { createSyncSettingsHandlers } from '../api/sync-settings.js';
+import { SYNC_COLLECTIONS, SYNC_OFF_CODE } from '../common/sync-collections.js';
+import { sanitizeLists } from '../frontend/utils/features/connectivity-lists.js';
+import { requireUser, requireUserStorage, requireValidSyncCollection } from '../server/guards.js';
 import { AUTH_REASON } from '../common/codes/service-errors.js';
 import { FEATURE_USES, recordFeatureUse } from '../server/db/feature-uses.js';
 import { fakeUserDb, fakeStorage } from './fake-user-db.js';
@@ -1152,6 +1156,392 @@ describe('achievements handlers', () => {
         const putRes = await route(handlers.unlock, put({ name: 'IAmHuman' }), { storage });
         assert.equal(putRes.statusCode, 500);
         assert.deepEqual(putRes.body, { error: 'Achievement not saved' });
+    });
+});
+
+// -- sync handlers --------------------------------------------------------
+
+describe('sync handlers', () => {
+    const NOW = 1_000_000;
+    const { preferences, connectivity } = SYNC_COLLECTIONS;
+    // A stand-in collection with deletes and small pages, exercising the generic engine.
+    const ticks = Object.freeze({
+        id: 'ticks', version: 1,
+        isValidItemId: (id) => typeof id === 'string' && /^[a-z0-9-]{1,32}$/.test(id),
+        isValidValue: (id, value) => value === 'checked' || value === 'ignored',
+        maxItems: 100, maxItemBytes: 64, allowDelete: true, pageSize: 3,
+    });
+    const COLLECTIONS = Object.freeze({ ...SYNC_COLLECTIONS, ticks });
+    // The route's chain: requireValidSyncCollection(), requireUser(), requireUserStorage(), then the handler.
+    const route = async (handler, req, { verify = async () => ({ id: USER_ID }), storage, collections = COLLECTIONS }) => {
+        const res = createResponse();
+        for (const step of [requireValidSyncCollection('collection', collections), requireUser(verify), requireUserStorage(storage), handler]) {
+            let advanced = false;
+            await step(req, res, () => { advanced = true; });
+            if (step !== handler && !advanced) break;
+        }
+        return res;
+    };
+    const enable = (db, user = USER_ID, ids = ['ticks', 'preferences', 'connectivity']) =>
+        db.syncSettings.set(user, { collections: ids, updated_at: new Date() });
+    const setup = ({ enabled = true } = {}) => {
+        const db = fakeUserDb();
+        if (enabled) for (const user of [USER_ID, 'alice', 'bob']) enable(db, user);
+        const storage = fakeStorage(db);
+        return { db, storage, handlers: createSyncHandlers(storage, { now: () => NOW }) };
+    };
+    const get = (collection, query = {}) => ({ ...createRequest({ query }), params: { collection } });
+    const put = (collection, body) => ({ ...createRequest({ method: 'PUT', body }), params: { collection } });
+    const as = (id) => async () => ({ id });
+    const tick = (id, updatedAt, value = 'checked') => ({ id, updatedAt, deleted: false, value });
+    const v = String(ticks.version);
+    const SYNC_OFF = { error: 'Sync is off for this collection', code: SYNC_OFF_CODE };
+
+    it('rejects the wrong method with 405', async () => {
+        const { handlers } = setup();
+        const res = signedIn(createResponse());
+        res.locals.syncCollection = ticks;
+        await handlers.read(createRequest({ method: 'POST' }), res);
+        assert.equal(res.statusCode, 405);
+        const res2 = signedIn(createResponse());
+        res2.locals.syncCollection = ticks;
+        await handlers.write(createRequest({ method: 'GET' }), res2);
+        assert.equal(res2.statusCode, 405);
+    });
+
+    it('an unknown collection → 404 before sign-in or storage; snapshots and checklist are not collections', async () => {
+        const { db, storage, handlers } = setup();
+        let verified = false;
+        const verify = async () => { verified = true; return { id: USER_ID }; };
+        for (const name of ['nope', 'snapshots', 'checklist', 'constructor', '__proto__', '']) {
+            for (const req of [get(name, { v: '1' }), put(name, { version: 1, items: [] })]) {
+                const res = await route(req.method === 'PUT' ? handlers.write : handlers.read, req, { verify, storage, collections: SYNC_COLLECTIONS });
+                assert.equal(res.statusCode, 404, name);
+                assert.deepEqual(res.body, { error: 'Unknown collection' });
+            }
+        }
+        assert.equal(verified, false);
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('signed out → 403 auth; storage off or not ready → 503; storage untouched either way', async () => {
+        const { db, storage, handlers } = setup();
+        const signedOut = async () => ({ reason: AUTH_REASON.SIGN_IN_REQUIRED });
+        for (const [handler, req] of [[handlers.read, get('ticks', { v })], [handlers.write, put('ticks', { version: 1, items: [] })]]) {
+            const res = await route(handler, req, { verify: signedOut, storage });
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+            for (const options of [{ configured: false }, { ready: false }]) {
+                const off = await route(handler, req, { storage: fakeStorage(db, options) });
+                assert.equal(off.statusCode, 503);
+            }
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('a collection the account has not enabled → 409 sync_off, nothing read or written', async () => {
+        const { db, storage, handlers } = setup({ enabled: false });
+        const attempt = async () => {
+            db.calls.length = 0;
+            const read = await route(handlers.read, get('preferences', { v: String(preferences.version) }), { storage });
+            const write = await route(handlers.write, put('preferences', {
+                version: preferences.version, items: [{ id: 'theme', updatedAt: 1, value: 'dark' }],
+            }), { storage });
+            return [read, write];
+        };
+        for (const ids of [null, [], ['connectivity']]) {
+            if (ids) enable(db, USER_ID, ids);
+            for (const res of await attempt()) {
+                assert.equal(res.statusCode, 409, JSON.stringify(ids));
+                assert.deepEqual(res.body, SYNC_OFF);
+            }
+            assert.ok(db.calls.every(({ text }) => !text.includes('synced_items')), 'synced_items untouched');
+            assert.equal(db.syncedItems.size, 0);
+        }
+        enable(db, USER_ID, ['preferences']);
+        const [read, write] = await attempt();
+        assert.equal(read.statusCode, 200);
+        assert.deepEqual(write.body, { base: 0, cursor: 1, conflicts: [], refused: [] });
+    });
+
+    it('GET with a bad v or since → 400, storage untouched', async () => {
+        const { db, storage, handlers } = setup();
+        for (const query of [{}, { v: '0' }, { v: '-1' }, { v: '1.5' }, { v: 'x' }, { v: '01' }, { v: '9999999999' }, { v: ['1', '2'] },
+            { v, since: '-1' }, { v, since: '1.5' }, { v, since: 'abc' }, { v, since: '99999999999999999' }, { v, since: ['1'] }]) {
+            const res = await route(handlers.read, get('ticks', query), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(query));
+            assert.equal(typeof res.body.error, 'string');
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('GET with nothing stored → an empty page at the given cursor, and a users row', async () => {
+        const { db, storage, handlers } = setup();
+        const res = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { cursor: 0, more: false, items: [] });
+        assert.ok(db.users.has(USER_ID));
+        const later = await route(handlers.read, get('ticks', { v, since: '42' }), { storage });
+        assert.deepEqual(later.body, { cursor: 42, more: false, items: [] });
+    });
+
+    it('PUT then GET round-trips; base / cursor tell whether the device missed anything', async () => {
+        const { storage, handlers } = setup();
+        const first = await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 10), tick('b', 20, 'ignored')] }), { storage });
+        assert.equal(first.statusCode, 200);
+        assert.deepEqual(first.body, { base: 0, cursor: 2, conflicts: [], refused: [] });
+        const second = await route(handlers.write, put('ticks', { version: 1, items: [{ id: 'a', updatedAt: 30, deleted: true }] }), { storage });
+        assert.deepEqual(second.body, { base: 2, cursor: 3, conflicts: [], refused: [] });
+        const all = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.deepEqual(all.body, { cursor: 3, more: false, items: [tick('b', 20, 'ignored'), { id: 'a', updatedAt: 30, deleted: true }] });
+        const since = await route(handlers.read, get('ticks', { v, since: '2' }), { storage });
+        assert.deepEqual(since.body, { cursor: 3, more: false, items: [{ id: 'a', updatedAt: 30, deleted: true }] });
+    });
+
+    it('the Connectivity lists and default list id round-trip', async () => {
+        const { storage, handlers } = setup();
+        const lists = sanitizeLists(null, null, []);
+        const items = [
+            { id: 'lists', updatedAt: 5, deleted: false, value: lists },
+            { id: 'defaultListId', updatedAt: 5, deleted: false, value: 'mine' },
+        ];
+        const saved = await route(handlers.write, put('connectivity', { version: connectivity.version, items }), { storage });
+        assert.deepEqual(saved.body, { base: 0, cursor: 2, conflicts: [], refused: [] });
+        const listed = await route(handlers.read, get('connectivity', { v: String(connectivity.version) }), { storage });
+        assert.deepEqual(listed.body, { cursor: 2, more: false, items });
+        const bad = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
+            { id: 'lists', updatedAt: 6, value: { ...lists, extra: 1 } }, { id: 'defaultListId', updatedAt: 6, value: '' },
+        ] }), { storage });
+        assert.deepEqual(bad.body.refused, [{ id: 'lists', reason: 'invalid' }, { id: 'defaultListId', reason: 'invalid' }]);
+        const unknown = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
+            { id: 'connectivityLists', updatedAt: 6, value: lists },
+        ] }), { storage });
+        assert.equal(unknown.statusCode, 400);
+    });
+
+    it('GET pages by the collection\'s pageSize with `more`', async () => {
+        const { storage, handlers } = setup();
+        const count = ticks.pageSize + 2;
+        const items = Array.from({ length: count }, (_, i) => tick(`s${i}`, i + 1));
+        const saved = await route(handlers.write, put('ticks', { version: 1, items }), { storage });
+        assert.deepEqual(saved.body, { base: 0, cursor: count, conflicts: [], refused: [] });
+        const page1 = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.equal(page1.body.items.length, ticks.pageSize);
+        assert.equal(page1.body.more, true);
+        assert.equal(page1.body.cursor, ticks.pageSize);
+        assert.deepEqual(page1.body.items[0], tick('s0', 1));
+        const page2 = await route(handlers.read, get('ticks', { v, since: String(page1.body.cursor) }), { storage });
+        assert.deepEqual(page2.body.items.map(({ id }) => id), Array.from({ length: 2 }, (_, i) => `s${ticks.pageSize + i}`));
+        assert.equal(page2.body.more, false);
+        assert.equal(page2.body.cursor, count);
+    });
+
+    it('a stored edit as new or newer stays and comes back in conflicts; a future time is clamped', async () => {
+        const { storage, handlers } = setup();
+        await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 100), tick('b', NOW * 3)] }), { storage });
+        const res = await route(handlers.write, put('ticks', {
+            version: 1, items: [tick('a', 100, 'ignored'), tick('b', NOW + 5, 'ignored'), tick('c', 1)],
+        }), { storage });
+        assert.deepEqual(res.body, { base: 2, cursor: 3, conflicts: [tick('a', 100), tick('b', NOW)], refused: [] });
+    });
+
+    it('refuses an item per reason and stores the rest', async () => {
+        const { storage, handlers } = setup();
+        const small = { ...COLLECTIONS, ticks: { ...ticks, maxItems: 1 } };
+        const res = await route(handlers.write, put('ticks', { version: 1, items: [
+            tick('bad', 1, 'maybe'), tick('ok', 1), tick('over', 1), { id: 'big', updatedAt: 1, value: 'x'.repeat(100) },
+        ] }), { storage, collections: small });
+        assert.deepEqual(res.body.refused, [
+            { id: 'bad', reason: 'invalid' }, { id: 'over', reason: 'full' }, { id: 'big', reason: 'too_large' },
+        ]);
+        const prefs = await route(handlers.write, put('preferences', { version: preferences.version, items: [
+            { id: 'theme', updatedAt: 1, deleted: true }, { id: 'lang', updatedAt: 1, value: 'fr' },
+        ] }), { storage });
+        assert.deepEqual(prefs.body.refused, [{ id: 'theme', reason: 'no_delete' }]);
+        const listed = await route(handlers.read, get('preferences', { v: String(preferences.version) }), { storage });
+        assert.deepEqual(listed.body.items, [{ id: 'lang', updatedAt: 1, deleted: false, value: 'fr' }]);
+    });
+
+    it('PUT with a bad shape or another version → 400, nothing written', async () => {
+        const { db, storage, handlers } = setup();
+        const many = Array.from({ length: 501 }, (_, i) => tick(`s-${i}`, 1));
+        for (const body of [
+            undefined, [], 'x', {}, { version: 1 }, { version: 1, items: {} },
+            { version: 2, items: [] }, { version: 0, items: [] }, { version: '1', items: [] },
+            { version: 1, items: many },
+            { version: 1, items: [null] },
+            { version: 1, items: [{ updatedAt: 1, value: 'checked' }] },
+            { version: 1, items: [tick('Not A Slug', 1)] },
+            { version: 1, items: [tick('a', 0)] },
+            { version: 1, items: [tick('a', -5)] },
+            { version: 1, items: [tick('a', 1.5)] },
+            { version: 1, items: [tick('a', '5')] },
+            { version: 1, items: [{ ...tick('a', 5), deleted: 'yes' }] },
+            { version: 1, items: [tick('a', 1), tick('a', 2)] },
+        ]) {
+            const res = await route(handlers.write, put('ticks', body), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(body)?.slice(0, 80));
+            assert.equal(typeof res.body.error, 'string');
+        }
+        assert.equal(db.calls.length, 0);
+        const prefs = await route(handlers.write, put('preferences', { version: 1, items: [{ id: 'theme', updatedAt: 1, value: 'dark' }] }), { storage });
+        assert.equal(prefs.statusCode, 400);
+        const unknownKey = await route(handlers.write, put('preferences', { version: preferences.version, items: [{ id: 'nope', updatedAt: 1, value: 1 }] }), { storage });
+        assert.equal(unknownKey.statusCode, 400);
+        assert.equal(db.syncedItems.size, 0);
+    });
+
+    it('a write to version N+1 never touches version N rows; GET serves each version its own rows', async () => {
+        const { db, storage, handlers } = setup();
+        await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 1), tick('b', 1)] }), { storage });
+        const next = { ...COLLECTIONS, ticks: { ...ticks, version: 2 } };
+        const stale = await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 5, 'ignored')] }), { storage, collections: next });
+        assert.equal(stale.statusCode, 400);
+        const res = await route(handlers.write, put('ticks', { version: 2, items: [tick('a', 5, 'ignored')] }), { storage, collections: next });
+        assert.deepEqual(res.body, { base: 0, cursor: 3, conflicts: [], refused: [] });
+        const v1 = await route(handlers.read, get('ticks', { v: '1' }), { storage, collections: next });
+        assert.deepEqual(v1.body.items, [tick('a', 1), tick('b', 1)]);
+        const v2 = await route(handlers.read, get('ticks', { v: '2' }), { storage, collections: next });
+        assert.deepEqual(v2.body.items, [tick('a', 5, 'ignored')]);
+        assert.deepEqual([...db.syncedItems.values()].filter((row) => row.schema_version === 1).map((row) => row.data), ['checked', 'checked']);
+    });
+
+    it('a user never sees another user\'s items', async () => {
+        const { storage, handlers } = setup();
+        await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 1)] }), { verify: as('alice'), storage });
+        const bob = await route(handlers.read, get('ticks', { v }), { verify: as('bob'), storage });
+        assert.deepEqual(bob.body, { cursor: 0, more: false, items: [] });
+        const bobPut = await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 2, 'ignored')] }), { verify: as('bob'), storage });
+        assert.deepEqual(bobPut.body, { base: 0, cursor: 2, conflicts: [], refused: [] });
+        const alice = await route(handlers.read, get('ticks', { v }), { verify: as('alice'), storage });
+        assert.deepEqual(alice.body.items, [tick('a', 1)]);
+    });
+
+    it('a storage failure answers 500 without its details', async () => {
+        const storage = fakeStorage({ query: async () => { throw new Error('relation "x" does not exist'); } });
+        const handlers = createSyncHandlers(storage);
+        const readRes = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.equal(readRes.statusCode, 500);
+        assert.deepEqual(readRes.body, { error: 'Sync unavailable' });
+        const putRes = await route(handlers.write, put('ticks', { version: 1, items: [] }), { storage });
+        assert.equal(putRes.statusCode, 500);
+        assert.deepEqual(putRes.body, { error: 'Sync not saved' });
+    });
+});
+
+// -- sync settings handlers -----------------------------------------------
+
+describe('sync settings handlers', () => {
+    // The route's chain: requireUser(), requireUserStorage(), then the handler.
+    const route = async (handler, req, { verify = async () => ({ id: USER_ID }), storage }) => {
+        const res = createResponse();
+        for (const step of [requireUser(verify), requireUserStorage(storage), handler]) {
+            let advanced = false;
+            await step(req, res, () => { advanced = true; });
+            if (step !== handler && !advanced) break;
+        }
+        return res;
+    };
+    const setup = () => {
+        const db = fakeUserDb();
+        const storage = fakeStorage(db);
+        return { db, storage, handlers: createSyncSettingsHandlers(storage) };
+    };
+    const put = (body) => createRequest({ method: 'PUT', body });
+    const itemsOf = (db, user) => [...db.syncedItems.values()].filter((row) => row.user_id === user).map((row) => row.collection).sort();
+    const putRow = (db, user, collection, version, item) => db.syncedItems.set([user, collection, version, item].join('\u0000'), {
+        user_id: user, collection, schema_version: version, item_id: item, updated_at: 1, deleted: false, data: 'v', seq: db.syncedItems.size + 1,
+    });
+
+    it('rejects the wrong method with 405', async () => {
+        const { handlers } = setup();
+        const res = signedIn(createResponse());
+        await handlers.read(createRequest({ method: 'POST' }), res);
+        assert.equal(res.statusCode, 405);
+        const res2 = signedIn(createResponse());
+        await handlers.write(createRequest({ method: 'GET' }), res2);
+        assert.equal(res2.statusCode, 405);
+    });
+
+    it('signed out → 403 auth; storage off or not ready → 503; storage untouched either way', async () => {
+        const { db, storage, handlers } = setup();
+        const signedOut = async () => ({ reason: AUTH_REASON.SIGN_IN_REQUIRED });
+        for (const [handler, req] of [[handlers.read, createRequest()], [handlers.write, put({ collections: [] })]]) {
+            const res = await route(handler, req, { verify: signedOut, storage });
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+            for (const options of [{ configured: false }, { ready: false }]) {
+                assert.equal((await route(handler, req, { storage: fakeStorage(db, options) })).statusCode, 503);
+            }
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('GET for a user who never decided → undecided, nothing enabled, and a users row', async () => {
+        const { db, storage, handlers } = setup();
+        const res = await route(handlers.read, createRequest(), { storage });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { decided: false, collections: [] });
+        assert.ok(db.users.has(USER_ID));
+    });
+
+    it('PUT with anything but an array of distinct registry ids → 400, nothing written', async () => {
+        const { db, storage, handlers } = setup();
+        for (const body of [
+            undefined, null, [], 'x', {}, { collections: 'preferences' }, { collections: {} }, { collections: null },
+            { collections: ['nope'] }, { collections: ['snapshots'] }, { collections: ['checklist'] },
+            { collections: ['preferences', 'preferences'] }, { collections: [1] }, { collections: [null] },
+            { collections: ['constructor'] }, { collections: ['__proto__'] },
+        ]) {
+            const res = await route(handlers.write, put(body), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(body));
+            assert.equal(typeof res.body.error, 'string');
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('PUT decides: nothing, then both, in registry order; GET reads it back', async () => {
+        const { db, storage, handlers } = setup();
+        const none = await route(handlers.write, put({ collections: [] }), { storage });
+        assert.equal(none.statusCode, 200);
+        assert.deepEqual(none.body, { decided: true, collections: [] });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { decided: true, collections: [] });
+        const both = await route(handlers.write, put({ collections: ['connectivity', 'preferences'] }), { storage });
+        assert.deepEqual(both.body, { decided: true, collections: ['preferences', 'connectivity'] });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, both.body);
+        assert.ok(db.users.has(USER_ID));
+    });
+
+    it('turning a collection off deletes exactly its rows, in every version; other users keep theirs', async () => {
+        const { db, storage, handlers } = setup();
+        await route(handlers.write, put({ collections: ['preferences', 'connectivity'] }), { storage });
+        for (const user of [USER_ID, 'other']) {
+            putRow(db, user, 'preferences', 7, 'theme');
+            putRow(db, user, 'preferences', 6, 'lang');
+            putRow(db, user, 'connectivity', 1, 'lists');
+        }
+        await route(handlers.write, put({ collections: ['connectivity'] }), { storage });
+        assert.deepEqual(itemsOf(db, USER_ID), ['connectivity']);
+        await route(handlers.write, put({ collections: [] }), { storage });
+        assert.deepEqual(itemsOf(db, USER_ID), []);
+        assert.deepEqual(itemsOf(db, 'other'), ['connectivity', 'preferences', 'preferences']);
+    });
+
+    it('GET leaves out stored ids the registry no longer has', async () => {
+        const { db, storage, handlers } = setup();
+        db.syncSettings.set(USER_ID, { collections: ['snapshots', 'preferences', 'checklist'], updated_at: new Date() });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { decided: true, collections: ['preferences'] });
+    });
+
+    it('a storage failure answers 500 without its details', async () => {
+        const storage = fakeStorage({ query: async () => { throw new Error('relation "x" does not exist'); } });
+        const handlers = createSyncSettingsHandlers(storage);
+        const readRes = await route(handlers.read, createRequest(), { storage });
+        assert.equal(readRes.statusCode, 500);
+        assert.deepEqual(readRes.body, { error: 'Sync settings unavailable' });
+        const putRes = await route(handlers.write, put({ collections: [] }), { storage });
+        assert.equal(putRes.statusCode, 500);
+        assert.deepEqual(putRes.body, { error: 'Sync settings not saved' });
     });
 });
 
