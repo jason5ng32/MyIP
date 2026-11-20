@@ -171,11 +171,12 @@ const take = (state, item, local) => {
     if (!Object.hasOwn(local, item.id) || hashSyncValue(local[item.id]) !== hash) state.upserts[item.id] = item.value;
 };
 
-// Per item: no local stamp, or a newer cloud stamp, takes the cloud's; else the local edit stays (pending). Its own
-// echo (same stamp, same value) marks it held.
+// Per item: no local stamp, a stamp the server already held (whatever it sends since is newer there, even when this
+// device's clock runs ahead), or a newer cloud stamp, takes the cloud's; else the local edit stays (pending). Its
+// own echo (same stamp, same value) marks it held.
 const mergeItem = (state, item, local) => {
     const entry = state.items[item.id];
-    if (!entry?.at || item.updatedAt > entry.at) {
+    if (!entry?.at || entry.ack >= entry.at || item.updatedAt > entry.at) {
         take(state, item, local);
         return;
     }
@@ -315,8 +316,9 @@ export const readSyncSave = (answer, collection) => {
 
 /**
  * A PUT answer for the `sent` items → `{ record, upserts, deletes, pullNeeded }`. Accepted items are held at the
- * stamp sent; refused ones wait for the next edit; conflicts (kept by the server, as new or newer) are taken. The
- * cursor jumps to the answer's when it was the answer's `base`; otherwise a pull catches up.
+ * stamp sent; refused ones wait for the next edit; conflicts (kept by the server, as new or newer) are taken, unless
+ * the item was edited again after it was sent and that edit is newer: it stays pending. The cursor jumps to the
+ * answer's when it was the answer's `base`; otherwise a pull catches up.
  */
 export const mergeSave = ({ record, sent, answer, local, now }) => {
     const state = { items: { ...record.items }, upserts: {}, deletes: [] };
@@ -331,7 +333,12 @@ export const mergeSave = ({ record, sent, answer, local, now }) => {
         }
         state.items[item.id] = { ...entry, ack: Math.max(entry.ack ?? 0, item.updatedAt) };
     }
-    for (const item of answer.conflicts) take(state, item, local);
+    const sentAt = new Map(sent.map((item) => [item.id, item.updatedAt]));
+    for (const item of answer.conflicts) {
+        const at = state.items[item.id]?.at;
+        if (at > sentAt.get(item.id) && at > item.updatedAt) continue;
+        take(state, item, local);
+    }
     const jumps = record.cursor === answer.base;
     return {
         record: {

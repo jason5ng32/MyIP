@@ -198,6 +198,14 @@ describe('account sync — merging a pull', () => {
         assert.ok(isPending(result.record.items.b));
     });
 
+    it('a stamp the server already held takes the cloud\'s, even an older one (this device\'s clock ran ahead)', () => {
+        const rec = record({ a: { hash: h('mine'), at: 9000, ack: 9000 }, b: { hash: h('mine'), at: 9000, ack: 5 } });
+        const result = merge(rec, { a: 'mine', b: 'mine' }, [live('a', 'theirs', 8), live('b', 'theirs', 8)]);
+        assert.deepEqual(result.upserts, { a: 'theirs' });
+        assert.deepEqual(result.record.items.a, { hash: h('theirs'), at: 8, ack: 8 });
+        assert.ok(isPending(result.record.items.b));
+    });
+
     it('its own echo (same stamp, same value) is held', () => {
         const rec = record({ a: { hash: h('x'), at: 9 }, b: { deleted: true, at: 9 } });
         const result = merge(rec, { a: 'x' }, [live('a', 'x', 9), gone('b', 9)]);
@@ -395,6 +403,35 @@ describe('account sync — merging a save answer', () => {
         const accepted = mergeSave({ record: edited, sent, local, now: 3000, answer: { base: 10, cursor: 12, conflicts: [], refused: [] } });
         assert.deepEqual(accepted.record.items.a, { hash: h('x2'), at: 9, ack: 5 });
         assert.ok(isPending(accepted.record.items.a));
+    });
+});
+
+describe('account sync — a conflict against an edit made while the request was in flight', () => {
+    const sent = [{ id: 'a', updatedAt: 5, value: 'x' }];
+    const edited = record({ a: { hash: h('x2'), at: 9 } }, { cursor: 10 });
+    const answer = (updatedAt) => ({ base: 10, cursor: 10, conflicts: [live('a', 'cloud', updatedAt)], refused: [] });
+
+    it('the newer local edit stays pending', () => {
+        const result = mergeSave({ record: edited, sent, local: { a: 'x2' }, now: 3000, answer: answer(7) });
+        assert.deepEqual(result.upserts, {});
+        assert.deepEqual(result.record.items.a, { hash: h('x2'), at: 9 });
+        assert.ok(isPending(result.record.items.a));
+    });
+
+    it('a cloud value as new or newer than that edit is taken', () => {
+        for (const updatedAt of [9, 12]) {
+            const result = mergeSave({ record: edited, sent, local: { a: 'x2' }, now: 3000, answer: answer(updatedAt) });
+            assert.deepEqual(result.upserts, { a: 'cloud' });
+            assert.equal(isPending(result.record.items.a), false);
+        }
+    });
+
+    it('the stamp that was sent always takes the conflict, whatever the clocks say', () => {
+        const ahead = record({ a: { hash: h('x'), at: 9000 } }, { cursor: 10 });
+        const result = mergeSave({
+            record: ahead, sent: [{ id: 'a', updatedAt: 9000, value: 'x' }], local: { a: 'x' }, now: 3000, answer: answer(7),
+        });
+        assert.deepEqual(result.upserts, { a: 'cloud' });
     });
 });
 
