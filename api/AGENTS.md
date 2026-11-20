@@ -344,7 +344,8 @@ user decided, an empty list = sync nothing). `seq` comes from
   value, an oversized one, a delete where deletes are off, a new live row
   past `maxItems` or a new row past `maxRows` is refused (`invalid` /
   `too_large` / `no_delete` / `full`; the request's deletes free their room
-  first); a delete of an id without a row writes nothing; `updatedAt` is
+  first); a delete of an id without a row is kept as a tombstone while rows
+  remain under `maxRows`, else writes nothing; `updatedAt` is
   clamped to now; no row → insert, a stored
   `updated_at` as new or newer stays and comes back in `conflicts`, else
   replaced (a delete too, as a tombstone). One transaction: the user's

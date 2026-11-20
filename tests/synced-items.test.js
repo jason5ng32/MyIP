@@ -57,8 +57,8 @@ describe('planSyncWrite', () => {
 
     it('a delete replaces like an edit and is written as a tombstone; a newer edit revives one', () => {
         assert.deepEqual(plan([drop('a', 200)], { stored: [tick('a', 100)] }).writes, [drop('a', 200)]);
-        const unknown = plan([drop('new', 5)]);
-        assert.deepEqual([unknown.writes, unknown.conflicts, unknown.refused], [[], [], []], 'a delete of an id without a row writes nothing');
+        assert.deepEqual(plan([drop('new', 5)]).writes, [drop('new', 5)], 'kept, so an older create still on its way loses');
+        assert.deepEqual(plan([tick('new', 4)], { stored: [drop('new', 5)] }).conflicts, [drop('new', 5)]);
         assert.deepEqual(plan([tick('a', 300)], { stored: [drop('a', 200)] }).writes, [tick('a', 300)]);
         assert.deepEqual(plan([tick('a', 100)], { stored: [drop('a', 200)] }).conflicts, [drop('a', 200)]);
     });
@@ -113,9 +113,12 @@ describe('planSyncWrite — rows, tombstones included', () => {
         assert.deepEqual(result.refused, [{ id: 'c', reason: SYNC_REFUSAL.FULL }]);
     });
 
-    it('fresh ids sent as deletes never become rows', () => {
+    it('fresh ids sent as deletes become rows only up to maxRows; past it they write nothing and are not refused', () => {
         const fresh = Array.from({ length: 500 }, (_, i) => drop(`x${i}`, 5));
-        assert.deepEqual(plan(fresh, { stored: [tick('a', 1)] }).writes, []);
+        const result = plan(fresh, { collection: capped, stored: [tick('a', 1)] });
+        assert.deepEqual(result.writes, [drop('x0', 5), drop('x1', 5)]);
+        assert.deepEqual([result.refused, result.conflicts], [[], []]);
+        assert.equal(plan(fresh, { stored: [tick('a', 1)] }).writes.length, 500, 'room for them under the stand-in\'s open cap');
     });
 });
 

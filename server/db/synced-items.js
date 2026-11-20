@@ -24,7 +24,8 @@ export const mergeDecision = (stored, updatedAt) => {
  * returned as a conflict; a new live item past `maxItems`, or a new row past
  * `maxRows` (`rowCount`: live items and tombstones), is refused. The
  * request's deletes free their room first, wherever they sit in it; a delete
- * of an id that has no row writes nothing.
+ * of an id that has no row is kept as a tombstone while rows remain (an older
+ * create still on its way then loses to it), and writes nothing past `maxRows`.
  */
 export const planSyncWrite = ({ collection, items, stored, liveCount, rowCount = liveCount, now }) => {
     const writes = [];
@@ -52,7 +53,7 @@ export const planSyncWrite = ({ collection, items, stored, liveCount, rowCount =
         }
         const updatedAt = Math.min(sent, now);
         const current = stored.get(id) ?? null;
-        if (deleted && !current) continue;
+        if (deleted && !current && rows >= maxRows) continue;
         if (mergeDecision(current, updatedAt) === 'keep') {
             conflicts.push(current);
             continue;
