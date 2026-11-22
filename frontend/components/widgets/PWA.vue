@@ -4,7 +4,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import '@khmyznikov/pwa-install';
 import { detectBrowser, detectOS } from '@/utils/system-detect.js';
@@ -12,6 +13,7 @@ import { getPwaVisitCount } from '@/utils/pwa.js';
 import { trackEvent } from '@/utils/analytics';
 
 const { t } = useI18n();
+const route = useRoute();
 
 
 // Define data
@@ -85,9 +87,21 @@ onMounted(() => {
     // the prompt moment. The short delay lets the pwa-install element
     // upgrade and process the manifest before the dialog opens.
     setTimeout(() => {
-        showPWA();
+        elementReady = true;
+        showOnHome();
     }, 3000);
 });
+
+// The dialog opens on Home only, once: a visitor who left during the delay
+// gets it on the next return.
+let elementReady = false;
+let attempted = false;
+const showOnHome = () => {
+    if (!elementReady || attempted || route.path !== '/') return;
+    attempted = true;
+    showPWA();
+};
+watch(() => route.path, showOnHome);
 </script>
 
 <style scoped></style>

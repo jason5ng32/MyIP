@@ -36,16 +36,18 @@ import { useMainStore } from '@/store';
 
 // PWA install prompt — async and eligibility-gated: ineligible visits (too
 // few 12h-deduped uses, prompt cap reached, already installed) never load
-// pwa-install or trigger its manifest fetch; eligible ones load it at the
-// prompt's 50s mark.
+// pwa-install or trigger its manifest fetch; eligible ones load it once the
+// prompt is due (50s in) and the visitor is on Home — a prompt that comes due
+// on another page waits for the next visit to Home.
 const PWA = defineAsyncComponent(() => import('@/components/widgets/PWA.vue'));
 // Dialogs nothing shows on first paint: their code stays off the boot path.
 const User = defineAsyncComponent(() => import('@/components/User.vue'));
 const Preferences = defineAsyncComponent(() => import('@/components/widgets/Preferences.vue'));
+const pwaPromptDue = ref(false);
 const offerPwaInstall = ref(false);
 onMounted(() => {
     if (shouldOfferPwaInstall()) {
-        setTimeout(() => { offerPwaInstall.value = true; }, 50 * 1000);
+        setTimeout(() => { pwaPromptDue.value = true; }, 50 * 1000);
     }
     // Earth Online visit tick — app-level so every route counts, once per
     // page load; the backend dedups per IP (utils/features/pulse-beacon.js).
@@ -70,6 +72,9 @@ watch(() => store.openSheet === 'preferences', (open) => {
 const route = useRoute();
 watch(() => route.path, () => {
     if (store.openSheet) store.setOpenSheet(null);
+});
+watch(() => pwaPromptDue.value && route.path === '/', (onHome) => {
+    if (onHome) offerPwaInstall.value = true;
 });
 
 // Pre-Vue boot overlay → real app hand-off. CSS lives in index.html.
