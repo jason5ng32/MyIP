@@ -17,8 +17,8 @@ export const IP_DATABASES = [
   { id: 1, text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true, configKey: 'ipapiis', extended: true, attribution: { url: 'https://ipapi.is/' } },
   { id: 2, text: 'IP2Location.io', url: '/api/ip2locationio?ip={{ip}}', enabled: true, configKey: 'ip2locationio', extended: true, attribution: { url: 'https://www.ip2location.io/' } },
   { id: 3, text: 'IP-API.com', url: '/api/ipapicom?ip={{ip}}&lang={{lang}}', enabled: true, extended: true, attribution: { url: 'https://ip-api.com/' } },
-  { id: 4, text: 'IP.sb', url: '/api/ipsb?ip={{ip}}', enabled: true, attribution: { url: 'https://ip.sb/' } },
-  { id: 5, text: 'IPinfo.io', url: '/api/ipinfoio?ip={{ip}}', enabled: true, configKey: 'ipinfoio', attribution: { url: 'https://ipinfo.io/' } },
+  { id: 4, text: 'BigDataCloud', url: '/api/bigdatacloud?ip={{ip}}&lang={{lang}}', enabled: true, configKey: 'bigdatacloud', extended: true, attribution: { url: 'https://www.bigdatacloud.com/' } },
+  { id: 5, text: 'IPLocate.io', url: '/api/iplocate?ip={{ip}}', enabled: true, configKey: 'iplocate', extended: true, attribution: { url: 'https://www.iplocate.io/' } },
   { id: 6, text: 'MaxMind', url: '/api/maxmind?ip={{ip}}&lang={{lang}}', enabled: true, attribution: { url: 'https://www.maxmind.com/' } },
 ];
 

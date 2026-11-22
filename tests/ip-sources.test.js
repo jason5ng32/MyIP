@@ -7,7 +7,7 @@ import { IP_SOURCES, IP_SOURCE_KEYS, ipSourceFlags } from '../api/ip-sources.js'
 import { IP_DATABASES } from '../frontend/data/ip-databases.js';
 
 const ENV_KEYS = [
-    'IPINFO_API_KEY', 'IPINFO_API_TOKEN', 'IP2LOCATION_API_KEY', 'IPAPIIS_API_KEY',
+    'IPLOCATE_IO_API_KEY', 'BIGDATACLOUD_API_KEY', 'IP2LOCATION_API_KEY', 'IPAPIIS_API_KEY',
     'IPCHECKING_API' + '_KEY', 'IPCHECKING_API' + '_ENDPOINT',
 ];
 let envBackup = {};
@@ -31,7 +31,7 @@ const flagOf = (source) => source.configFlag ?? source.key;
 
 describe('IP_SOURCES', () => {
     it('lists the seven geo routes once each, in order', () => {
-        assert.deepEqual(IP_SOURCE_KEYS, ['ipinfoio', 'ipapicom', 'ipsb', 'ipapiis', 'ip2locationio', 'maxmind', 'ipchecking']);
+        assert.deepEqual(IP_SOURCE_KEYS, ['iplocate', 'ipapicom', 'bigdatacloud', 'ipapiis', 'ip2locationio', 'maxmind', 'ipchecking']);
         assert.equal(new Set(IP_SOURCE_KEYS).size, IP_SOURCE_KEYS.length);
         assert.ok(Object.isFrozen(IP_SOURCES) && Object.isFrozen(IP_SOURCE_KEYS));
     });
@@ -41,7 +41,7 @@ describe('IP_SOURCES', () => {
     });
 
     it('marks only the sources that need configuration', () => {
-        assert.deepEqual(keysWhere((s) => s.isConfigured).sort(), ['ip2locationio', 'ipapiis', 'ipchecking', 'ipinfoio']);
+        assert.deepEqual(keysWhere((s) => s.isConfigured).sort(), ['bigdatacloud', 'ip2locationio', 'ipapiis', 'ipchecking', 'iplocate']);
         for (const source of IP_SOURCES.filter((s) => s.isConfigured)) assert.equal(typeof source.isConfigured, 'function');
         assert.deepEqual(keysWhere((s) => s.configFlag), ['ipchecking']);
     });
@@ -65,22 +65,21 @@ describe('IP_SOURCES', () => {
 
 describe('ipSourceFlags', () => {
     it('reports one false flag per configurable source when nothing is set', () => {
-        assert.deepEqual(ipSourceFlags(), { ipinfoio: false, ipapiis: false, ip2locationio: false, ipChecking: false });
+        assert.deepEqual(ipSourceFlags(), { iplocate: false, bigdatacloud: false, ipapiis: false, ip2locationio: false, ipChecking: false });
     });
 
     it('follows the env at call time', () => {
-        process.env.IPINFO_API_TOKEN = 'legacy-token';
+        process.env.IPLOCATE_IO_API_KEY = 'k';
         process.env.IP2LOCATION_API_KEY = 'k';
         process.env.IPAPIIS_API_KEY = 'k';
         process.env['IPCHECKING_API' + '_KEY'] = 'k';
-        assert.deepEqual(ipSourceFlags(), { ipinfoio: true, ipapiis: true, ip2locationio: true, ipChecking: false });
+        assert.deepEqual(ipSourceFlags(), { iplocate: true, bigdatacloud: false, ipapiis: true, ip2locationio: true, ipChecking: false });
         process.env['IPCHECKING_API' + '_ENDPOINT'] = 'https://upstream.invalid';
         assert.equal(ipSourceFlags().ipChecking, true);
-        delete process.env.IPINFO_API_TOKEN;
-        process.env.IPINFO_API_KEY = 'k';
-        assert.equal(ipSourceFlags().ipinfoio, true);
-        delete process.env.IPINFO_API_KEY;
-        assert.equal(ipSourceFlags().ipinfoio, false);
+        process.env.BIGDATACLOUD_API_KEY = 'k';
+        assert.equal(ipSourceFlags().bigdatacloud, true);
+        delete process.env.IPLOCATE_IO_API_KEY;
+        assert.equal(ipSourceFlags().iplocate, false);
     });
 });
 

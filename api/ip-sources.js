@@ -5,9 +5,9 @@ import { isMaxMindReady } from '../server/datasets/maxmind-service.js';
 import { isIpCheckingApiConfigured } from '../server/ipcheck-ing-api.js';
 import { optionalUser } from '../server/guards.js';
 import { FEATURE_USES } from '../server/db/feature-uses.js';
-import ipinfoioHandler, { isConfigured as isIpinfoioConfigured } from './ipinfo-io.js';
+import iplocateHandler, { isConfigured as isIplocateConfigured } from './iplocate.js';
 import ipapicomHandler from './ipapi-com.js';
-import ipsbHandler from './ip-sb.js';
+import bigdatacloudHandler, { isConfigured as isBigdatacloudConfigured } from './bigdatacloud.js';
 import ipapiisHandler, { isConfigured as isIpapiisConfigured } from './ipapi-is.js';
 import ip2locationioHandler, { isConfigured as isIp2locationioConfigured } from './ip2location-io.js';
 import maxmindHandler from './maxmind.js';
@@ -21,9 +21,9 @@ const ONE_DAY = 24 * 60 * 60;
 // `gates` (middleware after requirePublicIP()), `cacheSeconds` (edge TTL),
 // `featureUse` (the signed-in use it counts, server/db/feature-uses.js).
 export const IP_SOURCES = Object.freeze([
-    { key: 'ipinfoio', handler: ipinfoioHandler, isConfigured: isIpinfoioConfigured, cacheSeconds: ONE_DAY },
+    { key: 'iplocate', handler: iplocateHandler, isConfigured: isIplocateConfigured, cacheSeconds: ONE_DAY },
     { key: 'ipapicom', handler: ipapicomHandler, cacheSeconds: ONE_DAY },
-    { key: 'ipsb', handler: ipsbHandler, cacheSeconds: ONE_DAY },
+    { key: 'bigdatacloud', handler: bigdatacloudHandler, isConfigured: isBigdatacloudConfigured, cacheSeconds: ONE_DAY },
     { key: 'ipapiis', handler: ipapiisHandler, isConfigured: isIpapiisConfigured, cacheSeconds: ONE_DAY },
     { key: 'ip2locationio', handler: ip2locationioHandler, isConfigured: isIp2locationioConfigured, cacheSeconds: ONE_DAY },
     { key: 'maxmind', handler: maxmindHandler, gates: [requireOfflineData([isMaxMindReady])], cacheSeconds: ONE_DAY },

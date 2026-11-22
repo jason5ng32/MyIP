@@ -8,7 +8,7 @@
         "title": "Como as ferramentas funcionam",
         "paragraphs": [
           "A maior parte do que as ferramentas mostram — detalhes do seu IP, impressão digital do navegador, DNS, conectividade e resultados do teste de velocidade — é calculada no seu navegador ou consultada em tempo real e exibida somente para você. Não mantemos esses resultados em nossos servidores para que outras pessoas os acessem, a menos que você crie explicitamente um link de relatório compartilhável.",
-          "Para consultar a geolocalização de um IP, o endereço IP pesquisado é enviado a fornecedores terceirizados (como ipinfo.io, ip-api.com e similares). Essas consultas são regidas pela política de privacidade de cada fornecedor."
+          "Para consultar a geolocalização de um IP, o endereço IP pesquisado é enviado a fornecedores terceirizados (como ipapi.is, ip-api.com e similares). Essas consultas são regidas pela política de privacidade de cada fornecedor."
         ]
       },
       "pulse": {

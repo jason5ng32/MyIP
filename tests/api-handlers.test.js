@@ -50,8 +50,8 @@ import serviceStatusHandler, {
 } from '../api/service-status.js';
 import createReportHandler, { getReport as getReportHandler, normalizeTtlDays } from '../api/share-report.js';
 import { modifyJsonForIPAPI } from '../api/ipapi-is.js';
-import { modifyJsonForIPSB } from '../api/ip-sb.js';
-import { modifyJson as modifyJsonForIpinfoio } from '../api/ipinfo-io.js';
+import iplocateHandler from '../api/iplocate.js';
+import bigdatacloudHandler from '../api/bigdatacloud.js';
 import { REPORT_VERSION } from '../common/report-schema.js';
 import logger from '../server/logger.js';
 
@@ -125,11 +125,11 @@ function createResponse() {
 const ENV_KEYS = [
     'IPCHECKING_API_KEY', 'IPCHECKING_API_ENDPOINT',
     'IPAPIIS_API_KEY',
-    'IPINFO_API_KEY', 'IP2LOCATION_API_KEY',
+    'IPLOCATE_IO_API_KEY', 'BIGDATACLOUD_API_KEY', 'IP2LOCATION_API_KEY',
     'CLOUDFLARE_API_KEY',
     'CLOUDFLARE_ACCOUNT_ID', 'CLOUDFLARE_KV_NAMESPACE_ID',
-    // Pre-rename spellings, still honored as fallbacks.
-    'IPINFO_API_TOKEN', 'CLOUDFLARE_API',
+    // Pre-rename spelling, still honored as a fallback.
+    'CLOUDFLARE_API',
 ];
 let envBackup = {};
 
@@ -163,7 +163,7 @@ describe('configs handler', () => {
         const res = createResponse();
         configsHandler(createRequest(), res);
         assert.equal(res.statusCode, 200);
-        const flags = ['map', 'ipinfoio', 'ipChecking', 'ip2locationio', 'cloudFlare', 'ipapiis', 'reportSharing', 'userStorage'];
+        const flags = ['map', 'iplocate', 'bigdatacloud', 'ipChecking', 'ip2locationio', 'cloudFlare', 'ipapiis', 'reportSharing', 'userStorage'];
         for (const key of flags) {
             assert.equal(typeof res.body[key], 'boolean');
         }
@@ -189,14 +189,11 @@ describe('configs handler', () => {
         assert.equal(both.body.ipChecking, true);
     });
 
-    it('honors the pre-rename env spellings as fallbacks', () => {
-        delete process.env.IPINFO_API_KEY;
+    it('honors the pre-rename CLOUDFLARE_API spelling as a fallback', () => {
         delete process.env.CLOUDFLARE_API_KEY;
-        process.env.IPINFO_API_TOKEN = 'legacy-token';
         process.env.CLOUDFLARE_API = 'legacy-key';
         const res = createResponse();
         configsHandler(createRequest(), res);
-        assert.equal(res.body.ipinfoio, true);
         assert.equal(res.body.cloudFlare, true);
     });
 });
@@ -1935,98 +1932,60 @@ describe('asn-profile handler', () => {
     });
 });
 
-// -- ip-sb normalizer -----------------------------------------------------
-// Pure transform, no fetch involved.
+// -- keyed geo source handlers --------------------------------------------
+// fetch is stubbed: the request is captured, the upstream never reached.
 
-describe('ip-sb normalize', () => {
-    it('prefixes the ASN', () => {
-        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7', asn: 64500 }).asn, 'AS64500');
-    });
+describe('iplocate and bigdatacloud handlers', () => {
+    const captureFetch = (body) => {
+        const calls = [];
+        globalThis.fetch = async (url) => {
+            calls.push(new URL(String(url)));
+            return new Response(JSON.stringify(body), { status: 200 });
+        };
+        return calls;
+    };
 
-    it('answers N/A when the upstream sends no ASN', () => {
-        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7' }).asn, 'N/A');
-        assert.equal(modifyJsonForIPSB({ ip: '203.0.113.7', asn: null }).asn, 'N/A');
-    });
-});
-
-// -- ipinfo-io normalizer -------------------------------------------------
-// Pure transform, no fetch involved.
-
-describe('ipinfo-io normalize', () => {
-    const CANONICAL_KEYS = [
-        'ip', 'city', 'region', 'country', 'country_name', 'country_code',
-        'latitude', 'longitude', 'asn', 'org',
-    ];
-
-    it('maps a fully populated upstream payload', () => {
-        const out = modifyJsonForIpinfoio({
-            ip: '8.8.8.8',
-            city: 'Mountain View',
-            region: 'California',
-            country: 'US',
-            loc: '37.4056,-122.0775',
-            org: 'AS15169 Google LLC',
-        });
-        assert.equal(out.country_name, 'United States');
-        assert.equal(out.country_code, 'US');
-        assert.equal(out.latitude, 37.4056);
-        assert.equal(out.longitude, -122.0775);
-        assert.equal(out.asn, 'AS15169');
-        assert.equal(out.org, 'Google LLC');
-    });
-
-    it('degrades coordinates to null when the upstream omits loc', () => {
-        // Anycast ranges answer 200 without loc.
-        const out = modifyJsonForIpinfoio({
-            ip: '104.28.212.153', city: 'Los Angeles', country: 'US', org: 'AS13335 Cloudflare, Inc.',
-        });
-        assert.equal(out.latitude, null);
-        assert.equal(out.longitude, null);
-        assert.equal(out.asn, 'AS13335');
-    });
-
-    it('degrades a partial or non-numeric loc to null', () => {
-        assert.equal(modifyJsonForIpinfoio({ loc: '37.4056' }).longitude, null);
-        assert.equal(modifyJsonForIpinfoio({ loc: '' }).latitude, null);
-        assert.equal(modifyJsonForIpinfoio({ loc: 'unknown,unknown' }).latitude, null);
-        assert.equal(modifyJsonForIpinfoio({ loc: ',-122.0775' }).latitude, null);
-        // 0 is a real coordinate, not a blank one.
-        assert.equal(modifyJsonForIpinfoio({ loc: '0,0' }).latitude, 0);
-    });
-
-    it('empties asn / org when the upstream omits org', () => {
-        const out = modifyJsonForIpinfoio({ ip: '8.8.8.8', country: 'US', loc: '37.4,-122.0' });
-        assert.equal(out.asn, '');
-        assert.equal(out.org, '');
-    });
-
-    it('uses ICU country names and accepts lowercase upstream codes', () => {
-        assert.equal(modifyJsonForIpinfoio({ country: 'TR' }).country_name, 'Türkiye');
-        assert.equal(modifyJsonForIpinfoio({ country: 'us' }).country_name, 'United States');
-    });
-
-    it('falls back to Unknown Country for absent, unknown or malformed codes', () => {
-        for (const country of [undefined, null, '', 'XX', 'ZZ', 'T1', 'USA', 123, {}]) {
-            assert.equal(modifyJsonForIpinfoio({ country }).country_name, 'Unknown Country');
+    it('throws before any fetch when the key is missing', async () => {
+        delete process.env.IPLOCATE_IO_API_KEY;
+        delete process.env.BIGDATACLOUD_API_KEY;
+        const calls = captureFetch({});
+        for (const handler of [iplocateHandler, bigdatacloudHandler]) {
+            await assert.rejects(handler(createRequest({ query: { ip: '203.0.113.7' } }), createResponse()));
         }
+        assert.equal(calls.length, 0);
     });
 
-    it('survives a bogon payload and still emits the canonical shape', () => {
-        // ipinfo.io answers {"ip":…,"bogon":true} — no loc, org or country.
-        const out = modifyJsonForIpinfoio({ ip: '192.0.2.1', bogon: true });
-        assert.equal(out.ip, '192.0.2.1');
-        for (const key of CANONICAL_KEYS) {
-            assert.ok(key in out, `${key} must stay present in the response`);
-        }
+    it('iplocate picks one of the comma-separated keys and normalizes the answer', async () => {
+        process.env.IPLOCATE_IO_API_KEY = 'key-a,key-b';
+        const calls = captureFetch({ ip: '203.0.113.7', country_code: 'XE', asn: { asn: 'AS64500', name: 'Example Net' } });
+        const res = createResponse();
+        await iplocateHandler(createRequest({ query: { ip: '203.0.113.7' } }), res);
+        assert.equal(calls[0].origin + calls[0].pathname, 'https://iplocate.io/api/lookup/203.0.113.7');
+        assert.ok(['key-a', 'key-b'].includes(calls[0].searchParams.get('apikey')));
+        assert.equal(res.body.asn, 'AS64500');
+        assert.equal(res.body.country_code, 'XE');
     });
 
-    it('survives an empty or null upstream body', () => {
-        for (const payload of [{}, null, undefined]) {
-            const out = modifyJsonForIpinfoio(payload);
-            for (const key of CANONICAL_KEYS) {
-                assert.ok(key in out, `${key} must stay present in the response`);
-            }
-        }
+    it('bigdatacloud forwards the raw lang, encoded, defaulting to en', async () => {
+        process.env.BIGDATACLOUD_API_KEY = 'key-a';
+        const calls = captureFetch({ ip: '203.0.113.7', country: { isoAlpha2: 'XE' } });
+        const res = createResponse();
+        await bigdatacloudHandler(createRequest({ query: { ip: '203.0.113.7', lang: 'zh-TW&x=1' } }), res);
+        await bigdatacloudHandler(createRequest({ query: { ip: '203.0.113.7' } }), createResponse());
+        assert.equal(calls[0].origin + calls[0].pathname, 'https://api-bdc.net/data/ip-geolocation-full');
+        assert.equal(calls[0].searchParams.get('localityLanguage'), 'zh-TW&x=1');
+        assert.equal(calls[0].searchParams.get('x'), null);
+        assert.equal(calls[0].searchParams.get('key'), 'key-a');
+        assert.equal(calls[1].searchParams.get('localityLanguage'), 'en');
+        assert.equal(res.body.country_code, 'XE');
+    });
+
+    it('answers 500 when the upstream fails', async () => {
+        process.env.BIGDATACLOUD_API_KEY = 'key-a';
+        globalThis.fetch = async () => new Response('<html>', { status: 502 });
+        const res = createResponse();
+        await bigdatacloudHandler(createRequest({ query: { ip: '203.0.113.7' } }), res);
+        assert.equal(res.statusCode, 500);
     });
 });
 

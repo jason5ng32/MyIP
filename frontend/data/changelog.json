@@ -2485,6 +2485,28 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "Added IPLocate.io as an IP data source, replacing IPinfo.io",
+          "zh": "新增 IPLocate.io 作为 IP 数据源，替换 IPinfo.io",
+          "zh-TW": "新增 IPLocate.io 作為 IP 資料來源，取代 IPinfo.io",
+          "fr": "Ajout d'IPLocate.io comme source de données IP, en remplacement d'IPinfo.io",
+          "ru": "Добавлен источник данных об IP IPLocate.io вместо IPinfo.io",
+          "pt-BR": "Adicionado o IPLocate.io como fonte de dados de IP, substituindo o IPinfo.io"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added BigDataCloud as an IP data source, replacing IP.sb",
+          "zh": "新增 BigDataCloud 作为 IP 数据源，替换 IP.sb",
+          "zh-TW": "新增 BigDataCloud 作為 IP 資料來源，取代 IP.sb",
+          "fr": "Ajout de BigDataCloud comme source de données IP, en remplacement d'IP.sb",
+          "ru": "Добавлен источник данных об IP BigDataCloud вместо IP.sb",
+          "pt-BR": "Adicionado o BigDataCloud como fonte de dados de IP, substituindo o IP.sb"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Reworked the program's architecture to make plugging in more IP data sources easier",
