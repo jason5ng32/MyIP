@@ -12,7 +12,7 @@ import {
 } from '../server/source-daily-limits.js';
 
 // The keys the backend passes in (api/ip-sources.js; its own spec checks them).
-const KEYS = ['ipinfoio', 'ipapicom', 'ipsb', 'ipapiis', 'ip2locationio', 'maxmind', 'ipchecking'];
+const KEYS = ['iplocate', 'ipapicom', 'bigdatacloud', 'ipapiis', 'ip2locationio', 'maxmind', 'ipchecking'];
 
 // A clock the test moves by hand.
 const clock = (iso) => {
@@ -37,16 +37,16 @@ describe('parseSourceDailyLimits', () => {
     });
 
     it('ignores and names every malformed pair, keeping the rest', () => {
-        const value = 'ipinfoio=10,foo=5,ipsb,ipsb=,=3,ipapicom=-1,maxmind=1.5,ipchecking=1e3,ipapiis=+4,'
-            + 'ip2locationio=abc,ipinfoio=20,ipapiis=99999999999999999999';
+        const value = 'iplocate=10,foo=5,bigdatacloud,bigdatacloud=,=3,ipapicom=-1,maxmind=1.5,ipchecking=1e3,ipapiis=+4,'
+            + 'ip2locationio=abc,iplocate=20,ipapiis=99999999999999999999';
         const { limits, ignored } = parseSourceDailyLimits(value, KEYS);
-        assert.deepEqual(limits, { ipinfoio: 10 });
-        assert.deepEqual(ignored, ['foo=5', 'ipsb', 'ipsb=', '=3', 'ipapicom=-1', 'maxmind=1.5', 'ipchecking=1e3',
-            'ipapiis=+4', 'ip2locationio=abc', 'ipinfoio=20', 'ipapiis=99999999999999999999']);
+        assert.deepEqual(limits, { iplocate: 10 });
+        assert.deepEqual(ignored, ['foo=5', 'bigdatacloud', 'bigdatacloud=', '=3', 'ipapicom=-1', 'maxmind=1.5', 'ipchecking=1e3',
+            'ipapiis=+4', 'ip2locationio=abc', 'iplocate=20', 'ipapiis=99999999999999999999']);
     });
 
     it('accepts only the keys it is given', () => {
-        assert.deepEqual(parseSourceDailyLimits('ipinfoio=1,ipsb=2', ['ipsb']), { limits: { ipsb: 2 }, ignored: ['ipinfoio=1'] });
+        assert.deepEqual(parseSourceDailyLimits('iplocate=1,bigdatacloud=2', ['bigdatacloud']), { limits: { bigdatacloud: 2 }, ignored: ['iplocate=1'] });
     });
 });
 
@@ -57,10 +57,10 @@ describe('localDayKey / restoreCounts', () => {
     });
 
     it('restores today\'s counts and ignores another day or a bad shape', () => {
-        assert.deepEqual(restoreCounts({ day: '2026-11-19', counts: { ipinfoio: 3, gone: 2 } }, '2026-11-19', KEYS), { ipinfoio: 3 });
-        assert.equal(restoreCounts({ day: '2026-11-18', counts: { ipinfoio: 3 } }, '2026-11-19', KEYS), null);
+        assert.deepEqual(restoreCounts({ day: '2026-11-19', counts: { iplocate: 3, gone: 2 } }, '2026-11-19', KEYS), { iplocate: 3 });
+        assert.equal(restoreCounts({ day: '2026-11-18', counts: { iplocate: 3 } }, '2026-11-19', KEYS), null);
         for (const bad of [null, 'x', [], { day: '2026-11-19' }, { day: '2026-11-19', counts: [] },
-            { day: '2026-11-19', counts: { ipinfoio: -1 } }, { day: '2026-11-19', counts: { ipinfoio: '3' } }]) {
+            { day: '2026-11-19', counts: { iplocate: -1 } }, { day: '2026-11-19', counts: { iplocate: '3' } }]) {
             assert.equal(restoreCounts(bad, '2026-11-19', KEYS), null, JSON.stringify(bad));
         }
     });
@@ -69,73 +69,73 @@ describe('localDayKey / restoreCounts', () => {
 describe('createDailyCounter', () => {
     it('reserves up to the limit, then refuses with one ceiling signal', () => {
         const ceilings = [];
-        const counter = createDailyCounter({ limits: { ipinfoio: 2 }, now: clock(DAY).now, onCeiling: (...a) => ceilings.push(a) });
-        assert.equal(counter.reserve('ipinfoio').ok, true);
-        assert.equal(counter.reserve('ipinfoio').ok, true);
-        assert.equal(counter.reserve('ipinfoio').ok, false);
-        assert.equal(counter.reserve('ipinfoio').ok, false);
-        assert.deepEqual(ceilings, [['ipinfoio', 2]]);
-        assert.equal(counter.count('ipinfoio'), 2);
+        const counter = createDailyCounter({ limits: { iplocate: 2 }, now: clock(DAY).now, onCeiling: (...a) => ceilings.push(a) });
+        assert.equal(counter.reserve('iplocate').ok, true);
+        assert.equal(counter.reserve('iplocate').ok, true);
+        assert.equal(counter.reserve('iplocate').ok, false);
+        assert.equal(counter.reserve('iplocate').ok, false);
+        assert.deepEqual(ceilings, [['iplocate', 2]]);
+        assert.equal(counter.count('iplocate'), 2);
     });
 
     it('a release gives the slot back, never below zero', () => {
-        const counter = createDailyCounter({ limits: { ipinfoio: 1 }, now: clock(DAY).now });
-        const slot = counter.reserve('ipinfoio');
-        assert.equal(counter.reserve('ipinfoio').ok, false);
-        counter.release('ipinfoio', slot.day);
-        assert.equal(counter.count('ipinfoio'), 0);
-        counter.release('ipinfoio', slot.day);
-        assert.equal(counter.count('ipinfoio'), 0);
-        assert.equal(counter.reserve('ipinfoio').ok, true);
+        const counter = createDailyCounter({ limits: { iplocate: 1 }, now: clock(DAY).now });
+        const slot = counter.reserve('iplocate');
+        assert.equal(counter.reserve('iplocate').ok, false);
+        counter.release('iplocate', slot.day);
+        assert.equal(counter.count('iplocate'), 0);
+        counter.release('iplocate', slot.day);
+        assert.equal(counter.count('iplocate'), 0);
+        assert.equal(counter.reserve('iplocate').ok, true);
     });
 
     it('starts over on the next local day, and a slot from yesterday releases nothing', () => {
         const time = clock(DAY);
         const ceilings = [];
-        const counter = createDailyCounter({ limits: { ipsb: 1 }, now: time.now, onCeiling: (key) => ceilings.push(key) });
-        const yesterday = counter.reserve('ipsb');
-        assert.equal(counter.reserve('ipsb').ok, false);
+        const counter = createDailyCounter({ limits: { bigdatacloud: 1 }, now: time.now, onCeiling: (key) => ceilings.push(key) });
+        const yesterday = counter.reserve('bigdatacloud');
+        assert.equal(counter.reserve('bigdatacloud').ok, false);
         time.set('2026-11-20T00:00:01');
-        const today = counter.reserve('ipsb');
+        const today = counter.reserve('bigdatacloud');
         assert.equal(today.ok, true);
-        counter.release('ipsb', yesterday.day);
-        assert.equal(counter.count('ipsb'), 1);
-        assert.equal(counter.reserve('ipsb').ok, false);
-        assert.deepEqual(ceilings, ['ipsb', 'ipsb']);
+        counter.release('bigdatacloud', yesterday.day);
+        assert.equal(counter.count('bigdatacloud'), 1);
+        assert.equal(counter.reserve('bigdatacloud').ok, false);
+        assert.deepEqual(ceilings, ['bigdatacloud', 'bigdatacloud']);
     });
 
     it('leaves sources without a limit alone', () => {
-        const counter = createDailyCounter({ limits: { ipinfoio: 1 }, now: clock(DAY).now });
+        const counter = createDailyCounter({ limits: { iplocate: 1 }, now: clock(DAY).now });
         for (let i = 0; i < 5; i += 1) assert.equal(counter.reserve('maxmind').ok, true);
         assert.equal(counter.count('maxmind'), 0);
         assert.equal(counter.limitOf('maxmind'), 0);
     });
 
     it('continues today\'s stored counts and ignores another day\'s', () => {
-        const stored = { day: '2026-11-19', counts: { ipinfoio: 2 } };
-        const counter = createDailyCounter({ limits: { ipinfoio: 3 }, now: clock(DAY).now, load: () => stored });
-        assert.equal(counter.count('ipinfoio'), 2);
-        assert.equal(counter.reserve('ipinfoio').ok, true);
-        assert.equal(counter.reserve('ipinfoio').ok, false);
+        const stored = { day: '2026-11-19', counts: { iplocate: 2 } };
+        const counter = createDailyCounter({ limits: { iplocate: 3 }, now: clock(DAY).now, load: () => stored });
+        assert.equal(counter.count('iplocate'), 2);
+        assert.equal(counter.reserve('iplocate').ok, true);
+        assert.equal(counter.reserve('iplocate').ok, false);
 
-        const old = createDailyCounter({ limits: { ipinfoio: 3 }, now: clock('2026-11-21T08:00:00').now, load: () => stored });
-        assert.equal(old.count('ipinfoio'), 0);
+        const old = createDailyCounter({ limits: { iplocate: 3 }, now: clock('2026-11-21T08:00:00').now, load: () => stored });
+        assert.equal(old.count('iplocate'), 0);
     });
 
     it('saves after a delay, at most once per window, and at once on a ceiling', async () => {
         const saved = [];
         const counter = createDailyCounter({
-            limits: { ipinfoio: 2 }, now: clock(DAY).now, save: async (s) => { saved.push(s); }, saveDelayMs: 20,
+            limits: { iplocate: 2 }, now: clock(DAY).now, save: async (s) => { saved.push(s); }, saveDelayMs: 20,
         });
-        counter.reserve('ipinfoio');
-        counter.reserve('ipinfoio');
+        counter.reserve('iplocate');
+        counter.reserve('iplocate');
         assert.equal(saved.length, 0);
         await new Promise((r) => { setTimeout(r, 40); });
-        assert.deepEqual(saved, [{ day: '2026-11-19', counts: { ipinfoio: 2 } }]);
-        counter.reserve('ipinfoio');
+        assert.deepEqual(saved, [{ day: '2026-11-19', counts: { iplocate: 2 } }]);
+        counter.reserve('iplocate');
         await Promise.resolve();
         assert.equal(saved.length, 2);
-        counter.reserve('ipinfoio');
+        counter.reserve('iplocate');
         await Promise.resolve();
         assert.equal(saved.length, 2);
     });
@@ -144,18 +144,18 @@ describe('createDailyCounter', () => {
         const loadErrors = [];
         const saveErrors = [];
         const counter = createDailyCounter({
-            limits: { ipinfoio: 5 },
+            limits: { iplocate: 5 },
             now: clock(DAY).now,
             load: () => { throw Object.assign(new Error('denied'), { code: 'EACCES' }); },
             save: async () => { throw new Error('read-only'); },
             onLoadError: (e) => loadErrors.push(e.message),
             onSaveError: (e) => saveErrors.push(e.message),
         });
-        counter.reserve('ipinfoio');
+        counter.reserve('iplocate');
         await counter.flush();
-        counter.reserve('ipinfoio');
+        counter.reserve('iplocate');
         await counter.flush();
-        assert.equal(counter.count('ipinfoio'), 2);
+        assert.equal(counter.count('iplocate'), 2);
         assert.deepEqual(loadErrors, ['denied']);
         assert.deepEqual(saveErrors, ['read-only']);
     });
@@ -163,24 +163,24 @@ describe('createDailyCounter', () => {
     it('treats a missing state as a fresh start, without a warning', () => {
         const loadErrors = [];
         const counter = createDailyCounter({
-            limits: { ipinfoio: 5 },
+            limits: { iplocate: 5 },
             now: clock(DAY).now,
             load: () => { throw Object.assign(new Error('missing'), { code: 'ENOENT' }); },
             onLoadError: (e) => loadErrors.push(e),
         });
-        assert.equal(counter.count('ipinfoio'), 0);
+        assert.equal(counter.count('iplocate'), 0);
         assert.equal(loadErrors.length, 0);
     });
 
     it('a malformed state file is ignored', () => {
         const loadErrors = [];
         const counter = createDailyCounter({
-            limits: { ipinfoio: 5 },
+            limits: { iplocate: 5 },
             now: clock(DAY).now,
             load: () => JSON.parse('{not json'),
             onLoadError: (e) => loadErrors.push(e),
         });
-        assert.equal(counter.count('ipinfoio'), 0);
+        assert.equal(counter.count('iplocate'), 0);
         assert.equal(loadErrors.length, 1);
     });
 });
@@ -213,19 +213,19 @@ const run = (middleware) => {
 };
 
 describe('sourceDailyLimitMiddleware', () => {
-    const limited = (limit = 1) => createDailyCounter({ limits: { ipinfoio: limit }, now: clock(DAY).now });
+    const limited = (limit = 1) => createDailyCounter({ limits: { iplocate: limit }, now: clock(DAY).now });
 
     it('admits within the limit and keeps the slot on success', () => {
         const counter = limited();
-        const { res, next } = run(sourceDailyLimitMiddleware(counter, 'ipinfoio'));
+        const { res, next } = run(sourceDailyLimitMiddleware(counter, 'iplocate'));
         assert.equal(next, 1);
         res.end(200);
-        assert.equal(counter.count('ipinfoio'), 1);
+        assert.equal(counter.count('iplocate'), 1);
     });
 
     it('answers 429 with a code once the day is used up', () => {
         const counter = limited();
-        const middleware = sourceDailyLimitMiddleware(counter, 'ipinfoio');
+        const middleware = sourceDailyLimitMiddleware(counter, 'iplocate');
         run(middleware).res.end(200);
         const { res, next } = run(middleware);
         assert.equal(next, 0);
@@ -235,25 +235,25 @@ describe('sourceDailyLimitMiddleware', () => {
 
     it('releases on an error status, once', () => {
         const counter = limited(3);
-        const middleware = sourceDailyLimitMiddleware(counter, 'ipinfoio');
+        const middleware = sourceDailyLimitMiddleware(counter, 'iplocate');
         run(middleware).res.end(200);
         const { res } = run(middleware);
         res.end(500);
         res.emit('finish');
         res.emit('close');
-        assert.equal(counter.count('ipinfoio'), 1);
+        assert.equal(counter.count('iplocate'), 1);
         run(middleware).res.end(400);
-        assert.equal(counter.count('ipinfoio'), 1);
+        assert.equal(counter.count('iplocate'), 1);
     });
 
     it('releases on an aborted connection, once', () => {
         const counter = limited(2);
-        const middleware = sourceDailyLimitMiddleware(counter, 'ipinfoio');
+        const middleware = sourceDailyLimitMiddleware(counter, 'iplocate');
         run(middleware).res.end(200);
         const { res } = run(middleware);
         res.abort();
         res.abort();
-        assert.equal(counter.count('ipinfoio'), 1);
+        assert.equal(counter.count('iplocate'), 1);
     });
 
     it('leaves an unlimited source untouched', () => {
@@ -262,14 +262,14 @@ describe('sourceDailyLimitMiddleware', () => {
         const { res, next } = run(middleware);
         assert.equal(next, 1);
         assert.equal(res.listenerCount('finish') + res.listenerCount('close'), 0);
-        assert.equal(sourceDailyLimitMiddleware({ limitOf: () => 0 }, 'ipinfoio'), middleware);
+        assert.equal(sourceDailyLimitMiddleware({ limitOf: () => 0 }, 'iplocate'), middleware);
     });
 });
 
 // Runs in order: the module's counters are process-wide, set by the first init.
 describe('sourceDailyLimit', () => {
     it('refuses to wire a route before the keys are known', () => {
-        assert.throws(() => sourceDailyLimit('ipinfoio'), /before initSourceDailyLimits/);
+        assert.throws(() => sourceDailyLimit('iplocate'), /before initSourceDailyLimits/);
     });
 
     it('rejects an unknown source key at wiring time', () => {

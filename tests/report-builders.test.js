@@ -220,7 +220,7 @@ describe('cleaning rules', () => {
         const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
         const section = build({
             cards: [
-                { source: 'IP.sb', ip: '1.2.3.4', country_code: 'SG', timezone: 'Asia/Singapore' },
+                { source: 'BigDataCloud', ip: '1.2.3.4', country_code: 'SG', timezone: 'Asia/Singapore' },
                 // Anycast / unlocatable: the backend sends '' rather than guessing.
                 { source: 'MaxMind', ip: '2001:db8::1', country_code: 'US', timezone: '' },
             ],

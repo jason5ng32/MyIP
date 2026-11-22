@@ -25,15 +25,15 @@ describe('IP_DATABASES', () => {
       'IPAPI.is': 1,
       'IP2Location.io': 2,
       'IP-API.com': 3,
-      'IP.sb': 4,
-      'IPinfo.io': 5,
+      BigDataCloud: 4,
+      'IPLocate.io': 5,
       MaxMind: 6,
     });
   });
 
   it('marks the sources whose answer carries the extended block', () => {
     const extended = IP_DATABASES.filter((d) => d.extended === true).map((d) => d.id);
-    assert.deepEqual([...extended].sort((a, b) => a - b), [0, 1, 2, 3]);
+    assert.deepEqual([...extended].sort((a, b) => a - b), [0, 1, 2, 3, 4, 5]);
     for (const db of IP_DATABASES) assert.ok(db.extended === undefined || db.extended === true, db.text);
   });
 
@@ -97,7 +97,7 @@ describe('buildDbUrl()', () => {
 
 describe('applyConfigAvailability()', () => {
   // Shape of a real /api/configs payload (booleans only).
-  const configs = { ipChecking: true, ipinfoio: false, ipapiis: false, ip2locationio: true };
+  const configs = { ipChecking: true, iplocate: false, bigdatacloud: true, ipapiis: false, ip2locationio: true };
 
   it('follows the configKey flag for keyed sources', () => {
     const out = applyConfigAvailability(createInitialIpDBs(), configs);
@@ -105,7 +105,8 @@ describe('applyConfigAvailability()', () => {
     assert.equal(byId[0], true);   // ipChecking: true
     assert.equal(byId[1], false);  // ipapiis: false
     assert.equal(byId[2], true);   // ip2locationio: true
-    assert.equal(byId[5], false);  // ipinfoio: false
+    assert.equal(byId[4], true);   // bigdatacloud: true
+    assert.equal(byId[5], false);  // iplocate: false
   });
 
   it('drops IPCheck.ing (id 0) when ipChecking is false', () => {
@@ -115,8 +116,8 @@ describe('applyConfigAvailability()', () => {
 
   it('keeps key-free sources always enabled', () => {
     const allOff = applyConfigAvailability(createInitialIpDBs(),
-      { ipChecking: false, ipinfoio: false, ipapiis: false, ip2locationio: false });
-    for (const id of [3, 4, 6]) {
+      { ipChecking: false, iplocate: false, bigdatacloud: false, ipapiis: false, ip2locationio: false });
+    for (const id of [3, 6]) {
       assert.equal(allOff.find((db) => db.id === id).enabled, true, `id ${id} must stay enabled`);
     }
   });

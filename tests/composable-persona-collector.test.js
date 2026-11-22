@@ -22,8 +22,8 @@ describe('payload normalization', () => {
     it('maps IP cards to the check-facing shape and tags the IP version', () => {
         const normalized = normalizeIpinfo({
             cards: [
-                { source: 'ipinfo.io', ip: '203.0.113.9', country_code: 'jp', asn: 'AS1', ipTypeCode: 'residential' },
-                { source: 'ip.sb', ip: '2001:db8::1', country_code: 'JP' },
+                { source: 'IPLocate.io', ip: '203.0.113.9', country_code: 'jp', asn: 'AS1', ipTypeCode: 'residential' },
+                { source: 'BigDataCloud', ip: '2001:db8::1', country_code: 'JP' },
             ],
         });
         assert.equal(normalized.cards.length, 2);

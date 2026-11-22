@@ -45,7 +45,7 @@ const sections = ({ cards, targets, servers, providers, speed } = {}) => {
 
 const BASE = {
     cards: [card('ipcheck', '8.8.8.8', { anonymity: 'none', ipType: 'residential', nativeIP: true, qualityScore: 90 }),
-        card('ipsb', '2001:4860::1')],
+        card('bigdatacloud', '2001:4860::1')],
     targets: [target('google'), target('github'), target('youtube'), target('blocked', 'timeout')],
     servers: [server('google', '8.8.8.8'), server('cloudflare', '8.8.8.8')],
     providers: [provider('p1', '9.9.9.9'), provider('p2', '9.9.9.10')],
@@ -353,7 +353,7 @@ describe('notable changes — the change notice', () => {
         assert.deepEqual(changes(sections(BASE), previous), [], 'sections it lacks');
         assert.deepEqual(changes(with_({ targets: [...BASE.targets, target('custom1', 'timeout', { custom: true })] })), [], 'a new target');
         assert.deepEqual(changes(with_({ targets: BASE.targets.slice(0, 3) })), [], 'a missing target');
-        assert.deepEqual(changes(with_({ cards: [BASE.cards[0], card('ipsb', '2001:4860::1', { anonymity: 'vpn' })] })), [], 'a one-sided field');
+        assert.deepEqual(changes(with_({ cards: [BASE.cards[0], card('bigdatacloud', '2001:4860::1', { anonymity: 'vpn' })] })), [], 'a one-sided field');
         assert.deepEqual(changes(with_({ cards: [...BASE.cards, card('extra', '1.1.1.1')] })), [], 'a new card');
         const speed = with_({ speed: { downloadMbps: 100 } });
         assert.deepEqual(changes(with_({ speed: { downloadMbps: 5 } }), speed), [], 'speed tests');

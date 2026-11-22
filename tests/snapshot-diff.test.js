@@ -45,7 +45,7 @@ const snap = (parts) => {
 };
 
 const BASE = {
-    cards: [card('ipcheck', '8.8.8.8', { anonymity: 'none', ipType: 'residential', nativeIP: true }), card('ipsb', '2001:4860::1')],
+    cards: [card('ipcheck', '8.8.8.8', { anonymity: 'none', ipType: 'residential', nativeIP: true }), card('bigdatacloud', '2001:4860::1')],
     targets: [target('google'), target('github'), target('youtube')],
     servers: [server('google', '8.8.8.8'), server('cloudflare', '8.8.8.8')],
     providers: [provider('p1', '9.9.9.9'), provider('p2', '9.9.9.10')],
@@ -97,7 +97,7 @@ describe('snapshot diff — alignment', () => {
             providers: [...BASE.providers, provider('p3', '9.9.9.11', { countryCode: 'US' })],
         });
         const { sections } = diffSnapshots(snap(BASE), right);
-        assert.deepEqual(sections.ipinfo.onlyLeft, ['ipsb']);
+        assert.deepEqual(sections.ipinfo.onlyLeft, ['bigdatacloud']);
         assert.deepEqual(sections.ipinfo.onlyRight, ['maxmind']);
         assert.equal(sections.ipinfo.rows.some((row) => row.key !== 'ipcheck'), false);
         assert.deepEqual(sections.webrtc.onlyLeft, ['cloudflare']);

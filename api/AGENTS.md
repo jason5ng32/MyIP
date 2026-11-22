@@ -18,8 +18,8 @@ handlers share is split by who imports it:
   holds the dataset directories (`*-db/`), which self-hosting docs and Docker
   volumes mount — they stay put.
 
-Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
-`ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /
+Roughly one handler file per route: IP-geolocation sources (`iplocate` /
+`ipapi-com` / `ipapi-is` / `ip2location-io` / `bigdatacloud` / `ipcheck-ing` /
 `maxmind`; their routes are mounted from `api/ip-sources.js`), tool backends
 (`get-whois` / `dns-resolver` / `mac-checker` /
 `cf-radar` / `asn-history` / `asn-connectivity` / `asn-profile` /
