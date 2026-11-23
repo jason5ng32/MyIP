@@ -81,8 +81,8 @@ const localeStripPlugin = () => ({
 // only start after index.js has downloaded and executed — a serialized
 // round-trip on the boot critical path. This plugin finds the emitted
 // locale-pack chunks in the bundle and injects a small head script that
-// picks the language exactly like locales/i18n.js (stored prefs →
-// ?hl= → browser language → en) and appends a
+// picks the language exactly like locales/i18n.js (?hl= → stored prefs →
+// browser language → en; tests/index-html-i18n.test.js runs it) and appends a
 // <link rel="modulepreload"> for every pack on its fallback chain — the
 // same set mount awaits — while the HTML is still streaming; the
 // packs then download in parallel with the main bundle. A wrong pick only
@@ -102,15 +102,15 @@ const localePreloadPlugin = () => {
     for (var k = 0; k < codes.length; k++) if (codes[k].toLowerCase().split('-')[0] === base) return codes[k];
     return null;
   };
-  var lang = null;
-  try {
-    var stored = JSON.parse(localStorage.getItem(${JSON.stringify(PREFS_STORAGE_KEY)}) || '{}').lang;
-    if (chunks[stored]) lang = stored;
-  } catch (e) { /* malformed entry — fall through to the default pick */ }
+  // An ?hl= matching no pack is ignored, as in utils/url-overrides.js.
+  var lang = match(new URLSearchParams(location.search).get('hl'));
   if (!lang) {
-    var hl = new URLSearchParams(location.search).get('hl');
-    lang = match(hl || navigator.language) || 'en';
+    try {
+      var stored = JSON.parse(localStorage.getItem(${JSON.stringify(PREFS_STORAGE_KEY)}) || '{}').lang;
+      if (chunks[stored]) lang = stored;
+    } catch (e) { /* malformed entry — fall through to the default pick */ }
   }
+  if (!lang) lang = match(navigator.language) || 'en';
   // Same chain as fallbackChain(): variant, base, en.
   var chain = [lang];
   var base = lang.split('-')[0];

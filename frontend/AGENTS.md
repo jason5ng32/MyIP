@@ -48,8 +48,8 @@ Every file opens with a header comment stating its purpose — read those.
   carries only `extendedGate`.
 - **Data-source sentence:** `IpSourceBlock.vue`, inline after the IP section's
   notes (`IpInfos.vue`; hidden with them in simple mode): the source that
-  answered a card, else the one selected in Preferences (`answeringSource` →
-  its `data/ip-databases.js` row, the name linking `attribution.url`), the
+  answered a card, else the effective one (`?ipdb=`, else Preferences;
+  `answeringSource` → its `data/ip-databases.js` row, the name linking `attribution.url`), the
   `{source}` slot of `ipInfos.sourceFields.sentence`; the sentence names the
   picker by its Preferences label (`nav.preferences.ipDB`). Cards carry no geo-source row;
   `geoSourceId` stays for the sentence, the cache and Snapshots.
@@ -222,6 +222,24 @@ checklist mark through `store.editChecklist` (`setChecklistMark`,
 `resetChecklist`): each lands on what localStorage holds at that moment, so
 another tab's save survives; no tab ever reacts to another (no `storage`
 listener). A size arriving mid-run waits for the speed test to end.
+
+### Global URL parameters override preferences
+
+`data/url-params.js` lists every global query parameter (`override` / `dev`
+`?festival=` / `legacy` `/?tool=`); `tests/url-params.test.js` fails on a
+read it lacks. Page inputs (`q`, `vs`) stay per tool, never registered.
+Overrides — `?hl=` → `lang`, `?theme=`, `?ipdb=<slug>` (the
+`data/ip-databases.js` row's backend route key) → `ipGeoSource`, `?probes=`
+→ `ipCardsToShow` — are parsed by `utils/url-overrides.js` (invalid =
+ignored) into `store.preferenceOverrides` once per page load: URL > stored >
+default, in memory only, never persisted or synced, surviving in-app
+navigation. Behavior reads `store.effectivePreferences` (an override naming
+a disabled source yields to the stored one); `userPreferences` stays the
+persisted layer. A user edit of the key (`editPreferences`) drops the
+override and `use-url-overrides.js` strips the parameter; sync pulls and the
+configs migration never do. Preferences notes each override in effect.
+`index.html` (theme seeding, boot language) and `vite.config.js` (locale
+preload) read `hl` / `theme` by hand, held in step by tests.
 
 ### Overlays take no keyboard shortcuts
 

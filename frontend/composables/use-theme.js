@@ -1,8 +1,8 @@
-// Theme orchestrator. Reads userPreferences.theme + OS color-scheme,
-// resolves the effective dark state, and pushes it to the store and
-// body class. Reacts to OS theme flips and preference changes. Mount
-// once at the app root (App.vue) — multiple instances would attach
-// duplicate listeners.
+// Theme orchestrator. Reads the effective theme (a ?theme= override, else
+// the stored preference) + OS color-scheme, resolves the effective dark
+// state, and pushes it to the store and body class. Reacts to OS theme
+// flips and preference changes. Mount once at the app root (App.vue) —
+// multiple instances would attach duplicate listeners.
 
 import { onMounted, onUnmounted, watch } from 'vue';
 import { useMainStore } from '@/store';
@@ -12,7 +12,7 @@ export function useTheme() {
     const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
 
     const applyTheme = () => {
-        const theme = store.userPreferences.theme;
+        const theme = store.effectivePreferences.theme;
         const isDark =
             theme === 'dark' ||
             (theme === 'auto' && mediaQueryList.matches);
@@ -31,5 +31,5 @@ export function useTheme() {
         mediaQueryList.removeEventListener('change', handleMediaChange);
     });
 
-    watch(() => store.userPreferences.theme, applyTheme);
+    watch(() => store.effectivePreferences.theme, applyTheme);
 }

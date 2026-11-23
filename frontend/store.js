@@ -20,6 +20,7 @@ import { isValidPreferenceValue, isValidConnectivityListId, isValidSpeedtestSize
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
 import { PROBE_CAPABILITIES } from './utils/probe-endpoints.js';
+import { readUrlOverrides } from './utils/url-overrides.js';
 const { t } = i18n.global;
 
 const SPEEDTEST_PREFERENCE_KEYS = Object.values(SPEEDTEST_ITEM_KEYS);
@@ -46,6 +47,9 @@ const readStoredPreferences = () => {
     return null;
   }
 };
+
+// An override is in effect unless it names an IP source the deployment doesn't offer: the stored one stays then.
+const overrideApplies = (ipDBs, key, value) => key !== 'ipGeoSource' || ipDBs.some((db) => db.id === value && db.enabled);
 
 // The two sign-in buttons. `other` is the provider to point a visitor at when
 // their email already owns an account through the other one;
@@ -117,7 +121,11 @@ export const useMainStore = defineStore('main', {
     // by IpInfos / WebRTC / RuleTest / SpeedTest.
     allIPs: [],
     configs: {},
+    // The persisted, synced preferences; read effectivePreferences where a value decides behavior.
     userPreferences: {},
+    // This page load's URL overrides (utils/url-overrides.js): `{ <key>: value }`, never persisted or synced; a
+    // user edit of the key drops it.
+    preferenceOverrides: readUrlOverrides(globalThis.window?.location?.search ?? ''),
     // Counts preference edits; account sync (use-account-sync.js) checks them for changes.
     preferenceEdits: 0,
     // Security Checklist progress (utils/features/checklist-progress.js): slug → 'checked' | 'ignored'; read from
@@ -145,6 +153,13 @@ export const useMainStore = defineStore('main', {
 
   getters: {
     activeSources: (state) => state.ipDBs.filter(db => db.enabled),
+    // The URL overrides in effect now.
+    activeOverrides: (state) => Object.fromEntries(Object.entries(state.preferenceOverrides)
+      .filter(([key, value]) => overrideApplies(state.ipDBs, key, value))),
+    // What decides behavior: URL override > stored preference (> default, merged in at load).
+    effectivePreferences() {
+      return { ...this.userPreferences, ...this.activeOverrides };
+    },
     allHasLoaded: (state) => {
       return Object.values(state.loadingStatus).every(status => status);
     },
@@ -280,9 +295,15 @@ export const useMainStore = defineStore('main', {
       this.adoptStoredPreferences();
       const values = change(this.userPreferences);
       if (!values) return;
+      this.dropPreferenceOverrides(Object.keys(values));
       Object.assign(this.userPreferences, values);
       this.persistPreferences();
       this.preferenceEdits += 1;
+    },
+    // A user edit ends these keys' URL overrides (composables/use-url-overrides.js strips their parameters).
+    dropPreferenceOverrides(keys) {
+      const kept = Object.entries(this.preferenceOverrides).filter(([key]) => !keys.includes(key));
+      if (kept.length !== Object.keys(this.preferenceOverrides).length) this.preferenceOverrides = Object.fromEntries(kept);
     },
     // set several preferences (an edit)
     setPreferences(values) {

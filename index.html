@@ -65,13 +65,15 @@
   <!-- @site-url:close -->
 
   <!-- Seed the `.dark` class on <html> BEFORE first paint.
-      Reads the stored theme preference (field `theme`, values:
-      "auto" / "light" / "dark") via `jnReadPrefs`, falling back to the OS
+      Takes a `?theme=` URL override (any case; an invalid one is ignored),
+      else the stored theme preference (field `theme`) via `jnReadPrefs`;
+      values "auto" / "light" / "dark", falling back to the OS
       `prefers-color-scheme` when on "auto" or when there's no stored
-      preference yet. Runs synchronously — must come before the inline
-      <style> block below and before the Vue bundle loads, so the boot
-      screen and the eventually-mounted app agree on the theme from
-      frame 1. Preferences.vue owns the class after mount via
+      preference yet (tests/index-html-theme.test.js runs it against
+      data/url-params.js and THEME_OPTIONS). Runs synchronously — must come
+      before the inline <style> block below and before the Vue bundle loads,
+      so the boot screen and the eventually-mounted app agree on the theme
+      from frame 1. Preferences.vue owns the class after mount via
       `store.setDarkMode`. -->
   <script>
     (function () {
@@ -89,7 +91,9 @@
           return {};
         }
       };
-      var theme = window.jnReadPrefs().theme || 'auto';
+      var THEME_VALUES = ['auto', 'light', 'dark'];
+      var linked = (new URLSearchParams(window.location.search).get('theme') || '').trim().toLowerCase();
+      var theme = THEME_VALUES.indexOf(linked) !== -1 ? linked : window.jnReadPrefs().theme || 'auto';
       var isDark =
         theme === 'dark' ||
         (theme === 'auto' &&
@@ -310,7 +314,8 @@
   <!-- Boot quips + fake progress. The copy lives inline (not in vue-i18n)
       because it runs before Vue loads; every full locale ships here (beta ones
       are welcome but not required) and the language pick mirrors
-      frontend/locales/i18n.js (stored prefs → ?hl= → browser language → en);
+      frontend/locales/i18n.js (?hl= → stored prefs → browser language → en;
+      an ?hl= matching no boot copy is ignored);
       it also sets <html lang>. tests/index-html-i18n.test.js holds both to
       common/locale-registry.js.
       The progress is time-driven make-believe: one
@@ -421,8 +426,8 @@
       const pickLang = () => {
         const prefs = window.jnReadPrefs ? window.jnReadPrefs() : {};
         const hl = new URLSearchParams(window.location.search).get('hl');
-        return matchLang(prefs.lang, QUIP_LANGS)
-          ?? matchLang(hl, QUIP_LANGS)
+        return matchLang(hl, QUIP_LANGS)
+          ?? matchLang(prefs.lang, QUIP_LANGS)
           ?? matchLang(navigator.language, QUIP_LANGS)
           ?? 'en';
       };

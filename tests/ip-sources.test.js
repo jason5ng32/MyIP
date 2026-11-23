@@ -92,6 +92,11 @@ describe('frontend IP_DATABASES match the registry', () => {
         for (const key of IP_SOURCE_KEYS) assert.equal(rowKeys.filter((k) => k === key).length, 1, key);
     });
 
+    it('names each frontend row by its registry key (the ?ipdb= slug)', () => {
+        for (const db of IP_DATABASES) assert.equal(db.slug, keyOfUrl(db.url), db.text);
+        assert.equal(new Set(IP_DATABASES.map((db) => db.slug)).size, IP_DATABASES.length);
+    });
+
     it('gates a frontend row on the registry flag exactly when the source needs configuration', () => {
         for (const db of IP_DATABASES) {
             const source = IP_SOURCES.find((s) => s.key === keyOfUrl(db.url));

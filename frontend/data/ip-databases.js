@@ -1,8 +1,9 @@
 // IP database definitions
 //
-// Each item: { id, text, url, enabled, configKey?, extended?, quotaKey?, attribution? }
+// Each item: { id, slug, text, url, enabled, configKey?, extended?, quotaKey?, attribution? }
 // - id    stable identifier, stored in visitors' localStorage (userPreferences.ipGeoSource):
 //         a stored number names whichever source holds it, so don't renumber casually
+// - slug  the backend route key (`/api/<slug>`), also the `?ipdb=` value (data/url-params.js)
 // - text  UI display name, also lookup key (e.g. `WebRtcTest.vue` looks for "MaxMind")
 // - url   template string, {{ip}} and {{lang}} will be replaced by buildDbUrl()
 // - enabled   availability, derived from /api/configs (runtime failures never touch it)
@@ -13,13 +14,13 @@
 // Array order is the Preferences list order and the fallback walk order.
 
 export const IP_DATABASES = [
-  { id: 0, text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true, configKey: 'ipChecking', extended: true, quotaKey: 'ipinfo', attribution: { url: 'https://ipcheck.ing/' } },
-  { id: 1, text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true, configKey: 'ipapiis', extended: true, attribution: { url: 'https://ipapi.is/' } },
-  { id: 2, text: 'IP2Location.io', url: '/api/ip2locationio?ip={{ip}}', enabled: true, configKey: 'ip2locationio', extended: true, attribution: { url: 'https://www.ip2location.io/' } },
-  { id: 3, text: 'IP-API.com', url: '/api/ipapicom?ip={{ip}}&lang={{lang}}', enabled: true, extended: true, attribution: { url: 'https://ip-api.com/' } },
-  { id: 4, text: 'BigDataCloud', url: '/api/bigdatacloud?ip={{ip}}&lang={{lang}}', enabled: true, configKey: 'bigdatacloud', extended: true, attribution: { url: 'https://www.bigdatacloud.com/' } },
-  { id: 5, text: 'IPLocate.io', url: '/api/iplocate?ip={{ip}}', enabled: true, configKey: 'iplocate', extended: true, attribution: { url: 'https://www.iplocate.io/' } },
-  { id: 6, text: 'MaxMind', url: '/api/maxmind?ip={{ip}}&lang={{lang}}', enabled: true, attribution: { url: 'https://www.maxmind.com/' } },
+  { id: 0, slug: 'ipchecking', text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true, configKey: 'ipChecking', extended: true, quotaKey: 'ipinfo', attribution: { url: 'https://ipcheck.ing/' } },
+  { id: 1, slug: 'ipapiis', text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true, configKey: 'ipapiis', extended: true, attribution: { url: 'https://ipapi.is/' } },
+  { id: 2, slug: 'ip2locationio', text: 'IP2Location.io', url: '/api/ip2locationio?ip={{ip}}', enabled: true, configKey: 'ip2locationio', extended: true, attribution: { url: 'https://www.ip2location.io/' } },
+  { id: 3, slug: 'ipapicom', text: 'IP-API.com', url: '/api/ipapicom?ip={{ip}}&lang={{lang}}', enabled: true, extended: true, attribution: { url: 'https://ip-api.com/' } },
+  { id: 4, slug: 'bigdatacloud', text: 'BigDataCloud', url: '/api/bigdatacloud?ip={{ip}}&lang={{lang}}', enabled: true, configKey: 'bigdatacloud', extended: true, attribution: { url: 'https://www.bigdatacloud.com/' } },
+  { id: 5, slug: 'iplocate', text: 'IPLocate.io', url: '/api/iplocate?ip={{ip}}', enabled: true, configKey: 'iplocate', extended: true, attribution: { url: 'https://www.iplocate.io/' } },
+  { id: 6, slug: 'maxmind', text: 'MaxMind', url: '/api/maxmind?ip={{ip}}&lang={{lang}}', enabled: true, attribution: { url: 'https://www.maxmind.com/' } },
 ];
 
 /**

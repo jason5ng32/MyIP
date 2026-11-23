@@ -2,7 +2,8 @@
 // (QUIPS / SLOW_HINTS), its JSON-LD and its language picker can't import
 // common/locale-registry.js. This spec reads the file as text and holds those
 // three inline copies to the registry, so a typo or a half-done sync fails here
-// instead of shipping.
+// instead of shipping. It also runs the boot language pick and vite.config.js's
+// locale preload script, both ?hl= → stored → browser → en.
 //
 // Full locales must be covered; beta ones may skip the boot copy by design
 // (docs/I18N-PLAN.md) — they resolve to a neighbour or to English at boot.
@@ -213,5 +214,67 @@ describe('index.html matchLang — the inline twin of matchLocale', () => {
             assert.ok(picked === null || picked in QUIPS,
                 `index.html matchLang returned "${picked}", which has no boot copy`);
         }
+    });
+});
+
+describe('index.html pickLang — ?hl= first', () => {
+    // Runs the boot pick with `?search`, stored prefs and a browser language.
+    const pickLang = ({ search = '', stored = {}, browser } = {}) => new Function('window', 'navigator', [
+        readDeclaration('matchLang'),
+        `const QUIP_LANGS = ${JSON.stringify(Object.keys(QUIPS))};`,
+        readDeclaration('pickLang'),
+        'return pickLang();',
+    ].join('\n'))({ location: { search }, jnReadPrefs: () => stored }, { language: browser });
+
+    it('takes a matching ?hl= over the stored language', () => {
+        assert.equal(pickLang({ search: '?hl=fr', stored: { lang: 'zh' } }), 'fr');
+        assert.equal(pickLang({ search: '?hl=zh-tw', stored: { lang: 'en' } }), 'zh-TW');
+    });
+
+    it('ignores an ?hl= matching no boot copy', () => {
+        assert.equal(pickLang({ search: '?hl=xx', stored: { lang: 'zh' } }), 'zh');
+        assert.equal(pickLang({ search: '?hl=xx', stored: { lang: 'auto' }, browser: 'ru-RU' }), 'ru');
+    });
+
+    it('falls to the stored language, the browser, then en', () => {
+        assert.equal(pickLang({ stored: { lang: 'ru' }, browser: 'fr' }), 'ru');
+        assert.equal(pickLang({ stored: { lang: 'auto' }, browser: 'fr-CA' }), 'fr');
+        assert.equal(pickLang({}), FALLBACK_LOCALE);
+    });
+});
+
+describe('vite.config.js locale preload — same pick as i18n.js', () => {
+    // The plugin's inline script is a template in vite.config.js; it is built
+    // here with fake chunks and run against stubs, returning the preloaded packs.
+    const source = fs.readFileSync(new URL('../vite.config.js', import.meta.url), 'utf8');
+    const open = 'const preloadScript = (chunks) => `';
+    const start = source.indexOf(open);
+    assert.notEqual(start, -1, 'vite.config.js no longer declares preloadScript');
+    const body = source.slice(start + open.length, source.indexOf('`;', start));
+    const build = new Function('chunks', 'PREFS_STORAGE_KEY', `return \`${body}\`;`);
+    const chunks = Object.fromEntries(LOCALE_CODES.map((code) => [code, `/${code}.js`]));
+    const KEY = 'prefs-key';
+
+    const preloads = ({ search = '', stored, browser } = {}) => {
+        const links = [];
+        const localStorage = { getItem: (key) => (key === KEY && stored ? JSON.stringify(stored) : null) };
+        const document = { createElement: () => ({}), head: { appendChild: (link) => links.push(link.href) } };
+        new Function('location', 'localStorage', 'navigator', 'document', build(chunks, KEY))(
+            { search }, localStorage, { language: browser }, document);
+        return links;
+    };
+
+    it('takes a matching ?hl= over the stored language', () => {
+        assert.deepEqual(preloads({ search: '?hl=zh-TW', stored: { lang: 'fr' } }), ['/zh-TW.js', '/zh.js', '/en.js']);
+    });
+
+    it('ignores an ?hl= matching no pack', () => {
+        assert.deepEqual(preloads({ search: '?hl=xx', stored: { lang: 'fr' } }), ['/fr.js', '/en.js']);
+    });
+
+    it('falls to the stored language, the browser, then en', () => {
+        assert.deepEqual(preloads({ stored: { lang: 'ru' }, browser: 'fr' }), ['/ru.js', '/en.js']);
+        assert.deepEqual(preloads({ stored: { lang: 'auto' }, browser: 'pt-PT' }), ['/pt-BR.js', '/en.js']);
+        assert.deepEqual(preloads({}), ['/en.js']);
     });
 });

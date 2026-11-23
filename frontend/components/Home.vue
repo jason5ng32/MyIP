@@ -65,6 +65,8 @@ const { t } = useI18n();
 const store = useMainStore();
 const capabilities = computed(() => store.capabilities);
 const userPreferences = computed(() => store.userPreferences);
+// With URL overrides applied: the shortcuts follow the cards on screen.
+const effectivePreferences = computed(() => store.effectivePreferences);
 
 // Template refs — UI chrome only; the test sections are reached through the
 // command bus (utils/app-commands.js), not refs.
@@ -94,7 +96,7 @@ const { loadShortcuts } = useShortcuts({
         queryIPRef, helpModalRef, shareReportRef, advancedToolsRef,
         isInfosLoaded, toggleInfoMask,
     },
-    store, t, capabilities, userPreferences,
+    store, t, capabilities, userPreferences: effectivePreferences,
 });
 
 // Scroll monitoring + section tracking (logic from widgets/Patch.vue)

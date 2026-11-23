@@ -408,7 +408,8 @@
       "ipDB": "Banco de geolocalização de IP",
       "ipDBTips": "Você pode selecionar a fonte padrão de geolocalização de IP. Se a fonte selecionada estiver indisponível, o sistema usará as fontes seguintes em ordem.",
       "language": "Configuração de idioma",
-      "languageTips": "Atualize o navegador para a alteração entrar em vigor. Idiomas em beta podem conter traduções incompletas."
+      "languageTips": "Atualize o navegador para a alteração entrar em vigor. Idiomas em beta podem conter traduções incompletas.",
+      "overriddenByLink": "Definido pelo parâmetro do link {param} nesta visita."
     },
     "DocsPrompt": "Digite sua pergunta…",
     "DocsSignInTitle": "Login necessário",

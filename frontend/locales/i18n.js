@@ -7,6 +7,7 @@ import {
   matchLocale,
   toHtmlLang,
 } from '../utils/locale-registry.js';
+import { readUrlOverrides } from '../utils/url-overrides.js';
 
 // Locale messages are loaded on demand so the first-paint path carries only the
 // language actually in use. Bundling all four eagerly cost ~44 KB gzipped of dead
@@ -45,15 +46,16 @@ function readStoredLang() {
   return null;
 }
 
-// Stored preference → ?hl= → browser language → en. Both tags go through
-// matchLocale, so a regional one (?hl=zh-CN, a zh-TW browser) lands on the
-// closest pack instead of dropping to English.
+// ?hl= (a URL override, utils/url-overrides.js) → stored preference →
+// browser language → en. Tags go through matchLocale, so a regional one
+// (?hl=zh-CN, a zh-TW browser) lands on the closest pack; an ?hl= matching
+// no pack is ignored.
 const setLanguage = () => {
+  const hl = readUrlOverrides(window.location.search, { localeCodes: supportedLanguages }).lang;
+  if (hl) return hl;
+
   const storedLang = readStoredLang();
   if (storedLang) return storedLang;
-
-  const hl = new URLSearchParams(window.location.search).get('hl');
-  if (hl) return matchLocale(hl, supportedLanguages) || FALLBACK_LOCALE;
 
   const browserLanguage = navigator.language || navigator.userLanguage;
   return matchLocale(browserLanguage, supportedLanguages) || FALLBACK_LOCALE;

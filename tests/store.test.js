@@ -751,3 +751,91 @@ describe('store — quota snapshot', () => {
     assert.deepEqual(s.remoteUserInfo.quota.features, {});
   });
 });
+
+describe('store — URL preference overrides', () => {
+  // A store created on a page loaded with `search`.
+  const storeAt = (search) => {
+    globalThis.window.location.search = search;
+    try {
+      setActivePinia(createPinia());
+      return useMainStore();
+    } finally {
+      globalThis.window.location.search = '';
+    }
+  };
+  const stored = () => JSON.parse(globalThis.localStorage.getItem('userPreferences_v7'));
+
+  it('reads the overrides once, at creation; none without parameters', () => {
+    assert.deepEqual(storeAt('').preferenceOverrides, {});
+    assert.deepEqual(storeAt('?hl=fr&theme=DARK&ipdb=maxmind&probes=4&q=x').preferenceOverrides,
+      { lang: 'fr', theme: 'dark', ipGeoSource: 6, ipCardsToShow: 4 });
+    assert.deepEqual(storeAt('?hl=xx&probes=5').preferenceOverrides, {}, 'invalid values are no override');
+  });
+
+  it('effectivePreferences lays the overrides over the stored preferences, which stay as they are', () => {
+    const s = storeAt('?theme=dark&probes=6');
+    s.loadPreferences();
+    assert.equal(s.effectivePreferences.theme, 'dark');
+    assert.equal(s.effectivePreferences.ipCardsToShow, 6);
+    assert.equal(s.effectivePreferences.simpleMode, false);
+    assert.equal(s.userPreferences.theme, 'auto');
+    assert.equal(s.userPreferences.ipCardsToShow, 2);
+    assert.equal(stored().theme, 'auto');
+    assert.equal(stored().ipCardsToShow, 2);
+  });
+
+  it('a user edit of an overridden key saves it and drops that override only', () => {
+    const s = storeAt('?theme=dark&ipdb=maxmind');
+    s.loadPreferences();
+    s.updatePreference('theme', 'light');
+    assert.deepEqual(s.preferenceOverrides, { ipGeoSource: 6 });
+    assert.equal(s.effectivePreferences.theme, 'light');
+    assert.equal(stored().theme, 'light');
+    s.updatePreference('simpleMode', true);
+    assert.deepEqual(s.preferenceOverrides, { ipGeoSource: 6 }, 'other edits leave the overrides alone');
+    s.setPreferences({ ipGeoSource: 3 });
+    assert.deepEqual(s.preferenceOverrides, {});
+    assert.equal(s.effectivePreferences.ipGeoSource, 3);
+  });
+
+  it('an account sync pull changes the stored value under an override, not the override', () => {
+    const s = storeAt('?ipdb=maxmind&theme=dark');
+    s.loadPreferences();
+    s.applySyncedPreferences({ ipGeoSource: 3, theme: 'light' });
+    assert.equal(s.userPreferences.ipGeoSource, 3);
+    assert.equal(s.effectivePreferences.ipGeoSource, 6);
+    assert.equal(s.effectivePreferences.theme, 'dark');
+    assert.deepEqual(s.preferenceOverrides, { ipGeoSource: 6, theme: 'dark' });
+    s.resetSyncedPreferences('preferences');
+    assert.equal(s.effectivePreferences.theme, 'dark');
+  });
+
+  it('an overridden IP source the deployment does not offer leaves the stored one in effect', () => {
+    const s = storeAt('?ipdb=ipapiis');
+    s.loadPreferences();
+    s.applySyncedPreferences({ ipGeoSource: 3 });
+    assert.equal(s.effectivePreferences.ipGeoSource, 1, 'enabled until configs say otherwise');
+    assert.deepEqual(s.activeOverrides, { ipGeoSource: 1 });
+    s.ipDBs = s.ipDBs.map((db) => ({ ...db, enabled: db.id !== 1 }));
+    assert.equal(s.effectivePreferences.ipGeoSource, 3);
+    assert.deepEqual(s.activeOverrides, {});
+    assert.deepEqual(s.preferenceOverrides, { ipGeoSource: 1 }, 'kept, just not in effect');
+  });
+
+  it('the configs migration moves only the stored source and keeps the override', async () => {
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ipChecking: false }) });
+    try {
+      const s = storeAt('?ipdb=maxmind');
+      s.loadPreferences();
+      s.fetchConfigs();
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      assert.notEqual(s.userPreferences.ipGeoSource, 0, 'the unavailable stored source migrates');
+      assert.deepEqual(s.preferenceOverrides, { ipGeoSource: 6 });
+      assert.equal(s.effectivePreferences.ipGeoSource, 6);
+      assert.equal(s.preferenceEdits, 0);
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+});

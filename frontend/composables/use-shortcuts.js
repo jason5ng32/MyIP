@@ -6,7 +6,7 @@
 //   - store: main store
 //   - t: i18n translation function
 //   - capabilities: computed(() => store.capabilities)
-//   - userPreferences: computed(() => store.userPreferences)
+//   - userPreferences: computed(() => store.effectivePreferences)
 //
 // Output:
 //   - loadShortcuts(): should be called onMounted; registers all mappings

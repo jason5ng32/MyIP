@@ -147,8 +147,8 @@ pnpm i18n-status   # progress report — never fails, just tells you where you a
 pnpm dev           # then pick your language in Preferences
 ```
 
-`?hl=<code>` also selects a language, but only before you've saved one in Preferences — a
-stored preference wins over the query param.
+`?hl=<code>` also selects a language for that visit, over the one saved in Preferences; a
+code matching no pack is ignored.
 
 ### What `pnpm test` enforces
 

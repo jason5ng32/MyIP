@@ -58,6 +58,8 @@ const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
+// URL overrides win here (store.effectivePreferences): the source and the card count.
+const effectivePreferences = computed(() => store.effectivePreferences);
 const lang = computed(() => store.lang);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 
@@ -132,16 +134,16 @@ const asnHistoryInfos = ref({});
 const asnConnectivityInfos = ref({});
 
 // Other data
-const ipCardsToShow = ref(userPreferences.value.ipCardsToShow);
+const ipCardsToShow = ref(effectivePreferences.value.ipCardsToShow);
 const IPArray = ref([]);
-const ipGeoSource = ref(userPreferences.value.ipGeoSource);
-const usingSource = ref(userPreferences.value.ipGeoSource);
+const ipGeoSource = ref(effectivePreferences.value.ipGeoSource);
+const usingSource = ref(effectivePreferences.value.ipGeoSource);
 // The selected source fills the `extended` block (IPCard's skeleton reserves its rows).
 const extendedSource = computed(() => store.ipDBs.find((db) => db.id === ipGeoSource.value)?.extended === true);
 // The source named beside the notes: the one that answered a card (a fallback
-// may have landed elsewhere), else the stored choice.
+// may have landed elsewhere), else the effective choice.
 const answeringSource = computed(() =>
-  ipDataCards.find((card) => card.geoSourceId != null)?.geoSourceId ?? userPreferences.value.ipGeoSource);
+  ipDataCards.find((card) => card.geoSourceId != null)?.geoSourceId ?? effectivePreferences.value.ipGeoSource);
 const fetchStatus = reactive([]);
 // Timing gate for the sponsor slot: flips once every visible card settled.
 const cardsHaveSettled = ref(false);
@@ -453,7 +455,8 @@ const clearCardData = (card) => {
   Object.assign(card, createDefaultCard());
 };
 
-watch(() => userPreferences.value.ipGeoSource, (newVal, oldVal) => {
+// The effective source: an edit that drops a ?ipdb= override refetches, a synced change under it doesn't.
+watch(() => effectivePreferences.value.ipGeoSource, (newVal) => {
   ipGeoSource.value = newVal;
   if (newVal !== usingSource.value) {
     selectIPGeoSource();

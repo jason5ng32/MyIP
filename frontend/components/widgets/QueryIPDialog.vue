@@ -83,7 +83,8 @@ const emit = defineEmits(['update:open', 'result']);
 const { t } = useI18n();
 
 const store = useMainStore();
-const userPreferences = computed(() => store.userPreferences);
+// The effective source: a ?ipdb= override wins over the stored one.
+const effectivePreferences = computed(() => store.effectivePreferences);
 const configs = computed(() => store.configs);
 const isDarkMode = computed(() => store.isDarkMode);
 const lang = computed(() => store.lang);
@@ -92,16 +93,16 @@ const inputIP = ref('');
 const modalQueryResult = ref(null);
 const modalQueryError = ref('');
 const isChecking = ref('idle');
-const ipGeoSource = ref(userPreferences.value.ipGeoSource);
+const ipGeoSource = ref(effectivePreferences.value.ipGeoSource);
 const { asnInfos } = useAsnInfo();
 const asnHistoryInfos = ref({});
 const asnConnectivityInfos = ref({});
 // Latest query wins: a superseded one (another IP opened mid-fetch) writes nothing.
 const request = createLatestRequest();
 
-watch(() => userPreferences.value.ipGeoSource, (newVal) => {
+watch(() => effectivePreferences.value.ipGeoSource, (newVal) => {
     ipGeoSource.value = newVal;
-}, { deep: true });
+});
 
 // Emptying the box retracts whatever the last attempt complained about —
 // the message no longer describes anything on screen.

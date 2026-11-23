@@ -23,7 +23,7 @@
         <!-- Language -->
         <section id="Pref_language">
           <SectionTitle :icon="Languages">{{ t('nav.preferences.language') }}</SectionTitle>
-          <Select :model-value="userPreferences.lang" @update:model-value="(v) => v && prefLanguage(v)">
+          <Select :model-value="effectivePreferences.lang" @update:model-value="(v) => v && prefLanguage(v)">
             <SelectTrigger class="w-full shadow-none">
               <SelectValue>
                 <span class="inline-flex items-center gap-2">
@@ -41,13 +41,14 @@
               </SelectItem>
             </SelectContent>
           </Select>
-          <SectionTip>{{ t('nav.preferences.languageTips') }}</SectionTip>
+          <SectionTip :flush="'lang' in overrideNotes">{{ t('nav.preferences.languageTips') }}</SectionTip>
+          <OverrideTip v-if="overrideNotes.lang">{{ overrideNotes.lang }}</OverrideTip>
         </section>
 
         <!-- Color Scheme -->
         <section id="Pref_colorScheme">
           <SectionTitle :icon="Palette">{{ t('nav.preferences.colorScheme') }}</SectionTitle>
-          <ToggleGroup :model-value="userPreferences.theme" type="single" class="w-full" variant="outline"
+          <ToggleGroup :model-value="effectivePreferences.theme" type="single" class="w-full" variant="outline"
             @update:model-value="(v) => v && prefTheme(v)">
             <ToggleGroupItem v-for="opt in themeOptions" :key="opt.value" :value="opt.value"
               class="flex-1 gap-1.5 cursor-pointer" :aria-label="opt.label" :title="opt.label">
@@ -55,6 +56,7 @@
               {{ opt.label }}
             </ToggleGroupItem>
           </ToggleGroup>
+          <OverrideTip v-if="overrideNotes.theme" standalone>{{ overrideNotes.theme }}</OverrideTip>
         </section>
 
         <!-- App Settings -->
@@ -90,20 +92,21 @@
         <!-- IP Sources Count -->
         <section id="Pref_ipCards">
           <SectionTitle :icon="LayoutGrid">{{ t('nav.preferences.ipSourcesToCheck') }}</SectionTitle>
-          <ToggleGroup :model-value="String(userPreferences.ipCardsToShow)" type="single" class="w-full"
+          <ToggleGroup :model-value="String(effectivePreferences.ipCardsToShow)" type="single" class="w-full"
             variant="outline" @update:model-value="(v) => v && prefipCards(Number(v))">
             <ToggleGroupItem v-for="num in [2, 4, 6]" :key="num" :value="String(num)"
               class="flex-1 gap-1.5 cursor-pointer" :aria-label="num.toString()" :title="num.toString()">
               {{ num }}
             </ToggleGroupItem>
           </ToggleGroup>
-          <SectionTip>{{ t('nav.preferences.ipSourcesToCheckTips') }}</SectionTip>
+          <SectionTip :flush="'ipCardsToShow' in overrideNotes">{{ t('nav.preferences.ipSourcesToCheckTips') }}</SectionTip>
+          <OverrideTip v-if="overrideNotes.ipCardsToShow">{{ overrideNotes.ipCardsToShow }}</OverrideTip>
         </section>
 
         <!-- IP Geo DB -->
         <section id="Pref_ipGeoSource">
           <SectionTitle :icon="Database">{{ t('nav.preferences.ipDB') }}</SectionTitle>
-          <Select :model-value="String(userPreferences.ipGeoSource)"
+          <Select :model-value="String(effectivePreferences.ipGeoSource)"
             @update:model-value="(v) => v != null && prefipGeoSource(Number(v))">
             <SelectTrigger class="w-full shadow-none">
               <SelectValue>{{ currentIpDB?.text || '—' }}</SelectValue>
@@ -115,7 +118,8 @@
               </SelectItem>
             </SelectContent>
           </Select>
-          <SectionTip>{{ t('nav.preferences.ipDBTips') }}</SectionTip>
+          <SectionTip :flush="'ipGeoSource' in overrideNotes">{{ t('nav.preferences.ipDBTips') }}</SectionTip>
+          <OverrideTip v-if="overrideNotes.ipGeoSource">{{ overrideNotes.ipGeoSource }}</OverrideTip>
         </section>
 
         <!-- Auto Run on Startup — per-module switches only. IP info always
@@ -275,6 +279,7 @@ import {
 } from '@/utils/features/snapshots.js';
 import { clampLabelCard } from '@/utils/features/snapshot-entry.js';
 import { LOCALES } from '@/utils/locale-registry.js';
+import { overrideParamOf } from '@/utils/url-overrides.js';
 import { syncStatusOf, syncStatusBadge } from '@/utils/features/account-sync.js';
 import { chosenCollections, defaultSyncChoice, syncChoiceOf } from '@/utils/features/sync-settings.js';
 import { saveSyncCollections } from '@/utils/features/account-sync-auth.js';
@@ -310,6 +315,10 @@ const { t } = useI18n();
 
 const store = useMainStore();
 const userPreferences = computed(() => store.userPreferences);
+// Language, theme, card count and IP source show their URL override while one is in effect; an edit drops it.
+const effectivePreferences = computed(() => store.effectivePreferences);
+const overrideNotes = computed(() => Object.fromEntries(Object.keys(store.activeOverrides).map((key) =>
+  [key, t('nav.preferences.overriddenByLink', { param: `?${overrideParamOf(key)}=` })])));
 const ipDBs = computed(() => store.ipDBs);
 
 // One site-wide sheet (App.vue, which closes it on a page change).
@@ -327,7 +336,7 @@ const langOptions = [
   })),
 ];
 const currentLang = computed(() =>
-  langOptions.find(l => l.value === userPreferences.value.lang) || langOptions[0]
+  langOptions.find(l => l.value === effectivePreferences.value.lang) || langOptions[0]
 );
 
 // Theme options (3 options: light / dark / auto)
@@ -339,7 +348,7 @@ const themeOptions = [
 
 // Current selected IP DB (for SelectValue display)
 const currentIpDB = computed(() =>
-  ipDBs.value.find(db => db.id === userPreferences.value.ipGeoSource)
+  ipDBs.value.find(db => db.id === effectivePreferences.value.ipGeoSource)
 );
 
 const prefTheme = (value) => {
@@ -460,10 +469,11 @@ const SNAPSHOT_AUTO_MODE_KEYS = {
   every: 'nav.preferences.snapshotsAutoEvery',
   off: 'nav.preferences.snapshotsAutoOff',
 };
+// The positions follow the cards on screen (effective count).
 const snapshotCardPositions = computed(() =>
-  Array.from({ length: userPreferences.value.ipCardsToShow || 0 }, (_, i) => i + 1));
+  Array.from({ length: effectivePreferences.value.ipCardsToShow || 0 }, (_, i) => i + 1));
 const snapshotLabelValue = computed(() =>
-  String(clampLabelCard(userPreferences.value.snapshotsLabelCard, userPreferences.value.ipCardsToShow)));
+  String(clampLabelCard(userPreferences.value.snapshotsLabelCard, effectivePreferences.value.ipCardsToShow)));
 
 const snapshotNotifyOn = computed(() => snapshotsNotifyOn(userPreferences.value));
 const prefSnapshotsNotify = (value) => {
@@ -479,7 +489,7 @@ const prefSnapshotsAuto = (value) => {
 // An empty pick is ignored: the stored card stays.
 const prefSnapshotsLabelCard = (value) => {
   if (!value) return;
-  store.updatePreference('snapshotsLabelCard', clampLabelCard(Number(value), userPreferences.value.ipCardsToShow));
+  store.updatePreference('snapshotsLabelCard', clampLabelCard(Number(value), effectivePreferences.value.ipCardsToShow));
   trackEvent('Nav', 'PrefereceClick', 'SnapshotsLabelCard');
 };
 
@@ -488,7 +498,8 @@ const prefSnapshotsKeepLast = (value) => {
   trackEvent('Nav', 'PrefereceClick', 'snapshotsKeepLast');
 };
 
-// Fewer IP cards shown: a label card past them falls back to card 1.
+// Fewer IP cards stored: a label card past them falls back to card 1. The
+// stored count, so a ?probes= override never rewrites the stored card.
 watch(() => [userPreferences.value.ipCardsToShow, userPreferences.value.snapshotsLabelCard], ([count, stored]) => {
   if (!Number.isInteger(count)) return;
   const clamped = clampLabelCard(stored, count);
@@ -514,9 +525,16 @@ const SectionTitle = (props, { slots }) =>
   ]);
 SectionTitle.props = ['icon'];
 
-// Section tip text
+// Section tip text; `flush` drops the base `p` bottom margin when an OverrideTip follows.
 const SectionTip = (props, { slots }) =>
-  h('p', { class: 'mt-2 text-xs text-muted-foreground leading-relaxed' }, slots.default?.());
+  h('p', { class: ['mt-2 text-xs text-muted-foreground leading-relaxed', props.flush && 'mb-0'] }, slots.default?.());
+SectionTip.props = { flush: Boolean };
+
+// A URL override's note: temporary, so warning-toned; tucked under the
+// section's tip, or spaced like one when it stands alone.
+const OverrideTip = (props, { slots }) =>
+  h('p', { class: [props.standalone ? 'mt-2' : 'mt-0.5', 'text-xs text-warning leading-relaxed'] }, slots.default?.());
+OverrideTip.props = { standalone: Boolean };
 
 // Preference switch row. Two stacked lines: label + Switch vertically
 // centered on the first, the optional tip full-width on the second (so it

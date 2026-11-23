@@ -31,6 +31,7 @@ import DocsAssistant from '@/components/widgets/DocsAssistant.vue';
 import { shouldOfferPwaInstall } from '@/utils/pwa.js';
 import { sendVisitBeacon } from '@/utils/features/pulse-beacon.js';
 import { useTheme } from '@/composables/use-theme.js';
+import { useUrlOverrideCleanup } from '@/composables/use-url-overrides.js';
 import { startFestivalSkin } from '@/composables/use-festival-skin.js';
 import { useMainStore } from '@/store';
 
@@ -100,6 +101,9 @@ if (loadingElement) {
 
 // Theme orchestration: initial apply, OS flip listener, preference watcher.
 useTheme();
+
+// URL overrides: a user edit that drops one strips its parameter from the URL.
+useUrlOverrideCleanup({ store });
 
 // Festival skin: logo, Pulse icon and nav trim while one is in window.
 startFestivalSkin();

@@ -408,7 +408,8 @@
       "ipDB": "IP 地理位置資料庫",
       "ipDBTips": "你可以選擇預設使用的 IP 地理位置資料來源。如果選定的來源無法使用，系統會依序使用後續來源。",
       "language": "語言設定",
-      "languageTips": "重新整理瀏覽器後生效。Beta 語言可能包含不完整的翻譯。"
+      "languageTips": "重新整理瀏覽器後生效。Beta 語言可能包含不完整的翻譯。",
+      "overriddenByLink": "本次造訪由連結參數 {param} 設定。"
     },
     "DocsPrompt": "輸入你想詢問的問題…",
     "DocsSignInTitle": "需要登入",
