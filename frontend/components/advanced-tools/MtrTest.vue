@@ -200,7 +200,7 @@ import { emitAppEvent } from '@/utils/app-events';
 import { useGlobalpingMeasurement, GLOBALPING_SUGGESTED_COUNTRIES, GLOBALPING_MAX_COUNTRIES, selectableIPs, classifyTarget } from '@/composables/use-globalping-measurement';
 import GlobalpingCountryPicker from './GlobalpingCountryPicker.vue';
 import { parseMtrOutput } from '@/utils/features/mtr-parse.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';

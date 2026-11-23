@@ -1,5 +1,4 @@
-import dotenv, { parse } from 'dotenv';
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 import { CodeInspectorPlugin } from 'code-inspector-plugin';
@@ -9,18 +8,6 @@ import { LOCALE_CODES } from './common/locale-registry.js';
 import { stripPack } from './common/locale-pack.js';
 import { FIREBASE_AUTH_PROXY_PATH, firebaseAuthProxyTarget } from './common/firebase-auth-proxy.js';
 
-dotenv.config();
-
-// Sentry source-map upload — build-time only. Needs SENTRY_AUTH_TOKEN and a
-// production SENTRY_ENVIRONMENT (unset means production, matching the
-// backend convention) — dev/test builds neither generate nor upload maps.
-// Maps go to Sentry, then get deleted from dist/ — users never download them.
-const sentryUploadEnabled = !!process.env.SENTRY_AUTH_TOKEN
-  && (process.env.SENTRY_ENVIRONMENT || 'production') === 'production';
-
-const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);
-const frontEndPort = parseInt(process.env.FRONTEND_PORT || 18966, 10);
-const firebaseAuthTarget = firebaseAuthProxyTarget(process.env.VITE_FIREBASE_PROJECT_ID);
 const nodeModuleChunkGroups = {
   vendor: ['vue', 'vue-router', 'vue-i18n'],
   chart: ['chart.js'],
@@ -54,8 +41,8 @@ function isNodePackage(normalizedId, packageName) {
 // `index.html` contains a small conditional block delimited by
 // `<!-- @site-url:open -->` … `<!-- @site-url:close -->` and uses
 // `__SITE_URL__` as the placeholder for an absolute origin.
-function siteUrlHtmlPlugin() {
-  const siteUrl = (process.env.VITE_SITE_URL || '').trim().replace(/\/+$/, '');
+function siteUrlHtmlPlugin(rawSiteUrl) {
+  const siteUrl = (rawSiteUrl || '').trim().replace(/\/+$/, '');
   const blockRe = /[ \t]*<!--\s*@site-url:open\s*-->[\s\S]*?<!--\s*@site-url:close\s*-->\n?/g;
   const markerOpenRe = /[ \t]*<!--\s*@site-url:open\s*-->\n?/g;
   const markerCloseRe = /[ \t]*<!--\s*@site-url:close\s*-->\n?/g;
@@ -185,94 +172,111 @@ function manualChunks(id) {
   return undefined;
 }
 
-export default defineConfig({
-  plugins: [
-    vue({
-      template: {
-        compilerOptions: {
-          isCustomElement: (tag) => tag === 'pwa-install'
-        }
-      }
-    }),
-    tailwindcss(),
-    siteUrlHtmlPlugin(),
-    localeStripPlugin(),
-    localePreloadPlugin(),
-    CodeInspectorPlugin({
-      bundler: 'vite',
-      hideDomPathAttr: true,
-      behavior: {
-        copy: '{file}',
-      },
-    }),
-    // Must stay last so it sees the final emitted chunks. Release name
-    // defaults to the current git commit SHA; the plugin injects the same
-    // release into the SDK at runtime, tying events to their sourcemaps.
-    sentryUploadEnabled && sentryVitePlugin({
-      org: process.env.SENTRY_ORG,
-      project: process.env.SENTRY_PROJECT_FRONTEND,
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      telemetry: false,
-      sourcemaps: {
-        // Rolldown's module-loading runtime chunk has no source to map —
-        // skip it so every build doesn't warn about its missing .map
-        ignore: ['**/rolldown-runtime*.js'],
-        filesToDeleteAfterUpload: ['dist/**/*.map'],
-      },
-    }),
-  ],
-  resolve: {
-    alias: {
-      '@': '/frontend',
-    },
-  },
-  build: {
-    // Hidden sourcemaps exist only for the Sentry upload; without a token,
-    // don't generate them at all (they'd end up publicly served from dist/)
-    sourcemap: sentryUploadEnabled ? 'hidden' : false,
-    rollupOptions: {
-      // @vueuse/core ships a couple of /* #__PURE__ */ comments in positions
-      // Rolldown (Vite 8's new bundler) can't interpret. They're harmless —
-      // just slightly less aggressive tree-shaking for those call sites —
-      // but the warnings clutter every build. Filter them out and let
-      // everything else through. Drop this once @vueuse/core fixes positions.
-      onwarn(warning, defaultHandler) {
-        if (warning.code === 'INVALID_ANNOTATION' && warning.id?.includes('@vueuse/core')) {
-          return;
-        }
-        defaultHandler(warning);
-      },
-      output: {
-        manualChunks,
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.fileName && (assetInfo.fileName.endsWith('.woff') || assetInfo.fileName.endsWith('.woff2'))) {
-            return 'fonts/[name][extname]';
+export default defineConfig(({ mode }) => {
+  // Empty prefix: load every .env key for the config itself (the client still
+  // only sees VITE_*); real environment variables win over .env.
+  const env = { ...loadEnv(mode, process.cwd(), ''), ...process.env };
+
+  // Sentry source-map upload — build-time only. Needs SENTRY_AUTH_TOKEN and a
+  // production SENTRY_ENVIRONMENT (unset means production, matching the
+  // backend convention) — dev/test builds neither generate nor upload maps.
+  // Maps go to Sentry, then get deleted from dist/ — users never download them.
+  const sentryUploadEnabled = !!env.SENTRY_AUTH_TOKEN
+    && (env.SENTRY_ENVIRONMENT || 'production') === 'production';
+
+  const backEndPort = parseInt(env.BACKEND_PORT || 11966, 10);
+  const frontEndPort = parseInt(env.FRONTEND_PORT || 18966, 10);
+  const firebaseAuthTarget = firebaseAuthProxyTarget(env.VITE_FIREBASE_PROJECT_ID);
+
+  return {
+    plugins: [
+      vue({
+        template: {
+          compilerOptions: {
+            isCustomElement: (tag) => tag === 'pwa-install'
           }
-          return 'assets/[name]-[hash][extname]';
-        },
-        chunkFileNames: (chunkInfo) => {
-          const prefix = chunkInfo.name.startsWith('utils-') ? 'utils/' : '';
-          return `assets/${prefix}[name].[hash].js`;
         }
+      }),
+      tailwindcss(),
+      siteUrlHtmlPlugin(env.VITE_SITE_URL),
+      localeStripPlugin(),
+      localePreloadPlugin(),
+      CodeInspectorPlugin({
+        bundler: 'vite',
+        hideDomPathAttr: true,
+        behavior: {
+          copy: '{file}',
+        },
+      }),
+      // Must stay last so it sees the final emitted chunks. Release name
+      // defaults to the current git commit SHA; the plugin injects the same
+      // release into the SDK at runtime, tying events to their sourcemaps.
+      sentryUploadEnabled && sentryVitePlugin({
+        org: env.SENTRY_ORG,
+        project: env.SENTRY_PROJECT_FRONTEND,
+        authToken: env.SENTRY_AUTH_TOKEN,
+        telemetry: false,
+        sourcemaps: {
+          // Rolldown's module-loading runtime chunk has no source to map —
+          // skip it so every build doesn't warn about its missing .map
+          ignore: ['**/rolldown-runtime*.js'],
+          filesToDeleteAfterUpload: ['dist/**/*.map'],
+        },
+      }),
+    ],
+    resolve: {
+      alias: {
+        '@': '/frontend',
+      },
+    },
+    build: {
+      // Hidden sourcemaps exist only for the Sentry upload; without a token,
+      // don't generate them at all (they'd end up publicly served from dist/)
+      sourcemap: sentryUploadEnabled ? 'hidden' : false,
+      rollupOptions: {
+        // @vueuse/core ships a couple of /* #__PURE__ */ comments in positions
+        // Rolldown (Vite 8's new bundler) can't interpret. They're harmless —
+        // just slightly less aggressive tree-shaking for those call sites —
+        // but the warnings clutter every build. Filter them out and let
+        // everything else through. Drop this once @vueuse/core fixes positions.
+        onwarn(warning, defaultHandler) {
+          if (warning.code === 'INVALID_ANNOTATION' && warning.id?.includes('@vueuse/core')) {
+            return;
+          }
+          defaultHandler(warning);
+        },
+        output: {
+          manualChunks,
+          assetFileNames: (assetInfo) => {
+            if (assetInfo.fileName && (assetInfo.fileName.endsWith('.woff') || assetInfo.fileName.endsWith('.woff2'))) {
+              return 'fonts/[name][extname]';
+            }
+            return 'assets/[name]-[hash][extname]';
+          },
+          chunkFileNames: (chunkInfo) => {
+            const prefix = chunkInfo.name.startsWith('utils-') ? 'utils/' : '';
+            return `assets/${prefix}[name].[hash].js`;
+          }
+        }
+      },
+      chunkSizeWarningLimit: 1000,
+      splitChunks: {
+        chunks: 'all',
+        minSize: 20000,
+        maxSize: 500000,
       }
     },
-    chunkSizeWarningLimit: 1000,
-    splitChunks: {
-      chunks: 'all',
-      minSize: 20000,
-      maxSize: 500000,
+    server: {
+      host: '0.0.0.0',
+      port: frontEndPort,
+      proxy: {
+        '/api': `http://localhost:${backEndPort}`,
+        // Firebase Auth handler, as frontend-server.js serves it in production
+        ...(firebaseAuthTarget && {
+          [FIREBASE_AUTH_PROXY_PATH]: { target: firebaseAuthTarget, changeOrigin: true },
+        }),
+      },
+      allowedHosts: ['dev.ipcheck.ing', 'test.ipcheck.ing'],
     }
-  },
-  server: {
-    host: '0.0.0.0',
-    port: frontEndPort,
-    proxy: {
-      '/api': `http://localhost:${backEndPort}`,
-      // Firebase Auth handler, as frontend-server.js serves it in production
-      ...(firebaseAuthTarget && {
-        [FIREBASE_AUTH_PROXY_PATH]: { target: firebaseAuthTarget, changeOrigin: true },
-      }),
-    },
-    allowedHosts: ['dev.ipcheck.ing', 'test.ipcheck.ing'],
-  }
-})
+  };
+});

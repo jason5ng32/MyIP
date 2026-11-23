@@ -8,7 +8,7 @@
         "title": "Como as ferramentas funcionam",
         "paragraphs": [
           "A maior parte do que as ferramentas mostram — detalhes do seu IP, impressão digital do navegador, DNS, conectividade e resultados do teste de velocidade — é calculada no seu navegador ou consultada em tempo real e exibida somente para você. Não mantemos esses resultados em nossos servidores para que outras pessoas os acessem, a menos que você crie explicitamente um link de relatório compartilhável.",
-          "Para consultar a geolocalização de um IP, o endereço IP pesquisado é enviado a fornecedores terceirizados (como ipinfo.io, ip-api.com e similares). Essas consultas são regidas pela política de privacidade de cada fornecedor."
+          "Para consultar a geolocalização de um IP, o endereço IP pesquisado é enviado a fornecedores terceirizados (como ipapi.is, ip-api.com e similares). Essas consultas são regidas pela política de privacidade de cada fornecedor."
         ]
       },
       "pulse": {
@@ -60,13 +60,21 @@
       },
       "account": {
         "title": "O que coletamos quando você entra na conta",
+        "intro": "Entrar é opcional — você pode usar a maioria das ferramentas do site sem uma conta. Usamos o Google Firebase Authentication para gerenciar seu login.",
+        "email": "Seu e-mail de login é usado para identificar sua conta e sincronizar os dados da sua conta.",
+        "ipChecking": "Alguns recursos deste site são fornecidos pela API do IPCheck.ing. Ela exige que cada usuário seja identificado pelo e-mail de login para evitar abusos, e o seu uso desses recursos é contabilizado com a mesma finalidade."
+      },
+      "accountStorage": {
+        "title": "O que fica armazenado com a sua conta",
         "paragraphs": [
-          "Entrar na conta é opcional — você pode usar a maioria das ferramentas do site sem uma conta. O login não é uma forma de cobrarmos de você, agora nem no futuro; ele é necessário para impedir o uso abusivo do serviço. Usamos o Google Firebase Authentication para gerenciar seu login e sincronizar suas conquistas. Quando você está conectado, são coletados os seguintes dados:"
+          "Quando você entra na conta, esta implantação guarda os seguintes dados no próprio banco de dados, vinculados à sua conta:"
         ],
         "bullets": [
-          "Seu endereço de e-mail usado no login, utilizado para identificar sua conta e fornecer os recursos que exigem autenticação.",
-          "A quantidade de vezes que você utiliza os recursos avançados, usada para detectar uso indevido mal-intencionado.",
-          "Ao final de cada período de contabilização, os registros de análise de abuso de cada usuário conectado, se houver, são excluídos automaticamente; apenas os totais de uso são mantidos."
+          "Um identificador de conta, uma sequência aleatória que não é o seu e-mail nem o seu nome, e a data em que foi armazenado pela primeira vez.",
+          "As conquistas que você desbloqueou e quando as desbloqueou.",
+          "Quantas vezes você usou cada recurso contabilizado, apenas como um número: sem alvo, endereço IP ou horário de uso.",
+          "A menos que você desative a sincronização: suas preferências, suas listas do teste de conectividade (incluindo os sites que você adicionou a elas), seu progresso no checklist de segurança e suas opções do teste de velocidade. Desativar um item sincronizado o exclui da sua conta.",
+          "Nenhum endereço IP, resultado de teste, instantâneo, e-mail, nome ou user agent é armazenado ali."
         ]
       },
       "telemetry": {
@@ -91,7 +99,8 @@
       "cookies": {
         "title": "Cookies e armazenamento local",
         "analytics": "O Google Analytics armazena um cookie para reconhecer visitantes que retornam.",
-        "local": "Suas configurações (tema, idioma e preferências de ferramentas) são mantidas no armazenamento local do seu navegador e nunca saem do seu dispositivo."
+        "local": "Suas configurações (tema, idioma e preferências de ferramentas) são mantidas no armazenamento local do seu navegador.",
+        "localSync": "Se você entrar na sua conta com a sincronização ativada, elas também ficam armazenadas na sua conta."
       },
       "eu": {
         "title": "Se você estiver na UE/EEE ou no Reino Unido",

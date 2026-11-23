@@ -6,7 +6,7 @@
             <div class="space-y-4">
                 <p class="flex items-start gap-2 text-sm text-muted-foreground leading-relaxed">
                     <ThumbsUp class="size-4 mt-0.5 shrink-0" />
-                    <span>{{ t('shortcutKeys.HelpNote') }}</span>
+                    <span>{{ t('shortcutKeys.HelpNote') }} {{ t('helpModal.HomeOnly') }}</span>
                 </p>
 
                 <!-- Multi-column shortcut list -->

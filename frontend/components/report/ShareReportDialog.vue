@@ -125,8 +125,11 @@ import { trackEvent } from '@/utils/analytics';
 import { useCollectedReport } from '@/composables/use-report-collector.js';
 import { useReportShare } from '@/composables/use-report-share.js';
 import { REPORT_SECTION_IDS, REPORT_TTL_DAYS } from '@/utils/report/report-schema.js';
-import { SECTION_TITLE_KEYS, buildShareReport, reportToMarkdown, downloadReportJson } from '@/utils/report/report-export.js';
+import { SECTION_TITLE_KEYS } from '@/utils/report/report-sections.js';
+import { buildShareReport, reportToMarkdown, downloadReportJson } from '@/utils/report/report-export.js';
 import { isoToDateTime } from '@/utils/time-utils.js';
+import { isToolAvailable } from '@/utils/tool-availability.js';
+import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
@@ -152,12 +155,19 @@ const maskTail = ref(false);
 const ttlDays = ref(String(REPORT_TTL_DAYS[0]));
 const previewOpen = ref(false);
 
-// The two original-site-only tools (sign-in + private API) don't exist for
-// self-host visitors — same gate as Advanced.vue's card grid. Hiding them
-// here keeps the checklist honest: no permanently-"not tested" entries.
-const ORIGINAL_SITE_ONLY_SECTIONS = new Set(['invisibility', 'enhanceddnsleak']);
+// Sections produced by an Advanced Tool follow that tool's listing gate
+// (sign-in, the IPCheck.ing API, a probe endpoint where needed), so the checklist never carries a
+// permanently-"not tested" entry for a tool this deployment doesn't list.
+// A section that has a result always shows: it is preselected, so it must
+// be there to untick.
+const TOOL_SECTIONS = new Map([
+    ['invisibility', 'invisibilitytest'],
+    ['enhanceddnsleak', 'enhanceddnsleaktest'],
+    ['persona', 'personacheck'],
+]);
 const visibleSectionIds = computed(() => REPORT_SECTION_IDS.filter((id) =>
-    !ORIGINAL_SITE_ONLY_SECTIONS.has(id) || store.configs?.originalSite === true));
+    !TOOL_SECTIONS.has(id) || availableSectionIds.value.includes(id)
+    || isToolAvailable(TOOL_BY_SLUG.get(TOOL_SECTIONS.get(id)), store.capabilities)));
 
 const hasSelection = computed(() => selectedIds.value.length > 0);
 

@@ -5,6 +5,8 @@
 // components stay achievement-agnostic:
 //   - signed-in check (store.isSignedIn)
 //   - already-achieved check
+//   - nothing dispatches before the /api/achievements snapshot syncs, so a
+//     deployment without user storage never unlocks
 //   - trigger spacing: the store slot holds one achievement at a time, so
 //     simultaneous unlocks (e.g. one speed test crossing three thresholds)
 //     are dispatched TRIGGER_SPACING_MS apart via a small queue.
@@ -44,8 +46,8 @@ export const useAchievementEngine = () => {
         if (!draining) drain();
     };
 
-    // Boot events (ipinfo:finished, iphistory:updated, …) can beat the remote
-    // achievements snapshot (/api/getuserinfo). Evaluating the already-achieved
+    // Boot events (ipinfo:finished, …) can beat the remote achievements
+    // snapshot (/api/achievements). Evaluating the already-achieved
     // guard against the all-false initial state would re-toast and re-report
     // badges the account holds, so slugs whose rule fired pre-sync park here
     // and are re-checked once User.vue applies the snapshot.

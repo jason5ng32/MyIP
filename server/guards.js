@@ -4,12 +4,17 @@
 // handlers stop carrying the defensive checks and can't accidentally forget
 // them.
 
-import { refererCheck } from './referer-check.js';
+import logger from './logger.js';
+import { refererCheck, refererHostname } from './referer-check.js';
 import { isValidIP, isValidDomain, isUsablePublicIP } from '../common/valid-ip.js';
 import { isValidBgpPrefix } from '../common/bgp-prefix.js';
 import { STATUS_PROVIDER_IDS } from './service-status-providers.js';
 import { DNS_RECORD_TYPE_SET } from '../common/dns-record-types.js';
 import { parseAsnInput } from '../common/asn-input.js';
+import { SERVICE_ERROR_CODE, AUTH_REASON } from '../common/codes/service-errors.js';
+import { verifySignIn } from './sign-in-token.js';
+import { userStorage } from './db/user-storage.js';
+import { SYNC_COLLECTIONS, syncCollectionOf } from '../common/sync-collections.js';
 
 // Express 5's req.query is a prototype getter that re-parses the URL on every
 // read, so a direct write is lost. Pin the parsed object as an own property
@@ -23,11 +28,34 @@ const setQueryParam = (req, name, value) => {
     req.query[name] = value;
 };
 
+// Self-hosting diagnostics: the first rejection per Referer host is logged at
+// info (below the warn+ Sentry mirror), capped so scanners' made-up hosts
+// can't grow the set without bound.
+const REFERER_REJECTION_LOG_CAP = 50;
+const loggedRefererRejections = new Set();
+
+export const resetRefererRejectionLog = () => loggedRefererRejections.clear();
+
+const logRefererRejection = (referer) => {
+    const host = refererHostname(referer);
+    const key = referer ? host ?? '(unparseable)' : '(none)';
+    if (loggedRefererRejections.has(key) || loggedRefererRejections.size >= REFERER_REJECTION_LOG_CAP) return;
+    loggedRefererRejections.add(key);
+    if (!referer) {
+        logger.info('API request without a Referer rejected (403) — a reverse proxy or Referrer-Policy may be stripping it; logged once');
+    } else if (!host) {
+        logger.info('API request with an unparseable Referer rejected (403); logged once');
+    } else {
+        logger.info({ host }, `API request from "${host}" rejected (403): not in ALLOWED_DOMAINS; logged once per host`);
+    }
+};
+
 // Reject requests without an allowed referer. The error message variant
 // preserves the existing user-facing wording.
 export const requireReferer = (req, res, next) => {
     const referer = req.headers.referer;
     if (!refererCheck(referer)) {
+        logRefererRejection(referer);
         return res.status(403).json({
             error: referer ? 'Access denied' : 'What are you doing?',
         });
@@ -173,4 +201,55 @@ export const requireValidProviderId = (paramName = 'id') => (req, res, next) => 
         return res.status(400).json({ error: 'Invalid provider id' });
     }
     next();
+};
+
+// The `:collection` route param names a synced collection
+// (common/sync-collections.js), else 404; its registry row lands on
+// `res.locals.syncCollection`.
+export const requireValidSyncCollection = (paramName = 'collection', collections = SYNC_COLLECTIONS) => (req, res, next) => {
+    const collection = syncCollectionOf(req.params?.[paramName], collections);
+    if (!collection) {
+        return res.status(404).json({ error: 'Unknown collection' });
+    }
+    res.locals.syncCollection = collection;
+    next();
+};
+
+// Sign-in: verify the `authorization` header and put the signed-in user id on
+// `res.locals.userId`. A refusal is 403 { error, code: 'auth', reason }; a
+// certificate outage is 503, uncoded. `verify` is the seam tests replace.
+const AUTH_ERROR_TEXT = {
+    [AUTH_REASON.SIGN_IN_REQUIRED]: 'Sign in required',
+    [AUTH_REASON.INVALID_TOKEN]: 'Invalid token',
+};
+
+const userGuard = (required, verify) => async (req, res, next) => {
+    let result;
+    try {
+        result = await verify(req.headers.authorization);
+    } catch (err) {
+        logger.debug({ err }, 'Sign-in check unavailable');
+        return res.status(503).json({ error: 'Sign-in check unavailable' });
+    }
+    if (result.id) {
+        res.locals.userId = result.id;
+        return next();
+    }
+    if (!required && result.reason === AUTH_REASON.SIGN_IN_REQUIRED) return next();
+    return res.status(403).json({
+        error: AUTH_ERROR_TEXT[result.reason], code: SERVICE_ERROR_CODE.AUTH, reason: result.reason,
+    });
+};
+
+// Signed out passes as a guest; a token that fails verification is refused.
+export const optionalUser = (verify = verifySignIn) => userGuard(false, verify);
+
+// Only a verified sign-in passes.
+export const requireUser = (verify = verifySignIn) => userGuard(true, verify);
+
+// User storage configured and ready, else 503 (uncoded, never cached). A
+// not-ready storage is re-checked here once its cooldown has passed.
+export const requireUserStorage = (storage = userStorage) => async (req, res, next) => {
+    if (storage.isConfigured() && await storage.ensureReady()) return next();
+    return res.status(503).json({ error: 'User storage unavailable' });
 };

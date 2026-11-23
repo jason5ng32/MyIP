@@ -55,6 +55,24 @@ describe('fetchWithTimeout()', () => {
         assert.equal(sawAbort, true, 'fetch received the abort signal from the timeout');
     });
 
+    it('names the timeout and the host, never the path or query, in the message', async () => {
+        installFetch((_input, init) => {
+            const { promise, reject } = deferred();
+            init.signal.addEventListener('abort', () => {
+                const err = new Error('This operation was aborted');
+                err.name = 'AbortError';
+                reject(err);
+            });
+            return promise;
+        });
+
+        await assert.rejects(
+            () => fetchWithTimeout('https://api.example.test:8443/v1/lookup?key=secret', { timeoutMs: 20 }),
+            (err) => err.name === 'AbortError'
+                && err.message === 'Timed out after 20ms: api.example.test:8443',
+        );
+    });
+
     it('clears the timer and does not abort when fetch resolves quickly', async () => {
         let sawAbortAfterResolve = false;
         installFetch((_input, init) => {
@@ -114,7 +132,7 @@ describe('fetchWithTimeout()', () => {
 
         queueMicrotask(() => outer.abort());
 
-        await assert.rejects(p, (err) => err.name === 'AbortError');
+        await assert.rejects(p, (err) => err.name === 'AbortError' && err.message === 'aborted');
         assert.equal(sawAbort, true);
     });
 

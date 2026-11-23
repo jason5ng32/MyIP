@@ -10,14 +10,33 @@
 //
 // Both accept a `timeoutMs` in init to override, and both chain any
 // caller-provided `signal` so aborting either one aborts the underlying
-// fetch. Timeouts surface as AbortError — callers already handle that
-// via try/catch. Written without AbortSignal.timeout() for broader
-// browser compatibility.
+// fetch. Timeouts surface as AbortError (message: what timed out, see
+// timeoutError) — callers already handle that via try/catch. Written
+// without AbortSignal.timeout() for broader browser compatibility.
+
+// Host only: query strings and paths can carry API keys, and the message
+// reaches 500 responses.
+const hostOf = (url) => {
+    try {
+        return new URL(String(url?.url ?? url), globalThis.location?.href).host;
+    } catch {
+        return String(url).split(/[?#]/)[0];
+    }
+};
+
+// Our own timeout, as an AbortError (callers and Sentry filters key on the
+// name) whose message says what timed out; a caller's abort passes through.
+const timeoutError = (url, timeoutMs) =>
+    Object.assign(new Error(`Timed out after ${timeoutMs}ms: ${hostOf(url)}`), { name: 'AbortError' });
 
 export async function fetchWithTimeout(url, init = {}) {
     const { timeoutMs = 5000, ...rest } = init;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    let timedOut = false;
+    const timer = setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+    }, timeoutMs);
 
     const callerSignal = rest.signal;
     if (callerSignal) {
@@ -30,6 +49,9 @@ export async function fetchWithTimeout(url, init = {}) {
 
     try {
         return await fetch(url, { ...rest, signal: controller.signal });
+    } catch (error) {
+        if (timedOut && error?.name === 'AbortError') throw timeoutError(url, timeoutMs);
+        throw error;
     } finally {
         clearTimeout(timer);
     }

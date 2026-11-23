@@ -4,13 +4,13 @@
 //
 // Each rule: { event, slug, when? }
 //   event — app-event name emitted by a component (see utils/app-events.js)
-//   slug  — achievement key from data/achievements.js
+//   slug  — achievement name from utils/codes/achievements.js
 //   when  — optional pure predicate over the event payload; omitted = always
 //
 // Rules are evaluated by composables/use-achievement-engine.js, which owns
 // the cross-cutting guards (signed-in check, already-achieved check, trigger
 // spacing). Keep predicates pure — tests/achievement-rules.test.js unit-tests
-// them and asserts every slug exists in data/achievements.js.
+// them and asserts every slug is a known achievement name.
 
 export const ACHIEVEMENT_RULES = [
     // Speed test finished — payload { downloadSpeed, uploadSpeed } in Mbps.
@@ -21,7 +21,8 @@ export const ACHIEVEMENT_RULES = [
     { event: 'speedtest:finished', slug: 'TooFastTooSimple', when: (p) => p.uploadSpeed >= 200 },
     { event: 'speedtest:finished', slug: 'SwiftAscent', when: (p) => p.uploadSpeed >= 1000 },
 
-    // Remote user info loaded after sign-in — payload { totalFunctionUses }.
+    // Achievements snapshot loaded after sign-in — payload { totalFunctionUses }:
+    // the account's lifetime uses of the counted features (/api/achievements totalUses).
     { event: 'user:info-loaded', slug: 'IAmHuman' },
     { event: 'user:info-loaded', slug: 'MakingBigNews', when: (p) => p.totalFunctionUses > 1000 },
 
@@ -36,8 +37,8 @@ export const ACHIEVEMENT_RULES = [
     // Whois lookup ran — payload { query }.
     { event: 'whois:lookup', slug: 'CuriousCat', when: (p) => (p.query || '').toLowerCase().includes('ipcheck.ing') },
 
-    // Rule test finished — payload { uniqueIPCount }.
-    { event: 'ruletest:finished', slug: 'CrossingTheWall', when: (p) => p.uniqueIPCount === 8 },
+    // Rule test finished — payload { uniqueIPCount }: distinct valid IPs over the tests.
+    { event: 'ruletest:finished', slug: 'CrossingTheWall', when: (p) => p.uniqueIPCount >= 8 },
 
     // Invisibility test — payloads: {} / { proxyScore, vpnScore } (floored ints).
     { event: 'invisibility:started', slug: 'JustInCase' },
@@ -52,14 +53,11 @@ export const ACHIEVEMENT_RULES = [
     { event: 'shortcut:help-opened', slug: 'CleverTrickery' },
 
     // IP cards settled — payload { cards: [{ country_code, qualityScore, … }] }.
-    // qualityScore (1–100) only rides the IPCheck.ing card; Number() maps its
-    // 'sign_in_required' / 'quota_exceeded' / absent states to NaN so they never match.
-    { event: 'ipinfo:finished', slug: 'PrettyDirty', when: (p) => (p.cards || []).some((c) => Number(c.qualityScore) === 1) },
-    { event: 'ipinfo:finished', slug: 'SqueakyClean', when: (p) => (p.cards || []).some((c) => Number(c.qualityScore) === 100) },
+    // qualityScore is a 0–100 number when the card carries one ('unknown' or
+    // absent otherwise, never matching).
+    { event: 'ipinfo:finished', slug: 'PrettyDirty', when: (p) => (p.cards || []).some((c) => c.qualityScore === 1) },
+    { event: 'ipinfo:finished', slug: 'SqueakyClean', when: (p) => (p.cards || []).some((c) => c.qualityScore === 100) },
     { event: 'ipinfo:finished', slug: 'WalkWithPenguins', when: (p) => (p.cards || []).some((c) => (c.country_code || '').toUpperCase() === 'AQ') },
-
-    // Local IP history snapshot — payload { countryCount } (distinct countries).
-    { event: 'iphistory:updated', slug: 'GlobeTrotter', when: (p) => p.countryCount >= 10 },
 
     // Earth Online status posted (backend confirmed the write).
     { event: 'pulse:status-sent', slug: 'HelloWorld' },

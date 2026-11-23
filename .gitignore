@@ -25,7 +25,9 @@ dist-ssr
 *.sln
 *.sw?
 .env
-.env.forker
+.env.forker*
+.env.dev
+.env.prod
 .vscode/extensions.json
 
 package-lock.json
@@ -35,7 +37,8 @@ localtest
 
 # Offline datasets (server/datasets/datasets.js): every common/<name>-db/ directory
 # holds only downloaded data, its state and lock — created at runtime, never
-# committed (CAIDA's data is under a non-commercial license).
+# committed (CAIDA's data is under a non-commercial license). Also the IP source
+# daily counts (common/source-limits-db/, server/source-daily-limits.js).
 common/*-db/
 .learnings/
 docs/

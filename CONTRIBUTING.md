@@ -12,11 +12,11 @@ New here? Look for issues labeled
 
 1. **Fork** the repo and create your branch **from `dev`** (never `main` — `main` only
    receives release merges from `dev`).
-2. **Set up:** Node.js 24+ (same as CI) and pnpm. The pnpm version is pinned
+2. **Set up:** Node.js 26 (same as CI) and pnpm. The pnpm version is pinned
    via the `packageManager` field, so the easiest path is:
 
    ```bash
-   corepack enable   # or: npm install -g pnpm
+   npm install -g pnpm   # picks up the pinned version from packageManager
    pnpm install
    pnpm dev          # starts Vite + the backend together
    ```
@@ -115,6 +115,11 @@ private channel in [SECURITY.md](SECURITY.md), never a public issue.
   connectivity data test may download missing favicons on local runs, never in CI).
 - UI rendering and browser APIs are out of scope for the Node runner; visual changes
   are verified by the maintainer during review, so mention in your PR what to look at.
+
+## License
+
+MyIP is licensed under [AGPL-3.0](LICENSE). By submitting a contribution, you
+agree that it is licensed under the same terms.
 
 ## Code of Conduct
 

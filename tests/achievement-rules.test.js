@@ -1,12 +1,12 @@
 // Tests for the achievement rule table (frontend/data/achievement-rules.js):
-// structural validity (every slug exists in data/achievements.js) and the
+// structural validity (every slug is a known achievement name) and the
 // behavior of each `when` predicate.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { ACHIEVEMENT_RULES } from '../frontend/data/achievement-rules.js';
-import { createInitialAchievementsState } from '../frontend/data/achievements.js';
+import { ACHIEVEMENT_NAMES } from '../common/codes/achievements.js';
 
 // Collect the rules for one event as { slug: rule } for easy lookup.
 const rulesFor = (event) =>
@@ -17,10 +17,10 @@ const fires = (rule, payload) => (rule.when ? !!rule.when(payload) : true);
 
 describe('ACHIEVEMENT_RULES structure', () => {
   it('every rule has a non-empty event name and a known achievement slug', () => {
-    const known = createInitialAchievementsState();
+    const known = new Set(ACHIEVEMENT_NAMES);
     for (const rule of ACHIEVEMENT_RULES) {
       assert.ok(typeof rule.event === 'string' && rule.event.length > 0, 'event name required');
-      assert.ok(known[rule.slug], `unknown achievement slug: ${rule.slug}`);
+      assert.ok(known.has(rule.slug), `unknown achievement slug: ${rule.slug}`);
       if (rule.when) assert.equal(typeof rule.when, 'function');
     }
   });
@@ -116,10 +116,11 @@ describe('whois:lookup', () => {
 });
 
 describe('ruletest:finished', () => {
-  it('CrossingTheWall needs exactly 8 unique IPs', () => {
+  it('CrossingTheWall needs at least 8 unique IPs', () => {
     const rule = rulesFor('ruletest:finished').CrossingTheWall;
     assert.equal(fires(rule, { uniqueIPCount: 7 }), false);
     assert.equal(fires(rule, { uniqueIPCount: 8 }), true);
+    assert.equal(fires(rule, { uniqueIPCount: 12 }), true);
   });
 });
 
@@ -167,11 +168,9 @@ describe('ipinfo:finished card rules', () => {
     assert.equal(fires(rules.SqueakyClean, cards(99, 1)), false);
   });
 
-  it('quality scores survive string form but not gated / absent states', () => {
-    assert.equal(fires(rules.PrettyDirty, cards('1')), true);
-    assert.equal(fires(rules.SqueakyClean, cards('100')), true);
+  it('unknown or absent quality scores never match', () => {
     for (const rule of [rules.PrettyDirty, rules.SqueakyClean]) {
-      assert.equal(fires(rule, cards('sign_in_required', 'unknown', undefined)), false);
+      assert.equal(fires(rule, cards('unknown', undefined)), false);
       assert.equal(fires(rule, { cards: [] }), false);
       assert.equal(fires(rule, {}), false);
     }
@@ -186,12 +185,9 @@ describe('ipinfo:finished card rules', () => {
   });
 });
 
-describe('iphistory:updated', () => {
-  it('GlobeTrotter needs 10 distinct countries', () => {
-    const rule = rulesFor('iphistory:updated').GlobeTrotter;
-    assert.equal(fires(rule, { countryCount: 9 }), false);
-    assert.equal(fires(rule, { countryCount: 10 }), true);
-    assert.equal(fires(rule, {}), false);
+describe('retired rules', () => {
+  it('GlobeTrotter has no unlock rule (retired with IP History)', () => {
+    assert.equal(ACHIEVEMENT_RULES.some((rule) => rule.slug === 'GlobeTrotter'), false);
   });
 });
 

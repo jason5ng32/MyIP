@@ -1,11 +1,10 @@
 // Lazy loader + controller for the GitBook Docs Assistant embed.
 //
-// Gated three ways: the docs site origin comes from `VITE_DOCS_URL`
-// (build-time — empty means the whole feature is absent); the nav entry
-// points only render on the canonical deployment (`configs.originalSite`),
-// since the assistant answers from IPCheck.ing's own docs site; and the
-// assistant itself is a sign-in benefit — entry points are visible to
-// everyone, but a signed-out interaction only prompts to sign in.
+// Gated two ways: the docs site origin comes from `VITE_DOCS_URL`
+// (build-time — empty means the whole feature is absent), and the assistant
+// is a sign-in benefit — the nav entry points render only where sign-in is
+// configured (`utils/docs-assistant-gate.js`), are visible to everyone there,
+// and a signed-out interaction only prompts to sign in.
 //
 // Nothing loads until the visitor actually asks for docs: the embed script
 // (served by the docs site) is injected on demand, then the assistant panel
@@ -40,8 +39,8 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useCollectedReport } from '@/composables/use-report-collector.js';
-import { REPORT_SECTION_IDS } from '@/utils/report/report-schema.js';
-import { SECTION_TITLE_KEYS } from '@/utils/report/report-export.js';
+import { SECTION_TITLE_KEYS } from '@/utils/report/report-sections.js';
+import { buildDocsResults } from '@/utils/report/report-export.js';
 import { dispatchAppCommand, waitForAppCommand } from '@/utils/app-commands.js';
 import { RUNNABLE_SECTION_COMMANDS, RUNNABLE_SECTION_IDS, normalizeRunSections } from '@/utils/report/docs-run-tests.js';
 
@@ -104,20 +103,10 @@ export function useDocsAssistant() {
     const isOpening = ref(false);
     const { sections } = useCollectedReport();
 
-    // Schema-shaped snapshots annotated with localized product names — the
-    // payload both tools return (read as-is, run after the tests finish).
-    const buildResultsSnapshot = () => {
-        const available = Object.keys(sections);
-        const sectionName = (id) => t(SECTION_TITLE_KEYS[id]);
-        return {
-            results: Object.fromEntries(available.map((id) => [id, {
-                name: sectionName(id),
-                ...JSON.parse(JSON.stringify(sections[id])),
-            }])),
-            missingSections: REPORT_SECTION_IDS.filter((id) => !available.includes(id))
-                .map((id) => ({ id, name: sectionName(id) })),
-        };
-    };
+    // Schema-shaped snapshots annotated with localized product names, local-only
+    // fields dropped — the payload both tools return (read as-is, run after
+    // the tests finish).
+    const buildResultsSnapshot = () => buildDocsResults(sections, (id) => t(SECTION_TITLE_KEYS[id]));
 
     // Localized suggestion questions (shared with the nav placeholder rotation).
     const docsQuestions = () => tm('nav.DocsQuestions').map((message) => rt(message));

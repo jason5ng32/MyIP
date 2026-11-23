@@ -65,7 +65,19 @@ export const STATUS_PROVIDERS = [
     },
     { id: 'perplexity', name: 'Perplexity', api: 'https://status.perplexity.com', page: 'https://status.perplexity.com', platform: 'incident.io' },
     { id: 'canva', name: 'Canva', api: 'https://www.canvastatus.com', page: 'https://www.canvastatus.com' },
+    { id: 'dropbox', name: 'Dropbox', api: 'https://status.dropbox.com', page: 'https://status.dropbox.com' },
     { id: 'docker', name: 'Docker', api: 'https://www.dockerstatus.com', page: 'https://www.dockerstatus.com', platform: 'incident.io' },
+    { id: 'bitbucket', name: 'Bitbucket', api: 'https://bitbucket.status.atlassian.com', page: 'https://bitbucket.status.atlassian.com' },
+    { id: 'digitalocean', name: 'DigitalOcean', api: 'https://status.digitalocean.com', page: 'https://status.digitalocean.com' },
+    { id: 'reddit', name: 'Reddit', api: 'https://www.redditstatus.com', page: 'https://www.redditstatus.com' },
+    { id: 'twitch', name: 'Twitch', api: 'https://status.twitch.com', page: 'https://status.twitch.com' },
+    { id: 'epicgames', name: 'Epic Games', api: 'https://status.epicgames.com', page: 'https://status.epicgames.com' },
+    { id: 'sentry', name: 'Sentry', api: 'https://status.sentry.io', page: 'https://status.sentry.io' },
+    // status.mixpanel.com only redirects here.
+    { id: 'mixpanel', name: 'Mixpanel', api: 'https://www.mixpanelstatus.com', page: 'https://www.mixpanelstatus.com' },
+    // The Python Infrastructure page rolls up PyPI (pypi.org + files.pythonhosted.org),
+    // python.org, docs and the download CDN as flat top-level groups — default selector fits.
+    { id: 'pypi', name: 'PyPI', api: 'https://status.python.org', page: 'https://status.python.org' },
 ];
 
 // Whitelist used by requireValidProviderId() — the per-provider detail

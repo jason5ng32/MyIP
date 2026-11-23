@@ -1,6 +1,6 @@
-// IPCheck.ing IPv6 — resolves via 6.ipcheck.ing. On the original site the
-// JSON endpoint is preferred (trace as internal fallback); mirrors go
-// straight to trace. Chained ahead of IPify IPv6 in index.js.
+// IPCheck.ing IPv6 — resolves via 6.ipcheck.ing. The JSON endpoint (trace as
+// internal fallback) is reserved for the upstream site; every other
+// deployment goes straight to trace. Chained ahead of IPify IPv6 in index.js.
 import { fetchWithTimeout } from '../fetch-with-timeout.js';
 import { parseTrace } from '../ip/parse-trace.js';
 
@@ -25,5 +25,5 @@ const getFromJson = async () => {
 export const ipChecking6 = {
     id: 'ipchecking-v6',
     name: 'IPCheck.ing IPv6',
-    run: (originalSite) => (originalSite ? getFromJson() : getFromTrace()),
+    run: (useJsonEndpoint) => (useJsonEndpoint ? getFromJson() : getFromTrace()),
 };

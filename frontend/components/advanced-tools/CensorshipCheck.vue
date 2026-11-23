@@ -187,7 +187,7 @@ import { emitAppEvent } from '@/utils/app-events.js';
 import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
 import GlobalpingCountryPicker from './GlobalpingCountryPicker.vue';
 import { isValidDomain } from '@/utils/ip/valid-ip.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { formatIsoDate } from '@/utils/time-utils.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

@@ -57,6 +57,36 @@
           </ToggleGroup>
         </section>
 
+        <!-- App Settings -->
+        <section id="Pref_appSettings">
+          <SectionTitle :icon="AppWindow">{{ t('nav.preferences.appSettings') }}</SectionTitle>
+          <div class="rounded-lg border bg-card divide-y">
+            <PrefRow id="simpleMode" :label="t('nav.preferences.simpleMode')" :tip="t('nav.preferences.simpleModeTips')"
+              :model-value="userPreferences.simpleMode" @update:model-value="prefSimpleMode" />
+          </div>
+        </section>
+
+        <!-- Sync settings: the title row carries the status badge; the controls (an Enable switch with its tip, the
+             collections' switches under it while on) apply at once; then what never syncs. Only where sync is
+             possible; signed out, one sentence. -->
+        <section v-if="accountSyncAvailable" id="Pref_sync">
+          <div class="mb-2 flex items-center justify-between gap-2">
+            <h3 class="m-0 flex min-w-0 items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <RefreshCw class="size-3.5 shrink-0" />{{ t('nav.preferences.sync') }}</h3>
+            <span v-if="syncBadge" role="status" :title="t(syncBadge.title)" :aria-label="t(syncBadge.title)"
+              class="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium"
+              :class="textClass(syncBadge.tone)">
+              <component :is="SYNC_BADGE_ICONS[syncBadge.tone]" class="size-3.5" />{{ t(syncBadge.label) }}
+            </span>
+          </div>
+          <template v-if="isSignedIn">
+            <SyncChoiceControls :model-value="syncDraft" id-prefix="prefSync" :disabled="!syncKnown"
+              @update:model-value="setSync" />
+            <SectionTip>{{ t('nav.preferences.syncNever') }}</SectionTip>
+          </template>
+          <SectionTip v-else>{{ t('nav.preferences.syncSignedOut') }}</SectionTip>
+        </section>
+
         <!-- IP Sources Count -->
         <section id="Pref_ipCards">
           <SectionTitle :icon="LayoutGrid">{{ t('nav.preferences.ipSourcesToCheck') }}</SectionTitle>
@@ -107,8 +137,9 @@
           <SectionTip>{{ t('nav.preferences.autoRunTips') }}</SectionTip>
         </section>
 
-        <!-- Connectivity Test: default list + its three switches. Labels
-                     stay terse; the section title carries the context. -->
+        <!-- Connectivity Test: default list + its switches (Discard First
+                     Result only in single-refresh mode). Labels stay terse;
+                     the section title carries the context. -->
         <section id="Pref_connectivity">
           <SectionTitle :icon="Activity">{{ t('nav.Connectivity') }}</SectionTitle>
           <div class="rounded-lg border bg-card divide-y">
@@ -138,6 +169,12 @@
               :model-value="userPreferences.connectivityMultipleTests"
               @update:model-value="prefConnectivityMultipleTests" />
 
+            <PrefRow v-if="!userPreferences.connectivityMultipleTests" id="ConnectivityDiscardFirstResult"
+              :label="t('nav.preferences.connectivity.discardFirstResult')"
+              :tip="t('nav.preferences.connectivity.discardFirstResultTips')"
+              :model-value="userPreferences.connectivityDiscardFirstResult"
+              @update:model-value="prefConnectivityDiscardFirstResult" />
+
             <PrefRow id="ConnectivityNotifications" :label="t('nav.preferences.connectivity.notifications')"
               :tip="t('nav.preferences.connectivity.notificationsTips')"
               :model-value="userPreferences.popupConnectivityNotifications"
@@ -150,40 +187,77 @@
           </div>
         </section>
 
-        <!-- App Settings -->
-        <section id="Pref_appSettings">
-          <SectionTitle :icon="AppWindow">{{ t('nav.preferences.appSettings') }}</SectionTitle>
+        <!-- Snapshots: automatic recording, its label card, the change notice, retention. -->
+        <section id="Pref_snapshots">
+          <SectionTitle :icon="Camera">{{ t('nav.preferences.snapshots') }}</SectionTitle>
           <div class="rounded-lg border bg-card divide-y">
-            <PrefRow id="simpleMode" :label="t('nav.preferences.simpleMode')" :tip="t('nav.preferences.simpleModeTips')"
-              :model-value="userPreferences.simpleMode" @update:model-value="prefSimpleMode" />
-          </div>
-        </section>
-
-        <!-- IP History -->
-        <section id="Pref_ipHistory">
-          <SectionTitle :icon="History">{{ t('nav.preferences.ipHistory') }}</SectionTitle>
-          <div class="rounded-lg border bg-card divide-y">
-            <PrefRow id="ipHistoryEnabled" :label="t('nav.preferences.ipHistoryEnabled')"
-              :model-value="userPreferences.ipHistoryEnabled" @update:model-value="prefIpHistoryEnabled" />
-
-            <!-- Retention slider: live number while dragging, preference
-                             committed on release so pruning never fires mid-drag. -->
-            <div class="p-3" :class="{ 'opacity-50': !userPreferences.ipHistoryEnabled }">
-              <div class="flex items-center justify-between gap-3 mb-3">
-                <label for="ipHistoryDays" class="text-sm font-medium select-none">
-                  {{ t('nav.preferences.ipHistoryDays') }}
-                </label>
-                <span class="text-sm font-mono tabular-nums text-muted-foreground">
-                  {{ ipHistoryDaysDraft }}
-                </span>
+            <!-- Automatic recording: one of the three modes, picked from a Select. -->
+            <div class="p-3 pb-2 space-y-2">
+              <div class="flex items-center justify-between gap-3">
+                <span class="min-w-0 flex-1 text-sm font-medium select-none">
+                  {{ t('nav.preferences.snapshotsAuto') }}</span>
+                <Select :model-value="snapshotAutoMode" @update:model-value="(v) => v && prefSnapshotsAuto(v)">
+                  <SelectTrigger class="w-40 shrink-0 shadow-none" :aria-label="t('nav.preferences.snapshotsAuto')">
+                    <SelectValue>{{ t(SNAPSHOT_AUTO_MODE_KEYS[snapshotAutoMode]) }}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="mode in SNAPSHOTS_AUTO_MODES" :key="mode" :value="mode">
+                      {{ t(SNAPSHOT_AUTO_MODE_KEYS[mode]) }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <Slider id="ipHistoryDays" :model-value="[ipHistoryDaysDraft]" :min="1" :max="30" :step="1"
-                :disabled="!userPreferences.ipHistoryEnabled"
-                @update:model-value="(v) => { if (v?.[0] != null) ipHistoryDaysDraft = v[0]; }"
-                @value-commit="(v) => prefIpHistoryDays(v?.[0])" />
+              <p class="text-xs text-muted-foreground leading-relaxed">
+                {{ t('nav.preferences.snapshotsAutoTips') }}</p>
+            </div>
+
+            <!-- Label card: one 1-based IP card position, picked from a Select. -->
+            <div v-if="snapshotAutoMode !== 'off'" class="p-3 pb-2 space-y-2">
+              <div class="flex items-center justify-between gap-3">
+                <span class="min-w-0 flex-1 text-sm font-medium select-none">
+                  {{ t('nav.preferences.snapshotsLabelCard') }}</span>
+                <Select :model-value="snapshotLabelValue"
+                  @update:model-value="(v) => v && prefSnapshotsLabelCard(Number(v))">
+                  <SelectTrigger class="w-40 shrink-0 shadow-none" :aria-label="t('nav.preferences.snapshotsLabelCard')">
+                    <SelectValue>{{ t('nav.preferences.snapshotsLabelCardName', { index: snapshotLabelValue }) }}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="num in snapshotCardPositions" :key="num" :value="String(num)">
+                      {{ t('nav.preferences.snapshotsLabelCardName', { index: num }) }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <p class="text-xs text-muted-foreground leading-relaxed">
+                {{ t('nav.preferences.snapshotsLabelCardTips') }}</p>
+            </div>
+
+            <!-- Change notice: needs automatic recording, hidden (and off) without it. -->
+            <PrefRow v-if="snapshotAutoMode !== 'off'" id="snapshotsNotify"
+              :label="t('nav.preferences.snapshotsNotify')" :tip="t('nav.preferences.snapshotsNotifyTips')"
+              :model-value="snapshotNotifyOn" @update:model-value="prefSnapshotsNotify" />
+
+            <!-- Retention: the number of unpinned snapshots kept. -->
+            <div class="p-3 pb-2 space-y-2">
+              <div class="flex items-center justify-between gap-3">
+                <span class="min-w-0 flex-1 text-sm font-medium select-none">
+                  {{ t('nav.preferences.snapshotsKeepLast') }}</span>
+                <Select :model-value="String(snapshotKeepLast)"
+                  @update:model-value="(v) => v && prefSnapshotsKeepLast(Number(v))">
+                  <SelectTrigger class="w-40 shrink-0 shadow-none" :aria-label="t('nav.preferences.snapshotsKeepLast')">
+                    <SelectValue>{{ t('nav.preferences.snapshotsCountOption', { n: snapshotKeepLast }) }}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="n in SNAPSHOTS_KEEP_LAST_OPTIONS" :key="n" :value="String(n)">
+                      {{ t('nav.preferences.snapshotsCountOption', { n }) }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <p class="text-xs text-muted-foreground leading-relaxed">
+                {{ t('nav.preferences.snapshotsKeepLastTips') }}</p>
             </div>
           </div>
-          <SectionTip>{{ t('nav.preferences.ipHistoryTips') }}</SectionTip>
         </section>
       </div>
     </SheetContent>
@@ -191,31 +265,43 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, h } from 'vue';
+import { computed, watch, h, ref } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
-import { clampRetentionDays } from '@/utils/ip/ip-history.js';
+import {
+  SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_AUTO_MODES, clampKeepLast, snapshotsAutoMode, snapshotsNotifyOn,
+} from '@/utils/features/snapshots.js';
+import { clampLabelCard } from '@/utils/features/snapshot-entry.js';
 import { LOCALES } from '@/utils/locale-registry.js';
-import { MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
+import { syncStatusOf, syncStatusBadge } from '@/utils/features/account-sync.js';
+import { chosenCollections, defaultSyncChoice, syncChoiceOf } from '@/utils/features/sync-settings.js';
+import { saveSyncCollections } from '@/utils/features/account-sync-auth.js';
+import { useAccountSyncState } from '@/composables/use-account-sync.js';
+import { useStatusTone } from '@/composables/use-status-tone.js';
+import SyncChoiceControls from './SyncChoiceControls.vue';
+import { MINE_LIST_ID } from '@/data/connectivity-defaults.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import {
   Activity,
   AppWindow,
+  Camera,
+  CircleAlert,
+  CircleCheck,
+  CirclePause,
   Database,
-  History,
   Languages,
   LaptopMinimal,
   LayoutGrid,
   Moon,
   Palette,
   Play,
+  RefreshCw,
   Cog,
   Sun,
 } from '@lucide/vue';
@@ -296,6 +382,49 @@ const prefSimpleMode = (value) => {
   trackEvent('Nav', 'PrefereceClick', 'SimpleMode');
 };
 
+// Sync settings (composables/use-account-sync.js): the account's choice, applied at
+// once and optimistically; a failed save puts the controls back and the badge says so.
+const accountSyncAvailable = computed(() => store.accountSyncAvailable);
+const isSignedIn = computed(() => store.isSignedIn);
+const syncState = useAccountSyncState();
+const { textClass } = useStatusTone();
+const SYNC_BADGE_ICONS = { 'ok-fast': CircleCheck, 'ok-mild': CircleAlert, 'ok-slow': CirclePause, fail: CircleAlert };
+const syncDraft = ref(defaultSyncChoice());
+const syncSaving = ref(false);
+const syncSaveFailed = ref(false);
+const syncKnown = computed(() => store.syncSettings?.user === store.user?.uid && store.syncSettings?.status !== 'unknown');
+// The draft follows the account; turned off, the collections are shown all on for the next Enable.
+watch(() => store.syncSettings, (settings) => {
+  if (syncSaving.value) return;
+  syncDraft.value = syncChoiceOf(settings?.collections ?? []);
+}, { immediate: true });
+// One save at a time: a toggle during a save is ignored, the controls stay as they are (no dimming).
+const setSync = async (next) => {
+  if (syncSaving.value) return;
+  const previous = syncDraft.value;
+  if (chosenCollections(next).join() === chosenCollections(previous).join()) {
+    syncDraft.value = next;
+    return;
+  }
+  syncDraft.value = next;
+  syncSaving.value = true;
+  syncSaveFailed.value = false;
+  const ok = await saveSyncCollections(chosenCollections(next));
+  syncSaving.value = false;
+  if (!ok) {
+    syncDraft.value = previous;
+    syncSaveFailed.value = true;
+  }
+  trackEvent('Nav', 'PrefereceClick', 'Sync');
+};
+const syncBadge = computed(() => {
+  const enabled = syncKnown.value ? store.syncSettings.collections : [];
+  return syncStatusBadge(syncStatusOf({
+    available: accountSyncAvailable.value, signedIn: isSignedIn.value,
+    states: enabled.map((id) => syncState[id]), saveFailed: syncSaveFailed.value,
+  }));
+});
+
 // Per-module startup auto-run toggle. The EnergySaver achievement rule
 // (earned once every auto-run module is off) lives in data/achievement-rules.js.
 const prefAutoRun = (key, value) => {
@@ -317,25 +446,54 @@ const prefConnectivityCardTitleOpensSite = (value) => {
   trackEvent('Nav', 'PrefereceClick', 'ConnectivityCardTitleOpensSite');
 };
 
-// IP history recorder: on/off + retention days (1–30). The draft ref feeds the
-// slider's live readout; the preference is written on value-commit only.
-const ipHistoryDaysDraft = ref(clampRetentionDays(userPreferences.value.ipHistoryDays));
-watch(() => userPreferences.value.ipHistoryDays, (v) => {
-  ipHistoryDaysDraft.value = clampRetentionDays(v);
-});
-
-const prefIpHistoryEnabled = (value) => {
-  store.updatePreference('ipHistoryEnabled', value);
-  trackEvent('Nav', 'PrefereceClick', 'IpHistoryEnabled');
+const prefConnectivityDiscardFirstResult = (value) => {
+  store.updatePreference('connectivityDiscardFirstResult', value);
+  trackEvent('Nav', 'PrefereceClick', 'ConnectivityDiscardFirstResult');
 };
 
-const prefIpHistoryDays = (value) => {
-  if (value == null) return;
-  const days = clampRetentionDays(value);
-  ipHistoryDaysDraft.value = days;
-  store.updatePreference('ipHistoryDays', days);
-  trackEvent('Nav', 'PrefereceClick', 'IpHistoryDays');
+// Snapshots: automatic recording, its label card, the change notice and
+// retention (options and defaults in utils/features/snapshots.js).
+const snapshotKeepLast = computed(() => clampKeepLast(userPreferences.value.snapshotsKeepLast));
+const snapshotAutoMode = computed(() => snapshotsAutoMode(userPreferences.value.snapshotsAuto));
+const SNAPSHOT_AUTO_MODE_KEYS = {
+  smart: 'nav.preferences.snapshotsAutoSmart',
+  every: 'nav.preferences.snapshotsAutoEvery',
+  off: 'nav.preferences.snapshotsAutoOff',
 };
+const snapshotCardPositions = computed(() =>
+  Array.from({ length: userPreferences.value.ipCardsToShow || 0 }, (_, i) => i + 1));
+const snapshotLabelValue = computed(() =>
+  String(clampLabelCard(userPreferences.value.snapshotsLabelCard, userPreferences.value.ipCardsToShow)));
+
+const snapshotNotifyOn = computed(() => snapshotsNotifyOn(userPreferences.value));
+const prefSnapshotsNotify = (value) => {
+  store.updatePreference('snapshotsNotify', value);
+  trackEvent('Nav', 'PrefereceClick', 'SnapshotsNotify');
+};
+
+const prefSnapshotsAuto = (value) => {
+  store.updatePreference('snapshotsAuto', snapshotsAutoMode(value));
+  trackEvent('Nav', 'PrefereceClick', 'SnapshotsAuto');
+};
+
+// An empty pick is ignored: the stored card stays.
+const prefSnapshotsLabelCard = (value) => {
+  if (!value) return;
+  store.updatePreference('snapshotsLabelCard', clampLabelCard(Number(value), userPreferences.value.ipCardsToShow));
+  trackEvent('Nav', 'PrefereceClick', 'SnapshotsLabelCard');
+};
+
+const prefSnapshotsKeepLast = (value) => {
+  store.updatePreference('snapshotsKeepLast', value);
+  trackEvent('Nav', 'PrefereceClick', 'snapshotsKeepLast');
+};
+
+// Fewer IP cards shown: a label card past them falls back to card 1.
+watch(() => [userPreferences.value.ipCardsToShow, userPreferences.value.snapshotsLabelCard], ([count, stored]) => {
+  if (!Number.isInteger(count)) return;
+  const clamped = clampLabelCard(stored, count);
+  if (clamped !== stored) store.updatePreference('snapshotsLabelCard', clamped);
+}, { immediate: true });
 
 const prefipCards = (value) => {
   store.updatePreference('ipCardsToShow', value);

@@ -1,13 +1,10 @@
 // frontend-server.js
-import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import logger from './server/logger.js';
 import { FIREBASE_AUTH_PROXY_PATH, firebaseAuthProxyTarget } from './common/firebase-auth-proxy.js';
-
-dotenv.config({ quiet: true });
 
 const frontendApp = express();
 const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);

@@ -185,10 +185,13 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
+import { TOOL_BY_SLUG } from '@/data/tools.js';
+import { INVISIBILITY_TEST_SCRIPT_URL } from '@/utils/probe-endpoints.js';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
+import { SERVICE_ERROR_CODE, AUTH_REASON } from '@/utils/codes/service-errors.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
@@ -197,6 +200,8 @@ import { CircleCheck, CircleX, Hourglass, Info, ListChecks, Lock, Shield, Play }
 const { t } = useI18n();
 
 const store = useMainStore();
+// This tool's metered feature in the quota snapshot.
+const QUOTA_KEY = TOOL_BY_SLUG.get('invisibilitytest').quotaKey;
 
 const checkingStatus = ref('idle');
 const errorMsg = ref('');
@@ -281,7 +286,7 @@ const generate28DigitString = () => {
 
 const loadScript = () => {
     const script = document.createElement('script');
-    script.src = `https://proxydetectjs.ipcheck.ing/?pdKey=${import.meta.env.VITE_INVISIBILITY_TEST_KEY}&pdVal=${userID.value}`;
+    script.src = `${INVISIBILITY_TEST_SCRIPT_URL}?pdKey=${import.meta.env.VITE_INVISIBILITY_TEST_KEY}&pdVal=${userID.value}`;
     script.async = true;
     script.setAttribute('data-tag', 'invisibilityTestScript');
     // No script means no probe data server-side — polling for a result is
@@ -308,7 +313,7 @@ const onSubmit = () => {
     // Frontend first line: the store's quota snapshot already knows the month
     // is exhausted — skip the whole probe run (script load + 10s poll). The
     // backend independently enforces the same limit (429) as the real guard.
-    if (store.quotaExceeded.invisibility_test) {
+    if (store.quotaExceeded(QUOTA_KEY)) {
         quotaExceeded.value = true;
         return;
     }
@@ -329,7 +334,7 @@ const getResult = async () => {
         const response = await authenticatedFetch(`/api/invisibility?id=${userID.value}`);
         const data = response;
 
-        const isPending = data.message === 'Data not found' || data.status === 'pending';
+        const isPending = data.status === 'pending';
         if (isPending && retryCount.value < 3) {
             setTimeout(() => {
                 getResult();
@@ -355,19 +360,19 @@ const getResult = async () => {
         }
     } catch (error) {
         console.error('Error fetching InvisibilityTest results:', error);
-        // 429 passed through by the backend: monthly quota exhausted —
-        // retrying can't fix it, show the quota hint (with the sponsor path).
-        if (error.message.includes('quota_exceeded')) {
+        // Monthly quota exhausted — retrying can't fix it, show the quota
+        // hint (with the sponsor path).
+        if (error.code === SERVICE_ERROR_CODE.QUOTA) {
             quotaExceeded.value = true;
-            store.markQuotaExhausted('invisibility_test');
+            store.markQuotaExhausted(QUOTA_KEY);
             checkingStatus.value = 'idle';
             retryCount.value = 0;
             return;
         }
-        // 401/403 passed through by the backend: the visitor's sign-in state
-        // is the problem — retrying can't fix it, so reset and bail.
-        if (/Status: 40[13] /.test(error.message)) {
-            errorMsg.value = error.message.includes('Invalid token')
+        // The visitor's sign-in state is the problem — retrying can't fix
+        // it, so reset and bail.
+        if (error.code === SERVICE_ERROR_CODE.AUTH) {
+            errorMsg.value = error.reason === AUTH_REASON.INVALID_TOKEN
                 ? t('user.InvalidUserToken')
                 : t('user.SignInToUse');
             checkingStatus.value = 'idle';

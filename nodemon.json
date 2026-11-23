@@ -1,0 +1,6 @@
+{
+  "watch": ["api", "server", "common", "backend-server.js", "sentry-instrument.js"],
+  "ext": "js,cjs,mjs,json",
+  "ignore": ["common/*-db", "tests", ".plan", "*.log"],
+  "delay": 300
+}

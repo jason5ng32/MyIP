@@ -108,7 +108,7 @@ const cachedEvents = { value: [], at: 0, loaded: false };
 import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { relativeTimeSince, formatDuration } from '@/utils/time-utils.js';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

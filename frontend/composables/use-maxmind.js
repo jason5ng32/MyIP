@@ -15,7 +15,7 @@ import { useMainStore } from '../store.js';
 import { useI18n } from 'vue-i18n';
 import { fetchWithTimeout } from '../utils/fetch-with-timeout.js';
 import { transformDataFromIPapi } from '../utils/ip/transform-ip-data.js';
-import getCountryName from '../data/country-name.js';
+import getCountryName from '../utils/country-name.js';
 import { toApiTag } from '../utils/locale-registry.js';
 
 // key → resolved result (successes only) / key → in-flight promise.
@@ -60,7 +60,7 @@ export function useMaxmind() {
                 const url = store.getDbUrl(source.id, ip, apiLang);
                 const response = await fetchWithTimeout(url);
                 const data = await response.json();
-                const ipData = transformDataFromIPapi(data, source.id, t, lang);
+                const ipData = transformDataFromIPapi(data, t, lang);
                 if (!ipData) return null;
                 const country_code = (ipData.country_code || '').toLowerCase();
                 const country = country_code

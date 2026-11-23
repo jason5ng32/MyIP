@@ -128,7 +128,7 @@ const EXAMPLES = [
     { labelKey: 'ipcalculator.exampleEui64', input: 'fe80::211:22ff:fe33:4455' },
 ];
 
-// Pills match IPHistory / DnsResolver's tag row.
+// Pills match DnsResolver's tag row.
 const tagClass = 'group h-7 rounded-full px-2.5 text-xs cursor-pointer';
 
 // Fold triggers: reka puts `data-state` on the button, which rotates the chevron.

@@ -1,29 +1,25 @@
-import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { slowDown } from 'express-slow-down'
-import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './server/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
-    requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './server/guards.js';
+    requireValidRecordType, requireValidReportId, requireValidSyncCollection, normalizeAsnQuery, requireUser, optionalUser,
+    requireUserStorage } from './server/guards.js';
+import { countFeatureUse } from './server/count-feature-use.js';
+import { FEATURE_USES } from './server/db/feature-uses.js';
 import { withTimeZone } from './server/ip-timezone.js';
+import { initSourceDailyLimits, sourceDailyLimit } from './server/source-daily-limits.js';
+import { inspectAllowedDomains } from './server/referer-check.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
 // IP Info
-import ipinfoHandler from './api/ipinfo-io.js';
-import ipapicomHandler from './api/ipapi-com.js';
-import ipCheckingHandler from './api/ipcheck-ing.js';
-import ipapiisHandler from './api/ipapi-is.js';
-import ip2locationHandler from './api/ip2location-io.js';
-import ipsbHandler from './api/ip-sb.js';
-import maxmindHandler from './api/maxmind.js';
+import { IP_SOURCES, IP_SOURCE_KEYS } from './api/ip-sources.js';
 // Others
 import cfRadarHandler from './api/cf-radar.js';
-import { RADAR_VIEWS, isCompleteRadarAnswer } from './server/cf-radar.js';
+import { RADAR_VIEWS, isCompleteRadarAnswer, hasRadarApiKey, startOutagePolling } from './server/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
@@ -45,8 +41,13 @@ import asnProfileHandler from './api/asn-profile.js';
 import { isCompleteProfile } from './server/asn-profile.js';
 // User
 import validateConfigs from './api/configs.js';
-import getUserinfo from './api/get-user-info.js';
-import updateUserAchievement from './api/update-user-achievement.js';
+import bulkLookupHandler from './api/bulk-lookup.js';
+import { bulkLookupSource } from './server/bulk-lookup-sources.js';
+import usageHandler from './api/usage.js';
+import listAchievementsHandler, { unlockAchievement as unlockAchievementHandler } from './api/achievements.js';
+import readSyncHandler, { writeSyncedItems as writeSyncHandler } from './api/sync.js';
+import readSyncSettingsHandler, { writeSyncSettings as writeSyncSettingsHandler } from './api/sync-settings.js';
+import { SYNC_MAX_BODY_BYTES } from './common/sync-collections.js';
 import { reloadMaxMindDatabases, isMaxMindReady, getMaxMindDbPaths } from './server/datasets/maxmind-service.js';
 import { bootstrapDatasets, startDatasetScheduler, watchDatasets } from './server/datasets/dataset-updater.js';
 import { datasets } from './server/datasets/datasets.js';
@@ -57,28 +58,18 @@ import { isAsRelLoaded } from './server/datasets/as-rel-db.js';
 import { isAsOrgLoaded } from './server/datasets/as-org-db.js';
 import { isOuiLoaded } from './server/datasets/oui-db.js';
 import { runOfflineBootstrap, requireOfflineData, isOfflineBootstrapping } from './server/offline-data.js';
+import { userStorage, accountSetupGap } from './server/db/user-storage.js';
 import { cacheable } from './server/cache-control.js';
 import { initUpstreamUserAgent } from './server/upstream-ua.js';
+import { createListenCallback } from './server/listen-callback.js';
 
-dotenv.config({ quiet: true });
 initUpstreamUserAgent();
 
 const app = express();
 const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);
-// Local rate-limit ledger file — opt-in: empty means no file is written.
-// The logger.warn in the limiter handler always fires regardless (and flows
-// to Sentry Logs when a backend DSN is configured), so the file only adds a
-// permanent on-disk record for deployments that want one (e.g. Sentry-less
-// self-hosts, or feeding a firewall script).
-const blackListIPLogFilePath = process.env.SECURITY_BLACKLIST_LOG_FILE_PATH || '';
-const rateLimitSet = parseInt(process.env.SECURITY_RATE_LIMIT || 0, 10);
-const speedLimitSet = parseInt(process.env.SECURITY_DELAY_AFTER || 0, 10);
-
-app.set('trust proxy', 1);
 
 // HTTP request logging on /api/* — off by default to keep pm2 logs lean.
-// Set LOG_HTTP=true in .env to enable. Mounted before the rate limiter
-// so 429s are also logged when enabled.
+// Set LOG_HTTP=true in .env to enable.
 if (process.env.LOG_HTTP === 'true') {
     app.use('/api', pinoHttp({
         logger,
@@ -97,123 +88,22 @@ if (process.env.LOG_HTTP === 'true') {
     logger.info('📝 HTTP request logging enabled (LOG_HTTP=true)');
 }
 
-function getClientIp(req) {
-    const cfIp = req.headers['cf-connecting-ip'];
-    const forwardedIps = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0] : null;
-    const cfIpV6 = req.headers['cf-connecting-ipv6'];
-    return cfIp || forwardedIps || cfIpV6 || req.ip;
-}
-
-// Host-local time with an explicit UTC offset ("2026-07-14 10:23:45 +0800"),
-// matching the pretty-log timestamp style — ledger entries stay unambiguous
-// whatever timezone the deployment runs in.
-const formatDate = (timestamp) => {
-    const d = new Date(timestamp);
-    const pad = (n) => String(n).padStart(2, '0');
-    const offsetMin = -d.getTimezoneOffset();
-    const sign = offsetMin >= 0 ? '+' : '-';
-    const abs = Math.abs(offsetMin);
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} `
-        + `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} `
-        + `${sign}${pad(Math.floor(abs / 60))}${pad(abs % 60)}`;
-};
-
-// Append-or-update one line in the rate-limit log, keeping the original
-// timestamp on repeat offenders so we can see when an IP *first* showed up.
-function logLimitedIP(ip) {
-    const logPath = path.join(__dirname, blackListIPLogFilePath);
-
-    const logDir = path.dirname(logPath);
-    if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true });
-        logger.info({ logDir }, 'Created log directory');
-    }
-
-    fs.readFile(logPath, 'utf8', (err, data) => {
-        if (err && err.code !== 'ENOENT') {
-            logger.error({ err }, 'Error reading the log file');
-            return;
-        }
-
-        const now = Date.now();
-        let newCount = 1;
-        let logExists = false;
-        let updatedData = '';
-
-        if (data) {
-            const lines = data.split('\n');
-            updatedData = lines.map(line => {
-                const [currentIp, count, timestamp] = line.split(',');
-                if (currentIp === ip) {
-                    newCount = parseInt(count, 10) + 1;
-                    logExists = true;
-                    return `${ip},${newCount},${timestamp}`;
-                }
-                return line;
-            }).join('\n');
-        }
-
-        if (!logExists) {
-            const newLine = `${ip},${newCount},${formatDate(now)}`;
-            updatedData += (updatedData ? '\n' : '') + newLine;
-        }
-
-        fs.writeFile(logPath, updatedData, 'utf8', err => {
-            if (err) {
-                logger.error({ err }, 'Failed to write to log file');
-            }
-        });
-    });
-}
-
-const rateLimiter = rateLimit({
-    windowMs: 20 * 60 * 1000,
-    max: rateLimitSet,
-    message: 'Too Many Requests',
-    // The Sentry tunnel is exempted — it has its own limiter at the route.
-    // Telemetry sharing the app quota is how reporting silently dies: one
-    // 429 and the browser SDK drops every event for the next minute.
-    skip: (req) => req.path === '/monitoring',
-    handler: (req, res, next) => {
-        const ip = getClientIp(req);
-        // Log on the exact transition into rate-limited state — not every
-        // blocked request — to avoid log flooding when an abusive client
-        // keeps hammering after being limited. The warn line is the primary
-        // record (mirrored to Sentry Logs when configured); the on-disk
-        // ledger is the opt-in extra.
-        if (req.rateLimit.current === req.rateLimit.limit + 1) {
-            logger.warn({ ip }, 'IP rate-limited');
-            if (blackListIPLogFilePath) {
-                logLimitedIP(ip);
-            }
-        }
-        res.status(429).json({ message: 'Too Many Requests' });
-    }
-});
-
-const speedLimiter = slowDown({
-    windowMs: 60 * 60 * 1000,
-    delayAfter: speedLimitSet,
-    delayMs: (used, req) => (used - req.slowDown.limit) * 400,
-    maxDelayMs: 5000,
-    skip: (req) => req.path === '/monitoring' || req.path === '/maxmind',
-})
-
-if (rateLimitSet !== 0) {
-    app.use('/api', rateLimiter);
-    logger.info(`🛡️  Rate limiter enabled — ${rateLimitSet} requests per 20 minutes`);
-}
-
-if (speedLimitSet !== 0) {
-    app.use('/api', speedLimiter);
-    logger.info(`🐢 Speed limiter enabled — slow down after ${speedLimitSet} requests`);
-}
-
 // 500kb instead of the 100kb default: shared diagnostic reports (POST
 // /api/report) legitimately reach ~100KB; the report handler enforces its
 // own tighter cap (REPORT_MAX_BYTES) after schema validation.
 // Must stay above REPORT_MAX_BYTES (common/report-schema.js) or report
 // uploads die here with a raw 413 before the handler's own size check.
+// Bulk lookup carries at most 200 IPs (~10KB as the longest IPv6 text forms):
+// its own tight parser runs first, and the global one skips a body that is
+// already parsed.
+app.use('/api/bulk-lookup', express.json({ limit: '16kb' }));
+// An achievement unlock is one short name.
+app.use('/api/achievements', express.json({ limit: '1kb' }));
+// A sync item write: one collection's items, the Connectivity lists the largest.
+// It runs before the settings parser below, which then skips the parsed body.
+app.use('/api/sync/:collection', express.json({ limit: SYNC_MAX_BODY_BYTES }));
+// The sync settings: a few collection ids.
+app.use('/api/sync', express.json({ limit: '1kb' }));
 app.use(express.json({ limit: '500kb' }));
 
 // Default every /api/* response to no-store. Routes that want edge caching
@@ -227,12 +117,38 @@ app.use('/api', (req, res, next) => {
 // check individually — see server/guards.js.
 app.use('/api', requireReferer);
 
+// The allowlist at startup, so a self-hoster sees why every request 403s.
+const allowlist = inspectAllowedDomains(process.env.ALLOWED_DOMAINS);
+if (allowlist.domains.length) {
+    logger.info(`🛡️  API referer allowlist: localhost, ${allowlist.domains.join(', ')}`);
+} else {
+    logger.info('⚠️  ALLOWED_DOMAINS not set — only localhost may call the API; any other host gets 403');
+}
+for (const { entry, reason } of allowlist.problems) {
+    logger.warn(`⚠️  ALLOWED_DOMAINS entry "${entry}" can never match: ${reason}`);
+}
+
+const removedSecurityVars = [
+    'SECURITY_RATE_LIMIT',
+    'SECURITY_DELAY_AFTER',
+    'SECURITY_BLACKLIST_LOG_FILE_PATH',
+].filter((key) => process.env[key] && process.env[key] !== '0');
+if (removedSecurityVars.length) {
+    logger.warn(`⚠️  These variables no longer have any effect (built-in rate limiting was removed; enforce limits at your reverse proxy or WAF): ${removedSecurityVars.join(', ')}`);
+}
+
 // Readiness gates for routes reading local data (server/offline-data.js):
 // 503 while that data is still downloading at boot, a no-op afterwards.
 const needsMaxMind = requireOfflineData([isMaxMindReady]);
 const needsAsGraph = requireOfflineData([isAsRelLoaded, isAsOrgLoaded]);
 const needsOui = requireOfflineData([isOuiLoaded]);
 const needsServiceStatus = requireOfflineData([isServiceStatusPrimed]);
+
+// Daily ceiling per IP source (IP_SOURCE_DAILY_LIMITS): on each geo route
+// (mounted below from api/ip-sources.js) after its validation and readiness
+// gates, so a refused request never holds a slot, and before the answer
+// chain, so a 429 is never cached.
+initSourceDailyLimits(IP_SOURCE_KEYS);
 
 const FIVE_MIN_CACHE = 5 * 60;
 const ONE_HOUR_CACHE = 60 * 60;
@@ -245,13 +161,19 @@ const ONE_YEAR_CACHE = 365 * 24 * 60 * 60;
 // Short Cache
 app.get('/api/service-status', needsServiceStatus, cacheable(FIVE_MIN_CACHE), serviceStatusHandler);
 app.get('/api/service-status/detail', requireValidProviderId(), needsServiceStatus, cacheable(FIVE_MIN_CACHE), serviceStatusDetailHandler);
+// IP-geolocation sources, one route per api/ip-sources.js row; edge-cached
+// for the row's cacheSeconds, no-store without it.
+for (const source of IP_SOURCES) {
+    app.get(`/api/${source.key}`,
+        requirePublicIP(),
+        ...(source.gates ?? []),
+        sourceDailyLimit(source.key),
+        ...(source.featureUse ? [countFeatureUse(source.featureUse)] : []),
+        withTimeZone(),
+        ...(source.cacheSeconds ? [cacheable(source.cacheSeconds)] : []),
+        source.handler);
+}
 // Cache for 1 day
-app.get('/api/ipinfo', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipinfoHandler);
-app.get('/api/ipapicom', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapicomHandler);
-app.get('/api/ipsb', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipsbHandler);
-app.get('/api/ipapiis', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapiisHandler);
-app.get('/api/ip2location', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ip2locationHandler);
-app.get('/api/maxmind', requirePublicIP(), needsMaxMind, withTimeZone(), cacheable(ONE_DAY_CACHE), maxmindHandler);
 app.get('/api/whois', normalizeAsnQuery(), cacheable(ONE_DAY_CACHE), getWhois);
 app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
@@ -278,9 +200,10 @@ app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, {
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
 // the TTL comes from that view's registry entry (server/cf-radar.js) — 7d
 // for the ASN summary and prefix list (same as /api/asn-profile), 30d for
-// country traffic, 1h for the outage feed. A partial answer (some upstream
-// calls failed, or prefix countries MaxMind couldn't fully work out) is
-// served but not cached.
+// country traffic, 15min for the outage feed (served from memory, see
+// startOutagePolling below). A partial answer (some upstream calls failed,
+// or prefix countries MaxMind couldn't fully work out) is served but not
+// cached.
 app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
@@ -291,19 +214,32 @@ app.get('/api/macchecker', needsOui, cacheable(THIRTY_DAYS_CACHE), macChecker);
 // Long Cache
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
-app.get('/api/ipchecking', requirePublicIP(), withTimeZone(), ipCheckingHandler);
 app.get('/api/dnsresolver', requireValidDomain('hostname'), requireValidRecordType(), dnsResolver);
-app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
-app.get('/api/invisibility', invisibilitytestHandler);
-app.get('/api/ipblocklist', requirePublicIP(), ipBlocklistHandler);
-app.get('/api/getuserinfo', getUserinfo);
-app.put('/api/updateuserachievement', updateUserAchievement);
+// Sign-in is verified here (server/guards.js): requireUser() refuses a
+// signed-out or invalid caller, optionalUser() lets a signed-out one through.
+// countFeatureUse() adds one to a signed-in caller's lifetime count after an
+// answer below 400 (user storage, for achievements; never a quota).
+app.get('/api/dnsleaktest/session/:token', requireUser(), countFeatureUse(FEATURE_USES.dnsleaktest), dnsLeakGetResult);
+app.get('/api/invisibility', requireUser(), countFeatureUse(FEATURE_USES.invisibility), invisibilitytestHandler);
+app.get('/api/ipblocklist', requirePublicIP(), optionalUser(), countFeatureUse(FEATURE_USES.ipblocklist), ipBlocklistHandler);
+app.get('/api/usage', requireUser(), usageHandler);
+// Achievements and synced items live in user storage: 503 without it.
+app.get('/api/achievements', requireUser(), requireUserStorage(), listAchievementsHandler);
+app.put('/api/achievements', requireUser(), requireUserStorage(), unlockAchievementHandler);
+app.get('/api/sync', requireUser(), requireUserStorage(), readSyncSettingsHandler);
+app.put('/api/sync', requireUser(), requireUserStorage(), writeSyncSettingsHandler);
+app.get('/api/sync/:collection', requireValidSyncCollection(), requireUser(), requireUserStorage(), readSyncHandler);
+app.put('/api/sync/:collection', requireValidSyncCollection(), requireUser(), requireUserStorage(), writeSyncHandler);
 // Shared reports stay no-store: an edge cache could serve a report past its
 // KV expiry, and private diagnostic data doesn't belong in a public cache.
 app.get('/api/report/:id', requireValidReportId(), getReportHandler);
 app.post('/api/report', createReportHandler);
 // One observation in, one graded report out — per-visitor by definition.
-app.post('/api/persona/evaluate', personaEvaluateHandler);
+app.post('/api/persona/evaluate', requireUser(), countFeatureUse(FEATURE_USES.persona), personaEvaluateHandler);
+// Bulk IP Lookup: local data only. Resolved here so a bad BULK_LOOKUP_SOURCE
+// warns at boot rather than on the first request.
+bulkLookupSource();
+app.post('/api/bulk-lookup', needsMaxMind, bulkLookupHandler);
 
 // Sentry tunnel — first-party relay for the frontend SDK's envelopes
 // Mounted only when this deployment actually built the frontend with a DSN.
@@ -313,13 +249,7 @@ app.post('/api/persona/evaluate', personaEvaluateHandler);
 // header at all — a '*/*' string matcher skips such requests and req.body
 // would never be populated.
 if (process.env.VITE_SENTRY_DSN_FRONTEND) {
-    // Dedicated, more generous per-IP limiter
-    const monitoringLimiter = rateLimit({
-        windowMs: 20 * 60 * 1000,
-        max: 600,
-        message: 'Too Many Requests',
-    });
-    app.post('/api/monitoring', monitoringLimiter, express.raw({ type: () => true, limit: '10mb' }), sentryTunnelHandler);
+    app.post('/api/monitoring', express.raw({ type: () => true, limit: '10mb' }), sentryTunnelHandler);
 }
 
 // Set static file server
@@ -350,14 +280,26 @@ const bootBackend = async () => {
         await reloadMaxMindDatabases('startup').catch(() => {});
     }
 
-    app.listen(backEndPort, () => {
-        logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);
-    });
+    // A failed bind (port in use, …) exits non-zero rather than draining.
+    app.listen(backEndPort, createListenCallback({ port: backEndPort, logger }));
 
     // Watching from before the downloads: a dataset another process
     // publishes (or someone places by hand) while a boot step is still
     // running is reloaded, not taken as the watcher's baseline.
     watchDatasets(datasets);
+
+    // The Radar outage feed fills on its own, outside the boot window
+    // (asn-profile's degraded caching keys on it); a request that finds it
+    // still empty fills it on demand.
+    if (hasRadarApiKey()) startOutagePolling();
+
+    // Optional user storage: migrated behind the listener, never fatal; a
+    // storage that is not ready is re-checked on a later request.
+    const missingAccountSetup = accountSetupGap();
+    if (missingAccountSetup) {
+        logger.warn(`⚠️  ${missingAccountSetup} is not set: sign-in and user storage need each other, account data features stay off`);
+    }
+    userStorage.bootCheck();
 
     await runOfflineBootstrap([
         async () => {

@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 Një kuti mjetesh IP gjithëpërfshirëse dhe me burim të hapur: kërkim IP nga shumë burime, teste lidhshmërie, zbulim i rrjedhjeve WebRTC dhe DNS, test shpejtësie, MTR, kontrolle censure, Whois e shumë të tjera — e vetë-strehueshme me një komandë të vetme Docker.
 
@@ -40,7 +40,7 @@ Mund ta ruani demon te faqeshënuesit ose të vendosni instancën tuaj.
 
 * 🛜 **Kartat e IP-së**: Zbulojnë IPv4 dhe IPv6 tuaj nga disa burime të pavarura krah për krah — shtetin, rajonin, qytetin, ASN-në, organizatën dhe zonën kohore lokale të IP-së.
 * 🔍 **Kërkimi i IP-së**: Kërkon të njëjtin informacion të detajuar për çdo adresë IP për të cilën jeni kureshtarë.
-* 🧾 **Historiku i IP-ve**: Mban një regjistër lokal të IP-ve me të cilat jeni parë, të filtrueshëm sipas llojit dhe shtetit — i ruajtur vetëm në shfletuesin tuaj.
+* 📸 **Historiku i fotografive të çastit**: Sa herë që faqja kryesore hapet, ruan rezultatet e testeve të saj — informacionin e IP-së, lidhshmërinë, WebRTC, testin e rrjedhjes DNS, testin e shpejtësisë — si një fotografi të çastit. Krahasoni çdo dy prej tyre dhe lexoni ndryshimet rresht pas rreshti, si një diff kodi; emërtoni ose fiksoni ato që kanë rëndësi — të ruajtura vetëm në shfletuesin tuaj.
 * 🖥️ **Gjurma e shfletuesit**: Llogarit gjurmën e shfletuesit tuaj në disa mënyra dhe tregon çfarë ju bën të identifikueshëm.
 
 ### 🕵️ Rrjedhjet dhe privatësia
@@ -65,6 +65,7 @@ Mund ta ruani demon te faqeshënuesit ose të vendosni instancën tuaj.
 * 📓 **Kërkimi Whois**: Kryen kërkime Whois për emra domenesh, adresa IP dhe numra AS.
 * 🗄️ **Kërkimi MAC**: Identifikon prodhuesin dhe detajet pas një adrese fizike.
 * 🧮 **Kalkulatori IP**: Llogaritje subnetesh, konvertime shënimesh dhe detaje të ndërfaqes IPv6 për çdo IP, prefiks, varg ose listë, të llogaritura lokalisht.
+* 🧾 **Kërkim IP në grup**: Ngjitni lista IP-sh ose regjistra të papërpunuar serveri (Nginx, Apache, firewall, CDN…) për të gjeolokalizuar menjëherë të gjitha IP-të.
 * 🛰️ **Informacioni ASN dhe topologjia drejt furnizuesve**: Direkt në çdo kartë IP — detajet e AS-së, shpalljet historike për prefiksin e IP-së dhe shtigjet nga ASN-ja e saj drejt shtyllës kurrizore Tier 1.
 * 🛂 **Profili ASN**: Tabloja e plotë e çdo AS — regjistrimi me të dhënat e papërpunuara Whois, renditja dhe madhësia globale, trafiku dhe cilësia e lidhjes, ku përdoret hapësira e saj IPv4, çdo prefiks i shpallur me gjendjen RPKI, furnizuesit, peer-at dhe klientët e saj, si dhe pikat e shkëmbimit të internetit dhe qendrat e të dhënave ku është e pranishme.
 * 📶 **Gjendja e shërbimeve**: Disponueshmëria live e shërbimeve të njohura — Claude, OpenAI, GitHub, Cloudflare e të tjera — nga faqet e tyre zyrtare të gjendjes, me incidentet e fundit.
@@ -132,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Gjithçka tjetër — çelësat opsionalë API, siguria dhe kufizimi i shpejtësisë, regjistrimi, Sentry, domenet e API-së curl — është dokumentuar te [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Gjithçka tjetër — çelësat opsionalë API, siguria, regjistrimi, Sentry, domenet e API-së curl — është dokumentuar te [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Dokumentacioni
 
@@ -181,36 +182,34 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Sponsorët dhe mbështetësit
 
-Si projekt me burim të hapur, jam shumë mirënjohës për mbështetjen e sponsorëve të mëposhtëm:
+MyIP është falas dhe me kod të hapur, por funksionon mbi serverë, burime të dhënash dhe shërbime reale. Këto kompani ndihmojnë që të mbetet i tillë dhe të gjitha bëjnë produkte të mira.
 
 **Sponsorët**
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" alt="RapidProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.rapidproxy.io/?ref=myip">RapidProxy</a>** — Residential proxies with 90M+ IPs, smart rotation and precise geo-targeting. From $0.55/GB, 10% off with code `RAPID10`</sub>
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="60" /></a><br />
+↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — offers private residential, mobile (4G/5G/LTE), ISP, and datacenter IPv4/IPv6 proxies with HTTP(S) and SOCKS5 support, 47M+ residential IPs in 220+ locations, precise country/city/ISP targeting, 99.7% uptime, and 24/7 support. MyIP users can use promo code `CHECKINGIP15` to get 15% off.
 
-<a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — High-quality rotating and static residential proxies, with 90M+ residential IPs across 220+ locations worldwide. It supports HTTP(S), SOCKS5, rotating and sticky sessions, with residential proxy plans starting at just $0.7/GB. Use code `PROXY90` for an additional 10% off.
-</sub>
-
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — offers private residential, mobile (4G/5G/LTE), ISP, and datacenter IPv4/IPv6 proxies with HTTP(S) and SOCKS5 support, 47M+ residential IPs in 220+ locations, precise country/city/ISP targeting, 99.7% uptime, and 24/7 support. MyIP users can use promo code `CHECKINGIP15` to get 15% off.
-</sub>
-
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=sq"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=sq">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=sq"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="60" /></a><br />
+↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=sq">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.
 
 ----
 
 **Mbështetësit**
 
-<p><a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" height="32" /></a></p>
-<p><a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a></p>
-<p><a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a></p>
-<p><a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a></p>
-<p><a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a></p>
+Mbështetësit i ofrojnë MyIP shërbime ose kredite falas për mjetet dhe infrastrukturën nga të cilat varet projekti. Faleminderit që mbështetni kodin e hapur.
+
+| Mbështetësi | Çfarë bëjnë |
+| --- | --- |
+| <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>Rrjet global për CDN, siguri, DNS dhe aplikacione serverless.</sub> |
+| <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>Monitorim aplikacionesh me gjurmim gabimesh, tracing dhe riprodhim sesionesh.</sub> |
+| <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>API dhe baza të dhënash për inteligjencë IP: gjeolokacion, ASN, VPN dhe zbulim abuzimi.</sub> |
+| <a href="https://www.ip2location.io"><img src="https://res.ipcheck.ing/img/ip2location_logo.png" alt="IP2Location.io" height="24" /></a> | <sub>API gjeolokacioni IP me zbulim proxy, VPN dhe hostingu, si dhe kërkim WHOIS për domene.</sub> |
+| <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>Rishikim kodi me AI që kupton gjithë bazën tuaj të kodit.</sub> |
+| <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>Platformë dokumentacioni për ekipet teknike.</sub> |
+| <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>Menaxher fjalëkalimesh dhe sekretesh për individë dhe ekipe.</sub> |
 
 Jeni të interesuar të sponsorizoni MyIP? [Bëhu sponsor](https://github.com/sponsors/jason5ng32)
 
 ## 📄 Licenca
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

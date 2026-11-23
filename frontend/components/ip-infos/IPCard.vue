@@ -40,7 +40,7 @@
                         :aria-label="'Copy ' + card.ip" />
                 </div>
 
-                <IpDetailPanel :data="card" :index="index" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
+                <IpDetailPanel :data="card" :index="index" :asn-infos="asnInfos"
                     :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
                     :configs="configs" :is-dark-mode="isDarkMode" map-mode="dialog"
                     country-traffic-mode="dialog" />
@@ -55,7 +55,7 @@
 
             <!-- Loading state: skeleton rows -->
             <div v-else class="flex-1 px-4 py-3 space-y-3">
-                <div v-for="(w, i) in placeholderSizes.slice(0, ipGeoSource === 0 ? 12 : 7)" :key="i"
+                <div v-for="(w, i) in placeholderSizes.slice(0, extendedSource ? 12 : 7)" :key="i"
                     class="h-4 bg-muted rounded animate-pulse" :style="`width: ${(w / 12) * 100}%`"></div>
             </div>
         </div>
@@ -91,7 +91,8 @@ const props = defineProps({
     index: { type: Number, required: true },
     isDarkMode: { type: Boolean, required: true },
     isMobile: { type: Boolean, required: true },
-    ipGeoSource: { type: Number, required: true },
+    // The selected source fills the `extended` block: the skeleton reserves its rows.
+    extendedSource: { type: Boolean, default: false },
     configs: { type: Object, required: true },
     asnInfos: { type: Object, required: true },
     asnHistoryInfos: { type: Object, default: () => ({}) },

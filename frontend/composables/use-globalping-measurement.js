@@ -23,7 +23,7 @@
 //       completed but produced no usable rows).
 
 import { ref, onScopeDispose } from 'vue';
-import { fetchWithTimeout } from '../../common/fetch-with-timeout.js';
+import { fetchWithTimeout } from '../utils/fetch-with-timeout.js';
 import { isValidIP, isUsablePublicIP } from '../utils/ip/valid-ip.js';
 
 // Curated 28-country spread shared by the MtrTest and GlobalLatencyTest

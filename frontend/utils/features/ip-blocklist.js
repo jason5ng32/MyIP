@@ -1,5 +1,5 @@
 // Pure layer of the IP Blocklist Check (advanced-tools/IpBlocklist.vue) over
-// the /api/ipblocklist answer — the private API's /iphitlist: two parts
+// the /api/ipblocklist answer — the IPCheck.ing API's /iphitlist: two parts
 // (`dnsbl`, `static`), each `{ checkedAt, summary, results }`, every item
 // carrying a status (listed / notice / clean / error) and a kind (abuse /
 // anonymity). The API decides kinds and order; this only picks what to show.

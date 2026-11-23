@@ -1,0 +1,126 @@
+// Tests for the domain code lists (common/codes/), their frontend bridges
+// and the code → i18n-key label maps: bridges re-export the very same lists,
+// every code has a label in the en pack, and the IP card's line type keeps
+// its labels and fallback.
+
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { readFileSync } from 'node:fs';
+
+import * as ipCodes from '../common/codes/ip.js';
+import * as connectivityCodes from '../common/codes/connectivity.js';
+import * as webrtcCodes from '../common/codes/webrtc.js';
+import * as speedtestCodes from '../common/codes/speedtest.js';
+import * as personaCodes from '../common/codes/persona.js';
+import * as serviceErrorCodes from '../common/codes/service-errors.js';
+import * as achievementCodes from '../common/codes/achievements.js';
+import * as ipCodesBridge from '../frontend/utils/codes/ip.js';
+import * as connectivityCodesBridge from '../frontend/utils/codes/connectivity.js';
+import * as webrtcCodesBridge from '../frontend/utils/codes/webrtc.js';
+import * as speedtestCodesBridge from '../frontend/utils/codes/speedtest.js';
+import * as personaCodesBridge from '../frontend/utils/codes/persona.js';
+import * as serviceErrorCodesBridge from '../frontend/utils/codes/service-errors.js';
+import * as achievementCodesBridge from '../frontend/utils/codes/achievements.js';
+import { VERDICT, AXIS, GRADE } from '../frontend/utils/persona/check-ids.js';
+import { IP_TYPE_I18N_KEYS, IP_TYPE_UNKNOWN_KEY, ABUSE_LEVEL_I18N_KEYS } from '../frontend/utils/codes/ip-labels.js';
+import { CONNECTIVITY_STATUS_KEYS } from '../frontend/utils/codes/connectivity-labels.js';
+import { natTypeKey } from '../frontend/utils/codes/webrtc-labels.js';
+import { transformDataFromIPapi } from '../frontend/utils/ip/transform-ip-data.js';
+
+const en = JSON.parse(readFileSync(new URL('../frontend/locales/en.json', import.meta.url), 'utf8'));
+const lookup = (key) => key.split('.').reduce((node, part) => node?.[part], en);
+
+describe('code list bridges', () => {
+    const pairs = [
+        ['ip', ipCodes, ipCodesBridge],
+        ['connectivity', connectivityCodes, connectivityCodesBridge],
+        ['webrtc', webrtcCodes, webrtcCodesBridge],
+        ['speedtest', speedtestCodes, speedtestCodesBridge],
+        ['persona', personaCodes, personaCodesBridge],
+        ['service-errors', serviceErrorCodes, serviceErrorCodesBridge],
+        ['achievements', achievementCodes, achievementCodesBridge],
+    ];
+    for (const [name, source, bridge] of pairs) {
+        it(`${name}: re-exports every list as the same object`, () => {
+            assert.deepEqual(Object.keys(bridge).sort(), Object.keys(source).sort());
+            for (const key of Object.keys(source)) assert.equal(bridge[key], source[key], key);
+        });
+    }
+
+    it('persona check-ids re-exports the shared enums', () => {
+        assert.equal(VERDICT, personaCodes.PERSONA_VERDICT);
+        assert.equal(AXIS, personaCodes.PERSONA_AXIS);
+        assert.equal(GRADE, personaCodes.PERSONA_GRADE);
+    });
+
+    it('NAT type codes extend the ICE candidate types', () => {
+        assert.deepEqual(webrtcCodes.NAT_TYPE_CODES.slice(0, webrtcCodes.ICE_CANDIDATE_TYPES.length),
+            webrtcCodes.ICE_CANDIDATE_TYPES);
+    });
+});
+
+describe('service error codes', () => {
+    // The reserved owner-level codes listed in the command bus header comment.
+    const appCommandsSource = readFileSync(new URL('../frontend/utils/app-commands.js', import.meta.url), 'utf8');
+    const reservedCodes = [...appCommandsSource.matchAll(/^\/\/\s+'(\w+)'\s+—/gm)].map(([, code]) => code);
+
+    it('reuse the command bus reserved codes auth and quota', () => {
+        const { SERVICE_ERROR_CODE } = serviceErrorCodes;
+        assert.deepEqual(SERVICE_ERROR_CODE, { AUTH: 'auth', QUOTA: 'quota' });
+        for (const code of Object.values(SERVICE_ERROR_CODE)) assert.ok(reservedCodes.includes(code), code);
+    });
+
+    it('name the two auth reasons', () => {
+        assert.deepEqual(serviceErrorCodes.AUTH_REASON, { SIGN_IN_REQUIRED: 'sign_in_required', INVALID_TOKEN: 'invalid_token' });
+    });
+
+    it('are frozen', () => {
+        assert.ok(Object.isFrozen(serviceErrorCodes.SERVICE_ERROR_CODE));
+        assert.ok(Object.isFrozen(serviceErrorCodes.AUTH_REASON));
+    });
+});
+
+describe('code label maps', () => {
+    it('IP line types: one key per code, each in the en pack', () => {
+        assert.deepEqual(Object.keys(IP_TYPE_I18N_KEYS).sort(), [...ipCodes.IP_TYPE_CODES].sort());
+        for (const key of [...Object.values(IP_TYPE_I18N_KEYS), IP_TYPE_UNKNOWN_KEY]) {
+            assert.equal(typeof lookup(key), 'string', key);
+        }
+    });
+
+    it('abuse levels: one key per code, each in the en pack', () => {
+        assert.deepEqual(Object.keys(ABUSE_LEVEL_I18N_KEYS), ipCodes.ABUSE_LEVELS);
+        for (const code of ipCodes.ABUSE_LEVELS) {
+            assert.equal(typeof lookup(ABUSE_LEVEL_I18N_KEYS[code]), 'string', code);
+        }
+    });
+
+    it('connectivity statuses: one key per code, each in the en pack', () => {
+        assert.deepEqual(Object.keys(CONNECTIVITY_STATUS_KEYS).sort(),
+            Object.values(connectivityCodes.CONNECTIVITY_STATUS).sort());
+        for (const key of Object.values(CONNECTIVITY_STATUS_KEYS)) assert.equal(typeof lookup(key), 'string', key);
+    });
+
+    it('NAT types: every code maps onto a key in the en pack', () => {
+        assert.equal(natTypeKey('srflx'), 'webrtc.NATType.srflx');
+        assert.equal(natTypeKey('unavailable'), 'webrtc.StatusUnavailable');
+        assert.equal(natTypeKey('error'), 'webrtc.StatusError');
+        for (const code of webrtcCodes.NAT_TYPE_CODES) assert.equal(typeof lookup(natTypeKey(code)), 'string', code);
+    });
+});
+
+describe('IP card line type label', () => {
+    const t = (key) => `<${key}>`;
+    const typeOf = (lineType) => transformDataFromIPapi({ extended: { lineType } }, t, 'en').type;
+
+    it('labels each known type through the shared map', () => {
+        assert.equal(typeOf('business'), '<ipInfos.advancedData.type.Business>');
+        assert.equal(typeOf('residential'), '<ipInfos.advancedData.type.Residential>');
+        assert.equal(typeOf('wireless'), '<ipInfos.advancedData.type.Wireless>');
+        assert.equal(typeOf('hosting'), '<ipInfos.advancedData.type.Hosting>');
+    });
+
+    it('labels the unknown line type with the unknown label', () => {
+        assert.equal(typeOf('unknown'), '<ipInfos.advancedData.type.unknownType>');
+    });
+});
