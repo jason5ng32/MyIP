@@ -11,11 +11,14 @@
     "QuotaSponsorCta": "Sponsern",
     "ViewUsage": "Nutzung anzeigen",
     "Usage": {
-      "Title": "Nutzungsstatistik",
+      "Title": "Nutzung von IPCheck.ing",
       "Note": "Erweiterte Funktionen haben ein kostenloses Monatskontingent, das zu Beginn jedes Monats (UTC) automatisch zurückgesetzt wird. Wiederholte Abfragen erweiterter IP-Daten werden aus dem Cache bedient und belasten Ihr Kontingent nicht.",
       "IpinfoFeature": "Erweiterte IP-Daten",
       "PercentUsed": "{percent} % genutzt",
-      "SponsorNote": "Sponsoring auf GitHub erhöht Ihre Monatskontingente."
+      "SponsorNote": "Sponsoring auf GitHub erhöht Ihre Monatskontingente.",
+      "DailyTitle": "24-Stunden-Limit",
+      "MonthlyTitle": "Monatskontingent",
+      "AvailableAgainAt": "Wieder verfügbar um {time}"
     },
     "MyAchievements": "Meine Erfolge",
     "Fields": {
@@ -36,34 +39,40 @@
     "Benefits": {
       "Title": "Vorteile & Nutzung",
       "Benefit": "Vorteile",
-      "Note1": "Als Open-Source-Produkt ist IPCheck.ing kostenlos nutzbar. Der Betrieb kostet jedoch viel Aufwand und Geld.",
-      "Note2": "Damit das Projekt nachhaltig weiterläuft und Missbrauch verhindert wird, erfordern einige erweiterte Funktionen eine Anmeldung. Jeder angemeldete Benutzer erhält ein großzügiges Monatskontingent – reicht es Ihnen nicht, können Sie uns sponsern und höhere Limits freischalten.",
+      "Intro": "Die Kernfunktionen können Sie ohne Konto kostenlos nutzen; mit einer Anmeldung erhalten Sie zusätzlich die unten aufgeführten Vorteile.",
       "Current": "Aktuell",
+      "Groups": {
+        "Basic": "Grundlegende Vorteile",
+        "IpChecking": "Vorteile bei IPCheck.ing"
+      },
       "Tiers": {
         "Visitor": {
           "Name": "Besucher",
-          "Item1": "IP-Abfrage mit Vergleich mehrerer Quellen",
-          "Item2": "Prüfung von Konnektivität und Dienstverfügbarkeit",
-          "Item3": "WebRTC-/DNS-Leak-Tests",
-          "Item4": "Speedtest, globale Latenz und MTR",
-          "Item5": "Whois, DNS-Resolver und weitere erweiterte Tools",
-          "Item6": "Keine Registrierung nötig – Open Source und selbst hostbar"
+          "IpLookup": "IP-Abfrage mit Vergleich mehrerer Quellen",
+          "Connectivity": "Konnektivitäts- und Verfügbarkeitstests für Dienste",
+          "LeakTests": "WebRTC- / DNS-Leak-Tests",
+          "SpeedTest": "Speedtest, globale Latenz und MTR",
+          "Tools": "Whois, DNS-Auflösung und weitere erweiterte Tools",
+          "OpenSource": "Keine Registrierung nötig – Open Source und selbst hostbar"
         },
         "SignedIn": {
           "Name": "Angemeldete Benutzer",
-          "Item1": "Alles aus „Besucher“",
-          "Item2": "Erweiterte IP-Daten ansehen: Qualitätsscore, Proxy-Erkennung, Netzwerktyp und Nativität",
-          "Item3": "Unsichtbarkeitstest nutzen",
-          "Item4": "Ausführlichen DNS-Leak-Test nutzen",
-          "Item5": "Ihre Erfolgsabzeichen ansehen",
-          "Item6": "IPilot fragen, unseren KI-Assistenten",
-          "Item7": "Erweiterte Funktionen mit kostenlosem Monatskontingent, das jeden Monat zurückgesetzt wird"
+          "IncludesVisitor": "Alles aus „Besucher“",
+          "Achievements": "Ihre Erfolge ansehen",
+          "AccountSync": "Einstellungen und Konnektivitäts-Testlisten geräteübergreifend synchronisieren",
+          "AdvancedIp": "Erweiterte IP-Daten ansehen: Qualitätswert, Proxy-Erkennung, Netzwerktyp und ASN-Geo-Übereinstimmung",
+          "InvisibilityTest": "Den Unsichtbarkeitstest nutzen",
+          "DnsLeakTest": "Den ausführlichen DNS-Leak-Test nutzen",
+          "PersonaCheck": "Den ausführlichen Persona-Check nutzen",
+          "IPilot": "IPilot fragen, unseren KI-Assistenten",
+          "MonthlyQuota": "Erweiterte Funktionen mit kostenlosem Monatskontingent, das sich jeden Monat zurücksetzt"
         },
         "Sponsor": {
           "Name": "Sponsoren",
-          "Item1": "Alles aus „Angemeldete Benutzer“",
-          "Item2": "Höhere Monatskontingente für erweiterte Funktionen",
-          "Item3": "Unterstützen Sie die Weiterentwicklung dieses Open-Source-Projekts"
+          "IncludesSignedIn": "Alles aus „Angemeldete Benutzer“",
+          "HigherQuota": "Höhere Monatskontingente für erweiterte Funktionen",
+          "DailyLimit": "Großzügigeres 24-Stunden-Limit",
+          "SupportProject": "Die Weiterentwicklung dieses Open-Source-Projekts unterstützen"
         }
       }
     },
@@ -161,7 +170,7 @@
         },
         "CrossingTheWall": {
           "Title": "Über die Mauer",
-          "Meet": "Alle 8 Test-IPs im Regeltest sind unterschiedlich"
+          "Meet": "Im Regeltest mindestens 8 verschiedene IPs erhalten"
         },
         "GlobeTrotter": {
           "Title": "Weltenbummler",
@@ -295,7 +304,18 @@
         "earthday": "Ich logge mich aus und gehe raus ins Grüne",
         "turing": "Dieser Status wurde von einem Menschen gesendet. Wahrscheinlich.",
         "emojiday": "📶🌍🎉✨",
-        "birthday": "Alles Gute zum Geburtstag, IPCheck.ing!"
+        "birthday": "Alles Gute zum Geburtstag, IPCheck.ing!",
+        "adaday": "Algorithmus von Ada, seit 1843",
+        "dayofdead": "In Gedenken an alle, die sich abgemeldet haben",
+        "thanksgiving": "Dankbar für jedes Paket, das angekommen ist",
+        "piday": "3,14159265358979 … lädt noch",
+        "holi": "Farbspritzer in vollem RGB",
+        "shannon": "Wird Bit für Bit übertragen",
+        "wtisd": "Voller Empfang, weltweit",
+        "ipv6day": "Jetzt mit 2¹²⁸ Adressen",
+        "sysadmin": "Haben Sie schon versucht, es aus- und wieder einzuschalten?",
+        "linux": "Nur ein Hobby, wird nicht groß und professionell",
+        "tomatina": "Unter Tomaten-Flood-Angriff"
       },
       "festivalDesc": {
         "prgday": "Tag der Programmierer – der 256. Tag des Jahres, hexadezimal 0x100",
@@ -313,7 +333,18 @@
         "earthday": "Tag der Erde (22. Apr.) – selbst Earth Online empfiehlt ein bisschen Earth Offline",
         "turing": "Geburtstag von Alan Turing (23. Juni 1912) – Vater des Turing-Tests",
         "emojiday": "Welt-Emoji-Tag (17. Juli) – Wörter sind sowas von letztes Jahrhundert",
-        "birthday": "Geburtstag von IPCheck.ing – v1.0 erschien am 6. Nov. 2020"
+        "birthday": "Geburtstag von IPCheck.ing – v1.0 erschien am 6. Nov. 2020",
+        "adaday": "Ada Lovelace Day (2. Dienstag im Oktober) – zu Ehren von Frauen in MINT-Berufen; Ada schrieb den ersten veröffentlichten Algorithmus",
+        "dayofdead": "Día de los Muertos (1.–2. November) – Mexiko gedenkt seiner Liebsten, die nie ganz offline sind",
+        "thanksgiving": "Thanksgiving (4. Donnerstag im November) – Dank an jeden Router auf dem Weg",
+        "piday": "Pi-Tag (14. März, 3/14) – zugleich der Internationale Tag der Mathematik der UNESCO",
+        "holi": "Holi – das hinduistische Farbenfest begrüßt den Frühling in jedem Hex-Code",
+        "shannon": "Geburtstag von Claude Shannon (30. April 1916) – Vater der Informationstheorie, der uns das Bit gab",
+        "wtisd": "Weltinformationsgesellschaftstag (17. Mai) – an diesem Tag wurde 1865 die ITU gegründet",
+        "ipv6day": "World IPv6 Launch (6. Juni 2012) – der Tag, an dem IPv6 dauerhaft eingeschaltet wurde",
+        "sysadmin": "Tag des Systemadministrators (letzter Freitag im Juli) – danken Sie dem Menschen, der Ihre Uptime oben hält",
+        "linux": "25. August 1991: Linus Torvalds kündigt auf comp.os.minix sein Betriebssystem an – „nur ein Hobby“",
+        "tomatina": "La Tomatina (letzter Mittwoch im August) – die Tomatenschlacht im spanischen Buñol; die einzige Flut, die niemand filtern will"
       }
     },
     "preferences": {
@@ -330,20 +361,50 @@
       "autoRunTips": "IP-Infos werden beim Laden der Seite immer geprüft. Wählen Sie, welche weiteren Module beim Start automatisch laufen.",
       "simpleMode": "Einfacher Modus",
       "simpleModeTips": "Blendet die Beschreibungstexte der Module aus – für alle, die die Anwendung bereits kennen.",
+      "sync": "Synchronisierung",
+      "syncEnable": "Aktivieren",
+      "syncPreferences": "Einstellungen",
+      "syncConnectivity": "Konnektivitäts-Testlisten",
+      "syncChecklist": "Fortschritt der Sicherheits-Checkliste",
+      "syncSpeedtest": "Speedtest-Optionen",
+      "syncNever": "IPs, Abfrageverlauf, Snapshots, Testergebnisse und Ähnliches werden nie synchronisiert. Sie bleiben ausschließlich in diesem Browser.",
+      "syncTips": "Bei aktivierter Synchronisierung wählen Sie aus, was synchronisiert wird; es erscheint dann auf jedem Gerät, auf dem Sie sich anmelden. Nach dem Abmelden wird es von diesem Gerät entfernt, bis Sie sich wieder anmelden.",
+      "syncSignedOut": "Melden Sie sich an, um mit Ihrem Konto zu synchronisieren.",
+      "syncSynced": "Mit Ihrem Konto synchronisiert.",
+      "syncReload": "Die Synchronisierung ist auf dieser Seite pausiert. Laden Sie die Seite neu, um fortzufahren.",
+      "syncSaveFailed": "Die Synchronisierungseinstellung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+      "syncFailed": "Die letzte Synchronisierung ist fehlgeschlagen. Sie wird bei Ihrer nächsten Änderung oder Ihrem nächsten Besuch erneut versucht.",
+      "syncPartial": "Einige dieser Daten konnten nicht in Ihrem Konto gespeichert werden und bleiben nur auf diesem Gerät.",
+      "syncStatusSynced": "Synchronisiert",
+      "syncStatusPaused": "Pausiert",
+      "syncStatusFailed": "Nicht synchronisiert",
+      "syncStatusPartial": "Teilweise synchronisiert",
       "connectivity": {
         "defaultList": "Standardliste",
         "defaultListTips": "Die Liste, die der Bereich beim Laden der Seite anzeigt.",
         "multipleTests": "Mehrfache Prüfung",
         "multipleTestsTips": "Pro Durchlauf mehrere Prüfungen ausführen und die niedrigste Latenz anzeigen.",
+        "discardFirstResult": "Erstes Ergebnis verwerfen",
+        "discardFirstResultTips": "Zuerst eine ungemessene Aufwärmanfrage senden, damit die angezeigte Latenz DNS-Auflösung und Verbindungsaufbau nicht enthält.",
         "notifications": "Pop-up-Hinweise",
         "notificationsTips": "Die Ergebnisse der ersten Prüfung als Pop-up-Hinweis anzeigen.",
         "titleOpensSite": "Kartentitel öffnet Website",
         "titleOpensSiteTips": "Ein Klick auf den Kartentitel öffnet die Website in einem neuen Tab; ausgeschaltet bleibt der Titel reiner Text."
       },
-      "ipHistory": "IP-Verlauf",
-      "ipHistoryEnabled": "IP-Verlauf aufzeichnen",
-      "ipHistoryDays": "Aufbewahrung (Tage)",
-      "ipHistoryTips": "Wenn aktiviert, werden erkannte IPs nur in diesem Browser gespeichert und für die gewählte Anzahl Tage aufbewahrt. Beim Ausschalten endet die Aufzeichnung; vorhandene Einträge bleiben, bis Sie sie im IP-Verlauf löschen.",
+      "snapshots": "Snapshot-Verlauf",
+      "snapshotsAuto": "Automatische Aufzeichnung",
+      "snapshotsAutoSmart": "Intelligent",
+      "snapshotsAutoEvery": "Bei jedem Besuch",
+      "snapshotsAutoOff": "Aus",
+      "snapshotsAutoTips": "Bei „Intelligent“ entscheidet die App, wann ein Snapshot aufgezeichnet wird. Bei „Aus“ werden Snapshots nur manuell auf der Seite „Snapshot-Verlauf“ gespeichert.",
+      "snapshotsLabelCard": "IP-Karte für die automatische Benennung von Snapshots",
+      "snapshotsLabelCardName": "IP-Karte {index}",
+      "snapshotsLabelCardTips": "Snapshots werden nach Land und IP dieser Karte benannt; hat sie keine gültige IP, wird die erste Karte mit IP verwendet.",
+      "snapshotsNotify": "Bei Änderungen benachrichtigen",
+      "snapshotsNotifyTips": "Ein Pop-up anzeigen, wenn sich dieser Besuch in den gemeinsam erfassten Werten deutlich vom vorherigen Snapshot unterscheidet.",
+      "snapshotsKeepLast": "Anzahl der Snapshots",
+      "snapshotsCountOption": "Letzte {n}",
+      "snapshotsKeepLastTips": "Ältere Snapshots über dieser Anzahl werden entfernt. Angeheftete Snapshots verfallen nie und zählen nicht mit.",
       "ipDB": "IP-Geolocation-Datenbank",
       "ipDBTips": "Sie können die Standardquelle für die IP-Geolocation wählen. Ist die gewählte Quelle nicht verfügbar, werden die übrigen Quellen der Reihe nach verwendet.",
       "language": "Sprache",
@@ -380,7 +441,7 @@
     "ShowChecked": ""
   },
   "curl": {
-    "Title": "",
+    "Title": "Kommandozeilen-API",
     "Note1": "",
     "Note2_1": "",
     "Note2_2": "",
@@ -1068,8 +1129,8 @@
     }
   },
   "advancedtools": {
-    "Title": "",
-    "Note": "",
+    "Title": "Erweiterte Tools",
+    "Note": "Wer das Beste aus seinem Netzwerk herausholen will, greift oft zu zusätzlichen Tools, um die Verbindung zu optimieren.",
     "category": {
       "network": "",
       "lookup": "",
@@ -1088,6 +1149,8 @@
     "InvisibilityTest": "",
     "MacChecker": "",
     "IpCalculator": "",
+    "BulkLookup": "",
+    "Snapshots": "",
     "BrowserInfo": "",
     "AdblockTest": "",
     "SecurityChecklist": "",
@@ -1254,6 +1317,223 @@
     "aggregated": "",
     "aggregationSummary": "",
     "invalidTokens": ""
+  },
+  "bulklookup": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "SourceWithBuild": "",
+    "SourceFallback": "",
+    "InputLabel": "",
+    "Placeholder": "",
+    "FirstPerLine": "",
+    "FirstPerLineHint": "",
+    "status": {
+      "empty": "",
+      "none": "",
+      "ready": "",
+      "new": "",
+      "existing": "",
+      "reserved": "",
+      "cidr": "",
+      "split": "",
+      "known": "",
+      "noRoom": "",
+      "running": "",
+      "runningSplit": "",
+      "updating": ""
+    },
+    "Run": "",
+    "RunCountsOnly": "",
+    "RunIdle": "",
+    "Unanswered": "",
+    "RunFailed": "",
+    "RunRateLimited": "",
+    "Paused": "",
+    "PausedRateLimited": "",
+    "PausedFailed": "",
+    "Continue": "",
+    "StorageError": "",
+    "stat": {
+      "rows": "",
+      "countries": "",
+      "asns": "",
+      "frequency": "",
+      "topShare": "",
+      "onceShare": ""
+    },
+    "ClearAll": "",
+    "OverviewTitle": "",
+    "MapTitle": "",
+    "tab": {
+      "ips": "",
+      "analysis": ""
+    },
+    "FilterPlaceholder": "",
+    "ClearSearch": "",
+    "BatchFilter": "",
+    "AllBatches": "",
+    "BatchLabel": "",
+    "ExportCsv": "",
+    "StarredOnly": "",
+    "NoMatches": "",
+    "ClearTitle": "",
+    "ClearBody": "",
+    "KeepStarred": "",
+    "Cancel": "",
+    "Save": "",
+    "ClearConfirm": "",
+    "Unknown": "",
+    "col": {
+      "star": "",
+      "ip": "",
+      "country": "",
+      "city": "",
+      "asn": "",
+      "org": "",
+      "count": "",
+      "note": "",
+      "actions": ""
+    },
+    "Star": "",
+    "Unstar": "",
+    "Delete": "",
+    "IpDetails": "",
+    "CheckBlocklist": "",
+    "EditNote": "",
+    "NotePlaceholder": "",
+    "PageRange": "",
+    "PageSize": "",
+    "PagePrev": "",
+    "PageNext": "",
+    "PickHint": "",
+    "PanelHint": {
+      "country": "",
+      "asn": "",
+      "block": ""
+    },
+    "WeightLabel": "",
+    "ByIps": "",
+    "ByHits": "",
+    "PanelCountry": "",
+    "PanelAsn": "",
+    "PanelBlock": "",
+    "ShowLess": "",
+    "MoreEntries": "",
+    "TopGroupsShare": "",
+    "MapHint": {
+      "ips": "",
+      "hits": ""
+    },
+    "MapUnavailable": "",
+    "MapTooltip": {
+      "ips": "",
+      "hits": ""
+    }
+  },
+  "snapshots": {
+    "Title": "",
+    "Note": "",
+    "SaveNow": "",
+    "SmartSkipped": "",
+    "ChangedTitle": "Abweichend vom vorherigen Snapshot",
+    "ChangedNote": "Geändert: {sections}.",
+    "ChangedView": "Ansehen",
+    "IntroTitle": "Ergebnisse auf diesem Gerät gespeichert",
+    "IntroNote": "Wenn sich Ihre IP ändert, informieren wir Sie beim nächsten Öffnen der Website.",
+    "SaveNowRunning": "",
+    "SaveNowFailed": "",
+    "StorageFailed": "",
+    "EmptyTitle": "",
+    "EmptyNote": "",
+    "ListLabel": "",
+    "ThisVisit": "",
+    "TimeRange": "",
+    "Pin": "",
+    "Pinned": "",
+    "Unpin": "",
+    "PinLimitTitle": "",
+    "PinLimit": "",
+    "Rename": "",
+    "RenameTitle": "",
+    "NameLabel": "",
+    "RenameHint": "",
+    "Save": "",
+    "Delete": "",
+    "AllSnapshots": "",
+    "Cancel": "",
+    "CompareWithThis": "",
+    "Compare": "",
+    "Comparing": "",
+    "CompareWith": "",
+    "ComparePrevious": "",
+    "OldestNote": "",
+    "NotRun": "",
+    "NotRunNote": "",
+    "NotRunSpeedNote": "",
+    "LayoutLabel": "",
+    "LayoutUnified": "",
+    "LayoutSplit": "",
+    "ShowDrift": "",
+    "DriftHint": "",
+    "ExpandAll": "",
+    "CollapseAll": "",
+    "NoChanges": "",
+    "OnlyHere": "",
+    "OnlyThere": "",
+    "CountChanged": "",
+    "CountOnlyHere": "",
+    "CountOnlyThere": "",
+    "NotRunThere": "",
+    "SideCompared": "",
+    "SideViewed": "",
+    "Yes": "",
+    "No": "",
+    "fields": {
+      "ip": "",
+      "countryCode": "",
+      "region": "",
+      "city": "",
+      "timezone": "",
+      "asn": "",
+      "isp": "",
+      "anonymity": "",
+      "ipType": "",
+      "nativeIP": "",
+      "qualityScore": "",
+      "anonymityProtocol": "",
+      "anonymityProvider": "",
+      "name": "",
+      "status": "",
+      "timeMs": "",
+      "minTimeMs": "",
+      "custom": "",
+      "url": "",
+      "natType": "",
+      "org": "",
+      "downloadMbps": "",
+      "uploadMbps": "",
+      "latencyMs": "",
+      "jitterMs": "",
+      "loadedLatencyDownMs": "",
+      "loadedLatencyUpMs": "",
+      "qualities": {
+        "streaming": "",
+        "gaming": "",
+        "rtc": ""
+      },
+      "scores": {
+        "streaming": "",
+        "gaming": "",
+        "rtc": ""
+      },
+      "connection": {
+        "ip": "",
+        "colo": "",
+        "coloCountryCode": "",
+        "coloCity": ""
+      }
+    }
   },
   "whois": {
     "Title": "",
@@ -1468,7 +1748,38 @@
     "Provider": "",
     "Result": "",
     "Record": "",
-    "AllRegions": ""
+    "AllRegions": "",
+    "HintWithCode": "",
+    "Failure": {
+      "nodata": {
+        "Label": "",
+        "Hint": ""
+      },
+      "nxdomain": {
+        "Label": "",
+        "Hint": ""
+      },
+      "servfail": {
+        "Label": "",
+        "Hint": ""
+      },
+      "refused": {
+        "Label": "",
+        "Hint": ""
+      },
+      "timeout": {
+        "Label": "",
+        "Hint": ""
+      },
+      "unavailable": {
+        "Label": "",
+        "Hint": ""
+      },
+      "malformed": {
+        "Label": "",
+        "Hint": ""
+      }
+    }
   },
   "ruletest": {
     "Title": "",
@@ -1495,7 +1806,7 @@
     "ViewOnMap": "Standort auf Karte anzeigen",
     "ShowCountryTraffic": "Muster der Online-Aktivität anzeigen",
     "InfoMask": "IP-Informationen ausblenden",
-    "IPHistory": "IP-Verlauf anzeigen",
+    "Snapshots": "Snapshot-Verlauf anzeigen",
     "ShareReport": "Diagnosebericht erstellen",
     "QueryIP": "IP-Adresse abfragen",
     "GithubLink": "Quellcode auf GitHub ansehen"
@@ -1522,10 +1833,10 @@
     "CopiedTitle": "",
     "CopiedMessage": "",
     "ai": {
-      "Heading": "",
-      "Intro": "",
-      "Masked": "",
-      "Instruction": "",
+      "Heading": "MyIP-Netzwerkdiagnosebericht",
+      "Intro": "Dieser Bericht wurde von MyIP ({origin}) am {time} aus Netzwerktests erstellt, die im Browser des Nutzers ausgeführt wurden. Feldnamen sind stabile Schema-Bezeichner; alle Latenzwerte sind in Millisekunden angegeben.",
+      "Masked": "Hinweis: IP-Adressen sind zum Schutz der Privatsphäre teilweise maskiert (IPv4: letztes Oktett, IPv6: Interface-Hälfte, dargestellt als „x“).",
+      "Instruction": "Analysieren Sie anhand der obigen Daten den Zustand dieses Netzwerks. Weisen Sie auf Auffälligkeiten hin (DNS-Leaks, WebRTC-Offenlegung, Proxy-/VPN-Merkmale, Paketverlust, hohe Latenz, Routing-Probleme) und geben Sie konkrete Vorschläge zur Fehlerbehebung.",
       "Sections": {
         "ipinfo": "",
         "connectivity": "",
@@ -1571,30 +1882,6 @@
       "none": "DNSSEC nicht aktiviert"
     }
   },
-  "ipHistory": {
-    "Title": "IP-Verlauf",
-    "Notes": "IPs, die bei der Nutzung dieser Website erkannt werden, werden hier gespeichert. Die Daten liegen nur in diesem Browser – sie werden nie mit Ihrem Konto synchronisiert und verlassen Ihr Gerät nicht. Die Aufbewahrungsdauer können Sie unter „Einstellungen“ anpassen.",
-    "Empty": "Noch keine Einträge. IPs erscheinen hier, sobald die Tests auf der Startseite sie erkennen.",
-    "FilterByType": "Nach IP-Typ filtern",
-    "FilterByCountry": "Nach Land / Region filtern",
-    "UnknownCountry": "Unbekannt",
-    "NoMatch": "Keine Einträge entsprechen den gewählten Filtern.",
-    "ClearAll": "Verlauf löschen",
-    "ClearConfirm": "Zum Bestätigen erneut klicken",
-    "ViewMode": "Verlaufsansicht",
-    "ByIP": "Nach IP",
-    "ByDate": "Nach Datum",
-    "UniqueIPCounts": "Zahlen an den Tags: eindeutige IPs über alle gespeicherten Einträge.",
-    "DailyRecordCounts": "Zahlen an den Tags: Einträge über alle gespeicherten Tage (einer pro IP und Tag).",
-    "LastSeen": "Zuletzt gesehen: {date}",
-    "FirstSeen": "Zuerst gesehen: {date}",
-    "RecordDates": "Alle erfassten Tage",
-    "MapTitle": "Länder / Regionen der IPs",
-    "MapUnavailable": "Karte nicht verfügbar. Die Länderfilter funktionieren trotzdem.",
-    "MapSelect": "Klicken, um nach diesem Land / dieser Region zu filtern",
-    "MapUnselect": "Klicken, um den Filter für dieses Land / diese Region zu entfernen",
-    "ViewMap": "Karte anzeigen"
-  },
   "ipInfos": {
     "Title": "IP-Infos",
     "Notes": "Das Programm ermittelt Ihre IP-Adresse zunächst über mehrere verschiedene Probes (IPv4 und IPv6) und fragt dann die zugehörigen Standortdaten bei der gewählten IP-Datenquelle ab. Gibt es nur einen IP-Stack, bleibt die Quelle ohne Daten leer.",
@@ -1619,12 +1906,15 @@
       "proxySuspected": "Möglicher Proxy",
       "vpn": "VPN",
       "vpnSuspected": "Mögliches VPN",
+      "detected": "Erkannt",
       "none": "Nicht erkannt"
     },
     "qualityScore": "IP-Qualität",
     "qualityScoreUnknown": "Score unbekannt",
-    "advancedUnlockCta": "Zum Schutz vor Missbrauch melden Sie sich an, um die folgenden Informationen zu sehen",
+    "advancedUnlockCta": "Zum Schutz vor Missbrauch ist eine Anmeldung erforderlich",
+    "advancedSignInCta": "Anmelden",
     "advancedQuotaCta": "Monatskontingent für erweiterte IP-Daten aufgebraucht",
+    "advancedCooldownCta": "24-Stunden-Limit für erweiterte IP-Daten erreicht",
     "ASNInfo": {
       "trafficPercentage": "Traffic-Anteile: ",
       "note": "Daten zu diesem AS : ",
@@ -1756,7 +2046,12 @@
       "none": "Nicht erkannt",
       "low": "Gelegentlich",
       "medium": "Mäßig",
-      "high": "Häufig"
+      "high": "Häufig",
+      "detected": "Erkannt"
+    },
+    "sourceMetrics": {
+      "fraudScore": "Betrugswert",
+      "abuserScore": "Missbrauchswert des Netzwerks"
     },
     "scenarioFriction": {
       "label": "Hürden je Szenario",
@@ -1793,6 +2088,10 @@
       "personaHint": "Neben der IP berücksichtigen Plattformen weitere Faktoren, wenn sie über Einschränkungen entscheiden. Möchten Sie wissen, ob Ihr Gesamtprofil Ihren Erwartungen entspricht?",
       "personaLink": "Persona-Check starten"
     },
+    "sourceFields": {
+      "source": "Datenquelle",
+      "sentence": "Verwendete IP-Geolocation-Datenbank: {source}. Sie können sie in den Einstellungen ändern."
+    },
     "countryTraffic": {
       "subtitle": "Typische wöchentliche Online-Aktivität in diesem Land / dieser Region – nur von Menschen erzeugten Traffic anzeigen oder den gesamten Traffic (inklusive Bots und automatisiertem Traffic).",
       "human": "Nur Menschen",
@@ -1812,6 +2111,8 @@
     "NoRecentIncidents": "",
     "Loading": "",
     "Checking": "",
+    "GroupIssues": "",
+    "GroupOperational": "",
     "IncidentsError": "",
     "ComponentsError": "",
     "indicator": {
@@ -1913,6 +2214,8 @@
       "kosovo": "Kosovo-Grundausstattung",
       "thailand": "Thailand-Grundausstattung",
       "mexico": "Mexiko-Grundausstattung",
+      "greece": "Griechenland-Grundausstattung",
+      "indonesia": "Indonesien-Grundausstattung",
       "ai": "KI-Dienste",
       "social": "Social Media & Messenger",
       "productivity": "Arbeit & Produktivität",
@@ -1964,10 +2267,23 @@
     "Upload": "Upload",
     "Latency": "Latenz",
     "Jitter": "Jitter",
+    "phaseStandby": "Bereit – startklar",
+    "clientNode": "Ihr Gerät",
+    "edgeAuto": "Cloudflare-Edge",
+    "estimatedData": "Geschätzte Daten ≈ {mb} MB",
+    "scenarioTitle": "Leistung nach Szenario",
+    "detailsTitle": "Last- & Laufdetails",
+    "route": "Testroute:",
+    "cloudflareNode": "Cloudflare-Edge: {colo}",
+    "coloLocation": "in {location}",
     "loadedLatency": "Latenz unter Last: ",
+    "loadedJitter": "Jitter unter Last",
+    "dataUsed": "Verbrauchte Daten",
+    "duration": "Dauer",
     "videoStreaming": "Video-Streaming",
     "gaming": "Gaming",
     "rtc": "Videochat",
+    "cloudSync": "Cloud-Sync & Live",
     "score": "Aus dem Speedtest ergeben sich folgende Qualitätswerte:",
     "connectionFrom": "Speedtest abgeschlossen – von Ihrem Gerät, IP: ",
     "connectionTo": " zum Testserver:",
@@ -2009,7 +2325,7 @@
     "EnterIPPlaceholder": "",
     "UseStored": "",
     "id": "",
-    "Title": "",
+    "Title": "Globaler Latenztest",
     "Note": "",
     "Note2": "",
     "Note3": "",
@@ -2028,7 +2344,7 @@
     "EnterIPLabel": "",
     "EnterIPPlaceholder": "",
     "UseStored": "",
-    "Title": "",
+    "Title": "MTR-Test",
     "Note": "",
     "Note2": "",
     "Note3": "",
@@ -2091,7 +2407,7 @@
     "DNSResolver": "DNS-Auflösung öffnen",
     "IPCheck": "IP-Adresse abfragen",
     "ToggleInfoMask": "Info-Maskierung umschalten",
-    "IPHistory": "IP-Verlauf öffnen",
+    "Snapshots": "Seite „Snapshot-Verlauf“ öffnen",
     "ShareReport": "Dialog „Bericht teilen“ öffnen",
     "Help": "Tastenkürzel anzeigen",
     "HelpNote": "Wer Tastenkürzel nutzt, ist einfach großartig!",
@@ -2107,6 +2423,7 @@
     "EnhancedDnsLeakTest": "Ausführlichen DNS-Leak-Test öffnen",
     "MacChecker": "MAC-Abfrage öffnen",
     "IpCalculator": "IP-Rechner öffnen",
+    "BulkLookup": "Massen-IP-Abfrage öffnen",
     "BrowserInfo": "Browser-Infos öffnen",
     "AdblockTest": "Werbe- & Tracker-Blocker-Test öffnen",
     "SecurityChecklist": "Sicherheits-Checkliste öffnen",
@@ -2124,17 +2441,19 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "Tastenkürzel"
+    "Title": "Tastenkürzel",
+    "HomeOnly": "Alle Tastenkürzel funktionieren nur auf der Startseite."
   },
   "footer": {
     "Tagline": "Eine kostenlose Open-Source-Privacy-Toolbox – alles in einem.",
     "Project": "Projekt",
     "Support": "Doku & Support",
+    "ShortcutGuide": "Tastenkürzel",
     "DeveloperDocs": "Entwickler-Doku",
     "SelfHosting": "Self-Hosting-Anleitung",
     "ReportIssue": "Problem melden",
     "FeatureRequest": "Feature anfragen",
-    "License": "MIT-Lizenz",
+    "License": "AGPL-3.0-Lizenz",
     "Contribute": "Mitwirken",
     "Clients": "Clients",
     "Raycast": "Raycast-Erweiterung",
