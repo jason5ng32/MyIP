@@ -75,6 +75,9 @@ export const STATUS_PROVIDERS = [
     { id: 'sentry', name: 'Sentry', api: 'https://status.sentry.io', page: 'https://status.sentry.io' },
     // status.mixpanel.com only redirects here.
     { id: 'mixpanel', name: 'Mixpanel', api: 'https://www.mixpanelstatus.com', page: 'https://www.mixpanelstatus.com' },
+    // The Python Infrastructure page rolls up PyPI (pypi.org + files.pythonhosted.org),
+    // python.org, docs and the download CDN as flat top-level groups — default selector fits.
+    { id: 'pypi', name: 'PyPI', api: 'https://status.python.org', page: 'https://status.python.org' },
 ];
 
 // Whitelist used by requireValidProviderId() — the per-provider detail
