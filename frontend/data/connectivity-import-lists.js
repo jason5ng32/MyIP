@@ -297,7 +297,6 @@ export const IMPORT_LISTS = [
         members: [
             { id: 'tokopedia', name: 'Tokopedia', url: 'https://www.tokopedia.com/favicon.ico' },
             { id: 'shopee-id', name: 'Shopee', url: 'https://shopee.co.id/favicon.ico' },
-            { id: 'blibli', name: 'Blibli', url: 'https://www.blibli.com/favicon.ico' },
             { id: 'gojek', name: 'Gojek', url: 'https://www.gojek.com/icon.png' },
             { id: 'traveloka', name: 'Traveloka', url: 'https://www.traveloka.com/favicon.ico' },
             { id: 'detik', name: 'detikcom', url: 'https://www.detik.com/favicon.ico' },
@@ -310,7 +309,6 @@ export const IMPORT_LISTS = [
             { id: 'telkomsel', name: 'Telkomsel', url: 'https://www.telkomsel.com/sites/default/files/2021-12/APP-Icon.png' },
             { id: 'xl', name: 'XL', url: 'https://www.xl.co.id/favicon.ico' },
             { id: 'indonesia-go-id', name: 'Indonesia.go.id', url: 'https://indonesia.go.id/favicon.ico' },
-            { id: 'pajak', name: 'DJP', url: 'https://www.pajak.go.id/sites/default/files/djp.ico' },
         ],
     },
     {
