@@ -83,7 +83,7 @@ const fetchTraffic = async (key, countryCode, humanOnly) => {
   try {
     const response = await fetchWithTimeout(
       `/api/cfradar?view=country-traffic&country=${countryCode}${humanOnly ? '&human=1' : ''}`,
-      { timeoutMs: 15000 } // the Radar timeseries is slow on cold edge caches
+      { timeoutMs: 15000 } // above the backend's 12 s Radar timeout (cold timeseries is slow)
     );
     if (!response.ok) {
       trafficCache[key] = 'error';

@@ -86,7 +86,8 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { parseTrace } from '@/utils/ip/parse-trace.js';
-import getCountryName from '@/data/country-name.js';
+import { isValidIP } from '@/utils/ip/valid-ip.js';
+import getCountryName from '@/utils/country-name.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
@@ -156,7 +157,7 @@ const fetchTrace = async (id, url) => {
             const geo = await lookupMaxmind(ip);
             ruleTests.value[id].org = geo ? geo.org : t('ruletest.StatusError');
             if (geo) {
-                // Back-fill details for the Globalping picker + IP history.
+                // Back-fill details for the Globalping picker.
                 IPArray.value = [...IPArray.value, {
                     ip,
                     country,
@@ -195,10 +196,10 @@ const checkAllRuleTest = async () => {
                 if (index === testCount.value - 1) {
                     finishAll.value = true;
                     // Achievement rule (CrossingTheWall) lives in data/achievement-rules.js;
-                    // the report collector consumes the per-worker details (the
-                    // builder recomputes its own unique count from valid IPs).
+                    // the report collector consumes the per-worker details. A failed
+                    // test holds a status string, not an IP, and is not counted.
                     emitAppEvent('ruletest:finished', {
-                        uniqueIPCount: new Set(ruleTests.value.map((test) => test.ip)).size,
+                        uniqueIPCount: new Set(ruleTests.value.map((test) => test.ip).filter(isValidIP)).size,
                         workers: ruleTests.value.map((test) => ({
                             id: test.id,
                             ip: test.ip,

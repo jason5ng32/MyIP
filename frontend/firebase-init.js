@@ -15,9 +15,9 @@ const loadFirebaseAuth = () => {
         import('firebase/app'),
         import('firebase/auth'),
     ]).then(([appModule, authModule]) => {
-        // Hostile client environments (extensions, filtered networks) can
-        // resolve a dynamic import to undefined instead of rejecting —
-        // convert that to a readable rejection so the retry path below runs.
+        // Defensive check: a failed chunk load rejects the import, so this
+        // should not fire; if a module ever arrives without these exports,
+        // fail with a readable rejection so the retry path below runs.
         if (!appModule?.initializeApp || !authModule?.getAuth) {
             throw new Error('Firebase modules resolved without expected exports');
         }

@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 一个开源的一站式 IP 工具箱：多来源 IP 查询、连通性测试、WebRTC 与 DNS 泄露检测、网速测试、MTR、封锁检测、Whois 等等 —— 一条 Docker 命令即可自行部署。
 
@@ -40,7 +40,7 @@
 
 * 🛜 **IP 卡片**：从多个相互独立的来源并列检测你的 IPv4 和 IPv6 —— 国家、地区、城市、ASN、组织，以及该 IP 所在地的时区。
 * 🔍 **IP 查询**：查询任意一个你感兴趣的 IP 地址的同样详细的信息。
-* 🧾 **IP 历史记录**：在本地记录你使用过的 IP，可按类型和国家筛选 —— 数据只存在你的浏览器里。
+* 📸 **快照记录**：每次打开首页时，把首页各项测试的结果（IP 信息、网络连通性、WebRTC、DNS 泄露测试、网速测试）保存为一份快照。任选两份对比，像代码 diff 一样逐行查看差异；重要的快照可以命名或固定 —— 数据只存在你的浏览器里。
 * 🖥️ **浏览器指纹**：用多种方式计算你的浏览器指纹，并展示是什么让你变得可被识别。
 
 ### 🕵️ 泄露与隐私
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-其余全部是可选配置 —— 第三方 API Key、安全与限流、日志、Sentry、curl API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/environment-variables)。
+其余全部是可选配置 —— 第三方 API Key、安全、日志、Sentry、curl API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/environment-variables)。
 
 ## 📖 官方文档
 
@@ -182,30 +182,31 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 赞助商与支持者
 
-作为一个开源项目，我非常感谢以下赞助者对我的支持：
+MyIP 免费且开源，但它的运行离不开真实的服务器、数据源和各类服务。正是这些公司让它得以持续运转，而且它们的产品都很出色。
 
 **赞助商**
 
-<a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — 提供高质量动态和静态住宅代理，拥有 9000 万+住宅 IP，覆盖全球 220+ 个地区，支持 HTTP(S)、SOCKS5 协议及动态轮换和粘性会话。动态住宅代理低至 $0.7/GB，使用优惠码 `PROXY90` 再享九折优惠。
-</sub>
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="60" /></a><br />
+↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — 提供私有住宅、移动（4G/5G/LTE）、静态 ISP 以及数据中心 IPv4/IPv6 代理，支持 HTTP(S) 与 SOCKS5 协议，拥有 4700 万+ 住宅 IP，覆盖全球 220+ 地区，可精准定位国家、城市及运营商，具备 99.7% 可用性与 24/7 技术支持。MyIP 用户使用优惠码 `CHECKINGIP15` 可享 15% 折扣。
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — 提供私有住宅、移动（4G/5G/LTE）、静态 ISP 以及数据中心 IPv4/IPv6 代理，支持 HTTP(S) 与 SOCKS5 协议，拥有 4700 万+ 住宅 IP，覆盖全球 220+ 地区，可精准定位国家、城市及运营商，具备 99.7% 可用性与 24/7 技术支持。MyIP 用户使用优惠码 `CHECKINGIP15` 可享 15% 折扣。
-</sub>
-
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh">V.PS</a>** — 高性能 KVM VPS，覆盖全球多个地区。日本与新加坡线路更有三网优化，提供极高速网络连接。支持 IPv4 与 IPv6。</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="60" /></a><br />
+↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh">V.PS</a>** — 高性能 KVM VPS，覆盖全球多个地区。日本与新加坡线路更有三网优化，提供极高速网络连接。支持 IPv4 与 IPv6。
 
 ----
 
 **支持者**
 
-<p><a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" height="32" /></a></p>
-<p><a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a></p>
-<p><a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a></p>
-<p><a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a></p>
-<p><a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a></p>
+支持者为 MyIP 免费提供服务或额度，用于项目所依赖的工具与基础设施。感谢他们对开源的支持。
+
+| 支持者 | 业务简介 |
+| --- | --- |
+| <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>全球网络，提供 CDN、安全防护、DNS 与 Serverless 应用。</sub> |
+| <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>应用监控，提供错误追踪、链路追踪与会话回放。</sub> |
+| <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>IP 情报 API 与数据库，覆盖地理位置、ASN、VPN 与滥用检测。</sub> |
+| <a href="https://www.ip2location.io"><img src="https://res.ipcheck.ing/img/ip2location_logo.png" alt="IP2Location.io" height="24" /></a> | <sub>IP 地理位置 API，提供代理、VPN 与托管检测，并支持域名 WHOIS 查询。</sub> |
+| <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>能理解整个代码库的 AI 代码审查。</sub> |
+| <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>面向技术团队的文档平台。</sub> |
+| <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>面向个人与团队的密码与机密管理。</sub> |
 
 有意赞助 MyIP？[成为赞助者](https://github.com/sponsors/jason5ng32)
 

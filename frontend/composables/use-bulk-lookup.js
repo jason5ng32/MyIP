@@ -116,9 +116,9 @@ export const pauseRun = ({ chunks, failedAt, batchId, done, total, kind }) => {
     return { batchId, remaining, done, total, kind };
 };
 
-// Plan for continuing a paused run: only its IPs still not stored, and no
-// count bumps (the first part of the run already applied them).
-export const planResume = (rows, paused, options) => ({ ...planRun(rows, paused.remaining, options), existing: [] });
+// Plan for continuing a paused run. Its remaining entries were never counted,
+// so one another tab stored during the pause bumps like any known IP.
+export const planResume = (rows, paused, options) => planRun(rows, paused.remaining, options);
 
 // A failed run, by who can act on it: 'rateLimited' (429), 'transient'
 // (network, timeout, 503 while data loads) or 'error' — only the last is our
@@ -158,11 +158,15 @@ export const inputStatus = ({
         { key: 'run', n: plan.fresh });
 };
 
-// Rows after a run: counts bumped for `existing`, one new row per result.
+// Rows after a run: counts bumped for `existing`, one new row per result. A
+// result whose IP another tab stored meanwhile bumps that row by its `counts`.
 export const mergeRun = (rows, { existing = [], results = [], counts = new Map(), batchId, at }) => {
-    const bump = new Map(existing.map((entry) => [entry.ip, entry.count]));
-    const next = rows.map((row) => (bump.has(row.ip) ? { ...row, count: row.count + bump.get(row.ip) } : row));
     const known = new Set(rows.map((row) => row.ip));
+    const bump = new Map(existing.map((entry) => [entry.ip, entry.count]));
+    for (const result of results) {
+        if (result && known.has(result.ip) && counts.has(result.ip)) bump.set(result.ip, counts.get(result.ip));
+    }
+    const next = rows.map((row) => (bump.has(row.ip) ? { ...row, count: row.count + bump.get(row.ip) } : row));
     for (const result of results) {
         if (!result || known.has(result.ip)) continue;
         const row = sanitizeRow({
@@ -563,10 +567,11 @@ export const useBulkLookup = ({
     let generation = 0;
 
     // Query `plan.toQuery` chunk by chunk, sequentially. Each answered chunk is
-    // stored at once; the count bumps ride with the first (or land alone when
-    // nothing is new). A failure before anything of the run was stored throws;
-    // after, the rest is parked in `paused` and the outcome says so. `done` /
-    // `total` count the whole run's new IPs, across a resume. A run gone stale
+    // stored at once; the count bumps ride with the first, or land up front
+    // when nothing is new or on a resume (a failure parks only `chunks`). A
+    // failure before anything of the run was stored throws; after, the rest is
+    // parked in `paused` and the outcome says so. `done` / `total` count the
+    // whole run's new IPs, across a resume. A run gone stale
     // (Clear all meanwhile) stops where it is: nothing more stored or parked,
     // no throw, `cancelled` in the outcome. `unanswered` counts the queried IPs
     // missing from their chunk's answer.
@@ -593,7 +598,7 @@ export const useBulkLookup = ({
         });
 
         try {
-            if (!chunks.length) store([], null);
+            if (!chunks.length || doneBefore > 0) store([], null);
             for (const [index, chunk] of chunks.entries()) {
                 progress.value = {
                     request: index + 1, requests: chunks.length, done: done - doneBefore, total: plan.toQuery.length,
@@ -629,7 +634,7 @@ export const useBulkLookup = ({
         return execute(plan, { lang, batchId: `b${Date.now().toString(36)}` });
     };
 
-    // Continue the paused run: its remaining IPs, same batch, no count bumps.
+    // Continue the paused run: its remaining IPs, same batch.
     const resume = async (lang) => {
         const job = paused.value;
         if (!job) return null;

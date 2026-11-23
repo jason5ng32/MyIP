@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 กล่องเครื่องมือ IP แบบโอเพนซอร์สที่รวมทุกอย่างไว้ในที่เดียว: ตรวจ IP จากหลายแหล่ง, ทดสอบการเชื่อมต่อ, ตรวจจับ WebRTC และ DNS รั่ว, ทดสอบความเร็ว, MTR, ตรวจการเซ็นเซอร์, Whois และอีกมากมาย ติดตั้งบนเซิร์ฟเวอร์ของคุณเองได้ด้วยคำสั่ง Docker เพียงคำสั่งเดียว
 
@@ -40,7 +40,7 @@
 
 * 🛜 **IP Cards**: ตรวจ IPv4 และ IPv6 ของคุณจากหลายแหล่งที่เป็นอิสระต่อกันแล้วแสดงเทียบกัน พร้อมประเทศ ภูมิภาค เมือง ASN องค์กร และเขตเวลาท้องถิ่นของ IP นั้น
 * 🔍 **ค้นหา IP**: ดูข้อมูลละเอียดแบบเดียวกันของ IP ใดก็ได้ที่คุณอยากรู้
-* 🧾 **ประวัติ IP**: บันทึก IP ที่คุณเคยใช้ไว้ในเครื่อง กรองตามประเภทและประเทศได้ ข้อมูลเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น
+* 📸 **ประวัติ Snapshot**: ทุกครั้งที่เปิดหน้าแรก จะบันทึกผลการทดสอบของหน้าแรก (ข้อมูล IP การเชื่อมต่อ WebRTC ทดสอบ DNS รั่ว ทดสอบความเร็ว) เป็น snapshot เลือกสองชุดใดก็ได้มาเทียบ แล้วอ่านความต่างทีละบรรทัดเหมือน diff ของโค้ด ตั้งชื่อหรือปักหมุดชุดที่สำคัญได้ ข้อมูลเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น
 * 🖥️ **Browser Fingerprint**: คำนวณลายนิ้วมือเบราว์เซอร์ของคุณด้วยหลายวิธี และแสดงว่าอะไรบ้างที่ทำให้คุณถูกระบุตัวตนได้
 
 ### 🕵️ การรั่วไหลและความเป็นส่วนตัว
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-การตั้งค่าอื่นทั้งหมด เช่น API key เสริม ความปลอดภัยและการจำกัดอัตราคำขอ การเก็บ log, Sentry และโดเมนสำหรับ curl API มีอธิบายไว้ใน[เอกสารอ้างอิงตัวแปรสภาพแวดล้อม](https://docs.ipcheck.ing/developer/reference/environment-variables)
+การตั้งค่าอื่นทั้งหมด เช่น API key เสริม ความปลอดภัย การเก็บ log, Sentry และโดเมนสำหรับ curl API มีอธิบายไว้ใน[เอกสารอ้างอิงตัวแปรสภาพแวดล้อม](https://docs.ipcheck.ing/developer/reference/environment-variables)
 
 ## 📖 เอกสาร
 
@@ -182,30 +182,31 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 ผู้สนับสนุน
 
-ในฐานะโปรเจกต์โอเพนซอร์ส ขอขอบคุณผู้สนับสนุนต่อไปนี้เป็นอย่างยิ่ง:
+MyIP ใช้งานฟรีและเป็นโอเพนซอร์ส แต่ทำงานอยู่บนเซิร์ฟเวอร์ แหล่งข้อมูล และบริการจริง บริษัทเหล่านี้ช่วยให้ MyIP เป็นแบบนี้ต่อไปได้ และทุกบริษัทล้วนทำผลิตภัณฑ์ที่ดี
 
 **Sponsors**
 
-<a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — พร็อกซี residential คุณภาพสูงทั้งแบบหมุนเวียนและแบบคงที่ มี IP residential มากกว่า 90 ล้าน IP ในกว่า 220 พื้นที่ทั่วโลก รองรับ HTTP(S), SOCKS5, session แบบหมุนเวียนและแบบคงที่ แพ็กเกจ residential เริ่มต้นเพียง $0.7/GB ใช้โค้ด `PROXY90` รับส่วนลดเพิ่มอีก 10%
-</sub>
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="60" /></a><br />
+↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — ให้บริการพร็อกซีส่วนตัวแบบ residential, mobile (4G/5G/LTE), ISP และดาต้าเซ็นเตอร์ทั้ง IPv4/IPv6 รองรับ HTTP(S) และ SOCKS5 มี IP residential มากกว่า 47 ล้าน IP ในกว่า 220 พื้นที่ เลือกประเทศ/เมือง/ISP ได้แม่นยำ uptime 99.7% และซัพพอร์ตตลอด 24 ชั่วโมง ผู้ใช้ MyIP ใช้โค้ด `CHECKINGIP15` รับส่วนลด 15%
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — ให้บริการพร็อกซีส่วนตัวแบบ residential, mobile (4G/5G/LTE), ISP และดาต้าเซ็นเตอร์ทั้ง IPv4/IPv6 รองรับ HTTP(S) และ SOCKS5 มี IP residential มากกว่า 47 ล้าน IP ในกว่า 220 พื้นที่ เลือกประเทศ/เมือง/ISP ได้แม่นยำ uptime 99.7% และซัพพอร์ตตลอด 24 ชั่วโมง ผู้ใช้ MyIP ใช้โค้ด `CHECKINGIP15` รับส่วนลด 15%
-</sub>
-
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th">V.PS</a>** — VPS แบบ KVM ประสิทธิภาพสูง มีหลายพื้นที่ทั่วโลก เชื่อมต่อเร็ว ให้ทั้ง IPv4 และ IPv6</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="60" /></a><br />
+↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th">V.PS</a>** — VPS แบบ KVM ประสิทธิภาพสูง มีหลายพื้นที่ทั่วโลก เชื่อมต่อเร็ว ให้ทั้ง IPv4 และ IPv6
 
 ----
 
 **Supporters**
 
-<p><a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" height="32" /></a></p>
-<p><a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a></p>
-<p><a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a></p>
-<p><a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a></p>
-<p><a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a></p>
+Supporters มอบบริการหรือเครดิตให้ MyIP ใช้ฟรี สำหรับเครื่องมือและโครงสร้างพื้นฐานที่โปรเจกต์ต้องพึ่งพา ขอบคุณที่สนับสนุนโอเพนซอร์ส
+
+| Supporter | ให้บริการอะไร |
+| --- | --- |
+| <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>เครือข่ายระดับโลกสำหรับ CDN ความปลอดภัย DNS และแอปแบบ serverless</sub> |
+| <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>ระบบมอนิเตอร์แอปพลิเคชัน พร้อมติดตามข้อผิดพลาด tracing และ session replay</sub> |
+| <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>API และฐานข้อมูลข่าวกรอง IP สำหรับตำแหน่งที่ตั้ง ASN VPN และการตรวจจับการละเมิด</sub> |
+| <a href="https://www.ip2location.io"><img src="https://res.ipcheck.ing/img/ip2location_logo.png" alt="IP2Location.io" height="24" /></a> | <sub>API ระบุตำแหน่ง IP พร้อมการตรวจจับพร็อกซี VPN และโฮสติ้ง รวมถึงการค้นหา WHOIS ของโดเมน</sub> |
+| <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>รีวิวโค้ดด้วย AI ที่เข้าใจโค้ดเบสทั้งหมดของคุณ</sub> |
+| <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>แพลตฟอร์มเอกสารสำหรับทีมเทคนิค</sub> |
+| <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>ตัวจัดการรหัสผ่านและข้อมูลลับสำหรับบุคคลและทีม</sub> |
 
 สนใจสนับสนุน MyIP? [มาเป็นผู้สนับสนุน](https://github.com/sponsors/jason5ng32)
 

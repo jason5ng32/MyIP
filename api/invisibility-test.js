@@ -1,5 +1,5 @@
-import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../server/logger.js';
+import { ipCheckingApiErrorBody, isIpCheckingApiConfigured, requestIpCheckingApi } from '../server/ipcheck-ing-api.js';
 
 // If length is not 28 and is not a combination of letters and numbers, return false
 function isValidUserID(userID) {
@@ -19,20 +19,15 @@ export default async (req, res) => {
         return res.status(400).json({ error: 'Invalid ID' });
     }
 
-    const apikey = process.env.IPCHECKING_API_KEY;
-
-    if (!apikey) {
+    if (!isIpCheckingApiConfigured()) {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
-    const url = new URL(`${apiEndpoint}/getpdresult/${id}?apikey=${apikey}`);
-
     try {
-        const apiResponse = await fetchUpstream(url, {
-            headers: {
-                ...req.headers,
-            }
+        const apiResponse = await requestIpCheckingApi(`/getpdresult/${id}`, {
+            keyParam: 'apikey',
+            forwardFrom: req,
+            endUserId: res.locals.userId,
         });
 
         // Upstream 404 = "result not computed yet" — a normal answer while
@@ -42,25 +37,11 @@ export default async (req, res) => {
             return res.json({ status: 'pending' });
         }
 
-        // Upstream 429 = monthly quota exhausted. Pass status + code through
-        // so the frontend can point at the sponsor path; not an error for us.
-        if (apiResponse.status === 429) {
-            const errorData = await apiResponse.json().catch(() => ({}));
-            return res.status(429).json({
-                error: errorData.error || 'Monthly quota exceeded',
-                code: 'quota_exceeded'
-            });
-        }
-
-        // Upstream 401/403. Pass the status through so the frontend prompts
-        // sign-in instead of retrying; keep it off the error logger.
-        if (apiResponse.status === 401 || apiResponse.status === 403) {
-            let detail = 'Sign in required';
-            try {
-                const errorData = await apiResponse.json();
-                detail = errorData.message || detail;
-            } catch { /* unreadable body — keep the generic detail */ }
-            return res.status(apiResponse.status).json({ error: detail });
+        // Upstream 429 (quota) and 401/403 (sign-in): the visitor's state,
+        // not an error for us. Status passes through with the coded body so
+        // the frontend shows the matching hint; kept off the error logger.
+        if (apiResponse.status === 429 || apiResponse.status === 401 || apiResponse.status === 403) {
+            return res.status(apiResponse.status).json(await ipCheckingApiErrorBody(apiResponse));
         }
 
         // Catch upstream error

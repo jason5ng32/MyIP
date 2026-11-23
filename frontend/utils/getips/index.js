@@ -1,7 +1,7 @@
 // Chain runner + public entry points for the homepage IP-card sources.
 //
 // Each source in this directory is a self-describing provider:
-//   { id, name, run(originalSite) }
+//   { id, name, run(useJsonEndpoint) }
 // where `run()` hits one upstream and resolves to the raw IP string (or
 // throws). Validation and fallback live HERE, not in the providers: every
 // hop is gated by the chain's `accept` check (isValidIP, or the IPv4 / IPv6
@@ -30,10 +30,10 @@ import { ipipNet } from './ipipnet.js';
 import { upai } from './upai.js';
 
 // Walk the providers in order; the first IP that passes `accept` wins.
-export const runChain = async (providers, { originalSite, accept = isValidIP } = {}) => {
+export const runChain = async (providers, { useJsonEndpoint, accept = isValidIP } = {}) => {
     for (const provider of providers) {
         try {
-            const ip = await provider.run(originalSite);
+            const ip = await provider.run(useJsonEndpoint);
             if (accept(ip)) return { ip, source: provider.name };
             console.warn(`Invalid IP from ${provider.name}:`, ip);
         } catch (error) {
@@ -43,9 +43,9 @@ export const runChain = async (providers, { originalSite, accept = isValidIP } =
     return { ip: null, source: providers[providers.length - 1].name };
 };
 
-export const getIPFromIPChecking4 = (originalSite) => runChain([ipChecking4, ipifyV4], { originalSite, accept: isValidIPv4 });
-export const getIPFromIPChecking6 = (originalSite) => runChain([ipChecking6, ipifyV6], { originalSite, accept: isValidIPv6 });
-export const getIPFromIPChecking64 = (originalSite) => runChain([ipChecking64], { originalSite });
+export const getIPFromIPChecking4 = (useJsonEndpoint) => runChain([ipChecking4, ipifyV4], { useJsonEndpoint, accept: isValidIPv4 });
+export const getIPFromIPChecking6 = (useJsonEndpoint) => runChain([ipChecking6, ipifyV6], { useJsonEndpoint, accept: isValidIPv6 });
+export const getIPFromIPChecking64 = (useJsonEndpoint) => runChain([ipChecking64], { useJsonEndpoint });
 export const getIPFromCloudflare_V4 = () => runChain([cloudflareV4, myExternalIPV4], { accept: isValidIPv4 });
 export const getIPFromCloudflare_V6 = () => runChain([cloudflareV6, myExternalIPV6], { accept: isValidIPv6 });
 export const getIPFromIPIP = () => runChain([ipipNet, upai]);

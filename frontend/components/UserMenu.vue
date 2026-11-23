@@ -14,16 +14,22 @@
     <DropdownMenuTrigger as-child>
       <!-- Not signed in: the solid block reads as the "sign in"
            call-to-action, and the menu opens on the sign-in options, so
-           the affordance is self-explaining one click deep. -->
+           the affordance is self-explaining one click deep. A spinner while
+           a popup sign-in loads the account's preferences, or a sign-out
+           sends pending edits and clears synced data, before reloading. -->
       <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1.5 cursor-pointer"
-        aria-label="User menu">
-        <UserRound class="size-5" />
+        aria-label="User menu" :disabled="authPending">
+        <Spinner v-if="authPending" class="size-5" />
+        <UserRound v-else class="size-5" />
         <ChevronDown class="opacity-60" />
       </Button>
       <!-- Signed in: avatar + chevron -->
       <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1 cursor-pointer"
-        aria-label="User menu">
-        <span class="inline-flex size-7 overflow-hidden rounded-full">
+        aria-label="User menu" :disabled="authPending">
+        <span v-if="authPending" class="inline-flex size-7 items-center justify-center">
+          <Spinner class="size-5" />
+        </span>
+        <span v-else class="inline-flex size-7 overflow-hidden rounded-full">
           <img :src="userPhotoURL" :alt="userName" :title="userName" class="size-full object-cover"
             referrerpolicy="no-referrer">
         </span>
@@ -48,7 +54,7 @@
                   {{ t('user.Level.' + remoteUserInfo.userLevel) }}
                 </Badge>
               </span>
-              <span v-else-if="!remoteUserInfoFetched" class="text-xs text-muted-foreground">{{
+              <span v-else-if="usageAvailable && !remoteUserInfoFetched" class="text-xs text-muted-foreground">{{
                 t('user.Fields.Fetching') }}</span>
             </div>
           </div>
@@ -71,11 +77,13 @@
             </div>
           </dl>
         </div>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem class="cursor-pointer" @select="openAchievements">
-          <Award />
-          <span>{{ t('user.MyAchievements') }}</span>
-        </DropdownMenuItem>
+        <template v-if="achievementsAvailable">
+          <DropdownMenuSeparator />
+          <DropdownMenuItem class="cursor-pointer" @select="openAchievements">
+            <Award />
+            <span>{{ t('user.MyAchievements') }}</span>
+          </DropdownMenuItem>
+        </template>
       </template>
 
       <!-- Not signed in: sign-in providers -->
@@ -90,15 +98,15 @@
         </DropdownMenuItem>
       </template>
 
-      <!-- Every state: preferences + benefits & usage -->
+      <!-- Every state: preferences + the benefits dialog (where signing in adds something) -->
       <DropdownMenuSeparator />
       <DropdownMenuItem class="cursor-pointer" @select="openPreferences">
         <Cog />
         <span>{{ t('nav.preferences.title') }}</span>
       </DropdownMenuItem>
-      <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
+      <DropdownMenuItem v-if="benefitsView.entry" class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
         <HeartHandshake />
-        <span>{{ t('user.Benefits.Title') }}</span>
+        <span>{{ t(benefitsView.titleKey) }}</span>
       </DropdownMenuItem>
 
       <template v-if="isSignedIn">
@@ -121,8 +129,10 @@ import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { unixToDateTime } from '@/utils/time-utils';
+import { userBenefitsView } from '@/utils/features/user-benefits.js';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { JnTooltip } from '@/components/ui/tooltip';
 import {
   DropdownMenu,
@@ -142,11 +152,22 @@ const router = useRouter();
 // Firebase / User
 const isFireBaseSet = computed(() => store.isFireBaseSet);
 const isSignedIn = computed(() => store.isSignedIn);
+const authPending = computed(() => store.authPending);
 const userName = computed(() => store.user?.displayName);
 const userPhotoURL = computed(() => store.user?.photoURL);
 const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata?.createdAt, locale.value));
 const remoteUserInfo = computed(() => store.remoteUserInfo);
 const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
+// The level badge and usage need the IPCheck.ing API; achievements need user storage.
+const usageAvailable = computed(() => store.usageAvailable);
+const achievementsAvailable = computed(() => store.achievementsAvailable);
+// Whether the benefits dialog exists here, and its title.
+const benefitsView = computed(() => userBenefitsView({
+  capabilities: store.capabilities,
+  achievements: achievementsAvailable.value,
+  accountSync: store.accountSyncAvailable,
+  usage: usageAvailable.value,
+}));
 // Sign-in methods attached to this account.
 const linkedProviders = computed(() => store.linkedProviders);
 
@@ -163,9 +184,12 @@ const levelBadgeClass = computed(() => {
   }
 });
 
+// Opening the menu asks User.vue for whatever account data is still missing.
 const getUserInfo = async () => {
-  if (remoteUserInfoFetched.value || !isSignedIn.value) return;
-  store.setTriggerRemoteUserInfo(true);
+  if (!isSignedIn.value) return;
+  const usageMissing = usageAvailable.value && !remoteUserInfoFetched.value;
+  const achievementsMissing = achievementsAvailable.value && !store.userAchievementsSynced;
+  if (usageMissing || achievementsMissing) store.setTriggerRemoteUserInfo(true);
 };
 
 const openPreferences = () => {

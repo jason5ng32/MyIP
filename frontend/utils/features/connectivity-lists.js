@@ -10,9 +10,10 @@ import {
     MINE_LIST_ID,
     DEFAULT_LIST_MEMBERS,
     faviconPath,
-} from '../../data/connectivity-import-lists.js';
+} from '../../data/connectivity-defaults.js';
+import { CONNECTIVITY_LISTS_SCHEMA_VERSION } from '../preferences-schema.js';
 
-export const CONNECTIVITY_LISTS_SCHEMA_VERSION = 1;
+export { CONNECTIVITY_LISTS_SCHEMA_VERSION };
 
 const hostnameOf = (url) => {
     try {

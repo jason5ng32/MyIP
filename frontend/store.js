@@ -6,12 +6,46 @@ import { markPendingRedirectSignIn, shouldFallBackToRedirect, takePendingRedirec
 import { isRunningAsPwa } from './utils/pwa.js';
 import i18n from './locales/i18n.js';
 import { createInitialAchievementsState } from './data/achievements.js';
+import { ACHIEVEMENT_NAMES } from './utils/codes/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
 import { createDefaultPreferences, PREFS_STORAGE_KEY } from './data/default-preferences.js';
 import { sanitizeLists } from './utils/features/connectivity-lists.js';
+import { refreshSyncRecords, syncDefaultPreferences, SPEEDTEST_ITEM_KEYS } from './utils/features/preferences-sync.js';
+import {
+  readStoredChecklist, writeStoredChecklist, applyChecklistMarks, applyChecklistItems, unsetAllMarks,
+} from './utils/features/checklist-progress.js';
+import { syncBeforeReload, clearAccountDataBeforeSignOut } from './utils/features/account-sync-auth.js';
+import { createSyncSettings } from './utils/features/sync-settings.js';
+import { isValidPreferenceValue, isValidConnectivityListId, isValidSpeedtestSize } from './utils/preferences-schema.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
+import { PROBE_CAPABILITIES } from './utils/probe-endpoints.js';
 const { t } = i18n.global;
+
+const SPEEDTEST_PREFERENCE_KEYS = Object.values(SPEEDTEST_ITEM_KEYS);
+
+// `{ <key>: value }` from account sync or localStorage → the entries the store takes, as at boot: Connectivity lists
+// sanitized, the IP source an available one, unknown keys and invalid values left out.
+const acceptedPreferenceEntries = (values, ipDBs) => Object.entries(values ?? {})
+  .filter(([key, value]) => (
+    key === 'connectivityLists' ? Array.isArray(value?.lists)
+      : key === 'connectivityDefaultListId' ? isValidConnectivityListId(value)
+        : SPEEDTEST_PREFERENCE_KEYS.includes(key) ? isValidSpeedtestSize(value)
+          : isValidPreferenceValue(key, value)))
+  .map(([key, value]) => [key,
+    key === 'connectivityLists' ? sanitizeLists(value, null, [])
+      : key === 'ipGeoSource' ? nearestEnabledId(value, ipDBs)
+        : value]);
+
+// What localStorage holds now, or null when it is missing or unreadable.
+const readStoredPreferences = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem(PREFS_STORAGE_KEY) ?? 'null');
+    return typeof stored === 'object' && stored !== null && !Array.isArray(stored) ? stored : null;
+  } catch {
+    return null;
+  }
+};
 
 // The two sign-in buttons. `other` is the provider to point a visitor at when
 // their email already owns an account through the other one;
@@ -46,15 +80,17 @@ export const useMainStore = defineStore('main', {
     lang: 'en',
     user: null,
     isSignedIn: false,
+    // Firebase has told whether someone is signed in (initializeAuthListener / a redirect sign-in).
+    authResolved: false,
     triggerAchievements: false,
     triggerUserBenefits: false,
     triggerRemoteUserInfo: false,
     triggerUpdateAchievements: false,
     achievementToUpdate: '',
-    // achievements defined in data/achievements.js; state is created by factory to avoid shared references between instances
-    userAchievements: createInitialAchievementsState(),
-    // True once the remote achievements snapshot has been applied to
-    // userAchievements (User.vue initUserAchievements). The achievement
+    // One entry per achievement name (utils/codes/achievements.js), fresh per store instance.
+    userAchievements: createInitialAchievementsState(ACHIEVEMENT_NAMES),
+    // True once the /api/achievements snapshot has been applied to
+    // userAchievements (User.vue applyAchievements). The achievement
     // engine holds rule evaluation until then — the all-false initial state
     // must never be mistaken for "nothing achieved yet".
     userAchievementsSynced: false,
@@ -67,18 +103,32 @@ export const useMainStore = defineStore('main', {
       ipv64Domain: import.meta.env?.VITE_CURL_IPV64_DOMAIN,
     },
     isFireBaseSet,
+    // Build-time probe endpoints configured (utils/probe-endpoints.js).
+    probeCapabilities: { ...PROBE_CAPABILITIES },
     openSheet: null,
+    // Preferences section id to reveal once the panel shows; Preferences.vue clears it.
     loadingStatus: createLoadingStatus(),
     isDarkMode: false,
     isMobile: false,
     shouldRefreshEveryThing: false,
-    // Collected user IPs, consumed by the Globalping tools' picker and the
-    // IP-history recorder. Shape: Array<{ ip, country, location, asn, org }>
-    // — country is a 2-letter code; location / asn / org are display strings
-    // ('' when unknown). Populated by IpInfos / WebRTC / RuleTest / SpeedTest.
+    // Collected user IPs, consumed by the Globalping tools' picker. Shape:
+    // Array<{ ip, country, location, asn, org }> — country is a 2-letter code;
+    // location / asn / org are display strings ('' when unknown). Populated
+    // by IpInfos / WebRTC / RuleTest / SpeedTest.
     allIPs: [],
     configs: {},
     userPreferences: {},
+    // Counts preference edits; account sync (use-account-sync.js) checks them for changes.
+    preferenceEdits: 0,
+    // Security Checklist progress (utils/features/checklist-progress.js): slug → 'checked' | 'ignored'; read from
+    // localStorage by adoptStoredChecklist, which the tool page and account sync call.
+    checklistProgress: {},
+    // Counts checklist edits, as preferenceEdits does for preferences.
+    checklistEdits: 0,
+    // A sign-in or sign-out waiting on account sync before the reload.
+    authPending: false,
+    // The signed-in account's choice of what syncs (utils/features/sync-settings.js); account sync writes it.
+    syncSettings: createSyncSettings(),
     alert: {
       alertToShow: false,
       alertStyle: "",
@@ -86,6 +136,9 @@ export const useMainStore = defineStore('main', {
       alertTitle: "",
       alertDuration: 2000,
     },
+    // Toasts that may wait or update in place, drained by Toast.vue
+    // (composables/use-toast-queue.js has the request shape).
+    toastRequests: [],
     currentSection: DEFAULT_SECTION,
     ipDBs: createInitialIpDBs(),
   }),
@@ -94,6 +147,26 @@ export const useMainStore = defineStore('main', {
     activeSources: (state) => state.ipDBs.filter(db => db.enabled),
     allHasLoaded: (state) => {
       return Object.values(state.loadingStatus).every(status => status);
+    },
+    // What the deployment offers, for feature gates (utils/tool-availability.js):
+    // the /api/configs flags plus the build-time facts — `accounts` (the
+    // sign-in setup: can sign in) and the probe endpoints (`invisibilityProbe`,
+    // `dnsLeakProbe`); `userStorage` (can store) is false until configs load.
+    capabilities: (state) => ({
+      ...state.configs, ...state.probeCapabilities,
+      accounts: state.isFireBaseSet, userStorage: Boolean(state.configs.userStorage),
+    }),
+    // Achievements need sign-in and user storage; the user level and the
+    // usage dialog need sign-in and the IPCheck.ing API. Each works without the other.
+    achievementsAvailable() {
+      return this.capabilities.accounts && this.capabilities.userStorage;
+    },
+    // Account sync needs sign-in and user storage.
+    accountSyncAvailable() {
+      return this.capabilities.accounts && this.capabilities.userStorage;
+    },
+    usageAvailable() {
+      return this.capabilities.accounts && Boolean(this.capabilities.ipChecking);
     },
     curlDomainsHadSet: (state) => {
       return state.curl.ipv4Domain && state.curl.ipv6Domain && state.curl.ipv64Domain;
@@ -111,25 +184,13 @@ export const useMainStore = defineStore('main', {
         };
       });
     },
-    // Per-feature "monthly quota exhausted" booleans, derived from the
-    // /api/getuserinfo quota snapshot in remoteUserInfo. Frontend first line
-    // only — the backend enforces the same limits authoritatively; absent
-    // data (signed out, old backend, fetch pending) reads as not exceeded.
-    //
-    // Metering differs per feature: invisibility_test / dns_leak_test /
-    // persona_check / ip_hitlist count requests, so exhausted means every
-    // further run is blocked and their components use this as a pre-flight gate.
-    quotaExceeded: (state) => {
-      const features = state.remoteUserInfo?.quota?.features || {};
-      const exceeded = (key) => features[key]?.exhausted === true;
-      return {
-        ipinfo: exceeded('ipinfo'),
-        invisibility_test: exceeded('invisibility_test'),
-        dns_leak_test: exceeded('dns_leak_test'),
-        persona_check: exceeded('persona_check'),
-        ip_hitlist: exceeded('ip_hitlist'),
-      };
-    },
+    // quotaExceeded(quotaKey): whether a metered feature's monthly quota is
+    // exhausted, from the /api/usage quota snapshot in remoteUserInfo.
+    // Keys come from the registries (`quotaKey` in data/tools.js and
+    // data/ip-databases.js). Frontend first line only — the backend enforces
+    // the same limits; absent data (signed out, old backend, fetch pending)
+    // reads as not exceeded. The tools use it as a pre-flight gate.
+    quotaExceeded: (state) => (key) => state.remoteUserInfo?.quota?.features?.[key]?.exhausted === true,
   },
 
   actions: {
@@ -149,6 +210,12 @@ export const useMainStore = defineStore('main', {
     // set Toast
     setAlert(alertToShow, alertStyle, alertMessage, alertTitle, alertDuration) {
       this.alert = { alertToShow, alertStyle, alertMessage, alertTitle, alertDuration };
+    },
+    queueToast(request) {
+      this.toastRequests.push(request);
+    },
+    cancelToast(id) {
+      this.toastRequests.push({ id, cancel: true });
     },
     // Collect and merge IP data from different components. Entries are
     // { ip, country, location, asn, org } objects (bare strings are tolerated
@@ -194,15 +261,98 @@ export const useMainStore = defineStore('main', {
         document.documentElement.classList.toggle('dark', !!value);
       }
     },
-    // set user preferences
-    setPreferences(userPreferences) {
+    // Writes userPreferences and localStorage; not counted as an edit.
+    persistPreferences(userPreferences = this.userPreferences) {
       this.userPreferences = userPreferences;
       localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(userPreferences));
     },
-    // update user preferences
+    // This tab's preferences brought up to what localStorage holds now (another tab may have saved since). Part of
+    // this tab's own edit only, never on its own; not an edit, and records are left alone: what another tab
+    // stamped already matches them.
+    adoptStoredPreferences() {
+      for (const [key, value] of acceptedPreferenceEntries(readStoredPreferences(), this.ipDBs)) {
+        this.userPreferences[key] = value;
+      }
+    },
+    // Every edit lands here: `change(prefs)` runs on the freshest preferences and returns the
+    // `{ <key>: value }` to save, or null for none.
+    editPreferences(change) {
+      this.adoptStoredPreferences();
+      const values = change(this.userPreferences);
+      if (!values) return;
+      Object.assign(this.userPreferences, values);
+      this.persistPreferences();
+      this.preferenceEdits += 1;
+    },
+    // set several preferences (an edit)
+    setPreferences(values) {
+      this.editPreferences(() => values);
+    },
+    // update one preference (an edit)
     updatePreference(key, value) {
-      this.userPreferences[key] = value;
-      localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(this.userPreferences));
+      this.editPreferences(() => ({ [key]: value }));
+    },
+    // A Connectivity lists edit: `op(lists)` (an op of utils/features/connectivity-lists.js) runs on the freshest
+    // lists → its result, whose `lists` are saved.
+    editConnectivityLists(op) {
+      let result = null;
+      this.editPreferences((prefs) => {
+        result = op(prefs.connectivityLists?.lists ?? []);
+        return result?.lists ? { connectivityLists: { ...prefs.connectivityLists, lists: result.lists } } : null;
+      });
+      return result;
+    },
+    // Values from account sync (`{ <key>: value }`), not counted as an edit. Connectivity lists are
+    // sanitized and the IP source falls back to an available one, as at boot.
+    applySyncedPreferences(values) {
+      const entries = acceptedPreferenceEntries(values, this.ipDBs);
+      if (!entries.length) return;
+      for (const [key, value] of entries) this.userPreferences[key] = value;
+      this.persistPreferences();
+    },
+    // Sign-out: one store-backed collection's keys ('preferences' / 'connectivity' / 'speedtest') back
+    // to a fresh visitor's values, not counted as an edit.
+    resetSyncedPreferences(collectionId) {
+      this.applySyncedPreferences(syncDefaultPreferences(collectionId));
+    },
+    // The checklist progress brought up to what localStorage holds now; not an edit. A missing or unreadable copy
+    // changes nothing.
+    adoptStoredChecklist() {
+      const stored = readStoredChecklist(localStorage);
+      if (stored) this.checklistProgress = stored;
+    },
+    // A checklist edit on the freshest progress: `change(progress)` → `{ <slug>: 'checked' | 'ignored' | '' }`, or
+    // null for none.
+    editChecklist(change) {
+      this.adoptStoredChecklist();
+      const marks = change(this.checklistProgress);
+      if (!marks) return;
+      this.checklistProgress = applyChecklistMarks(this.checklistProgress, marks);
+      writeStoredChecklist(localStorage, this.checklistProgress);
+      this.checklistEdits += 1;
+    },
+    // One item checked, ignored or unset ('') (an edit).
+    setChecklistMark(slug, mark) {
+      this.editChecklist(() => ({ [slug]: mark }));
+    },
+    // Reset: every item unset (an edit).
+    resetChecklist() {
+      this.editChecklist(unsetAllMarks);
+    },
+    // A pull's `{ upserts, deletes }` from account sync, on the freshest progress; not an edit.
+    applySyncedChecklist(changes) {
+      this.adoptStoredChecklist();
+      this.checklistProgress = applyChecklistItems(this.checklistProgress, changes);
+      writeStoredChecklist(localStorage, this.checklistProgress);
+    },
+    // Sign-out: the progress leaves this device; not an edit.
+    clearChecklist() {
+      this.checklistProgress = {};
+      writeStoredChecklist(localStorage, {});
+    },
+    // Written by account sync only.
+    setSyncSettings(settings) {
+      this.syncSettings = settings;
     },
     // load user preferences from local storage
     loadPreferences() {
@@ -219,7 +369,9 @@ export const useMainStore = defineStore('main', {
       merged.connectivityLists = sanitizeLists(
         merged.connectivityLists, merged.connectivityTargets, merged.customConnectivityTargets,
       );
-      this.setPreferences(merged);
+      this.persistPreferences(merged);
+      // Defaults and sanitising are not edits: account sync takes them unstamped.
+      refreshSyncRecords(localStorage, currentPreferences, merged);
     },
     // Fetch configs from server. A longer timeout than the default: the boot
     // request competes with every other first-render fetch on slow links.
@@ -243,7 +395,11 @@ export const useMainStore = defineStore('main', {
           if (nearest !== preferred) {
             const from = this.ipDBs.find(db => db.id === preferred)?.text || `#${preferred}`;
             const to = this.ipDBs.find(db => db.id === nearest)?.text || `#${nearest}`;
-            this.updatePreference('ipGeoSource', nearest);
+            // Not a user edit: account sync takes it unstamped.
+            const before = { ...this.userPreferences };
+            this.userPreferences.ipGeoSource = nearest;
+            this.persistPreferences();
+            refreshSyncRecords(localStorage, before, this.userPreferences);
             this.setAlert(true, 'text-warning',
               t('alert.IpGeoSourceFallbackMessage', { from, to }),
               t('alert.IpGeoSourceFallbackTitle'), 5000);
@@ -263,9 +419,10 @@ export const useMainStore = defineStore('main', {
     async signInWithGithub() {
       await this.signInWithProvider('github');
     },
-    // Shared sign-in path for both buttons: popup in a browser tab, then
-    // reload; redirect in the installed PWA or when the popup can't open
-    // (utils/auth-redirect.js), finished at boot by completeRedirectSignIn.
+    // Shared sign-in path for both buttons: popup in a browser tab, then the
+    // account's sync settings and synced data (bounded wait) and a reload; redirect in the
+    // installed PWA or when the popup can't open (utils/auth-redirect.js),
+    // finished at boot by completeRedirectSignIn.
     async signInWithProvider(providerKey) {
       const descriptor = SIGN_IN_PROVIDERS[providerKey];
       try {
@@ -276,6 +433,10 @@ export const useMainStore = defineStore('main', {
             this.user = result.user;
             writeAuthHint(true);
             rememberAccountId(result.user?.uid);
+            if (result.user?.uid && this.accountSyncAvailable) {
+              this.authPending = true;
+              await syncBeforeReload(result.user.uid);
+            }
             window.location.reload();
             return;
           } catch (error) {
@@ -302,6 +463,7 @@ export const useMainStore = defineStore('main', {
         if (!result?.user) return false;
         this.user = result.user;
         this.isSignedIn = true;
+        this.authResolved = true;
         writeAuthHint(true);
         rememberAccountId(result.user.uid);
         return true;
@@ -334,16 +496,28 @@ export const useMainStore = defineStore('main', {
             t('alert.SignInFailed'));
       }
     },
-    // sign out
+    // Sign out. With account sync, pending edits are sent first (bounded) and
+    // the account's data leaves this device; the page then reloads, as after
+    // a sign-in, so no view keeps showing it.
     async signOut() {
+      let cleared = 0;
       try {
+        if (this.accountSyncAvailable && this.user?.uid) {
+          this.authPending = true;
+          cleared = await clearAccountDataBeforeSignOut(this.user.uid);
+        }
         const { auth, signOut: firebaseSignOut } = await loadFirebaseAuth();
         await firebaseSignOut(auth);
         this.user = null;
         this.isSignedIn = false;
         writeAuthHint(false);
+        if (cleared > 0) window.location.reload();
+        else this.authPending = false;
       } catch (error) {
         console.error("Sign out failed:", error);
+        // Cleared but still signed in: the reload takes the account's data back.
+        if (cleared > 0) window.location.reload();
+        else this.authPending = false;
       }
     },
     // Resolve the persisted auth state once, and keep the sign-in hint in
@@ -359,6 +533,7 @@ export const useMainStore = defineStore('main', {
             rememberAccountId(currentUser.uid);
           }
           writeAuthHint(!!currentUser);
+          this.authResolved = true;
           unsubscribe(); // unsubscribe immediately after getting user state
           resolve();
         });
@@ -372,7 +547,7 @@ export const useMainStore = defineStore('main', {
     setTriggerUserBenefits(value) {
       this.triggerUserBenefits = value;
     },
-    // Backend replied 429 quota_exceeded for a feature: pin the local snapshot
+    // Backend answered with the quota code for a feature: pin the local snapshot
     // to exhausted so the quotaExceeded getter flips without a refetch.
     markQuotaExhausted(feature) {
       const quotaFeature = this.remoteUserInfo?.quota?.features?.[feature];

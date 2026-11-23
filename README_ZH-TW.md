@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 一個開源的多合一 IP 工具箱：多來源 IP 查詢、連通性測試、WebRTC 與 DNS 洩漏偵測、網速測試、MTR、審查封鎖檢查、Whois 等——一條 Docker 指令即可自行架設。
 
@@ -40,7 +40,7 @@
 
 * 🛜 **IP 卡片**：從多個獨立來源並列偵測你的 IPv4 與 IPv6——包括國家、地區、城市、ASN、組織，以及該 IP 所在地的當地時區。
 * 🔍 **IP 查詢**：查詢任何一個你感興趣的 IP 位址的同樣詳細資訊。
-* 🧾 **IP 歷史記錄**：在本機記錄你曾被偵測到的 IP，可依類型與國家篩選——只儲存在你的瀏覽器裡。
+* 📸 **快照記錄**：每次開啟首頁時，把首頁各項測試的結果（IP 資訊、網路連通性、WebRTC、DNS 洩漏測試、網速測試）儲存為一份快照。任選兩份比較，像程式碼 diff 一樣逐行查看差異；重要的快照可以命名或釘選——只儲存在你的瀏覽器裡。
 * 🖥️ **瀏覽器指紋**：以多種方式計算你的瀏覽器指紋，並顯示是哪些特徵讓你可被識別。
 
 ### 🕵️ 洩漏與隱私
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-其餘一切——選用的 API Key、安全與流量限制、日誌、Sentry、curl API 網域——都記錄在[環境變數參考](https://docs.ipcheck.ing/developer/reference/environment-variables)中。
+其餘一切——選用的 API Key、安全、日誌、Sentry、curl API 網域——都記錄在[環境變數參考](https://docs.ipcheck.ing/developer/reference/environment-variables)中。
 
 ## 📖 官方說明文件
 
@@ -182,30 +182,31 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 贊助商與支持者
 
-作為一個開源專案，我非常感謝以下贊助者對我的支持：
+MyIP 免費且開源，但它的運作離不開真實的伺服器、資料來源與各項服務。正是這些公司讓它得以持續運作，而且它們的產品都很出色。
 
 **贊助商**
 
-<a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — High-quality rotating and static residential proxies, with 90M+ residential IPs across 220+ locations worldwide. It supports HTTP(S), SOCKS5, rotating and sticky sessions, with residential proxy plans starting at just $0.7/GB. Use code `PROXY90` for an additional 10% off.
-</sub>
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="60" /></a><br />
+↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — 提供私有住宅、行動（4G/5G/LTE）、靜態 ISP 以及資料中心 IPv4/IPv6 代理，支援 HTTP(S) 與 SOCKS5 協定，擁有 4700 萬+ 住宅 IP，涵蓋全球 220+ 地區，可精準定位國家、城市及電信業者，具備 99.7% 可用性與 24/7 技術支援。MyIP 使用者使用優惠碼 `CHECKINGIP15` 即可享 15% 折扣。
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — 提供私有住宅、行動（4G/5G/LTE）、靜態 ISP 以及資料中心 IPv4/IPv6 代理，支援 HTTP(S) 與 SOCKS5 協定，擁有 4700 萬+ 住宅 IP，涵蓋全球 220+ 地區，可精準定位國家、城市及電信業者，具備 99.7% 可用性與 24/7 技術支援。MyIP 使用者使用優惠碼 `CHECKINGIP15` 即可享 15% 折扣。
-</sub>
-
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh-TW"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh-TW">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh-TW"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="60" /></a><br />
+↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh-TW">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.
 
 ----
 
 **支持者**
 
-<p><a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" height="32" /></a></p>
-<p><a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a></p>
-<p><a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a></p>
-<p><a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a></p>
-<p><a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a></p>
+支持者為 MyIP 免費提供服務或額度，用於專案所仰賴的工具與基礎設施。感謝他們對開源的支持。
+
+| 支持者 | 業務簡介 |
+| --- | --- |
+| <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>全球網路，提供 CDN、安全防護、DNS 與 Serverless 應用程式。</sub> |
+| <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>應用程式監控，提供錯誤追蹤、分散式追蹤與工作階段重播。</sub> |
+| <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>IP 情資 API 與資料庫，涵蓋地理位置、ASN、VPN 與濫用偵測。</sub> |
+| <a href="https://www.ip2location.io"><img src="https://res.ipcheck.ing/img/ip2location_logo.png" alt="IP2Location.io" height="24" /></a> | <sub>IP 地理位置 API，提供代理、VPN 與主機代管偵測，並支援網域 WHOIS 查詢。</sub> |
+| <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>能理解整個程式碼庫的 AI 程式碼審查。</sub> |
+| <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>為技術團隊打造的文件平台。</sub> |
+| <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>為個人與團隊打造的密碼與機密管理工具。</sub> |
 
 有意贊助 MyIP？[成為贊助者](https://github.com/sponsors/jason5ng32)
 

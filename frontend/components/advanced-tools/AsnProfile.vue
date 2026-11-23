@@ -137,7 +137,7 @@
                     </template>
                 </div>
 
-                <!-- ============ Reputation (backend sends it on the official site only) ============ -->
+                <!-- ============ Reputation (sent when the IPCheck.ing API is configured) ============ -->
                 <div v-if="reputation" class="rounded-lg border bg-card p-4 space-y-4 min-w-0">
                     <div class="space-y-1">
                         <div class="flex items-start justify-between gap-2">
@@ -441,7 +441,7 @@ import {
     peeringEnumKey, peeringHero, peeringFacts, formatPortSpeed, exchangeRows, facilityRows, hasPeeringCard, visibleRows,
 } from '@/utils/ip/asn-profile-view.js';
 import { formatIsoDate } from '@/utils/time-utils.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import AsnConnectionQuality from '@/components/ip-infos/AsnConnectionQuality.vue';
 import AsnTrafficShares from '@/components/ip-infos/AsnTrafficShares.vue';
 import CopyButton from '@/components/widgets/CopyButton.vue';

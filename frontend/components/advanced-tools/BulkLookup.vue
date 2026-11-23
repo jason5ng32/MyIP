@@ -166,7 +166,7 @@ import { toApiTag } from '@/utils/locale-registry.js';
 import { isoToDateTime, formatIsoDate } from '@/utils/time-utils.js';
 import { isToolAvailable } from '@/utils/tool-availability.js';
 import { TOOL_BY_SLUG } from '@/data/tools.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import {
     useBulkLookup, MAX_ROWS, compareRows, filterRows, summarizeRows,
     listBatches, buildCsv, downloadCsv, runFailureKind, toggleQueryPick,
@@ -354,8 +354,8 @@ const openDetails = (ip) => {
     detailsOpen.value = true;
 };
 
-// The Blocklist tool's own registry gate (original site only).
-const blocklistAvailable = computed(() => isToolAvailable(TOOL_BY_SLUG.get('blocklist'), store.configs));
+// The Blocklist tool's own registry gate (IPCheck.ing API + sign-in).
+const blocklistAvailable = computed(() => isToolAvailable(TOOL_BY_SLUG.get('blocklist'), store.capabilities));
 
 const tableProps = computed(() => ({
     sortKey: sortKey.value,

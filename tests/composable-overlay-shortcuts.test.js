@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { registerHooks } from 'node:module';
-import { effectScope, ref } from 'vue';
+import { KeepAlive, createRenderer, defineComponent, effectScope, h, nextTick, ref } from 'vue';
 
 globalThis.document = { addEventListener() {} };
 globalThis.window = {};
@@ -72,5 +72,85 @@ describe('useOverlayShortcuts()', () => {
         open.value = false;
         assert.equal(isOverlayOpen(), false, 'one open ⇒ one close');
         scope.stop();
+    });
+
+    it('immediately closes an overlay that mounts late inside a deactivated KeepAlive branch', async () => {
+        const { createApp } = createRenderer({
+            createElement: (type) => ({ type, children: [], parentNode: null }),
+            createText: (text) => ({ text, parentNode: null }),
+            createComment: (comment) => ({ comment, parentNode: null }),
+            setText: () => {},
+            setElementText: () => {},
+            insert: (el, parent) => {
+                el.parentNode = parent;
+                parent.children.push(el);
+            },
+            remove: (el) => {
+                if (!el.parentNode) return;
+                const idx = el.parentNode.children.indexOf(el);
+                if (idx !== -1) el.parentNode.children.splice(idx, 1);
+                el.parentNode = null;
+            },
+            parentNode: (node) => node.parentNode ?? null,
+            nextSibling: () => null,
+            patchProp: () => {},
+        });
+
+        const showPageA = ref(true);
+        const mountLazyDialog = ref(false);
+        const dialogOpen = ref(false);
+
+        const LazyOverlayRoot = defineComponent({
+            name: 'LazyOverlayRoot',
+            props: { open: { type: Boolean, default: false } },
+            emits: ['update:open'],
+            setup(props) {
+                useOverlayShortcuts(() => props.open);
+                return () => h('div');
+            },
+        });
+
+        const PageA = defineComponent({
+            name: 'PageA',
+            setup() {
+                return () => h('section', [
+                    mountLazyDialog.value
+                        ? h(LazyOverlayRoot, {
+                            open: dialogOpen.value,
+                            'onUpdate:open': (val) => { dialogOpen.value = val; },
+                        })
+                        : null,
+                ]);
+            },
+        });
+
+        const PageB = defineComponent({
+            name: 'PageB',
+            setup: () => () => h('section'),
+        });
+
+        const Root = defineComponent({
+            setup: () => () => h(KeepAlive, null, {
+                default: () => [showPageA.value ? h(PageA, { key: 'a' }) : h(PageB, { key: 'b' })],
+            }),
+        });
+
+        const container = { type: 'root', children: [], parentNode: null };
+        const app = createApp(Root);
+        app.mount(container);
+
+        // User triggers open on PageA, then navigates to PageB before the async chunk mounts.
+        dialogOpen.value = true;
+        showPageA.value = false;
+        await nextTick();
+
+        // Now the async overlay chunk finishes loading inside deactivated PageA.
+        mountLazyDialog.value = true;
+        await nextTick();
+
+        assert.equal(dialogOpen.value, false, 'late-mounted overlay emits update:open -> false');
+        assert.equal(isOverlayOpen(), false, 'deactivated overlay never suspends active-page shortcuts');
+
+        app.unmount();
     });
 });

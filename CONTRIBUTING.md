@@ -12,11 +12,11 @@ New here? Look for issues labeled
 
 1. **Fork** the repo and create your branch **from `dev`** (never `main` — `main` only
    receives release merges from `dev`).
-2. **Set up:** Node.js 24+ (same as CI) and pnpm. The pnpm version is pinned
+2. **Set up:** Node.js 26 (same as CI) and pnpm. The pnpm version is pinned
    via the `packageManager` field, so the easiest path is:
 
    ```bash
-   corepack enable   # or: npm install -g pnpm
+   npm install -g pnpm   # picks up the pinned version from packageManager
    pnpm install
    pnpm dev          # starts Vite + the backend together
    ```

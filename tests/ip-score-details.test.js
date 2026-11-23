@@ -29,7 +29,7 @@ const card = (overrides = {}) => ({
     isp: 'Amateur Radio Digital Communications',
     asn: 'AS7377',
     qualityScore: 90,
-    scoreTags: v3Tags,
+    flags: v3Tags,
     scoreDimensions: {
         reputation: { level: 'none', lastSeen: null },
         anonymity: { class: 'residential_proxy', sources: 'single', firstSeen: null, lastSeen: '2026-09-20' },
@@ -127,18 +127,18 @@ describe('buildScoreExplanation()', () => {
     it('keeps the confirmed residential proxy sentence plus its last-observed day', () => {
         const out = buildScoreExplanation(card({
             qualityScore: 25,
-            scoreTags: { ...v3Tags, isProxy: true, isAnyAnonymizer: true },
+            flags: { ...v3Tags, isProxy: true, isAnyAnonymizer: true },
         }), { t, formatDate: (d) => d });
         assert.deepEqual(keysOf(out).slice(2, 4), ['anonymity.residentialProxy', 'anonymityLastSeen']);
         assert.deepEqual(out[3].params, { date: '2026-09-20' });
     });
 
     it('picks network variants from the tags', () => {
-        const dc = buildScoreExplanation(card({ scoreTags: { ...v3Tags, isDatacenter: true, isMobile: true } }), { t });
+        const dc = buildScoreExplanation(card({ flags: { ...v3Tags, isDatacenter: true, isMobile: true } }), { t });
         assert.ok(keysOf(dc).includes('network.datacenter'));
-        const mobile = buildScoreExplanation(card({ scoreTags: { ...v3Tags, isMobile: true } }), { t });
+        const mobile = buildScoreExplanation(card({ flags: { ...v3Tags, isMobile: true } }), { t });
         assert.ok(keysOf(mobile).includes('network.mobile'));
-        const satellite = buildScoreExplanation(card({ scoreTags: { ...v3Tags, isSatellite: true, isMobile: true } }), { t });
+        const satellite = buildScoreExplanation(card({ flags: { ...v3Tags, isSatellite: true, isMobile: true } }), { t });
         assert.ok(keysOf(satellite).includes('network.satellite'));
         assert.ok(!keysOf(satellite).includes('network.isp'));
     });
@@ -195,9 +195,9 @@ describe('buildScoreExplanation()', () => {
         assert.equal(none[0].params.operator, `<${P}unknownOperator>`);
     });
 
-    it('is empty without dimensions, for gated data and unknown scores', () => {
+    it('is empty without dimensions, for gated cards and unknown scores', () => {
         assert.deepEqual(buildScoreExplanation(card({ scoreDimensions: undefined }), { t }), []);
-        assert.deepEqual(buildScoreExplanation(card({ qualityScore: 'sign_in_required', scoreDimensions: undefined }), { t }), []);
+        assert.deepEqual(buildScoreExplanation(card({ qualityScore: undefined, flags: undefined, scoreDimensions: undefined }), { t }), []);
         assert.deepEqual(buildScoreExplanation(card({ qualityScore: 'unknown' }), { t }), []);
         assert.deepEqual(buildScoreExplanation(card({ qualityScore: null }), { t }), []);
         assert.deepEqual(buildScoreExplanation(undefined), []);
@@ -215,9 +215,9 @@ describe('buildScoreExplanation()', () => {
         const resolve = (key) => key.split('.').reduce((node, part) => node?.[part], en);
         const variants = [
             card(),
-            card({ qualityScore: 60, scoreTags: { ...v3Tags, isDatacenter: true } }),
-            card({ qualityScore: 10, scoreTags: { ...v3Tags, isMobile: true } }),
-            card({ qualityScore: 25, scoreTags: { ...v3Tags, isProxy: true, isAnyAnonymizer: true } }),
+            card({ qualityScore: 60, flags: { ...v3Tags, isDatacenter: true } }),
+            card({ qualityScore: 10, flags: { ...v3Tags, isMobile: true } }),
+            card({ qualityScore: 25, flags: { ...v3Tags, isProxy: true, isAnyAnonymizer: true } }),
         ];
         const dims = [
             { class: null }, { class: 'tor' }, { class: 'relay' }, { class: 'proxy', sources: 'single' }, { class: 'proxy', sources: 'multi' },

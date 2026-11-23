@@ -11,6 +11,10 @@ import { isValidBgpPrefix } from '../common/bgp-prefix.js';
 import { STATUS_PROVIDER_IDS } from './service-status-providers.js';
 import { DNS_RECORD_TYPE_SET } from '../common/dns-record-types.js';
 import { parseAsnInput } from '../common/asn-input.js';
+import { SERVICE_ERROR_CODE, AUTH_REASON } from '../common/codes/service-errors.js';
+import { verifySignIn } from './sign-in-token.js';
+import { userStorage } from './db/user-storage.js';
+import { SYNC_COLLECTIONS, syncCollectionOf } from '../common/sync-collections.js';
 
 // Express 5's req.query is a prototype getter that re-parses the URL on every
 // read, so a direct write is lost. Pin the parsed object as an own property
@@ -197,4 +201,55 @@ export const requireValidProviderId = (paramName = 'id') => (req, res, next) => 
         return res.status(400).json({ error: 'Invalid provider id' });
     }
     next();
+};
+
+// The `:collection` route param names a synced collection
+// (common/sync-collections.js), else 404; its registry row lands on
+// `res.locals.syncCollection`.
+export const requireValidSyncCollection = (paramName = 'collection', collections = SYNC_COLLECTIONS) => (req, res, next) => {
+    const collection = syncCollectionOf(req.params?.[paramName], collections);
+    if (!collection) {
+        return res.status(404).json({ error: 'Unknown collection' });
+    }
+    res.locals.syncCollection = collection;
+    next();
+};
+
+// Sign-in: verify the `authorization` header and put the signed-in user id on
+// `res.locals.userId`. A refusal is 403 { error, code: 'auth', reason }; a
+// certificate outage is 503, uncoded. `verify` is the seam tests replace.
+const AUTH_ERROR_TEXT = {
+    [AUTH_REASON.SIGN_IN_REQUIRED]: 'Sign in required',
+    [AUTH_REASON.INVALID_TOKEN]: 'Invalid token',
+};
+
+const userGuard = (required, verify) => async (req, res, next) => {
+    let result;
+    try {
+        result = await verify(req.headers.authorization);
+    } catch (err) {
+        logger.debug({ err }, 'Sign-in check unavailable');
+        return res.status(503).json({ error: 'Sign-in check unavailable' });
+    }
+    if (result.id) {
+        res.locals.userId = result.id;
+        return next();
+    }
+    if (!required && result.reason === AUTH_REASON.SIGN_IN_REQUIRED) return next();
+    return res.status(403).json({
+        error: AUTH_ERROR_TEXT[result.reason], code: SERVICE_ERROR_CODE.AUTH, reason: result.reason,
+    });
+};
+
+// Signed out passes as a guest; a token that fails verification is refused.
+export const optionalUser = (verify = verifySignIn) => userGuard(false, verify);
+
+// Only a verified sign-in passes.
+export const requireUser = (verify = verifySignIn) => userGuard(true, verify);
+
+// User storage configured and ready, else 503 (uncoded, never cached). A
+// not-ready storage is re-checked here once its cooldown has passed.
+export const requireUserStorage = (storage = userStorage) => async (req, res, next) => {
+    if (storage.isConfigured() && await storage.ensureReady()) return next();
+    return res.status(503).json({ error: 'User storage unavailable' });
 };

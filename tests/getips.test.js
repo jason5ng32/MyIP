@@ -2,7 +2,7 @@
 // IP-card source result flows through. Providers are stubbed; the behaviors
 // under test are the per-hop `accept` gate, fallback advancement on both
 // throw and garbage response, the never-throws exhaustion contract, and the
-// originalSite passthrough. The single-version entry points run their real
+// useJsonEndpoint passthrough. The single-version entry points run their real
 // providers against a stubbed fetch, to pin which version each one accepts.
 
 import assert from 'node:assert/strict';
@@ -24,8 +24,8 @@ const stubProvider = (id, name, behavior) => {
   return {
     id,
     name,
-    run: async (originalSite) => {
-      calls.push(originalSite);
+    run: async (useJsonEndpoint) => {
+      calls.push(useJsonEndpoint);
       if (behavior instanceof Error) throw behavior;
       return behavior;
     },
@@ -78,10 +78,10 @@ describe('runChain', () => {
     assert.deepEqual(result, { ip: null, source: 'Broken' });
   });
 
-  it('passes originalSite through to every hop', async () => {
+  it('passes useJsonEndpoint through to every hop', async () => {
     const first = stubProvider('a', 'Source A', 'nope');
     const second = stubProvider('b', 'Source B', '3.3.3.3');
-    await runChain([first, second], { originalSite: true });
+    await runChain([first, second], { useJsonEndpoint: true });
     assert.deepEqual(first.calls, [true]);
     assert.deepEqual(second.calls, [true]);
   });
@@ -147,6 +147,32 @@ describe('single-version entry points', () => {
     it(`${fn.name} exhausts when every hop answers the wrong version`, async () => {
       stubFetch(() => wrong);
       assert.deepEqual(await fn(), { ip: null, source: fallback });
+    });
+  }
+});
+
+describe('IPCheck.ing endpoint choice', () => {
+  const originalFetch = globalThis.fetch;
+  afterEach(() => { globalThis.fetch = originalFetch; });
+
+  const requestedUrls = async (fn, ip, useJsonEndpoint) => {
+    const urls = [];
+    globalThis.fetch = async (url) => {
+      urls.push(String(url));
+      return new Response(String(url).includes('/cdn-cgi/trace') ? `ip=${ip}\n` : JSON.stringify({ ip }));
+    };
+    await fn(useJsonEndpoint);
+    return urls;
+  };
+
+  for (const [fn, host, ip] of [
+    [getIPFromIPChecking4, '4.ipcheck.ing', '1.1.1.1'],
+    [getIPFromIPChecking6, '6.ipcheck.ing', '2606:4700::1111'],
+    [getIPFromIPChecking64, '64.ipcheck.ing', '1.1.1.1'],
+  ]) {
+    it(`${fn.name} uses the JSON endpoint only when asked`, async () => {
+      assert.deepEqual(await requestedUrls(fn, ip, true), [`https://${host}`]);
+      assert.deepEqual(await requestedUrls(fn, ip, false), [`https://${host}/cdn-cgi/trace`]);
     });
   }
 });

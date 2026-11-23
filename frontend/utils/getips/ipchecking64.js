@@ -1,7 +1,8 @@
 // IPCheck.ing IPv6/4 — resolves via 64.ipcheck.ing (answers with whichever
-// stack the visitor reaches it on). On the original site the JSON endpoint
-// is preferred (trace as internal fallback); mirrors go straight to trace.
-// Runs as a single-hop chain in index.js — no external fallback.
+// stack the visitor reaches it on). The JSON endpoint (trace as internal
+// fallback) is reserved for the upstream site; every other deployment goes
+// straight to trace. Runs as a single-hop chain in index.js — no external
+// fallback.
 import { fetchWithTimeout } from '../fetch-with-timeout.js';
 import { parseTrace } from '../ip/parse-trace.js';
 
@@ -26,5 +27,5 @@ const getFromJson = async () => {
 export const ipChecking64 = {
     id: 'ipchecking-64',
     name: 'IPCheck.ing IPv6/4',
-    run: (originalSite) => (originalSite ? getFromJson() : getFromTrace()),
+    run: (useJsonEndpoint) => (useJsonEndpoint ? getFromJson() : getFromTrace()),
 };

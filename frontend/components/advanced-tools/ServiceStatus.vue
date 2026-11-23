@@ -1,133 +1,139 @@
 <template>
   <!-- Service Status advanced tool: shows whether a set of well-known
-       products are currently up, expandable per-card into sub-services and
-       recent incidents. ToolPage.vue owns the title, so this starts at the
-       note row. -->
+       products are currently up, grouped into reporting issues / operational,
+       expandable per-card into sub-services and recent incidents. ToolPage.vue
+       owns the title, so this starts at the note row. -->
   <div class="service-status-section my-4 space-y-4">
     <!-- Top note -->
     <p class="text-sm text-muted-foreground leading-relaxed">{{ t('serviceStatus.Note') }}</p>
 
-    <!-- Provider card grid — always rendered from the static list, so a failed
-        fetch shows per-card "status unavailable" rather than removing cards. -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-      <Collapsible v-for="p in PROVIDERS" :key="p.id" v-model:open="openState[p.id]" as-child>
-        <Card class="jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
-          <CardContent class="p-4 min-w-0">
-            <!-- Header row (toggles the panel) — provider icon + name + chevron -->
-            <CollapsibleTrigger class="w-full text-left cursor-pointer" @click="onToggle(p)">
-              <div class="flex items-center gap-2 mb-3">
-                <Icon v-if="p.icon" :icon="p.icon" class="size-6 text-muted-foreground shrink-0" />
-                <span v-else
-                  class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border-2 border-muted-foreground">
-                  {{ (p.name || '?').charAt(0).toUpperCase() }}
-                </span>
-                <span class="text-base font-medium truncate min-w-0 flex-1">{{ p.name }}</span>
-                <ChevronDown class="size-4 shrink-0 text-muted-foreground transition-transform duration-200"
-                  :class="{ 'rotate-180': openState[p.id] }" />
+    <!-- Provider cards in two groups: reporting issues (most severe first),
+         then operational (status unavailable last); an empty group is not
+         rendered. Built from the static list, so a failed fetch puts every
+         card in the operational group as "status unavailable" rather than
+         removing cards. -->
+    <section v-for="g in cardGroups" :key="g.id" class="space-y-3">
+      <h2 v-if="g.titleKey" class="text-base font-semibold">{{ t(g.titleKey) }}</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <Collapsible v-for="p in g.providers" :key="p.id" v-model:open="openState[p.id]" as-child>
+          <Card class="jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
+            <CardContent class="p-4 min-w-0">
+              <!-- Header row (toggles the panel) — provider icon + name + chevron -->
+              <CollapsibleTrigger class="w-full text-left cursor-pointer" @click="onToggle(p)">
+                <div class="flex items-center gap-2 mb-3">
+                  <Icon v-if="p.icon" :icon="p.icon" class="size-6 text-muted-foreground shrink-0" />
+                  <span v-else
+                    class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border-2 border-muted-foreground">
+                    {{ (p.name || '?').charAt(0).toUpperCase() }}
+                  </span>
+                  <span class="text-base font-medium truncate min-w-0 flex-1">{{ p.name }}</span>
+                  <ChevronDown class="size-4 shrink-0 text-muted-foreground transition-transform duration-200"
+                    :class="{ 'rotate-180': openState[p.id] }" />
+                </div>
+              </CollapsibleTrigger>
+
+              <!-- Primary status line — checking → pulse + label; else status icon + label -->
+              <div class="flex items-center gap-1.5 text-base min-w-0 min-h-6">
+                <template v-if="loading">
+                  <span class="relative flex shrink-0">
+                    <span class="absolute inline-flex size-2.5 rounded-full bg-info opacity-75 animate-ping"></span>
+                    <span class="relative inline-flex size-2.5 rounded-full bg-info"></span>
+                  </span>
+                  <span class="text-muted-foreground truncate">{{ t('serviceStatus.Checking') }}</span>
+                </template>
+                <template v-else>
+                  <component :is="toneIcon(indicatorTone(p))" class="size-4 shrink-0"
+                    :class="textClass(indicatorTone(p))" />
+                  <span :class="textClass(indicatorTone(p))" class="truncate">
+                    {{ indicatorLabel(effectiveIndicator(p)) }}
+                  </span>
+                </template>
               </div>
-            </CollapsibleTrigger>
-
-            <!-- Primary status line — checking → pulse + label; else status icon + label -->
-            <div class="flex items-center gap-1.5 text-base min-w-0 min-h-6">
-              <template v-if="loading">
-                <span class="relative flex shrink-0">
-                  <span class="absolute inline-flex size-2.5 rounded-full bg-info opacity-75 animate-ping"></span>
-                  <span class="relative inline-flex size-2.5 rounded-full bg-info"></span>
-                </span>
-                <span class="text-muted-foreground truncate">{{ t('serviceStatus.Checking') }}</span>
-              </template>
-              <template v-else>
-                <component :is="toneIcon(indicatorTone(p))" class="size-4 shrink-0"
-                  :class="textClass(indicatorTone(p))" />
-                <span :class="textClass(indicatorTone(p))" class="truncate">
-                  {{ indicatorLabel(effectiveIndicator(p)) }}
-                </span>
-              </template>
-            </div>
-          </CardContent>
-
-          <!-- Expanded: services + recent incidents behind tabs (keeps the
-               opened card from stretching the page too tall). Each tab's data
-               is fetched on first view, not with the overview. -->
-          <CollapsibleContent>
-            <CardContent class="px-4 pb-4 pt-0">
-              <Tabs :model-value="activeTab[p.id] || 'components'" @update:model-value="(v) => (activeTab[p.id] = v)">
-                <TabsList class="grid w-full grid-cols-2">
-                  <TabsTrigger value="components">{{ t('serviceStatus.ComponentsTitle') }}</TabsTrigger>
-                  <TabsTrigger value="incidents">{{ t('serviceStatus.IncidentsTitle') }}</TabsTrigger>
-                </TabsList>
-
-                <!-- Sub-services (first level only) -->
-                <TabsContent value="components" class="mt-3">
-                  <!-- Skeleton placeholder keeps the panel height stable while loading -->
-                  <ul v-if="detailState[p.id]?.loading" class="rounded-lg border bg-card divide-y">
-                    <li v-for="(w, i) in placeholderSizes" :key="i" class="px-3 py-2.5">
-                      <div class="h-3.5 bg-muted rounded animate-pulse" :style="`width:${(w / 12) * 100}%`"></div>
-                    </li>
-                  </ul>
-                  <p v-else-if="detailState[p.id]?.error" class="text-sm text-destructive py-2">
-                    {{ t('serviceStatus.ComponentsError') }}
-                  </p>
-                  <ul v-else-if="detailState[p.id]?.components?.length"
-                    class="rounded-lg border bg-card divide-y max-h-150 overflow-y-auto">
-                    <li v-for="(c, i) in detailState[p.id].components" :key="i"
-                      class="flex items-center justify-between gap-2 px-3 py-2 text-sm">
-                      <span class="truncate min-w-0" :title="c.name">{{ c.name }}</span>
-                      <span class="flex items-center gap-1.5 shrink-0">
-                        <component :is="toneIcon(componentStatusToTone(c.status))" class="size-3.5 shrink-0"
-                          :class="textClass(componentStatusToTone(c.status))" />
-                        <span :class="textClass(componentStatusToTone(c.status))" class="text-xs whitespace-nowrap">
-                          {{ componentLabel(c.status) }}
-                        </span>
-                      </span>
-                    </li>
-                  </ul>
-                  <p v-else class="text-sm text-muted-foreground py-2">{{ t('serviceStatus.NoComponents') }}</p>
-                </TabsContent>
-
-                <!-- Recent incidents -->
-                <TabsContent value="incidents" class="mt-3">
-                  <ul v-if="detailState[p.id]?.loading" class="rounded-lg border bg-card divide-y">
-                    <li v-for="(w, i) in placeholderSizes" :key="i" class="px-3 py-2.5">
-                      <div class="h-3.5 bg-muted rounded animate-pulse" :style="`width:${(w / 12) * 100}%`"></div>
-                    </li>
-                  </ul>
-                  <p v-else-if="detailState[p.id]?.error" class="text-sm text-destructive py-2">
-                    {{ t('serviceStatus.IncidentsError') }}
-                  </p>
-                  <ul v-else-if="detailState[p.id]?.incidents?.length"
-                    class="rounded-lg border bg-card divide-y max-h-150 overflow-y-auto">
-                    <li v-for="inc in detailState[p.id].incidents" :key="inc.id" class="px-3 py-2 text-sm">
-                      <!-- Line 1: incident title -->
-                      <a :href="inc.url || statusById[p.id]?.page" target="_blank" rel="noopener noreferrer"
-                        :title="inc.name" class="block truncate hover:underline">
-                        {{ inc.name }}
-                      </a>
-                      <!-- Line 2: date · severity (! icon count, no color) · status (colored by lifecycle) -->
-                      <div class="flex items-center justify-between gap-2 text-xs">
-                        <div class="mt-0.5 flex items-center gap-1.5  text-muted-foreground">
-                          <span>{{ formatDate(inc.startedAt) }}</span>
-                          <template v-if="impactLevel(inc.impact) > 0">
-                            <span aria-hidden="true">·</span>
-                            <span class="inline-flex items-center" :title="indicatorLabel(inc.impact)">
-                              <TriangleAlert v-for="n in impactLevel(inc.impact)" :key="n" class="size-3 mr-[2px]" />
-                            </span>
-                          </template>
-                        </div>
-                        <span :class="textClass(incidentStatusTone(inc.status))">
-                          {{ incidentStatusLabel(inc.status) }}
-                        </span>
-                      </div>
-                    </li>
-                  </ul>
-                  <p v-else class="text-sm text-muted-foreground py-2">{{ t('serviceStatus.NoRecentIncidents') }}</p>
-                </TabsContent>
-              </Tabs>
             </CardContent>
-          </CollapsibleContent>
-        </Card>
-      </Collapsible>
-    </div>
+
+            <!-- Expanded: services + recent incidents behind tabs (keeps the
+                 opened card from stretching the page too tall). Each tab's data
+                 is fetched on first view, not with the overview. -->
+            <CollapsibleContent>
+              <CardContent class="px-4 pb-4 pt-0">
+                <Tabs :model-value="activeTab[p.id] || 'components'" @update:model-value="(v) => (activeTab[p.id] = v)">
+                  <TabsList class="grid w-full grid-cols-2">
+                    <TabsTrigger value="components">{{ t('serviceStatus.ComponentsTitle') }}</TabsTrigger>
+                    <TabsTrigger value="incidents">{{ t('serviceStatus.IncidentsTitle') }}</TabsTrigger>
+                  </TabsList>
+
+                  <!-- Sub-services (first level only) -->
+                  <TabsContent value="components" class="mt-3">
+                    <!-- Skeleton placeholder keeps the panel height stable while loading -->
+                    <ul v-if="detailState[p.id]?.loading" class="rounded-lg border bg-card divide-y">
+                      <li v-for="(w, i) in placeholderSizes" :key="i" class="px-3 py-2.5">
+                        <div class="h-3.5 bg-muted rounded animate-pulse" :style="`width:${(w / 12) * 100}%`"></div>
+                      </li>
+                    </ul>
+                    <p v-else-if="detailState[p.id]?.error" class="text-sm text-destructive py-2">
+                      {{ t('serviceStatus.ComponentsError') }}
+                    </p>
+                    <ul v-else-if="detailState[p.id]?.components?.length"
+                      class="rounded-lg border bg-card divide-y max-h-150 overflow-y-auto">
+                      <li v-for="(c, i) in detailState[p.id].components" :key="i"
+                        class="flex items-center justify-between gap-2 px-3 py-2 text-sm">
+                        <span class="truncate min-w-0" :title="c.name">{{ c.name }}</span>
+                        <span class="flex items-center gap-1.5 shrink-0">
+                          <component :is="toneIcon(componentStatusToTone(c.status))" class="size-3.5 shrink-0"
+                            :class="textClass(componentStatusToTone(c.status))" />
+                          <span :class="textClass(componentStatusToTone(c.status))" class="text-xs whitespace-nowrap">
+                            {{ componentLabel(c.status) }}
+                          </span>
+                        </span>
+                      </li>
+                    </ul>
+                    <p v-else class="text-sm text-muted-foreground py-2">{{ t('serviceStatus.NoComponents') }}</p>
+                  </TabsContent>
+
+                  <!-- Recent incidents -->
+                  <TabsContent value="incidents" class="mt-3">
+                    <ul v-if="detailState[p.id]?.loading" class="rounded-lg border bg-card divide-y">
+                      <li v-for="(w, i) in placeholderSizes" :key="i" class="px-3 py-2.5">
+                        <div class="h-3.5 bg-muted rounded animate-pulse" :style="`width:${(w / 12) * 100}%`"></div>
+                      </li>
+                    </ul>
+                    <p v-else-if="detailState[p.id]?.error" class="text-sm text-destructive py-2">
+                      {{ t('serviceStatus.IncidentsError') }}
+                    </p>
+                    <ul v-else-if="detailState[p.id]?.incidents?.length"
+                      class="rounded-lg border bg-card divide-y max-h-150 overflow-y-auto">
+                      <li v-for="inc in detailState[p.id].incidents" :key="inc.id" class="px-3 py-2 text-sm">
+                        <!-- Line 1: incident title -->
+                        <a :href="inc.url || statusById[p.id]?.page" target="_blank" rel="noopener noreferrer"
+                          :title="inc.name" class="block truncate hover:underline">
+                          {{ inc.name }}
+                        </a>
+                        <!-- Line 2: date · severity (! icon count, no color) · status (colored by lifecycle) -->
+                        <div class="flex items-center justify-between gap-2 text-xs">
+                          <div class="mt-0.5 flex items-center gap-1.5  text-muted-foreground">
+                            <span>{{ formatDate(inc.startedAt) }}</span>
+                            <template v-if="impactLevel(inc.impact) > 0">
+                              <span aria-hidden="true">·</span>
+                              <span class="inline-flex items-center" :title="indicatorLabel(inc.impact)">
+                                <TriangleAlert v-for="n in impactLevel(inc.impact)" :key="n" class="size-3 mr-[2px]" />
+                              </span>
+                            </template>
+                          </div>
+                          <span :class="textClass(incidentStatusTone(inc.status))">
+                            {{ incidentStatusLabel(inc.status) }}
+                          </span>
+                        </div>
+                      </li>
+                    </ul>
+                    <p v-else class="text-sm text-muted-foreground py-2">{{ t('serviceStatus.NoRecentIncidents') }}</p>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+      </div>
+    </section>
 
     <!-- Bottom RefreshAll button (action color + Spinner standard) + the
          time of the frontend's last pull. We show *our last fetch* time, not
@@ -177,6 +183,7 @@ import { unixToDateTime } from '@/utils/time-utils.js';
 import {
   indicatorToTone, componentStatusToTone, impactLevel, incidentStatusTone,
 } from '@/utils/features/service-status-tone.js';
+import { groupProviders } from '@/utils/features/service-status-groups.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
@@ -216,10 +223,16 @@ const PROVIDERS = [
   { id: 'npm', name: 'npm', icon: 'ri:npmjs-line' },
   { id: 'perplexity', name: 'Perplexity', icon: 'ri:perplexity-line' },
   { id: 'canva', name: 'Canva', icon: 'simple-icons:canva' },
+  { id: 'dropbox', name: 'Dropbox', icon: 'simple-icons:dropbox' },
   { id: 'docker', name: 'Docker', icon: 'simple-icons:docker' },
   { id: 'bitbucket', name: 'Bitbucket', icon: 'simple-icons:bitbucket' },
   { id: 'digitalocean', name: 'DigitalOcean', icon: 'simple-icons:digitalocean' },
   { id: 'reddit', name: 'Reddit', icon: 'ri:reddit-line' },
+  { id: 'twitch', name: 'Twitch', icon: 'simple-icons:twitch' },
+  { id: 'epicgames', name: 'Epic Games', icon: 'simple-icons:epicgames' },
+  { id: 'sentry', name: 'Sentry', icon: 'simple-icons:sentry' },
+  { id: 'mixpanel', name: 'Mixpanel', icon: 'simple-icons:mixpanel' },
+  { id: 'pypi', name: 'PyPI', icon: 'simple-icons:pypi' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];
@@ -252,6 +265,21 @@ const detailState = reactive({}); // id → { loading, error, loaded, components
 const effectiveIndicator = (p) =>
   (fetchFailed.value ? 'unknown' : statusById[p.id]?.indicator) || 'unknown';
 const indicatorTone = (p) => indicatorToTone(effectiveIndicator(p));
+
+// The two card groups (utils/features/service-status-groups.js), empty ones
+// dropped. While loading or after a failed fetch no status is known, so the
+// operational group shows untitled.
+const cardGroups = computed(() => {
+  const indicators = Object.fromEntries(Object.entries(statusById).map(([id, s]) => [id, s?.indicator]));
+  const unresolved = loading.value || fetchFailed.value;
+  const { issues, operational } = groupProviders(PROVIDERS, indicators, {
+    loading: loading.value, failed: fetchFailed.value,
+  });
+  return [
+    { id: 'issues', titleKey: 'serviceStatus.GroupIssues', providers: issues },
+    { id: 'operational', titleKey: unresolved ? null : 'serviceStatus.GroupOperational', providers: operational },
+  ].filter((g) => g.providers.length);
+});
 
 // Localized HH:MM:SS of the frontend's last pull — the data-freshness signal
 // shown under the Refresh button. Seconds included so rapid re-clicks advance.

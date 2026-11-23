@@ -10,6 +10,7 @@ import {
   classifyRadar, classifyPrefixes, classifyConnectivity, classifyRank, classifyReputation, classifyPeeringdb,
   buildSectionLoaders, composeAsnProfile, allSourcesFailed, isCompleteProfile,
 } from '../server/asn-profile.js';
+import { RADAR_TIMEOUT_MS } from '../server/cf-radar.js';
 import { ASN_PROFILE_TIMEOUT_MS } from '../frontend/utils/ip/asn-profile-view.js';
 
 const sleep = (ms, value) => new Promise((resolve) => setTimeout(() => resolve(value), ms));
@@ -24,6 +25,8 @@ describe('deadlines', () => {
       assert.ok(DEADLINES[section] > INNER_TIMEOUTS[section], section);
     }
     assert.equal(INNER_TIMEOUTS.whois, 8000 + SOURCE_TIMEOUTS.autnum, 'IANA bootstrap, then autnum');
+    assert.equal(INNER_TIMEOUTS.radar, RADAR_TIMEOUT_MS);
+    assert.equal(INNER_TIMEOUTS.prefixes, RADAR_TIMEOUT_MS);
   });
 
   it('the page waits longer than the slowest section, with headroom', () => {

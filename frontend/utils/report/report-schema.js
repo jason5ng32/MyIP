@@ -7,10 +7,9 @@ export {
     REPORT_TTL_DAYS,
     REPORT_MAX_BYTES,
     REPORT_SECTION_IDS,
-    CONNECTIVITY_STATUS,
-    ANONYMITY_CODES,
     validateReport,
     maskIpTail,
     maskReportIps,
+    stripLocalOnly,
     isMaskedIP,
 } from '../../../common/report-schema.js';

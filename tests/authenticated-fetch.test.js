@@ -1,6 +1,7 @@
 // Contract tests for utils/authenticated-fetch.js — the HTTP status must
 // survive the error rewrapping, because fetchErrorLabel() turns it into the
-// console.error prefix that Sentry fingerprints on.
+// console.error prefix that Sentry fingerprints on; the body's error code and
+// reason ride along for the tools that branch on them.
 //
 // The module imports the Pinia store, which reaches for localStorage /
 // window / document at import time — same globalThis stubs as store.test.js,
@@ -84,10 +85,35 @@ describe('authenticatedFetch — error shape', () => {
     assert.equal(fetchErrorLabel(error), 'HTTP 403');
   });
 
+  it('carries the body\'s code and reason, message format unchanged', async () => {
+    const body = { error: 'Invalid token', code: 'auth', reason: 'invalid_token' };
+    globalThis.fetch = async () => httpResponse(403, body);
+    const error = await authenticatedFetch('/api/ipblocklist?ip=1.1.1.1').catch((e) => e);
+    assert.equal(error.status, 403);
+    assert.equal(error.code, 'auth');
+    assert.equal(error.reason, 'invalid_token');
+    assert.equal(error.message, `Fetch failed: HTTP error! Status: 403 - ${JSON.stringify(body)}`);
+  });
+
+  it('carries a code without a reason, and neither when the body has none', async () => {
+    globalThis.fetch = async () => httpResponse(429, { error: 'Monthly quota exceeded', code: 'quota' });
+    const quota = await authenticatedFetch('/api/persona/evaluate', 'POST', {}).catch((e) => e);
+    assert.equal(quota.status, 429);
+    assert.equal(quota.code, 'quota');
+    assert.equal('reason' in quota, false);
+
+    globalThis.fetch = async () => httpResponse(400, { error: 'Invalid token' });
+    const plain = await authenticatedFetch('/api/dnsleaktest/session/abc').catch((e) => e);
+    assert.equal(plain.status, 400);
+    assert.equal('code' in plain, false);
+    assert.equal('reason' in plain, false);
+  });
+
   it('keeps the status when the body is not JSON (edge block pages)', async () => {
     globalThis.fetch = async () => httpResponse(403, null, { json: false });
     const error = await authenticatedFetch('/api/ipchecking?ip=1.1.1.1').catch((e) => e);
     assert.equal(error.status, 403);
+    assert.equal('code' in error, false);
     assert.equal(fetchErrorLabel(error), 'HTTP 403');
   });
 
@@ -95,6 +121,7 @@ describe('authenticatedFetch — error shape', () => {
     globalThis.fetch = async () => { throw new TypeError('Failed to fetch'); };
     const error = await authenticatedFetch('/api/ipchecking?ip=1.1.1.1').catch((e) => e);
     assert.equal(error.status, undefined);
+    assert.equal(error.code, undefined);
     assert.equal(error.message, 'Fetch failed: Failed to fetch');
     assert.equal(fetchErrorLabel(error), 'network');
   });
@@ -114,7 +141,7 @@ describe('authenticatedFetch — error shape', () => {
   });
 });
 
-// A source declining with 403 is a fail-over, not a defect: it must log below
+// A source declining with 403 or 429 is a fail-over, not a defect: it must log below
 // the level error monitoring captures, while every other failure stays an
 // error so a real outage still surfaces.
 describe('logSourceFetchFailure', () => {
@@ -141,6 +168,15 @@ describe('logSourceFetchFailure', () => {
 
   it('warns on 403', async () => {
     logSourceFetchFailure('source 0', await failWith(403, { json: false }));
+    assert.equal(captured.warn.length, 1);
+    assert.equal(captured.error.length, 0);
+  });
+
+  it('warns on 429, a source\'s reached daily limit', async () => {
+    globalThis.fetch = async () => httpResponse(429, { error: 'Daily limit reached for this source', code: 'source_daily_limit' });
+    const error = await authenticatedFetch('/api/ipapiis?ip=1.1.1.1').catch((e) => e);
+    assert.equal(error.code, 'source_daily_limit');
+    logSourceFetchFailure('source 3', error);
     assert.equal(captured.warn.length, 1);
     assert.equal(captured.error.length, 0);
   });

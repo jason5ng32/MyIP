@@ -9,3 +9,24 @@ services:
         restart: always # restart policy / on-failure:5 restart 5 times / always restart forever / unless-stopped unless stopped / no never restart
         ports:
             - "18966:18966"
+        # Optional user storage: uncomment with the db service below; the
+        # backend applies its migrations at start.
+        # environment:
+        #     DATABASE_URL: postgres://myip:change-me@db:5432/myip
+        # depends_on:
+        #     - db
+
+    # Optional Postgres for user storage (only with sign-in configured too).
+    # db:
+    #     container_name: myip-db
+    #     image: postgres:18-alpine
+    #     restart: always
+    #     environment:
+    #         POSTGRES_USER: myip
+    #         POSTGRES_PASSWORD: change-me
+    #         POSTGRES_DB: myip
+    #     volumes:
+    #         - myip-db-data:/var/lib/postgresql
+
+# volumes:
+#     myip-db-data:

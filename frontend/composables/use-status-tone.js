@@ -1,17 +1,19 @@
-// Unified "state → visual" mapping: 5 tone levels share the same color scheme
+// Unified "state → visual" mapping: 6 tone levels share the same color scheme
 //
-//   wait     waiting/not executed     sky
-//   ok-fast  success + fast       green
+//   wait     waiting/not executed     sky dot, muted placeholder text
+//   active   live/in-progress         sky dot + sky text
+//   ok-fast  success + fast           green
 //   ok-mild  between fast and slow    light amber (half-strength --warning)
-//   ok-slow  success + slow       amber
-//   fail     failure/timeout       red
+//   ok-slow  success + slow / paused  amber
+//   fail     failure/timeout          red
 //
 // Each module maps its business status (e.g. test.status === 'Available' && test.time < 200)
-// to these tone levels, then calls dotClass(tone) / textClass(tone) to get the corresponding
-// Tailwind class. This way Connectivity / WebRTC / DnsLeak / future similar modules
-// all use the same visual language, and the color scheme is applied throughout the site.
+// to these tone levels, then calls dotClass(tone) / textClass(tone) / toneVar(tone) to get the
+// corresponding class or CSS token. This way Connectivity / WebRTC / DnsLeak / SpeedTest / future
+// modules all use the same visual language, and the color scheme is applied throughout the site.
 const dotColorMap = {
     'wait':    'bg-info',
+    'active':  'bg-info',
     'ok-fast': 'bg-success',
     'ok-mild': 'bg-warning/50',
     'ok-slow': 'bg-warning',
@@ -20,16 +22,27 @@ const dotColorMap = {
 
 const textColorMap = {
     'wait':    'text-muted-foreground',
+    'active':  'text-info',
     'ok-fast': 'text-success',
     'ok-mild': 'text-warning/75',
     'ok-slow': 'text-warning',
     'fail':    'text-destructive',
 };
 
+const cssVarMap = {
+    'wait':    'var(--info)',
+    'active':  'var(--info)',
+    'ok-fast': 'var(--success)',
+    'ok-mild': 'color-mix(in oklab, var(--warning) 50%, transparent)',
+    'ok-slow': 'var(--warning)',
+    'fail':    'var(--destructive)',
+};
+
 export function useStatusTone() {
     return {
         dotClass:  (tone) => dotColorMap[tone]  || dotColorMap.wait,
         textClass: (tone) => textColorMap[tone] || textColorMap.wait,
+        toneVar:   (tone) => cssVarMap[tone]    || cssVarMap.wait,
     };
 }
 

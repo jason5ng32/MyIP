@@ -3,7 +3,10 @@ import { describe, it } from 'node:test';
 import express from 'express';
 import logger from '../server/logger.js';
 
-import { requireReferer, resetRefererRejectionLog, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery } from '../server/guards.js';
+import { SYNC_COLLECTIONS } from '../common/sync-collections.js';
+import { requireReferer, resetRefererRejectionLog, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidSyncCollection, requireValidCountry, requireValidASN, normalizeAsnQuery, optionalUser, requireUser, requireUserStorage } from '../server/guards.js';
+import { createUserStorage } from '../server/db/user-storage.js';
+import { AUTH_REASON } from '../common/codes/service-errors.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -286,6 +289,39 @@ describe('requireValidReportId', () => {
     });
 });
 
+describe('requireValidSyncCollection', () => {
+    // Reads the `:collection` route param; the row goes on res.locals.
+    const run = (guard, collection) => {
+        const res = { ...makeRes(), locals: {} };
+        let nextCalled = false;
+        guard({ headers: {}, params: collection === undefined ? {} : { collection } }, res, () => { nextCalled = true; });
+        return { res, nextCalled };
+    };
+
+    it('passes a registry id and puts its row on res.locals', () => {
+        for (const id of ['preferences', 'connectivity', 'checklist', 'speedtest']) {
+            const { res, nextCalled } = run(requireValidSyncCollection(), id);
+            assert.equal(nextCalled, true, id);
+            assert.equal(res.locals.syncCollection, SYNC_COLLECTIONS[id]);
+        }
+    });
+
+    it('404s anything else, inherited names included', () => {
+        for (const bad of [undefined, '', 'nope', 'ipHistory', 'snapshots', 'Connectivity', 'constructor', '__proto__', 'toString']) {
+            const { res, nextCalled } = run(requireValidSyncCollection(), bad);
+            assert.equal(res.statusCode, 404, String(bad));
+            assert.deepEqual(res.body, { error: 'Unknown collection' });
+            assert.equal(nextCalled, false);
+        }
+    });
+
+    it('reads the registry it is given', () => {
+        const stub = Object.freeze({ other: Object.freeze({ id: 'other' }) });
+        assert.equal(run(requireValidSyncCollection('collection', stub), 'other').nextCalled, true);
+        assert.equal(run(requireValidSyncCollection('collection', stub), 'ipHistory').res.statusCode, 404);
+    });
+});
+
 describe('requireValidRecordType', () => {
     const guard = requireValidRecordType();
 
@@ -491,5 +527,147 @@ describe('guard rewrites on a real Express request', () => {
         assert.equal(calls, 2);
         assert.deepEqual({ ...req.query }, { type: 'CAA', hostname: 'example.com' });
         assert.equal(req.query, req.query);
+    });
+});
+
+describe('optionalUser / requireUser', () => {
+    const SIGNED_OUT = { reason: AUTH_REASON.SIGN_IN_REQUIRED };
+    const INVALID = { reason: AUTH_REASON.INVALID_TOKEN };
+
+    // Runs `guard` over a request carrying `authorization`; `seen` is what
+    // the verifier was handed.
+    const run = async (guard, authorization) => {
+        const req = { headers: authorization === undefined ? {} : { authorization }, query: {} };
+        const res = { ...makeRes(), locals: {} };
+        let nextCalled = false;
+        await guard(req, res, () => { nextCalled = true; });
+        return { res, nextCalled };
+    };
+    const verifier = (answer) => {
+        const seen = [];
+        const verify = async (header) => {
+            seen.push(header);
+            if (answer instanceof Error) throw answer;
+            return answer;
+        };
+        return { verify, seen };
+    };
+
+    it('both put a verified id on res.locals.userId and pass', async () => {
+        for (const factory of [optionalUser, requireUser]) {
+            const { verify, seen } = verifier({ id: 'user-1' });
+            const { res, nextCalled } = await run(factory(verify), 'Bearer t');
+            assert.equal(nextCalled, true);
+            assert.equal(res.locals.userId, 'user-1');
+            assert.deepEqual(seen, ['Bearer t']);
+        }
+    });
+
+    it('optionalUser lets a signed-out request through without an id', async () => {
+        const { res, nextCalled } = await run(optionalUser(verifier(SIGNED_OUT).verify));
+        assert.equal(nextCalled, true);
+        assert.equal(res.locals.userId, undefined);
+        assert.equal(res.statusCode, null);
+    });
+
+    it('requireUser refuses a signed-out request with 403 sign_in_required', async () => {
+        const { res, nextCalled } = await run(requireUser(verifier(SIGNED_OUT).verify));
+        assert.equal(nextCalled, false);
+        assert.equal(res.statusCode, 403);
+        assert.deepEqual(res.body, { error: 'Sign in required', code: 'auth', reason: AUTH_REASON.SIGN_IN_REQUIRED });
+    });
+
+    it('both refuse a token that fails verification with 403 invalid_token', async () => {
+        for (const factory of [optionalUser, requireUser]) {
+            const { res, nextCalled } = await run(factory(verifier(INVALID).verify), 'Bearer bad');
+            assert.equal(nextCalled, false);
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, { error: 'Invalid token', code: 'auth', reason: AUTH_REASON.INVALID_TOKEN });
+            assert.equal(res.locals.userId, undefined);
+        }
+    });
+
+    it('both answer 503 without a code when the check cannot run', async () => {
+        for (const factory of [optionalUser, requireUser]) {
+            const { res, nextCalled } = await run(factory(verifier(new Error('certificates down')).verify), 'Bearer t');
+            assert.equal(nextCalled, false);
+            assert.equal(res.statusCode, 503);
+            assert.deepEqual(res.body, { error: 'Sign-in check unavailable' });
+        }
+    });
+
+    it('treat every request as signed out when sign-in is not configured', async () => {
+        const saved = process.env.VITE_FIREBASE_PROJECT_ID;
+        delete process.env.VITE_FIREBASE_PROJECT_ID;
+        try {
+            const optional = await run(optionalUser(), 'Bearer anything');
+            assert.equal(optional.nextCalled, true);
+            assert.equal(optional.res.locals.userId, undefined);
+            const required = await run(requireUser(), 'Bearer anything');
+            assert.equal(required.nextCalled, false);
+            assert.equal(required.res.body.reason, AUTH_REASON.SIGN_IN_REQUIRED);
+        } finally {
+            if (saved !== undefined) process.env.VITE_FIREBASE_PROJECT_ID = saved;
+        }
+    });
+});
+
+describe('requireUserStorage', () => {
+    const run = async (guard) => {
+        const res = makeRes();
+        let nextCalled = false;
+        await guard(makeReq(), res, () => { nextCalled = true; });
+        return { res, nextCalled };
+    };
+
+    // A pg.Pool stand-in whose connection answers every statement, or fails a migration's SQL.
+    const fakeLoad = (migrationFails = false) => async () => class {
+        on() {}
+        async connect() {
+            return {
+                query: async (text) => {
+                    if (migrationFails && text === 'BROKEN') throw Object.assign(new Error('syntax error'), { severity: 'ERROR', code: '42601' });
+                    return { rows: [] };
+                },
+                release: () => {},
+            };
+        }
+    };
+    const migrations = async () => [{ name: '0001_x', sql: 'BROKEN' }];
+
+    it('answers 503 uncoded when DATABASE_URL is unset, loading nothing', async () => {
+        let loads = 0;
+        const storage = createUserStorage({ env: {}, load: async () => { loads += 1; return class {}; } });
+        const { res, nextCalled } = await run(requireUserStorage(storage));
+        assert.equal(nextCalled, false);
+        assert.equal(res.statusCode, 503);
+        assert.deepEqual(res.body, { error: 'User storage unavailable' });
+        assert.equal(loads, 0);
+    });
+
+    it('the default guard answers 503 with DATABASE_URL unset', async () => {
+        const saved = process.env.DATABASE_URL;
+        delete process.env.DATABASE_URL;
+        try {
+            const { res, nextCalled } = await run(requireUserStorage());
+            assert.equal(nextCalled, false);
+            assert.equal(res.statusCode, 503);
+        } finally {
+            if (saved !== undefined) process.env.DATABASE_URL = saved;
+        }
+    });
+
+    it('passes once storage is ready', async () => {
+        const storage = createUserStorage({ env: { DATABASE_URL: 'postgres://fake' }, load: fakeLoad(), readMigrations: migrations });
+        const { res, nextCalled } = await run(requireUserStorage(storage));
+        assert.equal(nextCalled, true);
+        assert.equal(res.statusCode, null);
+    });
+
+    it('answers 503 while a migration fails', async () => {
+        const storage = createUserStorage({ env: { DATABASE_URL: 'postgres://fake' }, load: fakeLoad(true), readMigrations: migrations });
+        const { res, nextCalled } = await run(requireUserStorage(storage));
+        assert.equal(nextCalled, false);
+        assert.equal(res.statusCode, 503);
     });
 });

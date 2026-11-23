@@ -12,9 +12,7 @@ import { readFileSync } from 'node:fs';
 
 import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
 
-// Build and register the UA. Called from backend-server.js after
-// dotenv.config() so VITE_SITE_URL from .env is visible — module import
-// time would be too early (imports are hoisted above the config call).
+// Build and register the UA. Called once from backend-server.js at startup.
 // Missing pieces degrade gracefully: `MyIP/v7.1.0`, or just `MyIP`.
 export const initUpstreamUserAgent = () => {
     let version = '';

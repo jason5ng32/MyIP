@@ -1,6 +1,6 @@
-// Tests for server/asn-reputation.js — the private-API request behind the
+// Tests for server/asn-reputation.js — the IPCheck.ing API request behind the
 // /api/asn-profile reputation section: no upstream call without a key or
-// endpoint, asn + system key + caller headers forwarded, upstream status and
+// endpoint, asn + system key sent without any visitor header, upstream status and
 // body handed back, network failures and unparsable 2xx bodies thrown.
 // fetch is stubbed.
 
@@ -31,11 +31,11 @@ describe('requestAsnReputation', () => {
             else delete process.env.IPCHECKING_API_KEY;
             if (env.endpoint) process.env.IPCHECKING_API_ENDPOINT = env.endpoint;
             else delete process.env.IPCHECKING_API_ENDPOINT;
-            assert.equal(await requestAsnReputation(13335, {}), null);
+            assert.equal(await requestAsnReputation(13335), null);
         }
     });
 
-    it('forwards asn, key and caller headers; returns status and payload', async () => {
+    it('sends asn and key but no visitor header; returns status and payload', async () => {
         process.env.IPCHECKING_API_KEY = 'test-key';
         process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
         const payload = { found: false, ratio: null, level: null, dropListed: false, proxy: 0, updatedAt: '2026-10-03T11:54:33.740Z' };
@@ -44,29 +44,29 @@ describe('requestAsnReputation', () => {
             requested = { url: new URL(String(url)), options };
             return { status: 200, ok: true, json: async () => payload };
         };
-        const result = await requestAsnReputation(64511, { 'accept-language': 'de-DE' });
+        const result = await requestAsnReputation(64511);
         assert.deepEqual(result, { status: 200, data: payload });
         assert.equal(requested.url.pathname, '/asnreputation');
         assert.equal(requested.url.searchParams.get('asn'), '64511');
         assert.equal(requested.url.searchParams.get('key'), 'test-key');
-        assert.equal(requested.options.headers['accept-language'], 'de-DE');
+        assert.deepEqual(requested.options.headers, {});
     });
 
     it('hands an upstream error status back, and throws on a network failure', async () => {
         process.env.IPCHECKING_API_KEY = 'test-key';
         process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
         globalThis.fetch = async () => ({ status: 503, ok: false, json: async () => ({ error: 'ASN data not loaded' }) });
-        assert.deepEqual(await requestAsnReputation(13335, {}), { status: 503, data: { error: 'ASN data not loaded' } });
+        assert.deepEqual(await requestAsnReputation(13335), { status: 503, data: { error: 'ASN data not loaded' } });
         globalThis.fetch = async () => { throw new Error('network down'); };
-        await assert.rejects(requestAsnReputation(13335, {}), /network down/);
+        await assert.rejects(requestAsnReputation(13335), /network down/);
     });
 
     it('rejects a 200 whose body is not JSON, but keeps a non-JSON error status', async () => {
         process.env.IPCHECKING_API_KEY = 'test-key';
         process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
         globalThis.fetch = async () => new Response('<html>maintenance</html>', { status: 200 });
-        await assert.rejects(requestAsnReputation(13335, {}));
+        await assert.rejects(requestAsnReputation(13335));
         globalThis.fetch = async () => new Response('<html>bad gateway</html>', { status: 502 });
-        assert.deepEqual(await requestAsnReputation(13335, {}), { status: 502, data: null });
+        assert.deepEqual(await requestAsnReputation(13335), { status: 502, data: null });
     });
 });

@@ -1,0 +1,161 @@
+// Specs for synced preferences: the shared schema (common/preferences-schema.js), its Connectivity lists checks and its agreement with the front end.
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { describe, it } from 'node:test';
+
+import {
+    PREFERENCES_VERSION, SYNCED_PREFERENCE_KEYS, isSyncedPreferenceKey, isValidPreferenceValue,
+    isValidConnectivityList, isValidConnectivityListOrder, isValidConnectivityListId, CONNECTIVITY_ORDER_LIMIT,
+    SPEEDTEST_SIZE_OPTIONS, isValidSpeedtestSize,
+    IP_CARDS_OPTIONS, SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_AUTO_MODES,
+    CONNECTIVITY_LISTS_SCHEMA_VERSION, CONNECTIVITY_TARGET_LIMIT, CONNECTIVITY_LIST_LIMIT, CONNECTIVITY_LIST_NAME_LIMIT,
+} from '../common/preferences-schema.js';
+import * as bridge from '../frontend/utils/preferences-schema.js';
+import { DEFAULT_PREFERENCES, PREFS_STORAGE_KEY } from '../frontend/data/default-preferences.js';
+import * as connectivityDefaults from '../frontend/data/connectivity-defaults.js';
+import { sanitizeLists, CONNECTIVITY_LISTS_SCHEMA_VERSION as LISTS_VERSION_FRONTEND } from '../frontend/utils/features/connectivity-lists.js';
+import * as snapshots from '../frontend/utils/features/snapshots.js';
+
+const LEGACY_KEYS = ['connectivityTargets', 'customConnectivityTargets'];
+// Synced as their own collection (common/sync-collections.js), not as preferences.
+const CONNECTIVITY_KEYS = ['connectivityLists', 'connectivityDefaultListId'];
+const SPEEDTEST_KEYS = ['speedtestDownloadBytes', 'speedtestUploadBytes'];
+
+const member = (over = {}) => ({ id: 'custom-1', name: 'Example', url: 'https://example.com/favicon.ico', ...over });
+
+describe('synced preference keys', () => {
+    it('are every default preference but the legacy, Connectivity list and speed test ones, frozen', () => {
+        assert.ok(Object.isFrozen(SYNCED_PREFERENCE_KEYS));
+        const expected = Object.keys(DEFAULT_PREFERENCES)
+            .filter((key) => ![...LEGACY_KEYS, ...CONNECTIVITY_KEYS, ...SPEEDTEST_KEYS].includes(key));
+        assert.deepEqual([...SYNCED_PREFERENCE_KEYS].sort(), expected.sort());
+        for (const key of [...LEGACY_KEYS, ...CONNECTIVITY_KEYS, ...SPEEDTEST_KEYS, 'constructor', '__proto__', 'toString']) {
+            assert.equal(isSyncedPreferenceKey(key), false, key);
+            assert.equal(isValidPreferenceValue(key, true), false, key);
+        }
+    });
+
+    it('every default value passes its own check; so do the sanitized lists and the default list id', () => {
+        for (const key of SYNCED_PREFERENCE_KEYS) assert.ok(isValidPreferenceValue(key, DEFAULT_PREFERENCES[key]), key);
+        for (const { id, name, members } of sanitizeLists(null, null, []).lists) assert.ok(isValidConnectivityList(id, { name, members }), id);
+        assert.ok(isValidConnectivityListId(DEFAULT_PREFERENCES.connectivityDefaultListId));
+        for (const key of SPEEDTEST_KEYS) assert.ok(isValidSpeedtestSize(DEFAULT_PREFERENCES[key]), key);
+    });
+
+    it('speed test sizes: one of the size options, nothing else', () => {
+        assert.deepEqual([...SPEEDTEST_SIZE_OPTIONS], [1e6, 10e6, 15e6, 50e6, 100e6]);
+        assert.ok(Object.isFrozen(SPEEDTEST_SIZE_OPTIONS));
+        for (const value of SPEEDTEST_SIZE_OPTIONS) assert.equal(isValidSpeedtestSize(value), true, String(value));
+        for (const value of [0, 2e6, 1e9, '50000000', null, -1e6, 50e6 + 0.5]) assert.equal(isValidSpeedtestSize(value), false, String(value));
+        assert.equal(bridge.SPEEDTEST_SIZE_OPTIONS, SPEEDTEST_SIZE_OPTIONS);
+    });
+});
+
+describe('the front end agrees with the shared schema', () => {
+    it('the storage key carries PREFERENCES_VERSION', () => {
+        assert.equal(PREFS_STORAGE_KEY, `userPreferences_v${PREFERENCES_VERSION}`);
+    });
+
+    it('the bridge, snapshots and Connectivity lists read the very same values', () => {
+        assert.equal(bridge.SYNCED_PREFERENCE_KEYS, SYNCED_PREFERENCE_KEYS);
+        assert.equal(bridge.isValidPreferenceValue, isValidPreferenceValue);
+        assert.equal(bridge.isValidConnectivityList, isValidConnectivityList);
+        assert.equal(bridge.isValidConnectivityListOrder, isValidConnectivityListOrder);
+        assert.equal(bridge.CONNECTIVITY_ORDER_LIMIT, CONNECTIVITY_ORDER_LIMIT);
+        assert.equal(bridge.isValidConnectivityListId, isValidConnectivityListId);
+        assert.equal(snapshots.SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_KEEP_LAST_OPTIONS);
+        assert.equal(snapshots.SNAPSHOTS_AUTO_MODES, SNAPSHOTS_AUTO_MODES);
+        assert.equal(LISTS_VERSION_FRONTEND, CONNECTIVITY_LISTS_SCHEMA_VERSION);
+    });
+
+    it('the Connectivity caps match frontend/data/connectivity-defaults.js', () => {
+        assert.equal(connectivityDefaults.CONNECTIVITY_TARGET_LIMIT, CONNECTIVITY_TARGET_LIMIT);
+        assert.equal(connectivityDefaults.CONNECTIVITY_LIST_LIMIT, CONNECTIVITY_LIST_LIMIT);
+        assert.equal(connectivityDefaults.CONNECTIVITY_LIST_NAME_LIMIT, CONNECTIVITY_LIST_NAME_LIMIT);
+        assert.equal(connectivityDefaults.MINE_LIST_ID, 'mine');
+    });
+
+    it('the IP card counts match the Preferences panel', () => {
+        const source = readFileSync(new URL('../frontend/components/widgets/Preferences.vue', import.meta.url), 'utf8');
+        const match = /v-for="num in \[([\d,\s]+)\]"/.exec(source);
+        assert.ok(match, 'IP card options not found in Preferences.vue');
+        assert.deepEqual(match[1].split(',').map(Number), [...IP_CARDS_OPTIONS]);
+    });
+});
+
+describe('isValidPreferenceValue', () => {
+    const cases = {
+        theme: { ok: ['auto', 'light', 'dark'], bad: ['system', '', null, 1] },
+        lang: { ok: ['auto', 'en', 'zh-CN', 'zh-Hant-TW', 'fil'], bad: ['', 'english', 'e', 'en_US', 'en-', `en-${'a'.repeat(40)}`, 7, null] },
+        ipCardsToShow: { ok: [2, 4, 6], bad: [1, 3, 8, '2', null] },
+        ipGeoSource: { ok: [0, 1, 6, 63], bad: [-1, 64, 1.5, '0', null] },
+        snapshotsAuto: { ok: ['smart', 'every', 'off'], bad: [false, true, 'never', null] },
+        snapshotsLabelCard: { ok: [1, 3, 6], bad: [0, 7, 1.5, '1'] },
+        snapshotsKeepLast: { ok: [10, 50, 100], bad: [20, 0, '50'] },
+    };
+    const booleans = ['connectivityMultipleTests', 'connectivityDiscardFirstResult', 'simpleMode', 'autoRunConnectivity',
+        'autoRunWebRTC', 'autoRunDnsLeak', 'popupConnectivityNotifications', 'snapshotsNotify', 'connectivityCardTitleOpensSite'];
+    for (const key of booleans) cases[key] = { ok: [true, false], bad: [0, 1, 'true', null, undefined] };
+
+    it('covers every synced key here', () => {
+        assert.deepEqual(Object.keys(cases).sort(), [...SYNCED_PREFERENCE_KEYS].sort());
+    });
+
+    for (const [key, { ok, bad }] of Object.entries(cases)) {
+        it(key, () => {
+            for (const value of ok) assert.equal(isValidPreferenceValue(key, value), true, JSON.stringify(value));
+            for (const value of bad) assert.equal(isValidPreferenceValue(key, value), false, JSON.stringify(value));
+        });
+    }
+
+    it('connectivityDefaultListId: a bounded non-empty string', () => {
+        for (const value of ['mine', 'list-1700000000000']) assert.equal(isValidConnectivityListId(value), true, value);
+        for (const value of ['', 'x'.repeat(65), 3, null]) assert.equal(isValidConnectivityListId(value), false, JSON.stringify(value));
+    });
+
+    it('a Connectivity list: accepts the stored shape, its id riding apart', () => {
+        assert.ok(isValidConnectivityList('mine', { name: null, members: [member()] }));
+        assert.ok(isValidConnectivityList('mine', { name: null, members: [member({ siteUrl: 'https://example.com', favicon: '/favicons/example.png' })] }));
+        assert.ok(isValidConnectivityList('list-1', { name: 'Work', members: [] }));
+        const full = Array.from({ length: CONNECTIVITY_TARGET_LIMIT }, (_, i) => member({ id: `m${i}` }));
+        assert.ok(isValidConnectivityList('mine', { name: null, members: full }));
+    });
+
+    it('a Connectivity list: rejects anything else', () => {
+        const mine = (members) => ['mine', { name: null, members }];
+        const bad = [
+            ['mine', null], ['mine', []], ['mine', 'x'],
+            ['', { name: 'L', members: [] }],
+            ['x'.repeat(65), { name: 'L', members: [] }],
+            ['mine', { id: 'mine', name: null, members: [] }],
+            ['mine', { name: 'Mine', members: [] }],
+            ['l1', { name: null, members: [] }],
+            ['l1', { name: '   ', members: [] }],
+            ['l1', { name: 'x'.repeat(CONNECTIVITY_LIST_NAME_LIMIT + 1), members: [] }],
+            ['l1', { name: 'L', members: [], color: 'red' }],
+            ['l1', { name: 'L' }],
+            mine(Array.from({ length: CONNECTIVITY_TARGET_LIMIT + 1 }, (_, i) => member({ id: `m${i}` }))),
+            mine([member({ url: 'javascript:alert(1)' })]),
+            mine([member({ url: 'ftp://example.com/' })]),
+            mine([member({ url: 'not a url' })]),
+            mine([member({ url: `https://example.com/${'a'.repeat(2048)}` })]),
+            mine([member({ siteUrl: 'data:text/html,x' })]),
+            mine([member({ favicon: 'https://evil.example/x.png' })]),
+            mine([member({ name: '' })]),
+            mine([member({ name: 'x'.repeat(101) })]),
+            mine([member({ id: 7 })]),
+            mine([member({ source: 'import' })]),
+            mine([null]),
+        ];
+        for (const [id, value] of bad) assert.equal(isValidConnectivityList(id, value), false, JSON.stringify([id, value])?.slice(0, 120));
+    });
+
+    it('the lists\' order: distinct list ids, bounded', () => {
+        assert.ok(isValidConnectivityListOrder([]));
+        assert.ok(isValidConnectivityListOrder(['mine', 'list-1']));
+        assert.ok(CONNECTIVITY_ORDER_LIMIT > CONNECTIVITY_LIST_LIMIT, 'room for lists meeting past the cap');
+        for (const bad of [null, 'mine', ['mine', 'mine'], [''], [3], Array.from({ length: CONNECTIVITY_ORDER_LIMIT + 1 }, (_, i) => `l${i}`)]) {
+            assert.equal(isValidConnectivityListOrder(bad), false, JSON.stringify(bad));
+        }
+    });
+});

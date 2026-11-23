@@ -3,13 +3,19 @@
 // <id>/) dresses the logo, nav and footer. App.vue calls startFestivalSkin() once;
 // it evaluates now, then re-checks on a coarse timer and on tab return.
 import { computed, defineAsyncComponent, shallowRef } from 'vue';
-import { FESTIVAL_STATUSES } from '@/data/pulse-statuses.js';
-import { FESTIVAL_SKINS_ENABLED, activeFestivalAt, skinPartPath } from '@/utils/features/festival-skin.js';
+import {
+    FESTIVAL_SKINS_ENABLED,
+    SKIN_SLOTS,
+    activeFestivalAt,
+    previewFestival,
+    skinPartPath,
+} from '@/utils/features/festival-skin.js';
 
 const RECHECK_MS = 10 * 60 * 1000;
 
 const PART_LOADERS = import.meta.glob('../components/festival/*/*.vue');
 const partCache = new Map();
+const hasSkin = (id) => SKIN_SLOTS.some((slot) => Boolean(PART_LOADERS[skinPartPath(id, slot)]));
 const partComponent = (festivalId, slot) => {
     const path = skinPartPath(festivalId, slot);
     if (!partCache.has(path)) {
@@ -22,13 +28,6 @@ const partComponent = (festivalId, slot) => {
 const festival = shallowRef(null);
 let started = false;
 
-// DEV only: ?festival=<id> forces a festival, ignoring switch and window.
-const previewFestival = () => {
-    if (!import.meta.env.DEV) return null;
-    const id = new URLSearchParams(window.location.search).get('festival');
-    return FESTIVAL_STATUSES.find((f) => f.id === id) ?? null;
-};
-
 export const startFestivalSkin = () => {
     if (started) return;
     started = true;
@@ -36,7 +35,7 @@ export const startFestivalSkin = () => {
     if (!preview && !FESTIVAL_SKINS_ENABLED) return;
 
     const evaluate = () => {
-        festival.value = preview ?? activeFestivalAt();
+        festival.value = preview ?? activeFestivalAt(new Date(), hasSkin);
     };
     evaluate();
     if (!preview) setInterval(evaluate, RECHECK_MS);

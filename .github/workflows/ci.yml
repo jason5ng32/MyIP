@@ -30,7 +30,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 26
           # The committed pnpm-lock.yaml lets setup-node cache the pnpm store keyed
           # off the lockfile hash — installs are warm on every run after the first.
           cache: pnpm

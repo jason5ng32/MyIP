@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md) | [Español](README_ES.md)
 
 Универсальный набор IP-инструментов с открытым исходным кодом: определение IP по нескольким источникам, проверка доступности сайтов, обнаружение утечек WebRTC и DNS, тест скорости, MTR, проверка цензуры, Whois и многое другое — разворачивается на своём сервере одной командой Docker.
 
@@ -40,7 +40,7 @@
 
 * 🛜 **Карточки IP**: определяют ваши IPv4 и IPv6 по нескольким независимым источникам одновременно — страна, регион, город, ASN, организация и местный часовой пояс IP-адреса.
 * 🔍 **Проверка IP**: показывает те же подробные сведения о любом интересующем вас IP-адресе.
-* 🧾 **История IP**: ведёт локальный журнал IP-адресов, с которых вас видели в сети, с фильтрами по типу и стране — данные хранятся только в вашем браузере.
+* 📸 **История снимков**: каждый раз, когда открывается главная страница, сохраняет результаты её тестов — сведения об IP, доступность, WebRTC, тест утечки DNS, тест скорости — в виде снимка. Сравнивайте любые два и читайте различия построчно, как diff кода; важные снимки можно переименовать или закрепить — данные хранятся только в вашем браузере.
 * 🖥️ **Цифровой отпечаток браузера**: рассчитывает отпечаток браузера несколькими способами и показывает, что именно делает вас узнаваемым.
 
 ### 🕵️ Утечки и приватность
@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Всё остальное — необязательные ключи API, безопасность и ограничение частоты запросов, логирование, Sentry, домены curl API — описано в [справочнике переменных окружения](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Всё остальное — необязательные ключи API, безопасность, логирование, Sentry, домены curl API — описано в [справочнике переменных окружения](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Документация
 
@@ -182,30 +182,31 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 💖 Спонсоры и поддержка
 
-Как автор проекта с открытым исходным кодом, я очень благодарен следующим спонсорам за поддержку:
+MyIP бесплатный и с открытым исходным кодом, но он работает на настоящих серверах, источниках данных и сервисах. Эти компании помогают ему оставаться таким, и все они делают хорошие продукты.
 
 **Спонсоры**
 
-<a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — High-quality rotating and static residential proxies, with 90M+ residential IPs across 220+ locations worldwide. It supports HTTP(S), SOCKS5, rotating and sticky sessions, with residential proxy plans starting at just $0.7/GB. Use code `PROXY90` for an additional 10% off.
-</sub>
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="60" /></a><br />
+↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — приватные резидентские, мобильные (4G/5G/LTE), ISP и датацентр IPv4/IPv6 прокси с поддержкой HTTP(S) и SOCKS5. Более 47 млн резидентских IP в 220+ локациях, точный таргетинг по стране, городу и провайдеру, аптайм 99,7% и поддержка 24/7. Пользователям MyIP — промокод `CHECKINGIP15` со скидкой 15%.
 
-<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
-<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — приватные резидентские, мобильные (4G/5G/LTE), ISP и датацентр IPv4/IPv6 прокси с поддержкой HTTP(S) и SOCKS5. Более 47 млн резидентских IP в 220+ локациях, точный таргетинг по стране, городу и провайдеру, аптайм 99,7% и поддержка 24/7. Пользователям MyIP — промокод `CHECKINGIP15` со скидкой 15%.
-</sub>
-
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=ru"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=ru">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=ru"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="60" /></a><br />
+↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=ru">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.
 
 ----
 
 **Поддержка**
 
-<p><a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" height="32" /></a></p>
-<p><a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a></p>
-<p><a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a></p>
-<p><a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a></p>
-<p><a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a></p>
+Эти компании безвозмездно предоставляют MyIP сервисы или кредиты на инструменты и инфраструктуру, от которых зависит проект. Спасибо за поддержку open source.
+
+| Компания | Чем занимается |
+| --- | --- |
+| <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cf_logo2.png" alt="Cloudflare Project Alexandria" height="24" /></a> | <sub>Глобальная сеть для CDN, защиты, DNS и serverless-приложений.</sub> |
+| <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="24" /></a> | <sub>Мониторинг приложений: отслеживание ошибок, трассировка и запись сессий.</sub> |
+| <a href="https://ipapi.is/?ref=myip"><img src="https://res.ipcheck.ing/img/ipapi_is_logo.png" alt="IPAPI.is" height="24" /></a> | <sub>API и базы данных IP-аналитики: геолокация, ASN, VPN и выявление злоупотреблений.</sub> |
+| <a href="https://www.ip2location.io"><img src="https://res.ipcheck.ing/img/ip2location_logo.png" alt="IP2Location.io" height="24" /></a> | <sub>API геолокации IP с выявлением прокси, VPN и хостинга, а также WHOIS-поиск по доменам.</sub> |
+| <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="24" /></a> | <sub>ИИ-ревью кода, которое понимает всю кодовую базу.</sub> |
+| <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="24" /></a> | <sub>Платформа документации для технических команд.</sub> |
+| <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="24" /></a> | <sub>Менеджер паролей и секретов для людей и команд.</sub> |
 
 Хотите поддержать MyIP? [Стать спонсором](https://github.com/sponsors/jason5ng32)
 

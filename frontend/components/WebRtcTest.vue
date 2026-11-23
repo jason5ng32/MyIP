@@ -138,6 +138,8 @@ import FitText from '@/components/widgets/FitText.vue';
 import CopyButton from '@/components/widgets/CopyButton.vue';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
+import { ICE_CANDIDATE_TYPES } from '@/utils/codes/webrtc.js';
+import { natTypeKey } from '@/utils/codes/webrtc-labels.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -271,7 +273,7 @@ const checkSTUNServer = (stun) => {
         stun.country_code = geo.country_code;
         stun.country = geo.country;
         stun.org = geo.org;
-        // Back-fill details for the Globalping picker + IP history.
+        // Back-fill details for the Globalping picker.
         IPArray.value = [...IPArray.value, { ip, country: geo.country_code, location: geo.country, asn: geo.asn, org: geo.org }];
       } else {
         stun.country = t('webrtc.StatusError');
@@ -370,22 +372,14 @@ const checkSTUNServer = (stun) => {
   });
 };
 
-// Analyze ICE candidate information, infer NAT type
-const determineNATType = (candidate) => {
-  const parts = candidate.split(' ');
-  const type = parts[7];
-  if (type === 'host') return t('webrtc.NATType.host');
-  if (type === 'srflx') return t('webrtc.NATType.srflx');
-  if (type === 'prflx') return t('webrtc.NATType.prflx');
-  if (type === 'relay') return t('webrtc.NATType.relay');
-  return t('webrtc.NATType.unknown');
-};
-
-// Locale-free twin of determineNATType for the report builder.
+// Analyze ICE candidate information, infer NAT type: the locale-free code
+// for the report builder, and its label.
 const natTypeCodeOf = (candidate) => {
   const type = candidate.split(' ')[7];
-  return ['host', 'srflx', 'prflx', 'relay'].includes(type) ? type : 'unknown';
+  return ICE_CANDIDATE_TYPES.includes(type) ? type : 'unknown';
 };
+
+const determineNATType = (candidate) => t(natTypeKey(natTypeCodeOf(candidate)));
 
 // Domain event: snapshot of all STUN cards for the report collector (servers
 // still waiting carry no natTypeCode and are dropped by the builder).

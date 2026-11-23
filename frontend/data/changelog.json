@@ -2316,7 +2316,7 @@
   },
   {
     "version": "v8.1.0",
-    "date": "Beta",
+    "date": "2026-11-08",
     "content": [
       {
         "type": "add",
@@ -2371,6 +2371,150 @@
           "fr": "L'outil Résolution DNS renvoie des résultats plus détaillés",
           "ru": "Инструмент «Разрешение DNS» возвращает более подробные результаты",
           "pt-BR": "A ferramenta Resolução DNS retorna resultados mais detalhados"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v8.2.0",
+    "date": "2026-11-19",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added Snapshot History: the homepage test results are saved per visit in this browser, so you can compare any two snapshots and see what differs",
+          "zh": "新增「快照记录」：首页各项测试结果每次访问保存一份在当前浏览器中，可任选两份快照对比，查看有哪些不同",
+          "zh-TW": "新增「快照記錄」：首頁各項測試結果每次造訪儲存一份在目前的瀏覽器中，可任選兩份快照比較，查看有哪些不同",
+          "fr": "Ajout de l'Historique des instantanés : les résultats des tests de la page d'accueil sont enregistrés à chaque visite dans ce navigateur, pour comparer deux instantanés et voir ce qui diffère",
+          "ru": "Добавлена «История снимков»: результаты тестов главной страницы сохраняются в этом браузере при каждом посещении, и любые два снимка можно сравнить, чтобы увидеть различия",
+          "pt-BR": "Novo Histórico de instantâneos: os resultados dos testes da página inicial são salvos por visita neste navegador, para você comparar dois instantâneos quaisquer e ver o que difere"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "SpeedTest becomes more informative and shows more details",
+          "zh": "网速测试变得更好看并展示更多的测速细节",
+          "zh-TW": "SpeedTest 變得更好看並展示更多的測速細節",
+          "fr": "SpeedTest devient plus informatif et montre plus de détails",
+          "ru": "SpeedTest стал более информативным и показывает больше деталей",
+          "pt-BR": "SpeedTest se tornou mais informativo e mostra mais detalhes"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Connectivity: in single-refresh mode, you can set to discard the first result so the latency leaves out DNS lookup and connection setup",
+          "zh": "网络连通性：单次刷新模式下可设置丢弃首次结果，使延迟不包含 DNS 解析与建立连接的耗时",
+          "zh-TW": "網路連通性：單次重新整理模式下可設定捨棄首次結果，使延遲不包含 DNS 解析與建立連線的時間",
+          "fr": "Connectivité : en mode rafraîchissement unique, vous pouvez définir pour ignorer le premier résultat pour que la latence exclue la résolution DNS et l'établissement de la connexion",
+          "ru": "Проверка доступности: в режиме одной проверки вы можете установить игнорировать первый результат, чтобы задержка не включала DNS-запрос и установку соединения",
+          "pt-BR": "Conectividade: no modo de atualização única, você pode definir para ignorar o primeiro resultado para que a latência não inclua a consulta DNS e o estabelecimento da conexão"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "IP History is retired; Snapshot History now covers its role",
+          "zh": "「IP 历史记录」已下线，其作用由「快照记录」接替",
+          "zh-TW": "「IP 歷史記錄」已下線，其作用由「快照記錄」接替",
+          "fr": "L'Historique des IP est retiré ; l'Historique des instantanés prend le relais",
+          "ru": "«История IP» удалена: её роль теперь выполняет «История снимков»",
+          "pt-BR": "O Histórico de IP foi descontinuado; o Histórico de instantâneos assume o seu papel"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v8.3.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Different IP data sources can now show their own distinctive data fields",
+          "zh": "不同的 IP 数据源现在可以展示其独特的数据字段",
+          "zh-TW": "不同的 IP 資料來源現在可以顯示其獨有的資料欄位",
+          "fr": "Les différentes sources de données IP peuvent désormais afficher leurs propres champs de données",
+          "ru": "Разные источники данных об IP теперь могут показывать собственные поля данных",
+          "pt-BR": "Diferentes fontes de dados de IP agora podem exibir seus próprios campos de dados"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "You can now sync your preferences across devices",
+          "zh": "现在你可以跨设备同步你的使用偏好",
+          "zh-TW": "現在你可以跨裝置同步你的使用偏好",
+          "fr": "Vous pouvez désormais synchroniser vos préférences entre vos appareils",
+          "ru": "Теперь можно синхронизировать свои настройки между устройствами",
+          "pt-BR": "Agora você pode sincronizar suas preferências entre dispositivos"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "For developers: any fork can connect its own user system",
+          "zh": "为开发者：任何 fork 都可以接入自己的用户系统",
+          "zh-TW": "給開發者：任何 fork 都可以接入自己的使用者系統",
+          "fr": "Pour les développeurs : chaque fork peut brancher son propre système d’utilisateurs",
+          "ru": "Для разработчиков: любой форк может подключить собственную систему пользователей",
+          "pt-BR": "Para desenvolvedores: qualquer fork pode conectar seu próprio sistema de usuários"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added IPLocate.io as an IP data source",
+          "zh": "新增 IPLocate.io 作为 IP 数据源",
+          "zh-TW": "新增 IPLocate.io 作為 IP 資料來源",
+          "fr": "Ajout d'IPLocate.io comme source de données IP",
+          "ru": "Добавлен источник данных об IP IPLocate.io",
+          "pt-BR": "Adicionado o IPLocate.io como fonte de dados de IP"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added BigDataCloud as an IP data source",
+          "zh": "新增 BigDataCloud 作为 IP 数据源",
+          "zh-TW": "新增 BigDataCloud 作為 IP 資料來源",
+          "fr": "Ajout de BigDataCloud comme source de données IP",
+          "ru": "Добавлен источник данных об IP BigDataCloud",
+          "pt-BR": "Adicionado o BigDataCloud como fonte de dados de IP"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Reworked the program's architecture to make plugging in more IP data sources easier",
+          "zh": "优化了程序的架构，为接入更多的 IP 数据源提供更便捷的通道",
+          "zh-TW": "最佳化了程式架構，讓接入更多 IP 資料來源更加便捷",
+          "fr": "Architecture du programme optimisée pour faciliter l'intégration de nouvelles sources de données IP",
+          "ru": "Оптимизирована архитектура программы: подключать новые источники данных об IP стало проще",
+          "pt-BR": "Arquitetura do programa otimizada para facilitar a integração de mais fontes de dados de IP"
         }
       },
       {

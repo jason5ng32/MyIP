@@ -8,47 +8,27 @@
 // same-origin, so icons render even when the tested site is blocked for
 // the visitor.
 
-// Per-list cap on stored targets, defaults included; enforced at
-// add/import time only, so an over-cap migrated set keeps working but
-// can't grow.
-export const CONNECTIVITY_TARGET_LIMIT = 60;
+import {
+    CONNECTIVITY_TARGET_LIMIT,
+    CONNECTIVITY_LIST_LIMIT,
+    CONNECTIVITY_LIST_NAME_LIMIT,
+    MINE_LIST_ID,
+    faviconPath,
+    DEFAULT_LIST_MEMBERS,
+    BUILTIN_FAVICONS,
+    TILE_PREVIEW,
+} from './connectivity-defaults.js';
 
-// How many lists a user can hold, the undeletable "Mine" list included.
-export const CONNECTIVITY_LIST_LIMIT = 10;
-
-// Max characters in a user-given list name; the UI truncates with an
-// ellipsis where space is tight.
-export const CONNECTIVITY_LIST_NAME_LIMIT = 40;
-
-// Fixed id of the seeded "Mine" list — localized display name, can't be
-// deleted or renamed.
-export const MINE_LIST_ID = 'mine';
-
-// Same-origin favicon path for a member id (fetched at dev time).
-export const faviconPath = (id) => `/favicons/${id}.png`;
-
-// Targets every fresh install starts with. `siteUrl` overrides the card's
-// open-website link when the test URL's host isn't the right page to open.
-// Cloudflare tests speed.cloudflare.com, not www: the marketing site
-// attaches font-preload headers to every response, which then fail CORS.
-export const DEFAULT_LIST_MEMBERS = [
-    { id: 'google', name: 'Google', url: 'https://www.google.com/favicon.ico' },
-    { id: 'youtube', name: 'YouTube', url: 'https://www.youtube.com/favicon.ico' },
-    { id: 'github', name: 'GitHub', url: 'https://github.com/favicon.ico' },
-    { id: 'cloudflare', name: 'Cloudflare', url: 'https://speed.cloudflare.com/favicon.ico', iconDomain: 'www.cloudflare.com', siteUrl: 'https://www.cloudflare.com' },
-    { id: 'claude', name: 'Claude', url: 'https://claude.com/favicon.ico' },
-    { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/favicon.ico' },
-    { id: 'wechat', name: 'WeChat', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', iconDomain: 'weixin.qq.com', siteUrl: 'https://wx.qq.com' },
-];
-
-// Favicon-fetch targets for the committed scripts/fetch-favicons.js
-// (`pnpm fetch-favicons`; the data test also auto-invokes it when icons
-// are missing). `iconDomain` differs from the test URL's host where that
-// host serves a poor or missing icon.
-export const BUILTIN_FAVICONS = DEFAULT_LIST_MEMBERS.map((m) => ({
-    id: m.id,
-    iconDomain: m.iconDomain || new URL(m.url).hostname,
-}));
+export {
+    CONNECTIVITY_TARGET_LIMIT,
+    CONNECTIVITY_LIST_LIMIT,
+    CONNECTIVITY_LIST_NAME_LIMIT,
+    MINE_LIST_ID,
+    faviconPath,
+    DEFAULT_LIST_MEMBERS,
+    BUILTIN_FAVICONS,
+    TILE_PREVIEW,
+};
 
 // The defaults as an importable list (shown last in the dialog) to bring
 // deleted default sites back. Not in IMPORT_LISTS: below its size floor.
@@ -155,19 +135,21 @@ export const IMPORT_LISTS = [
         emoji: '🇮🇳',
         members: [
             { id: 'cricbuzz', name: 'Cricbuzz', url: 'https://www.cricbuzz.com/favicon.ico' },
+            { id: 'timesofindia', name: 'Times of India', url: 'https://timesofindia.indiatimes.com/favicon.ico' },
+            { id: 'uidai', name: 'UIDAI', url: 'https://uidai.gov.in/favicon.ico' },
+            { id: 'irctc', name: 'IRCTC', url: 'https://irctc.co.in/favicon.ico', siteUrl: 'https://www.irctc.co.in' },
+            { id: 'jio', name: 'Jio', url: 'https://myjiostatic.cdn.jio.com/jiostaticresources/v02/images/favicon.ico', iconDomain: 'www.jio.com', siteUrl: 'https://www.jio.com' },
+            { id: 'airtel', name: 'Airtel', url: 'https://www.airtel.in/favicon.ico' },
+            { id: 'flipkart', name: 'Flipkart', url: 'https://www.flipkart.com/favicon.ico' },
+            { id: 'amazon-in', name: 'Amazon.in', url: 'https://www.amazon.in/favicon.ico' },
+            { id: 'nykaa', name: 'Nykaa', url: 'https://www.nykaa.com/favicon.ico' },
+            { id: 'bigbasket', name: 'BigBasket', url: 'https://www.bigbasket.com/favicon.ico' },
             { id: 'zomato', name: 'Zomato', url: 'https://www.zomato.com/favicon.ico' },
             { id: 'paytm', name: 'Paytm', url: 'https://paytm.com/favicon.ico' },
-            { id: 'flipkart', name: 'Flipkart', url: 'https://www.flipkart.com/favicon.ico' },
-            { id: 'bigbasket', name: 'BigBasket', url: 'https://www.bigbasket.com/favicon.ico' },
             { id: 'phonepe', name: 'PhonePe', url: 'https://www.phonepe.com/favicon.ico' },
-            { id: 'policybazaar', name: 'Policybazaar', url: 'https://www.policybazaar.com/favicon.ico' },
-            { id: 'nykaa', name: 'Nykaa', url: 'https://www.nykaa.com/favicon.ico' },
-            { id: 'justdial', name: 'Justdial', url: 'https://www.justdial.com/favicon.ico' },
+            { id: 'icicibank', name: 'ICICI Bank', url: 'https://www.icici.bank.in/favicon.ico' },
             { id: 'groww', name: 'Groww', url: 'https://groww.in/favicon.ico' },
-            { id: 'airtel', name: 'Airtel', url: 'https://www.airtel.in/favicon.ico' },
             { id: 'naukri', name: 'Naukri', url: 'https://www.naukri.com/favicon.ico' },
-            { id: 'indigo', name: 'IndiGo', url: 'https://www.goindigo.in/favicon.ico' },
-            { id: 'redbus', name: 'RedBus', url: 'https://www.redbus.in/favicon.ico' },
             { id: 'hotstar', name: 'JioHotstar', url: 'https://www.hotstar.com/favicon.ico' },
             { id: 'physicswallah', name: 'Physics Wallah', url: 'https://www.pw.live/favicon.ico' },
         ],
@@ -292,6 +274,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'greece',
+        emoji: '🇬🇷',
+        members: [
+            { id: 'gov-gr', name: 'Gov.gr', url: 'https://www.gov.gr/favicon.ico' },
+            { id: 'ertnews', name: 'ERT News', url: 'https://www.ertnews.gr/wp-content/uploads/2025/09/cropped-ertnews-logo-favicon-512x512-1-32x32.png' },
+            { id: 'kathimerini', name: 'Kathimerini', url: 'https://www.kathimerini.gr/favicon.ico' },
+            { id: 'in-gr', name: 'in.gr', url: 'https://www.in.gr/favicon.ico' },
+            { id: 'skroutz', name: 'Skroutz', url: 'https://statics.scdn.gr/favicon.ico', iconDomain: 'www.skroutz.gr', siteUrl: 'https://www.skroutz.gr' },
+            { id: 'box', name: 'BOX', url: 'https://box.gr/assets/favicon/favicon-32x32.png' },
+            { id: 'xe', name: 'xe.gr', url: 'https://www.xe.gr/images/favicon.ico' },
+            { id: 'vodafone-gr', name: 'Vodafone', url: 'https://www.vodafone.gr/favicon.ico' },
+            { id: 'nova-gr', name: 'Nova', url: 'https://nova.gr/img/icons/favicon.png' },
+            { id: 'nbg', name: 'NBG', url: 'https://www.nbg.gr/dist/nbgportal/browser/assets/images/favicon.ico' },
+            { id: 'eurobank', name: 'Eurobank', url: 'https://www.eurobank.gr/favicon.ico' },
+            { id: 'dei', name: 'DEI', url: 'https://www.dei.gr/imgs/favicons/favicon-32x32.png' },
+        ],
+    },
+    {
         id: 'indonesia',
         emoji: '🇮🇩',
         members: [
@@ -404,6 +404,7 @@ export const IMPORT_LISTS = [
             { id: 'soundcloud', name: 'SoundCloud', url: 'https://soundcloud.com/favicon.ico' },
             { id: 'vimeo', name: 'Vimeo', url: 'https://vimeo.com/favicon.ico' },
             { id: 'dailymotion', name: 'Dailymotion', url: 'https://www.dailymotion.com/favicon.ico' },
+            { id: 'kick', name: 'Kick', url: 'https://kick.com/favicon.ico' },
         ],
     },
     {
@@ -474,6 +475,7 @@ export const IMPORT_LISTS = [
             { id: 'rockstar', name: 'Rockstar', url: 'https://www.rockstargames.com/favicon.ico' },
             { id: 'roblox', name: 'Roblox', url: 'https://www.roblox.com/favicon.ico' },
             { id: 'itchio', name: 'itch.io', url: 'https://itch.io/favicon.ico' },
+            { id: 'gog', name: 'GOG', url: 'https://www.gog.com/favicon.ico' },
         ],
     },
     {
@@ -584,17 +586,4 @@ export const IMPORT_LISTS = [
             { id: 'wikipedia', name: 'Wikipedia', url: 'https://www.wikipedia.org/favicon.ico' },
         ],
     },
-];
-
-// Icons shown stacked on the "Add Test" grid tile — a hand-picked mix of
-// flag emoji and high-recognition brands that reads as "there are curated
-// lists inside". Kept here so the tile and the lists stay in one file.
-export const TILE_PREVIEW = [
-    { type: 'favicon', id: 'reddit' },
-    { type: 'favicon', id: 'yandex' },
-    { type: 'favicon', id: 'zarinpal' },
-    { type: 'favicon', id: 'xiaohongshu' },
-    { type: 'favicon', id: 'nytimes' },
-    { type: 'favicon', id: 'telegram' },
-    { type: 'favicon', id: 'netflix' },
 ];

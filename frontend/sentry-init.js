@@ -10,6 +10,7 @@ import * as Sentry from '@sentry/vue';
 import { onAppEvent } from '@/utils/app-events';
 import { isValidIP } from '@/utils/ip/valid-ip.js';
 import { readAccountId } from '@/utils/auth-hint.js';
+import { EXTENSION_URL_PATTERNS, isExtensionRejection } from '@/utils/extension-noise.js';
 
 const env = import.meta.env ?? {};
 
@@ -139,9 +140,8 @@ const initSentry = (app, router, earlyErrors = []) => {
             'Importing a module script failed',
             'Unable to preload CSS',
         ],
-        // Third-party scripts we don't own: Cloudflare's RUM beacon throws
-        // in some browsers — not actionable from this codebase.
-        denyUrls: [/static\.cloudflareinsights\.com/],
+        // Scripts we don't own throwing: Cloudflare's RUM beacon and browser extensions.
+        denyUrls: [/static\.cloudflareinsights\.com/, ...EXTENSION_URL_PATTERNS],
         // Console-captured events group by the console message instead of
         // the exception stack. The fallback chains all surface the same
         // "TypeError: Failed to fetch" from fetchWithTimeout, so stack
@@ -149,6 +149,8 @@ const initSentry = (app, router, earlyErrors = []) => {
         // — indistinguishable per source, and a single archive/discard on it
         // silently hides them all.
         beforeSend(event, hint) {
+            // An extension's own promise chain (e.g. a wrapped fetch) rejecting.
+            if (isExtensionRejection(event)) return null;
             // Timeout aborts (our own fetchWithTimeout firing on slow links)
             // are visitor connectivity, not defects — drop them wherever
             // they were logged from.

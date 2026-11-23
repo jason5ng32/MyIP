@@ -1,10 +1,11 @@
 // Factory for IP-geolocation source handlers.
 //
-// Every geo source (ipinfo.io, ip-api.com, ipapi.is, ip2location.io, ip.sb)
-// shares an identical Express shell: read the (already-validated) ?ip,
-// build a source-specific URL, fetch it through fetchUpstream, normalize the
-// upstream JSON into the canonical response shape, and respond — with a
-// uniform try/catch that logs the error and returns a 500.
+// Every third-party geo source (iplocate.io, ip-api.com, BigDataCloud,
+// ipapi.is, ip2location.io) shares an identical Express shell: read the
+// (already-validated) ?ip, build a source-specific URL, fetch it through
+// fetchUpstream, normalize the upstream JSON into the canonical response
+// shape, and respond — with a uniform try/catch that logs the error and
+// returns a 500.
 //
 // makeGeoHandler captures that shell. Each source supplies only:
 //   - name      : short id used in the error log message
@@ -12,9 +13,8 @@
 //                 handler wants extra fields (e.g. lang) on the error log
 //   - normalize : (json) => canonical response object
 //
-// buildUrl runs before the try block so any env-key selection it performs
-// keeps its current behavior (e.g. throwing on a missing key surfaces the
-// same way the original inline handlers did).
+// buildUrl runs before the try block, so a throw from it (e.g. a missing
+// key) reaches Express's error handler rather than the catch below.
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from './logger.js';

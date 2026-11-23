@@ -17,7 +17,7 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 import configsHandler from '../api/configs.js';
 import googleMapHandler from '../api/google-map.js';
 import dnsResolverHandler from '../api/dns-resolver.js';
-import getUserInfoHandler from '../api/get-user-info.js';
+import usageHandler from '../api/usage.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
 import invisibilityHandler from '../api/invisibility-test.js';
@@ -29,7 +29,15 @@ import asnProfileHandler, { peeringdbReadiness, connectivityReadiness } from '..
 import { isAsRelLoaded } from '../server/datasets/as-rel-db.js';
 import { describeMac } from '../server/datasets/oui-db.js';
 import { isCompleteProfile } from '../server/asn-profile.js';
-import updateAchievementHandler from '../api/update-user-achievement.js';
+import { createAchievementHandlers } from '../api/achievements.js';
+import { createSyncHandlers } from '../api/sync.js';
+import { createSyncSettingsHandlers } from '../api/sync-settings.js';
+import { SYNC_COLLECTIONS, SYNC_COLLECTION_IDS, SYNC_OFF_CODE } from '../common/sync-collections.js';
+import { sanitizeLists } from '../frontend/utils/features/connectivity-lists.js';
+import { requireUser, requireUserStorage, requireValidSyncCollection } from '../server/guards.js';
+import { AUTH_REASON } from '../common/codes/service-errors.js';
+import { FEATURE_USES, recordFeatureUse } from '../server/db/feature-uses.js';
+import { fakeUserDb, fakeStorage } from './fake-user-db.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { createBulkLookup } from '../api/bulk-lookup.js';
 import { BULK_LOOKUP_MAX_IPS } from '../common/bulk-lookup-limits.js';
@@ -42,7 +50,8 @@ import serviceStatusHandler, {
 } from '../api/service-status.js';
 import createReportHandler, { getReport as getReportHandler, normalizeTtlDays } from '../api/share-report.js';
 import { modifyJsonForIPAPI } from '../api/ipapi-is.js';
-import { modifyJson as modifyJsonForIpinfo } from '../api/ipinfo-io.js';
+import iplocateHandler from '../api/iplocate.js';
+import bigdatacloudHandler from '../api/bigdatacloud.js';
 import { REPORT_VERSION } from '../common/report-schema.js';
 import logger from '../server/logger.js';
 
@@ -58,10 +67,54 @@ function createRequest(options = {}) {
     return { method, headers, query, body };
 }
 
+// Visitor headers: the listed ones reach the IPCheck.ing API, the rest
+// (plus createRequest's referer) never do.
+const FORWARDED_VISITOR_HEADERS = {
+    'accept-language': 'de-DE',
+    'user-agent': 'VisitorBrowser/1.0',
+    'cf-connecting-ip': '203.0.113.7',
+    'x-forwarded-for': '203.0.113.7',
+};
+const DROPPED_VISITOR_HEADERS = {
+    authorization: 'Bearer t',
+    host: 'myip.example', cookie: 'session=1', origin: 'https://myip.example',
+    'content-length': '999', 'content-type': 'application/json',
+};
+
+const withVisitorHeaders = (req) => {
+    Object.assign(req.headers, FORWARDED_VISITOR_HEADERS, DROPPED_VISITOR_HEADERS);
+    return req;
+};
+
+// The exact header set sent upstream: the listed visitor headers plus `extra`.
+const assertForwardedHeaders = (headers, extra = {}) => {
+    assert.deepEqual(headers, { ...FORWARDED_VISITOR_HEADERS, ...extra });
+    for (const name of ['host', 'cookie', 'referer', 'content-length', 'authorization']) assert.equal(name in headers, false, name);
+};
+
+// The user id the sign-in guards put on res.locals, and the header carrying it.
+const USER_ID = 'user-123';
+const END_USER = { 'x-end-user-id': USER_ID };
+const signedIn = (res) => {
+    res.locals.userId = USER_ID;
+    return res;
+};
+
+// IPCheck.ing API failure bodies as it sends them, and the coded bodies the
+// tool routes answer with.
+const UPSTREAM_SIGN_IN_REQUIRED = { error: 'Sign in required', message: 'Authorization header is missing.', code: 'sign_in_required' };
+const UPSTREAM_INVALID_TOKEN = { error: 'Invalid token', message: 'Firebase ID token has expired.', code: 'invalid_token' };
+const UPSTREAM_QUOTA = { error: 'Monthly quota exceeded', code: 'quota_exceeded' };
+const CODED_SIGN_IN_REQUIRED = { error: 'Sign in required', code: 'auth', reason: 'sign_in_required' };
+const CODED_INVALID_TOKEN = { error: 'Invalid token', code: 'auth', reason: 'invalid_token' };
+const CODED_QUOTA = { error: 'Monthly quota exceeded', code: 'quota' };
+const upstreamAnswer = (status, body) => async () => new Response(JSON.stringify(body), { status });
+
 function createResponse() {
     return {
         statusCode: 200,
         body: undefined,
+        locals: {},
         status(code) { this.statusCode = code; return this; },
         json(payload) { this.body = payload; return this; },
         send(payload) { this.body = payload; return this; },
@@ -72,11 +125,11 @@ function createResponse() {
 const ENV_KEYS = [
     'IPCHECKING_API_KEY', 'IPCHECKING_API_ENDPOINT',
     'IPAPIIS_API_KEY',
-    'IPINFO_API_KEY', 'IP2LOCATION_API_KEY',
+    'IPLOCATE_IO_API_KEY', 'BIGDATACLOUD_API_KEY', 'IP2LOCATION_API_KEY',
     'CLOUDFLARE_API_KEY',
     'CLOUDFLARE_ACCOUNT_ID', 'CLOUDFLARE_KV_NAMESPACE_ID',
-    // Pre-rename spellings, still honored as fallbacks.
-    'IPINFO_API_TOKEN', 'CLOUDFLARE_API',
+    // Pre-rename spelling, still honored as a fallback.
+    'CLOUDFLARE_API',
 ];
 let envBackup = {};
 
@@ -106,14 +159,15 @@ describe('configs handler', () => {
         assert.deepEqual(res.body, { message: 'Method Not Allowed' });
     });
 
-    it('returns boolean config flags for localhost requests', () => {
+    it('returns exactly the boolean config flags plus the bulk lookup source', () => {
         const res = createResponse();
         configsHandler(createRequest(), res);
         assert.equal(res.statusCode, 200);
-        for (const key of ['map', 'ipInfo', 'ipChecking', 'ip2location', 'originalSite', 'cloudFlare', 'ipapiis', 'reportSharing']) {
+        const flags = ['map', 'iplocate', 'bigdatacloud', 'ipChecking', 'ip2locationio', 'cloudFlare', 'ipapiis', 'reportSharing', 'userStorage'];
+        for (const key of flags) {
             assert.equal(typeof res.body[key], 'boolean');
         }
-        assert.equal(res.body.originalSite, false);
+        assert.deepEqual(Object.keys(res.body).sort(), [...flags, 'bulkLookupSource'].sort());
     });
 
     it('names the bulk lookup source as a string', () => {
@@ -122,14 +176,24 @@ describe('configs handler', () => {
         assert.equal(res.body.bulkLookupSource, 'maxmind');
     });
 
-    it('honors the pre-rename env spellings as fallbacks', () => {
-        delete process.env.IPINFO_API_KEY;
+    it('ipChecking needs both the API key and the endpoint', () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        const keyOnly = createResponse();
+        configsHandler(createRequest(), keyOnly);
+        assert.equal(keyOnly.body.ipChecking, false);
+
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        const both = createResponse();
+        configsHandler(createRequest(), both);
+        assert.equal(both.body.ipChecking, true);
+    });
+
+    it('honors the pre-rename CLOUDFLARE_API spelling as a fallback', () => {
         delete process.env.CLOUDFLARE_API_KEY;
-        process.env.IPINFO_API_TOKEN = 'legacy-token';
         process.env.CLOUDFLARE_API = 'legacy-key';
         const res = createResponse();
         configsHandler(createRequest(), res);
-        assert.equal(res.body.ipInfo, true);
         assert.equal(res.body.cloudFlare, true);
     });
 });
@@ -442,28 +506,38 @@ describe('persona handler', () => {
             };
         };
 
-        const req = createRequest({ method: 'POST', body: { persona: { country: 'JP' } } });
-        req.headers['accept-language'] = 'ja-JP,ja;q=0.9';
-        // Framing headers describe this hop; the body is re-serialized here, so
-        // forwarding them would announce a length that no longer matches.
-        req.headers['content-length'] = '999';
-        req.headers.host = 'ipcheck.ing';
-        req.headers['content-type'] = 'application/json';
-        const res = createResponse();
+        const req = withVisitorHeaders(createRequest({ method: 'POST', body: { persona: { country: 'JP' } } }));
+        const res = signedIn(createResponse());
         await personaEvaluateHandler(req, res);
 
         assert.equal(res.statusCode, 200);
         assert.equal(res.body.grade, 'B');
         // The visitor's own Accept-Language is one of the things being checked,
-        // so it has to reach the evaluator untouched.
-        assert.equal(requested.options.headers['accept-language'], 'ja-JP,ja;q=0.9');
-        assert.equal('content-length' in requested.options.headers, false);
-        assert.equal('host' in requested.options.headers, false);
-        // Exactly one content-type reaches the upstream: two would arrive as
-        // "application/json, application/json" and be refused with 415.
-        assert.equal(requested.options.headers['Content-Type'], 'application/json');
-        assert.equal('content-type' in requested.options.headers, false);
+        // so it has to reach the evaluator untouched. The body is re-serialized
+        // here: exactly one content-type goes along (two would arrive as
+        // "application/json, application/json" and be refused with 415), and
+        // no content-length.
+        assertForwardedHeaders(requested.options.headers, { 'content-type': 'application/json', ...END_USER });
+        assert.equal(requested.options.body, JSON.stringify({ persona: { country: 'JP' } }));
         assert.match(requested.url, /\/persona\/evaluate\?key=test-key$/);
+    });
+
+    it('answers an upstream failure with its status and the coded body', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        for (const [status, upstream, coded] of [
+            [403, UPSTREAM_SIGN_IN_REQUIRED, CODED_SIGN_IN_REQUIRED],
+            [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
+            [429, UPSTREAM_QUOTA, CODED_QUOTA],
+            [400, { error: 'Invalid country' }, { error: 'Invalid country' }],
+        ]) {
+            globalThis.fetch = upstreamAnswer(status, upstream);
+            const res = createResponse();
+            await personaEvaluateHandler(
+                createRequest({ method: 'POST', body: { persona: { country: 'JP' } } }), res);
+            assert.equal(res.statusCode, status);
+            assert.deepEqual(res.body, coded);
+        }
     });
 
     it('answers 502 when the evaluator cannot be reached', async () => {
@@ -574,6 +648,32 @@ describe('cf-radar handler', () => {
         assert.deepEqual(res.body, { error: 'No country provided' });
     });
 
+    // Leaves the module-level outage feed empty: no other case here reads it.
+    it('answers 500 when an empty outage feed cannot fill on demand', async () => {
+        process.env.CLOUDFLARE_API_KEY = 'test-key';
+        const asked = [];
+        globalThis.fetch = async (url) => {
+            asked.push(new URL(String(url)).pathname);
+            return new Response('busy', { status: 503 });
+        };
+        const originalError = logger.error;
+        const logged = [];
+        logger.error = (ctx, msg) => logged.push(msg);
+        try {
+            const res = createResponse();
+            await cfRadarHandler(createRequest({ query: { view: 'outages' } }), res);
+            assert.equal(res.statusCode, 500);
+            assert.deepEqual(res.body, { error: 'Internal server error' });
+            assert.deepEqual(logged, ['cf-radar view failed']);
+            assert.deepEqual(asked.sort(), [
+                '/client/v4/radar/annotations/outages',
+                '/client/v4/radar/traffic_anomalies',
+            ]);
+        } finally {
+            logger.error = originalError;
+        }
+    });
+
     it('returns 500 when no Cloudflare API key is configured', async () => {
         delete process.env.CLOUDFLARE_API_KEY;
         delete process.env.CLOUDFLARE_API;
@@ -619,18 +719,57 @@ describe('invisibility-test handler', () => {
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
 
-    it('passes an upstream auth rejection through as its own 4xx, not a 500', async () => {
+    it('passes upstream sign-in and quota rejections through with their status and code', async () => {
         process.env.IPCHECKING_API_KEY = 'test-key';
         process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
-        globalThis.fetch = async () => ({
-            status: 403,
-            ok: false,
-            json: async () => ({ message: 'Authorization header is missing.' }),
-        });
+        for (const [status, upstream, coded] of [
+            [403, UPSTREAM_SIGN_IN_REQUIRED, CODED_SIGN_IN_REQUIRED],
+            [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
+            [429, UPSTREAM_QUOTA, CODED_QUOTA],
+        ]) {
+            globalThis.fetch = upstreamAnswer(status, upstream);
+            const res = createResponse();
+            await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
+            assert.equal(res.statusCode, status);
+            assert.deepEqual(res.body, coded);
+        }
+    });
+
+    it('answers a not-yet-computed upstream 404 as pending', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        globalThis.fetch = upstreamAnswer(404, { error: 'Data not found' });
         const res = createResponse();
         await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
-        assert.equal(res.statusCode, 403);
-        assert.deepEqual(res.body, { error: 'Authorization header is missing.' });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { status: 'pending' });
+    });
+
+    it('reports missing API key when only the endpoint is unset', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        globalThis.fetch = async () => assert.fail('no upstream call');
+        const res = createResponse();
+        await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    it('asks /getpdresult with the apikey and the listed caller headers; a 202 body passes through', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        let called;
+        globalThis.fetch = async (url, init) => {
+            called = { url: new URL(String(url)), init };
+            return new Response(JSON.stringify({ status: 'pending' }), { status: 202 });
+        };
+        const res = signedIn(createResponse());
+        await invisibilityHandler(withVisitorHeaders(createRequest({ query: { id: 'a'.repeat(28) } })), res);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { status: 'pending' });
+        assert.equal(called.url.pathname, `/getpdresult/${'a'.repeat(28)}`);
+        assert.equal(called.url.searchParams.get('apikey'), 'test-key');
+        assertForwardedHeaders(called.init.headers, END_USER);
     });
 });
 
@@ -651,41 +790,48 @@ describe('ip-blocklist handler', () => {
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
 
-    it('asks /iphitlist for the ip with the system key and forwards the caller headers', async () => {
+    it('asks /iphitlist for the ip with the system key and the listed caller headers', async () => {
         configure();
         let called;
         globalThis.fetch = async (url, init) => {
             called = { url: new URL(url), init };
             return { status: 200, ok: true, json: async () => ({ ip: '1.1.1.1', summary: { listed: 0 } }) };
         };
-        const req = createRequest({ query: { ip: '1.1.1.1' } });
-        req.headers.authorization = 'Bearer t';
-        const res = createResponse();
+        const req = withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1' } }));
+        const res = signedIn(createResponse());
         await ipBlocklistHandler(req, res);
         assert.equal(res.statusCode, 200);
         assert.deepEqual(res.body, { ip: '1.1.1.1', summary: { listed: 0 } });
         assert.equal(called.url.pathname, '/iphitlist');
         assert.equal(called.url.searchParams.get('ip'), '1.1.1.1');
         assert.equal(called.url.searchParams.get('key'), 'test-key');
-        assert.equal(called.init.headers.authorization, 'Bearer t');
+        assertForwardedHeaders(called.init.headers, END_USER);
+
+        await ipBlocklistHandler(withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1' } })), createResponse());
+        assertForwardedHeaders(called.init.headers);
     });
 
-    it('passes an upstream sign-in rejection through as its own 4xx', async () => {
+    it('passes an upstream sign-in rejection through as 403 with the auth code', async () => {
         configure();
-        globalThis.fetch = async () => ({ status: 403, ok: false, json: async () => ({ message: 'Sign in required' }) });
-        const res = createResponse();
-        await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
-        assert.equal(res.statusCode, 403);
-        assert.deepEqual(res.body, { error: 'Sign in required' });
+        for (const [upstream, coded] of [
+            [{ error: 'Sign in required' }, CODED_SIGN_IN_REQUIRED],
+            [UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
+        ]) {
+            globalThis.fetch = upstreamAnswer(403, upstream);
+            const res = createResponse();
+            await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, coded);
+        }
     });
 
-    it('passes an exhausted monthly quota through as 429 quota_exceeded', async () => {
+    it('passes an exhausted monthly quota through as 429 with the quota code', async () => {
         configure();
-        globalThis.fetch = async () => ({ status: 429, ok: false, json: async () => ({ error: 'Monthly quota exceeded' }) });
+        globalThis.fetch = upstreamAnswer(429, UPSTREAM_QUOTA);
         const res = createResponse();
         await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
         assert.equal(res.statusCode, 429);
-        assert.deepEqual(res.body, { error: 'Monthly quota exceeded', code: 'quota_exceeded' });
+        assert.deepEqual(res.body, CODED_QUOTA);
     });
 
     it('turns any other upstream failure into a 500', async () => {
@@ -879,34 +1025,569 @@ describe('bulk-lookup handler', () => {
     });
 });
 
-// -- update-user-achievement handler --------------------------------------
+// -- achievements handlers ------------------------------------------------
 
-describe('update-user-achievement handler', () => {
-    it('rejects non-PUT methods with 405', async () => {
+describe('achievements handlers', () => {
+    // The route's chain: requireUser(), requireUserStorage(), then the handler.
+    const route = async (handler, req, { verify = async () => ({ id: USER_ID }), storage }) => {
         const res = createResponse();
-        await updateAchievementHandler(createRequest({ method: 'POST', body: { name: 'X' } }), res);
+        for (const step of [requireUser(verify), requireUserStorage(storage), handler]) {
+            let advanced = false;
+            await step(req, res, () => { advanced = true; });
+            if (step !== handler && !advanced) break;
+        }
+        return res;
+    };
+    const setup = (times = [1000, 2000, 3000]) => {
+        const stamps = times.map((ms) => new Date(ms));
+        const db = fakeUserDb({ now: () => stamps.shift() ?? new Date(9999) });
+        return { db, storage: fakeStorage(db), handlers: createAchievementHandlers(fakeStorage(db)) };
+    };
+    const put = (body) => createRequest({ method: 'PUT', body });
+
+    it('rejects the wrong method with 405', async () => {
+        const { handlers } = setup();
+        const res = signedIn(createResponse());
+        await handlers.list(createRequest({ method: 'POST' }), res);
         assert.equal(res.statusCode, 405);
-        assert.deepEqual(res.body, { error: 'Method not allowed' });
+        const res2 = signedIn(createResponse());
+        await handlers.unlock(createRequest({ method: 'GET' }), res2);
+        assert.equal(res2.statusCode, 405);
     });
 
-    it('reports missing API key before forwarding', async () => {
-        delete process.env.IPCHECKING_API_KEY;
-        const res = createResponse();
-        await updateAchievementHandler(createRequest({ method: 'PUT', body: { name: 'X' } }), res);
-        assert.equal(res.statusCode, 500);
-        assert.deepEqual(res.body, { error: 'API key is missing' });
+    it('signed out → 403 auth, before storage is touched', async () => {
+        const { db, storage, handlers } = setup();
+        const verify = async () => ({ reason: AUTH_REASON.SIGN_IN_REQUIRED });
+        for (const [handler, req] of [[handlers.list, createRequest()], [handlers.unlock, put({ name: 'IAmHuman' })]]) {
+            const res = await route(handler, req, { verify, storage });
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('storage off or not ready → 503', async () => {
+        const { db, handlers } = setup();
+        for (const options of [{ configured: false }, { ready: false }]) {
+            const storage = fakeStorage(db, options);
+            for (const [handler, req] of [[handlers.list, createRequest()], [handlers.unlock, put({ name: 'IAmHuman' })]]) {
+                const res = await route(handler, req, { storage });
+                assert.equal(res.statusCode, 503);
+                assert.deepEqual(res.body, { error: 'User storage unavailable' });
+            }
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('PUT with an unknown, missing or non-string name → 400, nothing stored', async () => {
+        const { db, storage, handlers } = setup();
+        for (const body of [{ name: 'NoSuchBadge' }, {}, undefined, { name: 42 }, { name: 'constructor' }, { achievement: 'IAmHuman' }]) {
+            const res = await route(handlers.unlock, put(body), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(body));
+            assert.deepEqual(res.body, { error: 'Unknown achievement' });
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('a new user lists nothing, with zero uses, and gets a users row', async () => {
+        const { db, storage, handlers } = setup();
+        const res = await route(handlers.list, createRequest(), { storage });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { achievements: {}, totalUses: 0 });
+        assert.ok(db.users.has(USER_ID));
+    });
+
+    it('PUT unlocks once; a repeat keeps the first time; GET lists it with the summed uses', async () => {
+        const { db, storage, handlers } = setup([1000, 2000, 3000, 4000]);
+        const first = await route(handlers.unlock, put({ name: 'IAmHuman' }), { storage });
+        assert.equal(first.statusCode, 200);
+        assert.equal(first.body.name, 'IAmHuman');
+        const again = await route(handlers.unlock, put({ name: 'IAmHuman' }), { storage });
+        assert.deepEqual(again.body, first.body);
+        await route(handlers.unlock, put({ name: 'CuriousCat' }), { storage });
+        await recordFeatureUse(db.query, USER_ID, FEATURE_USES.persona);
+        await recordFeatureUse(db.query, USER_ID, FEATURE_USES.persona);
+        await recordFeatureUse(db.query, USER_ID, FEATURE_USES.ipchecking);
+        await recordFeatureUse(db.query, 'someone-else', FEATURE_USES.ipchecking);
+
+        const res = await route(handlers.list, createRequest(), { storage });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, {
+            achievements: {
+                IAmHuman: { achieved: true, achievedTime: first.body.achievedTime },
+                CuriousCat: { achieved: true, achievedTime: res.body.achievements.CuriousCat.achievedTime },
+            },
+            totalUses: 3,
+        });
+        assert.equal(typeof first.body.achievedTime, 'number');
+        assert.ok(res.body.achievements.CuriousCat.achievedTime > first.body.achievedTime);
+    });
+
+    it('a storage failure answers 500 without its details', async () => {
+        const storage = fakeStorage({ query: async () => { throw new Error('relation "x" does not exist'); } });
+        const handlers = createAchievementHandlers(storage);
+        const listRes = await route(handlers.list, createRequest(), { storage });
+        assert.equal(listRes.statusCode, 500);
+        assert.deepEqual(listRes.body, { error: 'Achievements unavailable' });
+        const putRes = await route(handlers.unlock, put({ name: 'IAmHuman' }), { storage });
+        assert.equal(putRes.statusCode, 500);
+        assert.deepEqual(putRes.body, { error: 'Achievement not saved' });
     });
 });
 
-// -- get-user-info handler ------------------------------------------------
+// -- sync handlers --------------------------------------------------------
 
-describe('get-user-info handler', () => {
+describe('sync handlers', () => {
+    const NOW = 1_000_000;
+    const { preferences, connectivity } = SYNC_COLLECTIONS;
+    // A stand-in collection with deletes and small pages, exercising the generic engine.
+    const ticks = Object.freeze({
+        id: 'ticks', version: 1,
+        isValidItemId: (id) => typeof id === 'string' && /^[a-z0-9-]{1,32}$/.test(id),
+        isValidValue: (id, value) => value === 'checked' || value === 'ignored',
+        maxItems: 100, maxItemBytes: 64, allowDelete: true, pageSize: 3,
+    });
+    const COLLECTIONS = Object.freeze({ ...SYNC_COLLECTIONS, ticks });
+    // The route's chain: requireValidSyncCollection(), requireUser(), requireUserStorage(), then the handler.
+    const route = async (handler, req, { verify = async () => ({ id: USER_ID }), storage, collections = COLLECTIONS }) => {
+        const res = createResponse();
+        for (const step of [requireValidSyncCollection('collection', collections), requireUser(verify), requireUserStorage(storage), handler]) {
+            let advanced = false;
+            await step(req, res, () => { advanced = true; });
+            if (step !== handler && !advanced) break;
+        }
+        return res;
+    };
+    const enable = (db, user = USER_ID, ids = ['ticks', 'preferences', 'connectivity']) =>
+        db.syncSettings.set(user, { collections: ids, updated_at: new Date() });
+    const setup = ({ enabled = true } = {}) => {
+        const db = fakeUserDb();
+        if (enabled) for (const user of [USER_ID, 'alice', 'bob']) enable(db, user);
+        const storage = fakeStorage(db);
+        return { db, storage, handlers: createSyncHandlers(storage, { now: () => NOW }) };
+    };
+    const get = (collection, query = {}) => ({ ...createRequest({ query }), params: { collection } });
+    const put = (collection, body) => ({ ...createRequest({ method: 'PUT', body }), params: { collection } });
+    const as = (id) => async () => ({ id });
+    const tick = (id, updatedAt, value = 'checked') => ({ id, updatedAt, deleted: false, value });
+    const v = String(ticks.version);
+    const SYNC_OFF = { error: 'Sync is off for this collection', code: SYNC_OFF_CODE };
+
+    it('rejects the wrong method with 405', async () => {
+        const { handlers } = setup();
+        const res = signedIn(createResponse());
+        res.locals.syncCollection = ticks;
+        await handlers.read(createRequest({ method: 'POST' }), res);
+        assert.equal(res.statusCode, 405);
+        const res2 = signedIn(createResponse());
+        res2.locals.syncCollection = ticks;
+        await handlers.write(createRequest({ method: 'GET' }), res2);
+        assert.equal(res2.statusCode, 405);
+    });
+
+    it('an unknown collection → 404 before sign-in or storage; snapshots and IP history are not collections', async () => {
+        const { db, storage, handlers } = setup();
+        let verified = false;
+        const verify = async () => { verified = true; return { id: USER_ID }; };
+        for (const name of ['nope', 'snapshots', 'ipHistory', 'constructor', '__proto__', '']) {
+            for (const req of [get(name, { v: '1' }), put(name, { version: 1, items: [] })]) {
+                const res = await route(req.method === 'PUT' ? handlers.write : handlers.read, req, { verify, storage, collections: SYNC_COLLECTIONS });
+                assert.equal(res.statusCode, 404, name);
+                assert.deepEqual(res.body, { error: 'Unknown collection' });
+            }
+        }
+        assert.equal(verified, false);
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('signed out → 403 auth; storage off or not ready → 503; storage untouched either way', async () => {
+        const { db, storage, handlers } = setup();
+        const signedOut = async () => ({ reason: AUTH_REASON.SIGN_IN_REQUIRED });
+        for (const [handler, req] of [[handlers.read, get('ticks', { v })], [handlers.write, put('ticks', { version: 1, items: [] })]]) {
+            const res = await route(handler, req, { verify: signedOut, storage });
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+            for (const options of [{ configured: false }, { ready: false }]) {
+                const off = await route(handler, req, { storage: fakeStorage(db, options) });
+                assert.equal(off.statusCode, 503);
+            }
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('a collection the account turned off → 409 sync_off, nothing read or written', async () => {
+        const { db, storage, handlers } = setup({ enabled: false });
+        const attempt = async () => {
+            db.calls.length = 0;
+            const read = await route(handlers.read, get('preferences', { v: String(preferences.version) }), { storage });
+            const write = await route(handlers.write, put('preferences', {
+                version: preferences.version, items: [{ id: 'theme', updatedAt: 1, value: 'dark' }],
+            }), { storage });
+            return [read, write];
+        };
+        for (const ids of [[], ['connectivity']]) {
+            enable(db, USER_ID, ids);
+            for (const res of await attempt()) {
+                assert.equal(res.statusCode, 409, JSON.stringify(ids));
+                assert.deepEqual(res.body, SYNC_OFF);
+            }
+            assert.ok(db.calls.every(({ text }) => !text.includes('synced_items')), 'synced_items untouched');
+            assert.equal(db.syncedItems.size, 0);
+        }
+        enable(db, USER_ID, ['preferences']);
+        const [read, write] = await attempt();
+        assert.equal(read.statusCode, 200);
+        assert.deepEqual(write.body, { base: 0, cursor: 1, conflicts: [], refused: [] });
+    });
+
+    it('no settings row: a registry collection syncs', async () => {
+        const { db, storage, handlers } = setup({ enabled: false });
+        const read = await route(handlers.read, get('preferences', { v: String(preferences.version) }), { storage });
+        assert.equal(read.statusCode, 200);
+        const write = await route(handlers.write, put('preferences', {
+            version: preferences.version, items: [{ id: 'theme', updatedAt: 1, value: 'dark' }],
+        }), { storage });
+        assert.deepEqual(write.body, { base: 0, cursor: 1, conflicts: [], refused: [] });
+        assert.equal(db.syncSettings.has(USER_ID), false, 'no row written');
+    });
+
+    it('GET with a bad v or since → 400, storage untouched', async () => {
+        const { db, storage, handlers } = setup();
+        for (const query of [{}, { v: '0' }, { v: '-1' }, { v: '1.5' }, { v: 'x' }, { v: '01' }, { v: '9999999999' }, { v: ['1', '2'] },
+            { v, since: '-1' }, { v, since: '1.5' }, { v, since: 'abc' }, { v, since: '99999999999999999' }, { v, since: ['1'] }]) {
+            const res = await route(handlers.read, get('ticks', query), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(query));
+            assert.equal(typeof res.body.error, 'string');
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('GET with nothing stored → an empty page at the given cursor, and a users row', async () => {
+        const { db, storage, handlers } = setup();
+        const res = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { cursor: 0, more: false, items: [] });
+        assert.ok(db.users.has(USER_ID));
+        const later = await route(handlers.read, get('ticks', { v, since: '42' }), { storage });
+        assert.deepEqual(later.body, { cursor: 42, more: false, items: [] });
+    });
+
+    it('PUT then GET round-trips; base / cursor tell whether the device missed anything', async () => {
+        const { storage, handlers } = setup();
+        const first = await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 10), tick('b', 20, 'ignored')] }), { storage });
+        assert.equal(first.statusCode, 200);
+        assert.deepEqual(first.body, { base: 0, cursor: 2, conflicts: [], refused: [] });
+        const second = await route(handlers.write, put('ticks', { version: 1, items: [{ id: 'a', updatedAt: 30, deleted: true }] }), { storage });
+        assert.deepEqual(second.body, { base: 2, cursor: 3, conflicts: [], refused: [] });
+        const all = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.deepEqual(all.body, { cursor: 3, more: false, items: [tick('b', 20, 'ignored'), { id: 'a', updatedAt: 30, deleted: true }] });
+        const since = await route(handlers.read, get('ticks', { v, since: '2' }), { storage });
+        assert.deepEqual(since.body, { cursor: 3, more: false, items: [{ id: 'a', updatedAt: 30, deleted: true }] });
+    });
+
+    it('the Connectivity lists, their order and the default list id round-trip; a list deletes as a tombstone', async () => {
+        const { storage, handlers } = setup();
+        const [mine] = sanitizeLists(null, null, []).lists;
+        const items = [
+            { id: 'order', updatedAt: 5, deleted: false, value: ['mine', 'work'] },
+            { id: 'defaultListId', updatedAt: 5, deleted: false, value: 'mine' },
+            { id: 'list:mine', updatedAt: 5, deleted: false, value: { name: null, members: mine.members } },
+            { id: 'list:work', updatedAt: 5, deleted: false, value: { name: 'Work', members: [] } },
+        ];
+        const saved = await route(handlers.write, put('connectivity', { version: connectivity.version, items }), { storage });
+        assert.deepEqual(saved.body, { base: 0, cursor: 4, conflicts: [], refused: [] });
+        const listed = await route(handlers.read, get('connectivity', { v: String(connectivity.version) }), { storage });
+        assert.deepEqual(listed.body, { cursor: 4, more: false, items });
+        const dropped = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
+            { id: 'list:work', updatedAt: 6, deleted: true },
+        ] }), { storage });
+        assert.deepEqual(dropped.body, { base: 4, cursor: 5, conflicts: [], refused: [] });
+        const bad = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
+            { id: 'list:work', updatedAt: 7, value: { name: 'Work', members: [], extra: 1 } },
+            { id: 'order', updatedAt: 7, value: ['mine', 'mine'] },
+            { id: 'defaultListId', updatedAt: 7, value: '' },
+        ] }), { storage });
+        assert.deepEqual(bad.body.refused, [
+            { id: 'list:work', reason: 'invalid' }, { id: 'order', reason: 'invalid' }, { id: 'defaultListId', reason: 'invalid' },
+        ]);
+        for (const id of ['lists', 'connectivityLists', 'list:']) {
+            const unknown = await route(handlers.write, put('connectivity', { version: connectivity.version, items: [
+                { id, updatedAt: 8, value: { name: 'X', members: [] } },
+            ] }), { storage });
+            assert.equal(unknown.statusCode, 400, id);
+        }
+    });
+
+    it('GET pages by the collection\'s pageSize with `more`', async () => {
+        const { storage, handlers } = setup();
+        const count = ticks.pageSize + 2;
+        const items = Array.from({ length: count }, (_, i) => tick(`s${i}`, i + 1));
+        const saved = await route(handlers.write, put('ticks', { version: 1, items }), { storage });
+        assert.deepEqual(saved.body, { base: 0, cursor: count, conflicts: [], refused: [] });
+        const page1 = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.equal(page1.body.items.length, ticks.pageSize);
+        assert.equal(page1.body.more, true);
+        assert.equal(page1.body.cursor, ticks.pageSize);
+        assert.deepEqual(page1.body.items[0], tick('s0', 1));
+        const page2 = await route(handlers.read, get('ticks', { v, since: String(page1.body.cursor) }), { storage });
+        assert.deepEqual(page2.body.items.map(({ id }) => id), Array.from({ length: 2 }, (_, i) => `s${ticks.pageSize + i}`));
+        assert.equal(page2.body.more, false);
+        assert.equal(page2.body.cursor, count);
+    });
+
+    it('a stored edit as new or newer stays and comes back in conflicts; a future time is clamped', async () => {
+        const { storage, handlers } = setup();
+        await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 100), tick('b', NOW * 3)] }), { storage });
+        const res = await route(handlers.write, put('ticks', {
+            version: 1, items: [tick('a', 100, 'ignored'), tick('b', NOW + 5, 'ignored'), tick('c', 1)],
+        }), { storage });
+        assert.deepEqual(res.body, { base: 2, cursor: 3, conflicts: [tick('a', 100), tick('b', NOW)], refused: [] });
+    });
+
+    it('refuses an item per reason and stores the rest', async () => {
+        const { storage, handlers } = setup();
+        const small = { ...COLLECTIONS, ticks: { ...ticks, maxItems: 1 } };
+        const res = await route(handlers.write, put('ticks', { version: 1, items: [
+            tick('bad', 1, 'maybe'), tick('ok', 1), tick('over', 1), { id: 'big', updatedAt: 1, value: 'x'.repeat(100) },
+        ] }), { storage, collections: small });
+        assert.deepEqual(res.body.refused, [
+            { id: 'bad', reason: 'invalid' }, { id: 'over', reason: 'full' }, { id: 'big', reason: 'too_large' },
+        ]);
+        const prefs = await route(handlers.write, put('preferences', { version: preferences.version, items: [
+            { id: 'theme', updatedAt: 1, deleted: true }, { id: 'lang', updatedAt: 1, value: 'fr' },
+        ] }), { storage });
+        assert.deepEqual(prefs.body.refused, [{ id: 'theme', reason: 'no_delete' }]);
+        const listed = await route(handlers.read, get('preferences', { v: String(preferences.version) }), { storage });
+        assert.deepEqual(listed.body.items, [{ id: 'lang', updatedAt: 1, deleted: false, value: 'fr' }]);
+    });
+
+    it('PUT with a bad shape or another version → 400, nothing written', async () => {
+        const { db, storage, handlers } = setup();
+        const many = Array.from({ length: 501 }, (_, i) => tick(`s-${i}`, 1));
+        for (const body of [
+            undefined, [], 'x', {}, { version: 1 }, { version: 1, items: {} },
+            { version: 2, items: [] }, { version: 0, items: [] }, { version: '1', items: [] },
+            { version: 1, items: many },
+            { version: 1, items: [null] },
+            { version: 1, items: [{ updatedAt: 1, value: 'checked' }] },
+            { version: 1, items: [tick('Not A Slug', 1)] },
+            { version: 1, items: [tick('a', 0)] },
+            { version: 1, items: [tick('a', -5)] },
+            { version: 1, items: [tick('a', 1.5)] },
+            { version: 1, items: [tick('a', '5')] },
+            { version: 1, items: [{ ...tick('a', 5), deleted: 'yes' }] },
+            { version: 1, items: [tick('a', 1), tick('a', 2)] },
+        ]) {
+            const res = await route(handlers.write, put('ticks', body), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(body)?.slice(0, 80));
+            assert.equal(typeof res.body.error, 'string');
+        }
+        assert.equal(db.calls.length, 0);
+        const prefs = await route(handlers.write, put('preferences', { version: 1, items: [{ id: 'theme', updatedAt: 1, value: 'dark' }] }), { storage });
+        assert.equal(prefs.statusCode, 400);
+        const unknownKey = await route(handlers.write, put('preferences', { version: preferences.version, items: [{ id: 'nope', updatedAt: 1, value: 1 }] }), { storage });
+        assert.equal(unknownKey.statusCode, 400);
+        assert.equal(db.syncedItems.size, 0);
+    });
+
+    it('a write to version N+1 never touches version N rows; GET serves each version its own rows', async () => {
+        const { db, storage, handlers } = setup();
+        await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 1), tick('b', 1)] }), { storage });
+        const next = { ...COLLECTIONS, ticks: { ...ticks, version: 2 } };
+        const stale = await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 5, 'ignored')] }), { storage, collections: next });
+        assert.equal(stale.statusCode, 400);
+        const res = await route(handlers.write, put('ticks', { version: 2, items: [tick('a', 5, 'ignored')] }), { storage, collections: next });
+        assert.deepEqual(res.body, { base: 0, cursor: 3, conflicts: [], refused: [] });
+        const v1 = await route(handlers.read, get('ticks', { v: '1' }), { storage, collections: next });
+        assert.deepEqual(v1.body.items, [tick('a', 1), tick('b', 1)]);
+        const v2 = await route(handlers.read, get('ticks', { v: '2' }), { storage, collections: next });
+        assert.deepEqual(v2.body.items, [tick('a', 5, 'ignored')]);
+        assert.deepEqual([...db.syncedItems.values()].filter((row) => row.schema_version === 1).map((row) => row.data), ['checked', 'checked']);
+    });
+
+    it('a user never sees another user\'s items', async () => {
+        const { storage, handlers } = setup();
+        await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 1)] }), { verify: as('alice'), storage });
+        const bob = await route(handlers.read, get('ticks', { v }), { verify: as('bob'), storage });
+        assert.deepEqual(bob.body, { cursor: 0, more: false, items: [] });
+        const bobPut = await route(handlers.write, put('ticks', { version: 1, items: [tick('a', 2, 'ignored')] }), { verify: as('bob'), storage });
+        assert.deepEqual(bobPut.body, { base: 0, cursor: 2, conflicts: [], refused: [] });
+        const alice = await route(handlers.read, get('ticks', { v }), { verify: as('alice'), storage });
+        assert.deepEqual(alice.body.items, [tick('a', 1)]);
+    });
+
+    it('a storage failure answers 500 without its details', async () => {
+        const storage = fakeStorage({ query: async () => { throw new Error('relation "x" does not exist'); } });
+        const handlers = createSyncHandlers(storage);
+        const readRes = await route(handlers.read, get('ticks', { v }), { storage });
+        assert.equal(readRes.statusCode, 500);
+        assert.deepEqual(readRes.body, { error: 'Sync unavailable' });
+        const putRes = await route(handlers.write, put('ticks', { version: 1, items: [] }), { storage });
+        assert.equal(putRes.statusCode, 500);
+        assert.deepEqual(putRes.body, { error: 'Sync not saved' });
+    });
+});
+
+// -- sync settings handlers -----------------------------------------------
+
+describe('sync settings handlers', () => {
+    // The route's chain: requireUser(), requireUserStorage(), then the handler.
+    const route = async (handler, req, { verify = async () => ({ id: USER_ID }), storage }) => {
+        const res = createResponse();
+        for (const step of [requireUser(verify), requireUserStorage(storage), handler]) {
+            let advanced = false;
+            await step(req, res, () => { advanced = true; });
+            if (step !== handler && !advanced) break;
+        }
+        return res;
+    };
+    const setup = () => {
+        const db = fakeUserDb();
+        const storage = fakeStorage(db);
+        return { db, storage, handlers: createSyncSettingsHandlers(storage) };
+    };
+    const put = (body) => createRequest({ method: 'PUT', body });
+    const itemsOf = (db, user) => [...db.syncedItems.values()].filter((row) => row.user_id === user).map((row) => row.collection).sort();
+    const putRow = (db, user, collection, version, item) => db.syncedItems.set([user, collection, version, item].join('\u0000'), {
+        user_id: user, collection, schema_version: version, item_id: item, updated_at: 1, deleted: false, data: 'v', seq: db.syncedItems.size + 1,
+    });
+
+    it('rejects the wrong method with 405', async () => {
+        const { handlers } = setup();
+        const res = signedIn(createResponse());
+        await handlers.read(createRequest({ method: 'POST' }), res);
+        assert.equal(res.statusCode, 405);
+        const res2 = signedIn(createResponse());
+        await handlers.write(createRequest({ method: 'GET' }), res2);
+        assert.equal(res2.statusCode, 405);
+    });
+
+    it('signed out → 403 auth; storage off or not ready → 503; storage untouched either way', async () => {
+        const { db, storage, handlers } = setup();
+        const signedOut = async () => ({ reason: AUTH_REASON.SIGN_IN_REQUIRED });
+        for (const [handler, req] of [[handlers.read, createRequest()], [handlers.write, put({ collections: [] })]]) {
+            const res = await route(handler, req, { verify: signedOut, storage });
+            assert.equal(res.statusCode, 403);
+            assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+            for (const options of [{ configured: false }, { ready: false }]) {
+                assert.equal((await route(handler, req, { storage: fakeStorage(db, options) })).statusCode, 503);
+            }
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('GET for a user without a row → every registry collection, and a users row', async () => {
+        const { db, storage, handlers } = setup();
+        const res = await route(handlers.read, createRequest(), { storage });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { collections: [...SYNC_COLLECTION_IDS] });
+        assert.ok(db.users.has(USER_ID));
+    });
+
+    it('PUT with anything but an array of distinct registry ids → 400, nothing written', async () => {
+        const { db, storage, handlers } = setup();
+        for (const body of [
+            undefined, null, [], 'x', {}, { collections: 'preferences' }, { collections: {} }, { collections: null },
+            { collections: ['nope'] }, { collections: ['snapshots'] }, { collections: ['ipHistory'] },
+            { collections: ['preferences', 'preferences'] }, { collections: [1] }, { collections: [null] },
+            { collections: ['constructor'] }, { collections: ['__proto__'] },
+        ]) {
+            const res = await route(handlers.write, put(body), { storage });
+            assert.equal(res.statusCode, 400, JSON.stringify(body));
+            assert.equal(typeof res.body.error, 'string');
+        }
+        assert.equal(db.calls.length, 0);
+    });
+
+    it('PUT stores nothing, then both, in registry order; GET reads it back', async () => {
+        const { db, storage, handlers } = setup();
+        const none = await route(handlers.write, put({ collections: [] }), { storage });
+        assert.equal(none.statusCode, 200);
+        assert.deepEqual(none.body, { collections: [] });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { collections: [] });
+        const both = await route(handlers.write, put({ collections: ['connectivity', 'preferences'] }), { storage });
+        assert.deepEqual(both.body, { collections: ['preferences', 'connectivity'] });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, both.body);
+        assert.ok(db.users.has(USER_ID));
+    });
+
+    it('turning a collection off deletes exactly its rows, in every version; other users keep theirs', async () => {
+        const { db, storage, handlers } = setup();
+        await route(handlers.write, put({ collections: ['preferences', 'connectivity'] }), { storage });
+        for (const user of [USER_ID, 'other']) {
+            putRow(db, user, 'preferences', 7, 'theme');
+            putRow(db, user, 'preferences', 6, 'lang');
+            putRow(db, user, 'connectivity', 1, 'lists');
+        }
+        await route(handlers.write, put({ collections: ['connectivity'] }), { storage });
+        assert.deepEqual(itemsOf(db, USER_ID), ['connectivity']);
+        await route(handlers.write, put({ collections: [] }), { storage });
+        assert.deepEqual(itemsOf(db, USER_ID), []);
+        assert.deepEqual(itemsOf(db, 'other'), ['connectivity', 'preferences', 'preferences']);
+    });
+
+    it('GET leaves out stored ids the registry no longer has', async () => {
+        const { db, storage, handlers } = setup();
+        db.syncSettings.set(USER_ID, { collections: ['snapshots', 'preferences', 'ipHistory'], updated_at: new Date() });
+        assert.deepEqual((await route(handlers.read, createRequest(), { storage })).body, { collections: ['preferences'] });
+    });
+
+    it('a storage failure answers 500 without its details', async () => {
+        const storage = fakeStorage({ query: async () => { throw new Error('relation "x" does not exist'); } });
+        const handlers = createSyncSettingsHandlers(storage);
+        const readRes = await route(handlers.read, createRequest(), { storage });
+        assert.equal(readRes.statusCode, 500);
+        assert.deepEqual(readRes.body, { error: 'Sync settings unavailable' });
+        const putRes = await route(handlers.write, put({ collections: [] }), { storage });
+        assert.equal(putRes.statusCode, 500);
+        assert.deepEqual(putRes.body, { error: 'Sync settings not saved' });
+    });
+});
+
+// -- usage handler --------------------------------------------------------
+
+describe('usage handler', () => {
     it('reports missing API key before fetch', async () => {
         delete process.env.IPCHECKING_API_KEY;
         const res = createResponse();
-        await getUserInfoHandler(createRequest(), res);
+        await usageHandler(createRequest(), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    it('reports missing API key when only the endpoint is unset', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        globalThis.fetch = async () => assert.fail('no upstream call');
+        const res = createResponse();
+        await usageHandler(createRequest(), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    // Fields beyond { userLevel, quota } (an older upstream's) are not relayed.
+    const upstreamSummary = {
+        userLevel: 'Standard',
+        quota: { month: '2026-11', isSponsor: false, features: {} },
+        functionUses: { total: 9 },
+        achievements: { IAmHuman: { achieved: true, achievedTime: 1 } },
+    };
+
+    it('asks /usage with the system key and the listed caller headers, relaying { userLevel, quota }', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        let called;
+        globalThis.fetch = async (url, init) => {
+            called = { url: new URL(String(url)), init };
+            return new Response(JSON.stringify(upstreamSummary), { status: 200 });
+        };
+        const res = signedIn(createResponse());
+        await usageHandler(withVisitorHeaders(createRequest()), res);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { userLevel: 'Standard', quota: upstreamSummary.quota });
+        assert.equal(called.url.pathname, '/usage');
+        assert.equal(called.url.searchParams.get('key'), 'test-key');
+        assertForwardedHeaders(called.init.headers, END_USER);
     });
 });
 
@@ -952,6 +1633,45 @@ describe('dns-leak-test getSessionResult', () => {
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
 
+    it('forwards the listed caller headers and passes the upstream status through', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        let called;
+        globalThis.fetch = async (url, init) => {
+            called = { url: new URL(String(url)), init };
+            return new Response(JSON.stringify(UPSTREAM_SIGN_IN_REQUIRED), { status: 403 });
+        };
+        const res = signedIn(createResponse());
+        const req = withVisitorHeaders({ method: 'GET', headers: { referer: 'http://localhost/' }, query: {}, params: { token: 'a'.repeat(32) } });
+        await dnsLeakGetResult(req, res);
+        assert.equal(res.statusCode, 403);
+        assert.deepEqual(res.body, CODED_SIGN_IN_REQUIRED);
+        assert.equal(called.url.pathname, `/dnsleaktest/session/${'a'.repeat(32)}`);
+        assertForwardedHeaders(called.init.headers, END_USER);
+    });
+
+    it('answers invalid-token and quota rejections with their status and code', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        for (const [status, upstream, coded] of [
+            [403, UPSTREAM_INVALID_TOKEN, CODED_INVALID_TOKEN],
+            [429, UPSTREAM_QUOTA, CODED_QUOTA],
+        ]) {
+            globalThis.fetch = upstreamAnswer(status, upstream);
+            const res = createResponse();
+                await dnsLeakGetResult({ method: 'GET', headers: {}, query: {}, params: { token: 'a'.repeat(32) } }, res);
+            assert.equal(res.statusCode, status);
+            assert.deepEqual(res.body, coded);
+        }
+    });
+
+    it('answers a malformed session token with 400 and no auth code', async () => {
+        const res = createResponse();
+        await dnsLeakGetResult({ method: 'GET', headers: {}, query: {}, params: { token: 'abc' } }, res);
+        assert.equal(res.statusCode, 400);
+        assert.equal('code' in res.body, false);
+    });
+
     // ?lang is a pass-through: the upstream owns tag resolution, so the handler
     // neither validates nor substitutes a default.
     describe('lang forwarding', () => {
@@ -963,10 +1683,8 @@ describe('dns-leak-test getSessionResult', () => {
                 requested = new URL(String(url));
                 return { status: 200, ok: true, json: async () => ({}) };
             };
-            // The success path sets a Cache-Control header on the way out.
             const res = createResponse();
-            res.set = () => res;
-            await dnsLeakGetResult({
+                await dnsLeakGetResult({
                 method: 'GET', headers: {}, query,
                 params: { token: 'a'.repeat(32) },
             }, res);
@@ -1006,13 +1724,103 @@ describe('ipcheck-ing handler', () => {
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
+
+    const geo = { ip: '1.1.1.1', country: 'AU', latitude: -33.86, longitude: 151.2, asn: 'AS13335', org: 'Cloudflare' };
+    const callWith = async (upstream) => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.test';
+        globalThis.fetch = upstream;
+        const res = createResponse();
+        await ipcheckIngHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        return res;
+    };
+    const answering = (body) => async () => new Response(JSON.stringify(body), { status: 200 });
+    const silenced = async (run) => {
+        const originalError = logger.error;
+        logger.error = () => {};
+        try { return await run(); } finally { logger.error = originalError; }
+    };
+
+    it('answers the geo fields and the extended block, without the advanced data', async () => {
+        const advancedData = { score: 88, operatorType: 'Business', tags: { isNative: true } };
+        const res = await callWith(answering({ ...geo, advancedData }));
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, {
+            ...geo,
+            extended: {
+                anonymity: { code: 'none' }, lineType: 'business', native: true, score: 88,
+                flags: advancedData.tags,
+            },
+        });
+    });
+
+    it('answers a gated block without the advanced data', async () => {
+        const gated = 'sign_in_required';
+        const advancedData = { score: gated, operatorType: gated, anonymityProvider: gated, anonymityProtocol: gated, tags: gated };
+        const res = await callWith(answering({ ...geo, advancedData }));
+        assert.deepEqual(res.body, { ...geo, extended: { gate: 'auth' } });
+    });
+
+    it('drops advanced data with no usable block', async () => {
+        const res = await callWith(answering({ ...geo, advancedData: { score: 88 } }));
+        assert.deepEqual(res.body, geo);
+    });
+
+    it('answers the geo fields alone when there is no advanced data', async () => {
+        const res = await callWith(answering(geo));
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, geo);
+    });
+
+    it('answers 500 when the upstream fails or is unreachable', async () => {
+        const failing = await silenced(() => callWith(async () => new Response('busy', { status: 503 })));
+        assert.equal(failing.statusCode, 500);
+        assert.deepEqual(failing.body, { error: 'API responded with status: 503' });
+        const limited = await silenced(() => callWith(upstreamAnswer(429, UPSTREAM_QUOTA)));
+        assert.equal(limited.statusCode, 500);
+        assert.equal('code' in limited.body, false);
+        const down = await silenced(() => callWith(async () => { throw new Error('network down'); }));
+        assert.equal(down.statusCode, 500);
+        assert.match(down.body.error, /network down/);
+    });
+
+    it('reports missing API key when only the endpoint is unset', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        globalThis.fetch = async () => assert.fail('no upstream call');
+        const res = createResponse();
+        await ipcheckIngHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    it('encodes lang and sends the listed caller headers', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.test';
+        let called;
+        globalThis.fetch = async (url, init) => {
+            called = { url: new URL(String(url)), init };
+            return new Response(JSON.stringify(geo), { status: 200 });
+        };
+        const res = signedIn(createResponse());
+        await ipcheckIngHandler(withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1', lang: 'en&ip=10.0.0.1' } })), res);
+        assert.equal(res.statusCode, 200);
+        assert.equal(called.url.pathname, '/ipinfo');
+        assert.equal(called.url.searchParams.get('key'), 'test-key');
+        assert.deepEqual(called.url.searchParams.getAll('ip'), ['1.1.1.1']);
+        assert.equal(called.url.searchParams.get('lang'), 'en&ip=10.0.0.1');
+        assertForwardedHeaders(called.init.headers, END_USER);
+
+        await ipcheckIngHandler(withVisitorHeaders(createRequest({ query: { ip: '1.1.1.1' } })), createResponse());
+        assertForwardedHeaders(called.init.headers);
+    });
 });
 
 // -- asn-profile handler ---------------------------------------------------
 // Composition and deadlines are covered in tests/asn-profile-aggregate.test.js;
 // here: unconfigured sources read as disabled, failing upstreams as error,
-// a partial Radar answer, the local PeeringDB section, and the private-API
-// pass-through for the reputation section.
+// a partial Radar answer, the local PeeringDB section, and the reputation
+// request to the IPCheck.ing API, which carries no visitor header.
 
 describe('asn-profile handler', () => {
     it('answers 200 with per-section statuses when only some sources work', async () => {
@@ -1093,7 +1901,7 @@ describe('asn-profile handler', () => {
         }
     });
 
-    it('forwards the caller headers to the private API for reputation', async () => {
+    it('asks the IPCheck.ing API for reputation without any visitor header', async () => {
         delete process.env.CLOUDFLARE_API_KEY;
         delete process.env.CLOUDFLARE_API;
         process.env.IPCHECKING_API_KEY = 'test-key';
@@ -1111,8 +1919,7 @@ describe('asn-profile handler', () => {
             }
             throw new Error('network down');
         };
-        const req = createRequest({ query: { asn: '64511' } });
-        req.headers['accept-language'] = 'de-DE';
+        const req = withVisitorHeaders(createRequest({ query: { asn: '64511' } }));
         const res = createResponse();
         await asnProfileHandler(req, res);
 
@@ -1121,88 +1928,64 @@ describe('asn-profile handler', () => {
         assert.deepEqual(res.body.reputation, payload);
         assert.equal(requested.url.searchParams.get('asn'), '64511');
         assert.equal(requested.url.searchParams.get('key'), 'test-key');
-        assert.equal(requested.options.headers['accept-language'], 'de-DE');
+        assert.deepEqual(requested.options.headers, {});
     });
 });
 
-// -- ipinfo-io normalizer -------------------------------------------------
-// Pure transform, no fetch involved.
+// -- keyed geo source handlers --------------------------------------------
+// fetch is stubbed: the request is captured, the upstream never reached.
 
-describe('ipinfo-io normalize', () => {
-    const CANONICAL_KEYS = [
-        'ip', 'city', 'region', 'country', 'country_name', 'country_code',
-        'latitude', 'longitude', 'asn', 'org',
-    ];
+describe('iplocate and bigdatacloud handlers', () => {
+    const captureFetch = (body) => {
+        const calls = [];
+        globalThis.fetch = async (url) => {
+            calls.push(new URL(String(url)));
+            return new Response(JSON.stringify(body), { status: 200 });
+        };
+        return calls;
+    };
 
-    it('maps a fully populated upstream payload', () => {
-        const out = modifyJsonForIpinfo({
-            ip: '8.8.8.8',
-            city: 'Mountain View',
-            region: 'California',
-            country: 'US',
-            loc: '37.4056,-122.0775',
-            org: 'AS15169 Google LLC',
-        });
-        assert.equal(out.country_name, 'United States');
-        assert.equal(out.country_code, 'US');
-        assert.equal(out.latitude, 37.4056);
-        assert.equal(out.longitude, -122.0775);
-        assert.equal(out.asn, 'AS15169');
-        assert.equal(out.org, 'Google LLC');
-    });
-
-    it('degrades coordinates to null when the upstream omits loc', () => {
-        // Anycast ranges answer 200 without loc.
-        const out = modifyJsonForIpinfo({
-            ip: '104.28.212.153', city: 'Los Angeles', country: 'US', org: 'AS13335 Cloudflare, Inc.',
-        });
-        assert.equal(out.latitude, null);
-        assert.equal(out.longitude, null);
-        assert.equal(out.asn, 'AS13335');
-    });
-
-    it('degrades a partial or non-numeric loc to null', () => {
-        assert.equal(modifyJsonForIpinfo({ loc: '37.4056' }).longitude, null);
-        assert.equal(modifyJsonForIpinfo({ loc: '' }).latitude, null);
-        assert.equal(modifyJsonForIpinfo({ loc: 'unknown,unknown' }).latitude, null);
-        assert.equal(modifyJsonForIpinfo({ loc: ',-122.0775' }).latitude, null);
-        // 0 is a real coordinate, not a blank one.
-        assert.equal(modifyJsonForIpinfo({ loc: '0,0' }).latitude, 0);
-    });
-
-    it('empties asn / org when the upstream omits org', () => {
-        const out = modifyJsonForIpinfo({ ip: '8.8.8.8', country: 'US', loc: '37.4,-122.0' });
-        assert.equal(out.asn, '');
-        assert.equal(out.org, '');
-    });
-
-    it('uses ICU country names and accepts lowercase upstream codes', () => {
-        assert.equal(modifyJsonForIpinfo({ country: 'TR' }).country_name, 'Türkiye');
-        assert.equal(modifyJsonForIpinfo({ country: 'us' }).country_name, 'United States');
-    });
-
-    it('falls back to Unknown Country for absent, unknown or malformed codes', () => {
-        for (const country of [undefined, null, '', 'XX', 'ZZ', 'T1', 'USA', 123, {}]) {
-            assert.equal(modifyJsonForIpinfo({ country }).country_name, 'Unknown Country');
+    it('throws before any fetch when the key is missing', async () => {
+        delete process.env.IPLOCATE_IO_API_KEY;
+        delete process.env.BIGDATACLOUD_API_KEY;
+        const calls = captureFetch({});
+        for (const handler of [iplocateHandler, bigdatacloudHandler]) {
+            await assert.rejects(handler(createRequest({ query: { ip: '203.0.113.7' } }), createResponse()));
         }
+        assert.equal(calls.length, 0);
     });
 
-    it('survives a bogon payload and still emits the canonical shape', () => {
-        // ipinfo.io answers {"ip":…,"bogon":true} — no loc, org or country.
-        const out = modifyJsonForIpinfo({ ip: '192.0.2.1', bogon: true });
-        assert.equal(out.ip, '192.0.2.1');
-        for (const key of CANONICAL_KEYS) {
-            assert.ok(key in out, `${key} must stay present in the response`);
-        }
+    it('iplocate picks one of the comma-separated keys and normalizes the answer', async () => {
+        process.env.IPLOCATE_IO_API_KEY = 'key-a,key-b';
+        const calls = captureFetch({ ip: '203.0.113.7', country_code: 'XE', asn: { asn: 'AS64500', name: 'Example Net' } });
+        const res = createResponse();
+        await iplocateHandler(createRequest({ query: { ip: '203.0.113.7' } }), res);
+        assert.equal(calls[0].origin + calls[0].pathname, 'https://iplocate.io/api/lookup/203.0.113.7');
+        assert.ok(['key-a', 'key-b'].includes(calls[0].searchParams.get('apikey')));
+        assert.equal(res.body.asn, 'AS64500');
+        assert.equal(res.body.country_code, 'XE');
     });
 
-    it('survives an empty or null upstream body', () => {
-        for (const payload of [{}, null, undefined]) {
-            const out = modifyJsonForIpinfo(payload);
-            for (const key of CANONICAL_KEYS) {
-                assert.ok(key in out, `${key} must stay present in the response`);
-            }
-        }
+    it('bigdatacloud forwards the raw lang, encoded, defaulting to en', async () => {
+        process.env.BIGDATACLOUD_API_KEY = 'key-a';
+        const calls = captureFetch({ ip: '203.0.113.7', country: { isoAlpha2: 'XE' } });
+        const res = createResponse();
+        await bigdatacloudHandler(createRequest({ query: { ip: '203.0.113.7', lang: 'zh-TW&x=1' } }), res);
+        await bigdatacloudHandler(createRequest({ query: { ip: '203.0.113.7' } }), createResponse());
+        assert.equal(calls[0].origin + calls[0].pathname, 'https://api-bdc.net/data/ip-geolocation-full');
+        assert.equal(calls[0].searchParams.get('localityLanguage'), 'zh-TW&x=1');
+        assert.equal(calls[0].searchParams.get('x'), null);
+        assert.equal(calls[0].searchParams.get('key'), 'key-a');
+        assert.equal(calls[1].searchParams.get('localityLanguage'), 'en');
+        assert.equal(res.body.country_code, 'XE');
+    });
+
+    it('answers 500 when the upstream fails', async () => {
+        process.env.BIGDATACLOUD_API_KEY = 'key-a';
+        globalThis.fetch = async () => new Response('<html>', { status: 502 });
+        const res = createResponse();
+        await bigdatacloudHandler(createRequest({ query: { ip: '203.0.113.7' } }), res);
+        assert.equal(res.statusCode, 500);
     });
 });
 
@@ -1223,8 +2006,9 @@ describe('ipapi-is normalize', () => {
         assert.equal(out.city, 'Mountain View');
         assert.equal(out.country_code, 'US');
         assert.equal(out.asn, 'AS15169');
-        assert.equal(out.isHosting, true);
-        assert.equal(out.isProxy, false);
+        assert.equal(out.extended.lineType, 'hosting');
+        assert.equal('isHosting' in out, false);
+        assert.equal('isProxy' in out, false);
     });
 
     it('falls back to N/A when the upstream places no location', () => {
@@ -1235,13 +2019,13 @@ describe('ipapi-is normalize', () => {
             assert.equal(out[key], 'N/A', `${key} should degrade to N/A`);
         }
         assert.equal(out.asn, 'N/A');
-        assert.equal(out.isHosting, false);
-        assert.equal(out.isProxy, false);
+        assert.equal(out.extended, undefined);
     });
 
-    it('flags a proxy when any of the vpn / tor / proxy bits is set', () => {
-        assert.equal(modifyJsonForIPAPI({ location: {}, is_vpn: true }).isProxy, true);
-        assert.equal(modifyJsonForIPAPI({ location: {}, is_tor: true }).isProxy, true);
+    it('sums the vpn / tor bits up as a plain anonymizer yes', () => {
+        const detected = { anonymity: { code: 'detected' } };
+        assert.deepEqual(modifyJsonForIPAPI({ location: {}, is_vpn: true }).extended, detected);
+        assert.deepEqual(modifyJsonForIPAPI({ location: {}, is_tor: true }).extended, detected);
     });
 });
 

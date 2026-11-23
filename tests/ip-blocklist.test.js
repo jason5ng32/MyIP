@@ -8,7 +8,7 @@ import { blocklistVerdict, listedCounts, splitPart, itemTone, reasonMessage } fr
 
 const en = JSON.parse(readFileSync(new URL('../frontend/locales/en.json', import.meta.url), 'utf8'));
 
-// The reason keys and categories /iphitlist can send, as the private API's
+// The reason keys and categories /iphitlist can send, as the IPCheck.ing API's
 // docs list them (docs/ip-monitoring/hitlist.md §1.1-1.2 there).
 const API_REASONS = [
     'socksProxy', 'httpProxy', 'proxyChain', 'webProxy', 'wingateProxy', 'openProxy', 'torExit',

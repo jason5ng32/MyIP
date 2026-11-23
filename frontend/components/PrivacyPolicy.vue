@@ -44,6 +44,9 @@ import { storeToRefs } from 'pinia';
 import { useMainStore } from '@/store';
 import { isAnalyticsEnabled } from '@/utils/analytics';
 import { isDocsConfigured } from '@/composables/use-docs-assistant.js';
+import { isDocsAssistantAvailable } from '@/utils/docs-assistant-gate.js';
+import { isToolAvailable } from '@/utils/tool-availability.js';
+import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import { datasetLoaders, loadLocaleDataset } from '@/utils/locale-datasets.js';
 import Footer from '@/components/Footer.vue';
@@ -55,7 +58,7 @@ const store = useMainStore();
 const { isFireBaseSet } = storeToRefs(store);
 
 // Bump when the policy text changes materially.
-const LAST_UPDATED = '2026-08-20';
+const LAST_UPDATED = '2026-11-20';
 
 // Sentry telemetry is a build-time decision (see frontend/AGENTS.md): the
 // section only renders on deployments actually built with a DSN.
@@ -65,15 +68,20 @@ const isSentryEnabled = !!(import.meta.env ?? {}).VITE_SENTRY_DSN_FRONTEND;
 // the section only renders on deployments where links can actually be made.
 const isReportSharingEnabled = computed(() => store.configs?.reportSharing === true);
 
-// The docs assistant carries its own gate (build-time VITE_DOCS_URL plus the
-// canonical deployment) — same condition as its nav entry point, so the
-// section never describes a feature this deployment doesn't ship.
-const isDocsAssistantEnabled = computed(() => isDocsConfigured && store.configs?.originalSite === true);
+// The docs assistant section uses its nav entry point's gate (docs site +
+// sign-in), so it never describes a feature this deployment doesn't ship.
+const isDocsAssistantEnabled = computed(() => isDocsAssistantAvailable(isDocsConfigured, store.capabilities));
 
 // Persona Check is the one tool whose measurements leave the browser, so it
-// gets its own section — gated exactly like the tool itself (originalSite in
-// data/tools.js), which keeps the section off deployments without it.
-const isPersonaCheckEnabled = computed(() => store.configs?.originalSite === true);
+// gets its own section — gated exactly like the tool's listing, which keeps
+// the section off deployments without it.
+const isPersonaCheckEnabled = computed(() => isToolAvailable(TOOL_BY_SLUG.get('personacheck'), store.capabilities));
+
+// What an account stores: offered with sign-in and user storage.
+const isUserStorageEnabled = computed(() => store.capabilities.accounts && store.capabilities.userStorage);
+
+// Features served by the IPCheck.ing API: offered with sign-in and that API.
+const isIpCheckingApiEnabled = computed(() => store.usageAvailable);
 
 // Privacy copy is loaded on demand per locale (same loader as the security
 // checklist dataset), then merged into i18n so t() / tm() can resolve it.
@@ -112,6 +120,7 @@ const order = computed(() => {
   if (isDocsAssistantEnabled.value) ids.push('docsAssistant');
   if (isAnalyticsEnabled) ids.push('analytics');
   if (isFireBaseSet.value) ids.push('account');
+  if (isUserStorageEnabled.value) ids.push('accountStorage');
   if (isSentryEnabled) ids.push('telemetry');
   if (isAnalyticsEnabled || isFireBaseSet.value || isSentryEnabled) ids.push('why');
   ids.push('cookies');
@@ -119,9 +128,11 @@ const order = computed(() => {
   return ids;
 });
 
-// Resolve a section's paragraphs to display strings. Two sections are assembled
+// Resolve a section's paragraphs to display strings. Three sections are assembled
 // per-flag rather than from a fixed array: "why" carries a reason per collection
-// type, and "cookies" mentions the GA cookie only when analytics is on.
+// type, "cookies" mentions the GA cookie only when analytics is on and
+// account sync only with user storage, and "account" mentions the IPCheck.ing
+// API only where it serves features.
 const paragraphs = (id) => {
   if (id === 'why') {
     const out = [];
@@ -130,10 +141,16 @@ const paragraphs = (id) => {
     if (isSentryEnabled) out.push(t('privacy.sections.why.telemetry'));
     return out;
   }
+  if (id === 'account') {
+    const out = [t('privacy.sections.account.intro'), t('privacy.sections.account.email')];
+    if (isIpCheckingApiEnabled.value) out.push(t('privacy.sections.account.ipChecking'));
+    return out;
+  }
   if (id === 'cookies') {
     const out = [];
     if (isAnalyticsEnabled) out.push(t('privacy.sections.cookies.analytics'));
     out.push(t('privacy.sections.cookies.local'));
+    if (isUserStorageEnabled.value) out.push(t('privacy.sections.cookies.localSync'));
     return out;
   }
   const arr = tm(`privacy.sections.${id}.paragraphs`);
