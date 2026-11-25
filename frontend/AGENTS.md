@@ -357,7 +357,12 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   `<PageBreadcrumb :items />` above the `<h1>` (← Home / … / current page):
   real links, Home via `resolveBackTarget()`, section crumbs via the Nav's
   helper, a bare last crumb `aria-current="page"`. A tool page ends on the
-  Advanced Tools crumb: its `<h1>` already names the tool.
+  Advanced Tools crumb: its `<h1>` already names the tool. That `<h1>`
+  (`data-page-heading`, `tabindex="-1"`) takes focus after a navigation
+  (`utils/page-focus.js`), never on a history step or a query-only change.
+  A tool marks its primary control `data-page-focus` (on the control, or a
+  component root around it); the first Tab from the heading goes to the
+  first one shown and enabled, so each layout may mark its own copy.
 - **Page transitions** — View Transitions hooked in the router's
   `beforeResolve` (`utils/page-transition.js`: Home → page slides forward,
   → Home back, page → page fades; keyframes in `style/style.css`); none on a

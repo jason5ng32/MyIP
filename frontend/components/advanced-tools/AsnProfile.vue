@@ -20,7 +20,7 @@
         <div class="space-y-2">
             <Label for="asnProfileQuery">{{ t('asnprofile.InputLabel') }}</Label>
             <div class="flex items-center gap-2">
-                <Input type="text" id="asnProfileQuery" name="asnProfileQuery" class="font-mono"
+                <Input type="text" id="asnProfileQuery" name="asnProfileQuery" data-page-focus class="font-mono"
                     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore
                     data-lpignore="true" :placeholder="t('asnprofile.Placeholder')" v-model="query"
                     :disabled="loading" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />

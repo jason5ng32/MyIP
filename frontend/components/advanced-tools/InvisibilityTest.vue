@@ -15,7 +15,7 @@
                     :class="{ 'opacity-50 cursor-not-allowed': !store.user }">
                     <input type="checkbox" id="collectingDatas" name="collectingDatas"
                         class="size-4 cursor-pointer accent-action" aria-label="Checkbox for Collecting datas"
-                        v-model="isAgreed" :disabled="!store.user" />
+                        v-model="isAgreed" :disabled="!store.user" data-page-focus />
                     <span>{{ t('invisibilitytest.agreement') }}</span>
                 </label>
                 <Button variant="action" class="rounded-l-none cursor-pointer"

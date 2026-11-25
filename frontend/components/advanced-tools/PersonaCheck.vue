@@ -49,7 +49,9 @@
                                     <Globe class="size-4 text-muted-foreground" />
                                     {{ t('personacheck.step.country') }}
                                 </p>
-                                <CountryPicker v-model="country" :disabled="!signedIn"
+                                <!-- data-page-focus lands on the picker's root;
+                                     the Tab redirect focuses its trigger. -->
+                                <CountryPicker v-model="country" :disabled="!signedIn" data-page-focus
                                     :placeholder="t('personacheck.selectCountry')" />
                                 <!-- Only rendered for the rare territory with
                                      no profile (BV, HM) — a reserved slot here

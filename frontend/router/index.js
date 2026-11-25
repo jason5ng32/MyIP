@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/components/Home.vue';
 import { resolveLegacyToolLink } from '@/utils/legacy-tool-link.js';
 import { installPageTransitions } from '@/utils/page-transition.js';
+import { installPageFocus } from '@/utils/page-focus.js';
 import { installAnimationRevival } from '@/utils/revive-animations.js';
 
 // Pages:
@@ -44,6 +45,7 @@ router.beforeEach((to) => resolveLegacyToolLink(to) ?? undefined);
 // Hooked here, not in a component, so they exist before the first navigation
 // and outlive any page.
 installPageTransitions(router);
+installPageFocus(router);
 installAnimationRevival(router);
 
 export default router;

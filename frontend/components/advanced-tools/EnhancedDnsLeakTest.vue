@@ -9,7 +9,7 @@
         <p class="text-sm text-muted-foreground leading-relaxed">{{ t('enhanceddnsleaktest.Note3') }}</p>
 
         <!-- Run button -->
-        <Button variant="action" :disabled="isBusy || !store.user" @click="runTest" class="cursor-pointer">
+        <Button variant="action" :disabled="isBusy || !store.user" @click="runTest" class="cursor-pointer" data-page-focus>
             <Spinner v-if="isBusy" />
             <template v-else>
                 <Play class="size-4 shrink-0" />

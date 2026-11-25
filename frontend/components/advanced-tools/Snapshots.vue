@@ -31,7 +31,7 @@
         <p class="m-0 font-medium">{{ t('snapshots.EmptyTitle') }}</p>
         <p class="m-0 max-w-md text-sm text-muted-foreground">{{ t('snapshots.EmptyNote') }}</p>
         <div class="mt-2 w-full max-w-xs">
-          <SnapshotSaveButton :running="saving" class="w-full" @save="onSaveNow" />
+          <SnapshotSaveButton :running="saving" class="w-full" @save="onSaveNow" data-page-focus />
         </div>
       </CardContent>
     </Card>
@@ -39,7 +39,7 @@
     <div v-else class="lg:grid lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start lg:gap-6">
       <!-- Left column (≥1024px): the save button (and the smart-mode note) over the snapshot list -->
       <aside class="max-lg:hidden lg:sticky lg:top-20 lg:flex lg:flex-col lg:gap-3">
-        <SnapshotSaveButton :running="saving" class="w-full" @save="onSaveNow" />
+        <SnapshotSaveButton :running="saving" class="w-full" @save="onSaveNow" data-page-focus />
         <p v-if="skippedThisSession" class="m-0 text-xs leading-relaxed text-muted-foreground">
           {{ t('snapshots.SmartSkipped') }}</p>
         <SnapshotList :snapshots="snapshots" :selected-id="selected?.id ?? null" :current-id="currentId"
@@ -59,7 +59,7 @@
               <List />
               {{ t('snapshots.AllSnapshots') }}
             </Button>
-            <SnapshotSaveButton :running="saving" class="flex-1" @save="onSaveNow" />
+            <SnapshotSaveButton :running="saving" class="flex-1" @save="onSaveNow" data-page-focus />
           </div>
           <p v-if="skippedThisSession" class="m-0 text-xs leading-relaxed text-muted-foreground">
             {{ t('snapshots.SmartSkipped') }}</p>

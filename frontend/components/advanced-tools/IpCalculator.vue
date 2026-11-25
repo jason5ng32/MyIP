@@ -16,6 +16,7 @@
             <Label for="ipCalcQuery">{{ t('ipcalculator.Note2') }}</Label>
             <div class="flex items-center gap-2">
                 <Input type="text" id="ipCalcQuery" name="ipCalcQuery" data-1p-ignore data-lpignore="true"
+                    data-page-focus
                     class="font-mono" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                     :placeholder="t('ipcalculator.Placeholder')" v-model="query" @keyup.enter="onSubmit"
                     :aria-invalid="errorMsg !== ''" />

@@ -10,7 +10,8 @@
       </div>
 
       <article v-else>
-        <h1 class="mb-1 text-2xl md:text-3xl font-semibold tracking-tight">{{ t('privacy.Title') }}</h1>
+        <h1 tabindex="-1" data-page-heading
+          class="mb-1 text-2xl md:text-3xl font-semibold tracking-tight focus:outline-none">{{ t('privacy.Title') }}</h1>
         <p class="mb-6 text-xs text-muted-foreground">{{ t('privacy.UpdatedLabel') }}: {{ LAST_UPDATED }}</p>
 
         <p class="mb-8 leading-relaxed text-foreground/90">{{ t('privacy.Intro') }}</p>

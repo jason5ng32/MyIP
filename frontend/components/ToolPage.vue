@@ -5,7 +5,8 @@
     <main class="flex-1">
       <div class="mx-auto w-full max-w-[1400px] px-4 md:px-6 py-6">
         <PageBreadcrumb v-if="tool" :items="breadcrumb" />
-        <h1 v-if="tool" class="mb-4 flex items-center gap-2 text-2xl md:text-3xl font-semibold tracking-tight">
+        <h1 v-if="tool" tabindex="-1" data-page-heading
+          class="mb-4 flex items-center gap-2 text-2xl md:text-3xl font-semibold tracking-tight focus:outline-none">
           <span aria-hidden="true">{{ tool.emoji }}</span>
           {{ t(tool.titleKey) }}
         </h1>

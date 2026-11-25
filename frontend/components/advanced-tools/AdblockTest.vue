@@ -63,7 +63,7 @@
                     <div class="col-span-3 min-w-0 flex flex-col">
                         <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b">
                             <span class="text-sm text-muted-foreground">{{ t('adblocktest.Hint') }}</span>
-                            <Button variant="action" :disabled="!canRun" class="cursor-pointer ml-auto" @click="startTest">
+                            <Button variant="action" :disabled="!canRun" class="cursor-pointer ml-auto" @click="startTest" data-page-focus>
                                 <Spinner v-if="isRunning" />
                                 <RotateCw v-else-if="hasFinished" class="size-4 shrink-0" />
                                 <Play v-else class="size-4 shrink-0" />

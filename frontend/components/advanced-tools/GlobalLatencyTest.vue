@@ -23,7 +23,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <Select v-if="!manualMode" v-model="selectedIP" :disabled="pingCheckStatus === 'running'">
-                    <SelectTrigger id="pingIP" aria-label="Select IP to Ping" class="flex-1 min-w-0">
+                    <SelectTrigger id="pingIP" aria-label="Select IP to Ping" data-page-focus class="flex-1 min-w-0">
                         <SelectValue :placeholder="t('pingtest.SelectIP')" class="truncate font-mono" />
                     </SelectTrigger>
                     <SelectContent>
@@ -36,7 +36,7 @@
                         </SelectItem>
                     </SelectContent>
                 </Select>
-                <Input v-else id="pingIPManual" v-model="manualIP" class="flex-1 font-mono"
+                <Input v-else id="pingIPManual" v-model="manualIP" data-page-focus class="flex-1 font-mono"
                     :placeholder="t('pingtest.EnterIPPlaceholder')" :disabled="pingCheckStatus === 'running'"
                     :aria-invalid="targetState === 'invalid' || targetState === 'unreachable'" autocomplete="off"
                     autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"

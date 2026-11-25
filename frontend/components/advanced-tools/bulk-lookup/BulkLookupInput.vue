@@ -9,7 +9,7 @@
             <!-- data-sentry-block: pasted logs are third parties' IPs, and a
                  large paste would swell an error replay past ingest limits -->
             <Textarea id="bulkLookupText" v-model="text" rows="6" :disabled="running" data-sentry-block
-                class="font-mono text-xs md:text-xs min-h-32 max-h-72 overflow-auto"
+                data-page-focus class="font-mono text-xs md:text-xs min-h-32 max-h-72 overflow-auto"
                 :placeholder="t('bulklookup.Placeholder')" autocomplete="off" autocorrect="off"
                 autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" />
 

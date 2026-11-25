@@ -21,7 +21,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <Select v-if="!manualMode" v-model="selectedIP" :disabled="isRunning">
-                    <SelectTrigger id="blocklistIP" aria-label="Select IP to check" class="flex-1 min-w-0">
+                    <SelectTrigger id="blocklistIP" aria-label="Select IP to check" data-page-focus class="flex-1 min-w-0">
                         <SelectValue :placeholder="t('ipblocklist.SelectIP')" class="truncate font-mono" />
                     </SelectTrigger>
                     <SelectContent>
@@ -34,7 +34,7 @@
                         </SelectItem>
                     </SelectContent>
                 </Select>
-                <Input v-else id="blocklistIPManual" v-model="manualIP" class="flex-1 font-mono"
+                <Input v-else id="blocklistIPManual" v-model="manualIP" data-page-focus class="flex-1 font-mono"
                     :placeholder="t('ipblocklist.EnterIPPlaceholder')" :disabled="isRunning"
                     :aria-invalid="inputInvalid" autocomplete="off"
                     autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"

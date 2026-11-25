@@ -29,7 +29,7 @@
                         </SelectContent>
                     </Select>
                     <Input type="text" id="queryURL" name="queryURL" data-1p-ignore data-lpignore="true"
-                        class="font-mono"
+                        data-page-focus class="font-mono"
                         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                         :disabled="dnsCheckStatus === 'running'"
                         :placeholder="t('dnsresolver.Placeholder')" v-model="queryURL" @keyup.enter="onSubmit"
